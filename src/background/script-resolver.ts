@@ -72,7 +72,9 @@ async function resolveScriptCode(script: StoredScript): Promise<ResolvedCode> {
             }
             return { code: cached, source: "cache" };
         }
-    } catch { /* cache miss — proceed to fetch */ }
+    } catch (err) { // allow-swallow: cache miss is the expected hot path; logging every miss would flood the console
+        logBgWarnError(BgLogTag.SCRIPT_RESOLVER, `Cache lookup failed for ${script.filePath} — falling back to fetch`, err);
+    }
 
     const cacheMissMs = (performance.now() - t0).toFixed(1);
     const candidates = buildFilePathCandidates(script);

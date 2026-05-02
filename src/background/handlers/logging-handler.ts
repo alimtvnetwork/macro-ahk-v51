@@ -278,7 +278,11 @@ export async function handleGetLogStats(): Promise<{ logCount: number; errorCoun
     const errorCount = countTable(getErrorsDb(), "Errors");
     // Defensive: Sessions lives in logs.db — catch startup race where schema may not be ready
     let sessionCount = 0;
-    try { sessionCount = countTable(getLogsDb(), "Sessions"); } catch { /* schema not ready */ }
+    try {
+        sessionCount = countTable(getLogsDb(), "Sessions");
+    } catch (err) { // allow-swallow: startup race — Sessions schema may not yet exist; bg-logger forbidden here (recursion)
+        console.warn("[logging-handler] Sessions count unavailable (schema not ready):", err);
+    }
 
     return { logCount, errorCount, sessionCount };
 }
