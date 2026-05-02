@@ -45,7 +45,11 @@ function buildThemePreamble(themeJson: string): string {
 function buildSdkPreamble(script: InjectableScript): string {
     const projectId = getActiveProjectId() ?? "";
     let version = "0.0.0";
-    try { version = chrome.runtime.getManifest().version; } catch { /* preview/test fallback */ }
+    try {
+        version = chrome.runtime.getManifest().version;
+    } catch (err) { // allow-swallow: preview/test contexts lack chrome.runtime; "0.0.0" sentinel is the documented fallback
+        console.warn("[injection-wrapper] chrome.runtime.getManifest unavailable, using version fallback:", err);
+    }
 
     return buildMarcoSdkScript({
         projectId,

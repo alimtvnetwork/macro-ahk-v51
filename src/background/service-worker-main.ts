@@ -36,8 +36,8 @@ import { EXTENSION_VERSION } from "../shared/constants";
 
 try {
     chrome.action.setTitle({ title: `Macro Controller v${EXTENSION_VERSION}` });
-} catch {
-    /* chrome.action may not be available in all contexts */
+} catch (err) { // allow-swallow: chrome.action unavailable in test/preview SW contexts; tooltip is cosmetic
+    logCaughtError(BgLogTag.MARCO, "chrome.action.setTitle failed (non-fatal — tooltip skipped)", err);
 }
 
 const BOOT_FAST_PATH_TYPES = new Set<string>([
