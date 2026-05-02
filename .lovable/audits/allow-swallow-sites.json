@@ -1,0 +1,264 @@
+{
+  "GeneratedAt": "2026-05-02T16:04:03.078Z",
+  "Items": [
+    {
+      "file": "src/background/handlers/injection-handler.ts",
+      "line": 507,
+      "reason": "settings load failure falls back to default budget",
+      "snippet": "} catch { /* use default */ } // allow-swallow: settings load failure falls back to default budget"
+    },
+    {
+      "file": "src/background/handlers/injection-handler.ts",
+      "line": 626,
+      "reason": "settings load failure falls back to default budget",
+      "snippet": "} catch { /* use default */ } // allow-swallow: settings load failure falls back to default budget"
+    },
+    {
+      "file": "src/background/handlers/injection-handler.ts",
+      "line": 729,
+      "reason": "best-effort IndexedDB cache write",
+      "snippet": ".catch(() => { /* best-effort cache write */ }); // allow-swallow: best-effort IndexedDB cache write"
+    },
+    {
+      "file": "src/background/handlers/injection-wrapper.ts",
+      "line": 50,
+      "reason": "preview/test contexts lack chrome.runtime; \"0.0.0\" sentinel is the documented fallback",
+      "snippet": "} catch (err) { // allow-swallow: preview/test contexts lack chrome.runtime; \"0.0.0\" sentinel is the documented fallback"
+    },
+    {
+      "file": "src/background/handlers/logging-handler.ts",
+      "line": 283,
+      "reason": "startup race — Sessions schema may not yet exist; bg-logger forbidden here (recursion)",
+      "snippet": "} catch (err) { // allow-swallow: startup race — Sessions schema may not yet exist; bg-logger forbidden here (recursion)"
+    },
+    {
+      "file": "src/background/handlers/token-seeder.ts",
+      "line": 191,
+      "reason": "localStorage unavailable on this origin; seeding is best-effort",
+      "snippet": "} catch { // allow-swallow: localStorage unavailable on this origin; seeding is best-effort"
+    },
+    {
+      "file": "src/background/handlers/token-seeder.ts",
+      "line": 263,
+      "reason": "localStorage unavailable; caller falls back to null",
+      "snippet": "} catch { // allow-swallow: localStorage unavailable; caller falls back to null"
+    },
+    {
+      "file": "src/background/handlers/token-seeder.ts",
+      "line": 497,
+      "reason": "malformed URL; fallback regex checks below handle the parse failure",
+      "snippet": "} catch { // allow-swallow: malformed URL; fallback regex checks below handle the parse failure"
+    },
+    {
+      "file": "src/background/injection-diagnostics.ts",
+      "line": 53,
+      "reason": "diagnostics must never break injection paths",
+      "snippet": "} catch { // allow-swallow: diagnostics must never break injection paths"
+    },
+    {
+      "file": "src/background/injection-diagnostics.ts",
+      "line": 83,
+      "reason": "diagnostics must never break injection paths",
+      "snippet": "} catch { // allow-swallow: diagnostics must never break injection paths"
+    },
+    {
+      "file": "src/background/injection-diagnostics.ts",
+      "line": 111,
+      "reason": "tab console mirroring is best-effort only",
+      "snippet": "} catch { // allow-swallow: tab console mirroring is best-effort only"
+    },
+    {
+      "file": "src/background/injection-diagnostics.ts",
+      "line": 175,
+      "reason": "tab pipeline mirroring is best-effort only",
+      "snippet": "} catch { // allow-swallow: tab pipeline mirroring is best-effort only"
+    },
+    {
+      "file": "src/background/project-db-manager.ts",
+      "line": 181,
+      "reason": "ProjectDatabases table may not exist yet if MetaTables schema hasn't run",
+      "snippet": "} catch { // allow-swallow: ProjectDatabases table may not exist yet if MetaTables schema hasn't run"
+    },
+    {
+      "file": "src/background/project-db-manager.ts",
+      "line": 216,
+      "reason": "OPFS unavailable, falls through to chrome.storage",
+      "snippet": "} catch { // allow-swallow: OPFS unavailable, falls through to chrome.storage"
+    },
+    {
+      "file": "src/background/project-db-manager.ts",
+      "line": 226,
+      "reason": "storage failed, falls through to in-memory db",
+      "snippet": "} catch { // allow-swallow: storage failed, falls through to in-memory db"
+    },
+    {
+      "file": "src/background/project-db-manager.ts",
+      "line": 303,
+      "reason": "removeEntry is best-effort cleanup",
+      "snippet": "} catch { /* file may not exist */ } // allow-swallow: removeEntry is best-effort cleanup"
+    },
+    {
+      "file": "src/background/script-resolver.ts",
+      "line": 75,
+      "reason": "cache miss is the expected hot path; logging every miss would flood the console",
+      "snippet": "} catch (err) { // allow-swallow: cache miss is the expected hot path; logging every miss would flood the console"
+    },
+    {
+      "file": "src/background/service-worker-main.ts",
+      "line": 39,
+      "reason": "chrome.action unavailable in test/preview SW contexts; tooltip is cosmetic",
+      "snippet": "} catch (err) { // allow-swallow: chrome.action unavailable in test/preview SW contexts; tooltip is cosmetic"
+    },
+    {
+      "file": "src/background/session-log-writer.ts",
+      "line": 467,
+      "reason": "missing log file is expected",
+      "snippet": "} catch { /* file may not exist */ } // allow-swallow: missing log file is expected"
+    },
+    {
+      "file": "src/background/session-log-writer.ts",
+      "line": 469,
+      "reason": "unreadable session dir is skipped",
+      "snippet": "} catch { /* dir unreadable */ } // allow-swallow: unreadable session dir is skipped"
+    },
+    {
+      "file": "src/background/session-log-writer.ts",
+      "line": 549,
+      "reason": "directory exists but can't be read; report empty file list",
+      "snippet": "} catch { // allow-swallow: directory exists but can't be read; report empty file list"
+    },
+    {
+      "file": "src/background/session-log-writer.ts",
+      "line": 555,
+      "reason": "OPFS root or session-logs dir doesn't exist",
+      "snippet": "} catch { // allow-swallow: OPFS root or session-logs dir doesn't exist"
+    },
+    {
+      "file": "src/components/popup/BootFailureBanner.tsx",
+      "line": 83,
+      "reason": "localStorage may be denied; safe default is \"full\"",
+      "snippet": "} catch { // allow-swallow: localStorage may be denied; safe default is \"full\""
+    },
+    {
+      "file": "src/components/popup/BootFailureBanner.tsx",
+      "line": 122,
+      "reason": "clipboard denied; textarea fallback stays visible",
+      "snippet": "} catch { // allow-swallow: clipboard denied; textarea fallback stays visible"
+    },
+    {
+      "file": "src/components/popup/BootFailureBanner.tsx",
+      "line": 132,
+      "reason": "clipboard denied; snippet stays visible for manual copy",
+      "snippet": "} catch { // allow-swallow: clipboard denied; snippet stays visible for manual copy"
+    },
+    {
+      "file": "src/components/popup/BootFailureBanner.tsx",
+      "line": 160,
+      "reason": "Blob/URL unavailable in sandbox; Copy report still works",
+      "snippet": "} catch { // allow-swallow: Blob/URL unavailable in sandbox; Copy report still works"
+    },
+    {
+      "file": "src/components/popup/InjectionCopyButton.tsx",
+      "line": 212,
+      "reason": "poll failure is non-critical; next tick retries",
+      "snippet": "} catch { /* silent */ } // allow-swallow: poll failure is non-critical; next tick retries"
+    },
+    {
+      "file": "src/components/popup/InjectionCopyButton.tsx",
+      "line": 233,
+      "reason": "extension context invalidated during teardown",
+      "snippet": "} catch { /* extension context invalidated */ } // allow-swallow: extension context invalidated during teardown"
+    },
+    {
+      "file": "src/components/popup/InjectionCopyButton.tsx",
+      "line": 259,
+      "reason": "extension context already torn down",
+      "snippet": "try { runtime!.onMessage!.removeListener(handleBroadcast); } catch { /* ignore */ } // allow-swallow: extension context already torn down"
+    },
+    {
+      "file": "src/content-scripts/network-reporter.ts",
+      "line": 76,
+      "reason": "extension context invalidated mid-flight; report is best-effort",
+      "snippet": "} catch { // allow-swallow: extension context invalidated mid-flight; report is best-effort"
+    },
+    {
+      "file": "src/content-scripts/network-reporter.ts",
+      "line": 252,
+      "reason": "extension context invalidated; status report is best-effort",
+      "snippet": "} catch { // allow-swallow: extension context invalidated; status report is best-effort"
+    },
+    {
+      "file": "src/content-scripts/network-reporter.ts",
+      "line": 323,
+      "reason": "pagehide flush is best-effort",
+      "snippet": "try { flushBuffer(); } catch { /* ignore */ } // allow-swallow: pagehide flush is best-effort"
+    },
+    {
+      "file": "src/hooks/use-draggable.ts",
+      "line": 52,
+      "reason": "corrupt stored position falls back to default",
+      "snippet": "} catch { /* ignore */ } // allow-swallow: corrupt stored position falls back to default"
+    },
+    {
+      "file": "src/hooks/use-draggable.ts",
+      "line": 58,
+      "reason": "localStorage quota/denied; position is convenience-only",
+      "snippet": "try { window.localStorage.setItem(POSITION_STORAGE_KEY, JSON.stringify(p)); } catch { /* ignore */ } // allow-swallow: localStorage quota/denied; position is convenience-only"
+    },
+    {
+      "file": "src/hooks/use-draggable.ts",
+      "line": 160,
+      "reason": "localStorage denied; reset is best-effort",
+      "snippet": "try { window.localStorage.removeItem(POSITION_STORAGE_KEY); } catch { /* ignore */ } // allow-swallow: localStorage denied; reset is best-effort"
+    },
+    {
+      "file": "src/lib/click-trail.ts",
+      "line": 58,
+      "reason": "sessionStorage may be unavailable (private mode/quota)",
+      "snippet": "} catch { // allow-swallow: sessionStorage may be unavailable (private mode/quota)"
+    },
+    {
+      "file": "src/lib/click-trail.ts",
+      "line": 67,
+      "reason": "clearing diagnostic trail is best-effort",
+      "snippet": "} catch { // allow-swallow: clearing diagnostic trail is best-effort"
+    },
+    {
+      "file": "src/lib/click-trail.ts",
+      "line": 120,
+      "reason": "clearing frozen trails is best-effort",
+      "snippet": "} catch { // allow-swallow: clearing frozen trails is best-effort"
+    },
+    {
+      "file": "src/lib/click-trail.ts",
+      "line": 140,
+      "reason": "snapshot eviction is best-effort",
+      "snippet": "} catch { // allow-swallow: snapshot eviction is best-effort"
+    },
+    {
+      "file": "standalone-scripts/marco-sdk/src/notify.ts",
+      "line": 138,
+      "reason": "missing theme tokens fall back to defaults",
+      "snippet": "} catch { /* fallback defaults */ } // allow-swallow: missing theme tokens fall back to defaults"
+    },
+    {
+      "file": "standalone-scripts/marco-sdk/src/notify.ts",
+      "line": 185,
+      "reason": "listener errors must not break notify pipeline",
+      "snippet": "for (const cb of _errorListeners) { try { cb(entry); } catch { /* */ } } // allow-swallow: listener errors must not break notify pipeline"
+    },
+    {
+      "file": "standalone-scripts/marco-sdk/src/notify.ts",
+      "line": 295,
+      "reason": "execCommand fallback for old browsers; UI continues regardless",
+      "snippet": "() => { /* fallback */ const ta = document.createElement(\"textarea\"); ta.value = copyText; ta.style.cssText = \"position:fixed;opacity:0;\"; document.body.appendChild(ta); ta.select(); try { document.execCommand(\"copy\"); copyBtn.textContent = \"\\u2713\"; } catch { /* */ } document.body.removeChild(ta); setTimeout(() => { copyBtn.textContent = \"\\uD83D\\uDCCB\"; }, 1500); }, // allow-swallow: execCommand fallback for old browsers; UI continues regardless"
+    },
+    {
+      "file": "standalone-scripts/marco-sdk/src/notify.ts",
+      "line": 331,
+      "reason": "stop-loop callback errors must not block toast pipeline",
+      "snippet": "try { _stopLoopFn(); } catch { /* */ } // allow-swallow: stop-loop callback errors must not block toast pipeline"
+    }
+  ],
+  "Missing": []
+}
