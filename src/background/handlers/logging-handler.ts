@@ -24,6 +24,22 @@ import { bindOpt, bindReq } from "./handler-guards";
 let dbManager: DbManager | null = null;
 let currentSessionId: number | null = null;
 
+/**
+ * Inline throttle for "Sessions schema not ready" warnings emitted from
+ * `handleGetLogStats`. The Options panel polls log stats on a timer, so
+ * during the startup race window this warning would otherwise repeat
+ * dozens of times per test run. We cannot use `bg-logger` here (would
+ * cause logging→logging recursion), so we keep the budget local.
+ */
+const SESSIONS_WARN_BUDGET = 3;
+let sessionsWarnCount = 0;
+function warnSessionsUnavailableThrottled(err: unknown): void {
+    if (sessionsWarnCount >= SESSIONS_WARN_BUDGET) return;
+    sessionsWarnCount += 1;
+    const suffix = sessionsWarnCount === SESSIONS_WARN_BUDGET ? " (further occurrences suppressed)" : "";
+    console.warn(`[logging-handler] Sessions count unavailable (schema not ready)${suffix}:`, err);
+}
+
 /* ------------------------------------------------------------------ */
 /*  Initialization                                                     */
 /* ------------------------------------------------------------------ */
