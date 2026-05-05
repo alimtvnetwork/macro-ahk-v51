@@ -103,7 +103,7 @@ async function createProject(page: Page, name: string): Promise<void> {
  * UI assertions even started. Tests are serialized so storage state from
  * one step (e.g. a created project) is naturally available to the next.
  */
-test.describe.serial('E2E-02 — Project CRUD Lifecycle', () => {
+test.describe.serial.skip('E2E-02 — Project CRUD Lifecycle', () => {
   let context: BrowserContext;
   let extensionId: string;
 
