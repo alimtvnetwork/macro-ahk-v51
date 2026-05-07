@@ -100,7 +100,7 @@ export async function seedFromManifest(): Promise<SeedResult> {
         };
     }
 
-    const projectNames = manifest.Projects.map((p) => `${p.name}(${p.scripts.length}s/${p.configs.length}c)`);
+    const projectNames = manifest.Projects.map((p) => `${p.Name}(${p.Scripts.length}s/${p.Configs.length}c)`);
     console.log(
         "[manifest-seeder] Processing %d project(s) from seed-manifest.json (schema v%d): [%s]",
         manifest.Projects.length,
@@ -428,8 +428,8 @@ function resolveConfigSeedId(
     project: SeedProjectEntry,
 ): string | undefined {
     if (!key) return undefined;
-    const config = project.Configs.find((c) => c.key === key);
-    return config?.seedId;
+    const config = project.Configs.find((c) => c.Key === key);
+    return config?.SeedId;
 }
 
 /**
@@ -441,15 +441,15 @@ function resolveDependencyIds(manifest: SeedManifest, project: SeedProjectEntry)
     const resolved = new Set<string>();
 
     for (const dependencyName of project.Dependencies) {
-        const dependencyProject = manifest.Projects.find((entry) => entry.name === dependencyName);
+        const dependencyProject = manifest.Projects.find((entry) => entry.Name === dependencyName);
 
-        if (!dependencyProject || dependencyProject.scripts.length === 0) {
+        if (!dependencyProject || dependencyProject.Scripts.length === 0) {
             resolved.add(dependencyName);
             continue;
         }
 
-        for (const dependencyScript of dependencyProject.scripts) {
-            resolved.add(dependencyScript.seedId);
+        for (const dependencyScript of dependencyProject.Scripts) {
+            resolved.add(dependencyScript.SeedId);
         }
     }
 
