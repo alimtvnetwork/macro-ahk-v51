@@ -3,7 +3,9 @@
  * check-changelog-entry.mjs
  *
  * Verifies that `changelog.md` contains an entry for the current
- * `EXTENSION_VERSION` declared in `src/shared/constants.ts`.
+ * version declared in `manifest.json` (the canonical bumped-version
+ * source). The version is auto-extracted from `manifest.json` — no
+ * value needs to be passed in via CLI args or env vars.
  *
  * The entry MUST match the canonical project template:
  *   ## [vX.Y.Z] — YYYY-MM-DD <Title>
@@ -29,7 +31,7 @@ import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const CONSTANTS = resolve(ROOT, "src/shared/constants.ts");
+const MANIFEST = resolve(ROOT, "manifest.json");
 const CHANGELOG = resolve(ROOT, "changelog.md");
 
 function fail(msg) {
@@ -37,18 +39,27 @@ function fail(msg) {
     process.exit(1);
 }
 
-if (!existsSync(CONSTANTS)) fail(`Missing required file: ${CONSTANTS}`);
+if (!existsSync(MANIFEST)) fail(`Missing required file: ${MANIFEST}`);
 if (!existsSync(CHANGELOG)) fail(`Missing required file: ${CHANGELOG}`);
 
-const constantsTxt = readFileSync(CONSTANTS, "utf-8");
-const versionMatch = constantsTxt.match(/EXTENSION_VERSION\s*=\s*"(\d+\.\d+\.\d+)"/);
-if (!versionMatch) {
+let manifest;
+try {
+    manifest = JSON.parse(readFileSync(MANIFEST, "utf-8"));
+} catch (err) {
     fail(
-        `Could not parse EXTENSION_VERSION from ${CONSTANTS}. ` +
-        `Expected pattern: EXTENSION_VERSION = "X.Y.Z"`
+        `Could not parse JSON from ${MANIFEST}: ${err?.message ?? String(err)}. ` +
+        `Reason: manifest.json must be valid JSON for the changelog check to ` +
+        `extract the current version field.`
     );
 }
-const version = versionMatch[1];
+const version = manifest?.version;
+if (typeof version !== "string" || !/^\d+\.\d+\.\d+$/.test(version)) {
+    fail(
+        `Could not read a valid "version" field from ${MANIFEST}. ` +
+        `Found: ${JSON.stringify(version)}. ` +
+        `Expected pattern: "version": "X.Y.Z"`
+    );
+}
 
 const changelogTxt = readFileSync(CHANGELOG, "utf-8");
 
@@ -84,7 +95,7 @@ if (!canonicalMatch) {
         console.error("     • Non-empty title after the date");
     } else {
         console.error("❌ Changelog entry missing for current version.");
-        console.error(`   EXTENSION_VERSION = "${version}" (from src/shared/constants.ts)`);
+        console.error(`   manifest.json version = "${version}"`);
         console.error(`   Expected heading in changelog.md:`);
         console.error(`     ${expected}`);
     }
