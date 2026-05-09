@@ -748,7 +748,7 @@ function main() {
         // standalone-scripts/*/src/) would produce a false green.
         if (projects.length === 0) {
             console.error(
-                `❌ No standalone projects discovered under ${rel(STANDALONE_DIR)} ` +
+                `[FAIL] No standalone projects discovered under ${rel(STANDALONE_DIR)} ` +
                 `(no src/instruction.ts files found)`,
             );
             process.exit(2);
@@ -756,7 +756,7 @@ function main() {
     }
 
     console.log("Instruction Schema Validator");
-    console.log("════════════════════════════");
+    console.log("============================");
 
     let totalFailures = 0;
     let totalArtifacts = 0;
@@ -771,11 +771,11 @@ function main() {
         const canonicalPath = join(distDir, "instruction.json");
         const compatPath = join(distDir, "instruction.compat.json");
 
-        console.log(`\n• ${project.name}`);
+        console.log(`\n- ${project.name}`);
         if (!existsSync(distDir)) {
-            const msg = `  ❌ Missing dist/ — run compile-instruction.mjs first`;
+            const msg = `  [FAIL] Missing dist/ - run compile-instruction.mjs first`;
             console.error(msg);
-            annotate(rel(distDir), "Missing dist/ — run compile-instruction.mjs first");
+            annotate(rel(distDir), "Missing dist/ - run compile-instruction.mjs first");
             if (isPerProject) {
                 process.exit(2);
             }
@@ -793,13 +793,13 @@ function main() {
         printArtifactReport("compat   ", compat);
     }
 
-    console.log("\n────────────────────────────");
+    console.log("\n----------------------------");
     console.log(`Scanned: ${projects.length} project(s), ${totalArtifacts} artifact(s)`);
     if (totalFailures === 0) {
-        console.log("✅ All instruction artifacts pass schema validation");
+        console.log("[OK] All instruction artifacts pass schema validation");
         process.exit(0);
     }
-    const failMsg = `❌ ${totalFailures} artifact(s) failed schema validation`;
+    const failMsg = `[FAIL] ${totalFailures} artifact(s) failed schema validation`;
     console.log(failMsg);
     if (IS_GITHUB_ACTIONS) {
         process.stdout.write(
@@ -821,7 +821,7 @@ try {
     // refactor would crash with exit 0 in some Node versions on CI
     // runners that swallow the rejection.
     const msg = err && err.stack ? err.stack : String(err);
-    console.error(`❌ Validator crashed: ${msg}`);
+    console.error(`[FAIL] Validator crashed: ${msg}`);
     if (IS_GITHUB_ACTIONS) {
         process.stdout.write(
             `::error title=Instruction schema validator crashed::${ghEscape(msg)}\n`,
