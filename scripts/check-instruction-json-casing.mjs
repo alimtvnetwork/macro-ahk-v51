@@ -464,19 +464,19 @@ function reportProject(name, result) {
         const MAX_PRINT = 50;
 
         process.stderr.write(
-            `\n┌─ ✗ ${name} ${label.trim()} — ${res.violations.length} ${shape}-shape violation(s) ─\n` +
-            `│  file (relative): ${fileRel}\n` +
-            `│  file (absolute): ${fileAbs}\n` +
-            `│  rule:            ${expectation}\n` +
-            `│  offending keys:  (showing ${Math.min(res.violations.length, MAX_PRINT)} of ${res.violations.length})\n`,
+            `\n[FAIL] ${name} ${label.trim()} - ${res.violations.length} ${shape}-shape violation(s)\n` +
+            `  file (relative): ${fileRel}\n` +
+            `  file (absolute): ${fileAbs}\n` +
+            `  rule:            ${expectation}\n` +
+            `  offending keys:  (showing ${Math.min(res.violations.length, MAX_PRINT)} of ${res.violations.length})\n`,
         );
         for (const v of res.violations.slice(0, MAX_PRINT)) {
-            process.stderr.write(`│    ${v.path}  →  "${v.key}"\n`);
+            process.stderr.write(`    ${v.path}  ->  "${v.key}"\n`);
         }
         if (res.violations.length > MAX_PRINT) {
-            process.stderr.write(`│    … and ${res.violations.length - MAX_PRINT} more (use --json for the full list)\n`);
+            process.stderr.write(`    ... and ${res.violations.length - MAX_PRINT} more (use --json for the full list)\n`);
         }
-        process.stderr.write(`└──────────────────────────────────────────────────────────────\n`);
+        process.stderr.write("\n");
 
         // Per-key GitHub Actions annotations: one ::error per
         // offending JSON-pointer key, capped at MAX_ANNOTATIONS so a
@@ -491,12 +491,12 @@ function reportProject(name, result) {
         if (res.violations.length > emittedKeys) {
             annotateFile(
                 fileRel,
-                `… and ${res.violations.length - emittedKeys} more ${shape}-shape violation(s) in ${fileRel} (showing first ${emittedKeys}; run --json or raise INSTRUCTION_CASING_MAX_ANNOTATIONS for the full list).`,
+                `... and ${res.violations.length - emittedKeys} more ${shape}-shape violation(s) in ${fileRel} (showing first ${emittedKeys}; run --json or raise INSTRUCTION_CASING_MAX_ANNOTATIONS for the full list).`,
             );
         }
         annotateFile(
             fileRel,
-            `${res.violations.length} ${shape}-shape violation(s) in ${fileRel}. First offender: ${res.violations[0].path} → "${res.violations[0].key}". ` +
+            `${res.violations.length} ${shape}-shape violation(s) in ${fileRel}. First offender: ${res.violations[0].path} -> "${res.violations[0].key}". ` +
             `Fix compile-instruction.mjs or the source instruction.ts so this artifact stays pure ${shape}.`,
         );
         failures.push({ project: name, label: label.trim(), shape, fileRel, fileAbs, kind: "casing", count: res.violations.length });
