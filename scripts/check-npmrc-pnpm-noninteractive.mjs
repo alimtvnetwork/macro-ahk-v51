@@ -11,7 +11,7 @@
 import { readFileSync } from "node:fs";
 
 const TARGET = "scripts/ps-modules/pnpm-config.ps1";
-const REQUIRED = ["verify-deps-before-run=false", "confirm-modules-purge=false", "strict-dep-builds=false"];
+const REQUIRED = ["verify-deps-before-run=false", "confirm-modules-purge=false", "strict-dep-builds=false", "dangerouslyAllowAllBuilds: true"];
 const text = readFileSync(TARGET, "utf-8");
 const missing = REQUIRED.filter((key) => !text.includes(key));
 
@@ -23,3 +23,22 @@ if (missing.length > 0) {
 }
 
 console.log("[OK] pnpm-config.ps1 emits non-interactive .npmrc keys");
+
+const UTILS_TARGET = "scripts/ps-modules/utils.ps1";
+const utilsText = readFileSync(UTILS_TARGET, "utf-8");
+const requiredEnv = [
+    "Set-PnpmNonInteractiveEnvironment",
+    "pnpm_config_$name",
+    "npm_config_$name",
+    "dangerously_allow_all_builds",
+    "verify_deps_before_run",
+];
+const missingEnv = requiredEnv.filter((key) => !utilsText.includes(key));
+if (missingEnv.length > 0) {
+    console.error("[FAIL] " + UTILS_TARGET + " is missing inherited pnpm environment safeguards:");
+    for (const key of missingEnv) console.error("  - " + key);
+    console.error("Reason: pnpm v10/v11 child install checks may ignore command flags but inherit pnpm_config_*.");
+    process.exit(1);
+}
+
+console.log("[OK] utils.ps1 exports pnpm non-interactive environment safeguards");

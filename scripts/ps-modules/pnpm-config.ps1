@@ -41,6 +41,7 @@ function Configure-PnpmStore {
 #>
 function Configure-PnpMode {
     Assert-ExtensionDirExists -CallerName "Configure-PnpMode"
+    Set-PnpmNonInteractiveEnvironment
 
     $projectDrive = Get-DriveRoot $script:ExtensionDir
     $storeDrive = Get-DriveRoot $script:PnpmStorePath
@@ -65,6 +66,7 @@ function Configure-PnpMode {
     }
 
     $npmrcPath = Join-Path $script:ExtensionDir ".npmrc"
+    $workspacePath = Join-Path $script:ExtensionDir "pnpm-workspace.yaml"
 
     if ($isCrossDrive) {
         $npmrcContent = @(
@@ -108,6 +110,29 @@ function Configure-PnpMode {
         Write-Host "  [OK] pnpm linker configured: $($script:EffectiveNodeLinker)$(if ($isCrossDrive) { ' (copy mode)' }) (.npmrc $npmrcState)" -ForegroundColor Green
     } else {
         Write-Host "  [OK] pnpm linker unchanged: $($script:EffectiveNodeLinker)$(if ($isCrossDrive) { ' (copy mode)' })" -ForegroundColor Green
+    }
+
+    $workspaceContent = @(
+        "packages:",
+        "  - \".\"",
+        "recursiveInstall: false",
+        "nodeLinker: $($script:EffectiveNodeLinker)",
+        "symlink: $(if ($script:EffectiveNodeLinker -eq 'pnp') { 'false' } else { 'true' })",
+        "packageImportMethod: $(if ($isCrossDrive) { 'copy' } else { 'auto' })",
+        "verifyDepsBeforeRun: false",
+        "confirmModulesPurge: false",
+        "strictDepBuilds: false",
+        "dangerouslyAllowAllBuilds: true",
+        "allowBuilds:",
+        "  \"@swc/core\": true",
+        "  esbuild: true"
+    ) -join "`n"
+    $hasWorkspaceBefore = Test-Path $workspacePath
+    $existingWorkspaceContent = if ($hasWorkspaceBefore) { Get-Content $workspacePath -Raw } else { "" }
+    if (($existingWorkspaceContent -replace "`r`n", "`n") -ne ($workspaceContent -replace "`r`n", "`n")) {
+        Set-Content -Path $workspacePath -Value $workspaceContent -Force
+        $workspaceState = if ($hasWorkspaceBefore) { "updated" } else { "created" }
+        Write-Host "  [OK] pnpm workspace config $workspaceState (build approvals enabled)" -ForegroundColor Green
     }
 }
 

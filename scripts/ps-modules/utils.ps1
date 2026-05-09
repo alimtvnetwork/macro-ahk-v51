@@ -163,6 +163,31 @@ function Get-PnpmMajorVersion([string]$Version) {
 
 <#
 .SYNOPSIS
+    Forces pnpm dependency checks into non-interactive build-safe mode.
+.DESCRIPTION
+    pnpm v10/v11 can fail Windows builds with ERR_PNPM_IGNORED_BUILDS when a
+    script-triggered dependency-status check spawns `pnpm install` without the
+    flags from our configured install command. Environment config is inherited
+    by those child pnpm processes, so set both pnpm_config_* (v11+) and
+    npm_config_* (v10 compatibility) before any install/run command executes.
+#>
+function Set-PnpmNonInteractiveEnvironment {
+    $settings = @{
+        "verify_deps_before_run" = "false"
+        "confirm_modules_purge" = "false"
+        "strict_dep_builds" = "false"
+        "dangerously_allow_all_builds" = "true"
+    }
+
+    foreach ($name in $settings.Keys) {
+        $value = $settings[$name]
+        [Environment]::SetEnvironmentVariable("pnpm_config_$name", $value, "Process")
+        [Environment]::SetEnvironmentVariable("npm_config_$name", $value, "Process")
+    }
+}
+
+<#
+.SYNOPSIS
     Injects --ignore-workspace into a pnpm command if not already present.
 .DESCRIPTION
     Prevents pnpm workspace resolution from leaking parent-level dependencies
@@ -176,8 +201,10 @@ function Get-EffectivePnpmCommand([string]$BaseCommand) {
     $cmd = $BaseCommand.Trim()
     $isPnpmInstallCommand = $cmd -match '^(pnpm(?:\.cmd|\.exe)?)\s+install(\s|$)'
     $isPnpmRunCommand = $cmd -match '^(pnpm(?:\.cmd|\.exe)?)\s+run\s+'
+    $workspaceConfigPath = if ([string]::IsNullOrWhiteSpace($script:ExtensionDir)) { "pnpm-workspace.yaml" } else { Join-Path $script:ExtensionDir "pnpm-workspace.yaml" }
+    $hasProjectWorkspaceConfig = Test-Path $workspaceConfigPath -PathType Leaf
 
-    if (($isPnpmInstallCommand -or $isPnpmRunCommand) -and $cmd -notmatch '(^|\s)--ignore-workspace(\s|$)') {
+    if (($isPnpmInstallCommand -or $isPnpmRunCommand) -and (-not $hasProjectWorkspaceConfig) -and $cmd -notmatch '(^|\s)--ignore-workspace(\s|$)') {
         if ($isPnpmInstallCommand) {
             $cmd = $cmd -replace '^(pnpm(?:\.cmd|\.exe)?)\s+install', 'pnpm --ignore-workspace install'
         } else {
