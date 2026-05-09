@@ -240,8 +240,7 @@ const SHARED_PREREQS = [
  *  so cache misses behave exactly like the pre-cache pipeline.
  *  Bypass with STANDALONE_BUILD_NO_CACHE=1; force-rebuild with STANDALONE_BUILD_FORCE=1.
  */
-const viteModeFlagStr = BUILD_MODE === "development" ? " --mode development" : "";
-function cachedJob(name, innerShell) {
+function cachedJob(name) {
     return {
         name,
         steps: [
@@ -263,18 +262,9 @@ function cachedJob(name, innerShell) {
     };
 }
 const PARALLEL_JOBS = [
-    cachedJob(
-        "marco-sdk",
-        `npx --no-install tsc --noEmit -p tsconfig.sdk.json && npx --no-install vite build --config vite.config.sdk.ts${viteModeFlagStr} && node scripts/generate-dts.mjs`,
-    ),
-    cachedJob(
-        "xpath",
-        `npx --no-install tsc --noEmit -p tsconfig.xpath.json && npx --no-install vite build --config vite.config.xpath.ts${viteModeFlagStr}`,
-    ),
-    cachedJob(
-        "macro-controller",
-        `npx --no-install tsc --noEmit -p tsconfig.macro.build.json && npx --no-install vite build --config vite.config.macro.ts${viteModeFlagStr} && node scripts/sync-macro-controller-legacy.mjs`,
-    ),
+    cachedJob("marco-sdk"),
+    cachedJob("xpath"),
+    cachedJob("macro-controller"),
 ];
 
 /* ------------------------------------------------------------------ */
