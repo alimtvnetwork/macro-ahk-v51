@@ -176,7 +176,6 @@ function Set-PnpmNonInteractiveEnvironment {
         "verify_deps_before_run" = "false"
         "confirm_modules_purge" = "false"
         "strict_dep_builds" = "false"
-        "dangerously_allow_all_builds" = "true"
     }
 
     foreach ($name in $settings.Keys) {
@@ -224,10 +223,9 @@ function Get-EffectivePnpmCommand([string]$BaseCommand) {
 #>
 function Get-EffectivePnpmInstallCommand([string]$BaseCommand, [int]$Major) {
     $cmd = Get-EffectivePnpmCommand $BaseCommand
-    $isPnpmInstall = $cmd -match '^(pnpm(?:\.cmd|\.exe)?)\s+(.+\s)?install(\s|$)'
-    if ($Major -ge 10 -and $isPnpmInstall -and $cmd -notmatch 'dangerously-allow-all-builds') {
-        $cmd = "$cmd --dangerously-allow-all-builds"
-    }
+    # Note: --dangerously-allow-all-builds intentionally NOT added — it conflicts
+    # with package.json -> pnpm.onlyBuiltDependencies (ERR_PNPM_CONFIG_CONFLICT_BUILT_DEPENDENCIES).
+    # Native builds are approved via onlyBuiltDependencies + strict-dep-builds=false.
     return $cmd
 }
 
