@@ -253,7 +253,7 @@ function Test-StandaloneDistArtifacts([string]$RootDir) {
     $standaloneDir = Join-Path $RootDir "standalone-scripts"
     $requiredArtifacts = @{
         "marco-sdk"        = @("marco-sdk.js")
-        "macro-controller" = @("macro-looping.js")
+        "macro-controller" = @("macro-looping.js", "macro-looping.css")
         "xpath"            = @("xpath.js")
     }
     $guardFailed = $false
