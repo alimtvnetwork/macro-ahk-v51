@@ -121,11 +121,7 @@ function Configure-PnpMode {
         "packageImportMethod: $(if ($isCrossDrive) { 'copy' } else { 'auto' })",
         "verifyDepsBeforeRun: false",
         "confirmModulesPurge: false",
-        "strictDepBuilds: false",
-        "dangerouslyAllowAllBuilds: true",
-        "allowBuilds:",
-        '  "@swc/core": true',
-        "  esbuild: true"
+        "strictDepBuilds: false"
     ) -join "`n"
     $hasWorkspaceBefore = Test-Path $workspacePath
     $existingWorkspaceContent = if ($hasWorkspaceBefore) { Get-Content $workspacePath -Raw } else { "" }

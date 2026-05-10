@@ -11,9 +11,17 @@
 import { readFileSync } from "node:fs";
 
 const TARGET = "scripts/ps-modules/pnpm-config.ps1";
-const REQUIRED = ["verify-deps-before-run=false", "confirm-modules-purge=false", "strict-dep-builds=false", "dangerouslyAllowAllBuilds: true"];
+const REQUIRED = ["verify-deps-before-run=false", "confirm-modules-purge=false", "strict-dep-builds=false"];
+const FORBIDDEN = ["dangerouslyAllowAllBuilds", "dangerously-allow-all-builds"];
 const text = readFileSync(TARGET, "utf-8");
 const missing = REQUIRED.filter((key) => !text.includes(key));
+const forbiddenFound = FORBIDDEN.filter((key) => text.includes(key));
+if (forbiddenFound.length > 0) {
+    console.error("[FAIL] " + TARGET + " contains keys that conflict with package.json -> pnpm.onlyBuiltDependencies:");
+    for (const key of forbiddenFound) console.error("  - " + key);
+    console.error("Reason: pnpm aborts with ERR_PNPM_CONFIG_CONFLICT_BUILT_DEPENDENCIES.");
+    process.exit(1);
+}
 
 if (missing.length > 0) {
     console.error("[FAIL] " + TARGET + " is missing pnpm non-interactive keys:");
@@ -30,7 +38,6 @@ const requiredEnv = [
     "Set-PnpmNonInteractiveEnvironment",
     "pnpm_config_$name",
     "npm_config_$name",
-    "dangerously_allow_all_builds",
     "verify_deps_before_run",
 ];
 const missingEnv = requiredEnv.filter((key) => !utilsText.includes(key));
