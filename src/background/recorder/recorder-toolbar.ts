@@ -106,6 +106,21 @@ const TOOLBAR_CSS = `
     70%  { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
     100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
 }
+.health {
+    align-self: center; display: inline-flex; align-items: center; gap: 8px;
+    padding: 4px 8px; border-radius: 6px;
+    background: #0b1220; color: #cbd5e1;
+    font-size: 11px; font-variant-numeric: tabular-nums;
+    border: 1px solid #1f2937;
+}
+.health .hdot {
+    width: 6px; height: 6px; border-radius: 50%; background: #64748b;
+}
+.health[data-status="ok"]    .hdot { background: #22c55e; }
+.health[data-status="warn"]  .hdot { background: #f59e0b; }
+.health[data-status="error"] .hdot { background: #ef4444; }
+.health .sep { opacity: .4; }
+.health .muted { color: #94a3b8; }
 `;
 
 /* ------------------------------------------------------------------ */
