@@ -138,11 +138,22 @@ export function mountRecorderToolbar(
     const phaseLabel = document.createElement("span");
     phaseLabel.className = "phase";
 
+    const projectChip = document.createElement("span");
+    projectChip.className = "project";
+    projectChip.setAttribute("aria-label", "Active recording project");
+    projectChip.title = `Steps will be saved to project: ${options.ProjectSlug}`;
+    const projectDot = document.createElement("span");
+    projectDot.className = "dot";
+    const projectText = document.createElement("span");
+    projectText.className = "label";
+    projectText.textContent = options.ProjectSlug;
+    projectChip.append(projectDot, projectText);
+
     const startBtn = makeButton("start", "Start");
     const pauseBtn = makeButton("pause", "Pause");
     const stopBtn  = makeButton("stop", "Stop");
 
-    bar.append(phaseLabel, startBtn, pauseBtn, stopBtn);
+    bar.append(phaseLabel, projectChip, startBtn, pauseBtn, stopBtn);
     root.appendChild(bar);
     container.appendChild(host);
 
