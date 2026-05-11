@@ -82,6 +82,30 @@ const TOOLBAR_CSS = `
     align-self: center; padding: 0 8px;
     text-transform: uppercase; letter-spacing: .08em; font-size: 10px;
 }
+.project {
+    align-self: center; display: none; align-items: center; gap: 6px;
+    padding: 4px 8px; border-radius: 999px;
+    background: #1f2937; color: #e5e7eb;
+    font-size: 11px; max-width: 220px;
+}
+.project[data-active="true"] { display: inline-flex; }
+.project .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #ef4444; box-shadow: 0 0 0 0 rgba(239,68,68,.7);
+    animation: marco-pulse 1.4s infinite;
+}
+.project[data-phase="Paused"] .dot {
+    background: #f59e0b; animation: none;
+}
+.project .label {
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    max-width: 180px; font-weight: 600;
+}
+@keyframes marco-pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(239,68,68,.6); }
+    70%  { box-shadow: 0 0 0 6px rgba(239,68,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); }
+}
 `;
 
 /* ------------------------------------------------------------------ */
