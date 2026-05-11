@@ -32,6 +32,7 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
+import { logError } from "../options-logger";
 
 interface Props {
     projectSlug: string;
