@@ -23,7 +23,8 @@ import { RecorderStepGraph } from "./RecorderStepGraph";
 import { RecorderStepDetail } from "./RecorderStepDetail";
 import { RecorderEmptyState } from "./RecorderEmptyState";
 import { downloadRecorderExport, type ExportFormat } from "./recorder-export";
-import { Loader2, Database, Download } from "lucide-react";
+import { runRecorderSelfTest, RecorderSelfTestError } from "./recorder-self-test";
+import { Loader2, Database, Download, FlaskConical } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -54,6 +55,29 @@ export default function RecorderVisualisationPanel({ projectSlug }: Props) {
     const [selectedStepId, setSelectedStepId] = useState<number | null>(null);
     const [selectors, setSelectors] = useState<ReadonlyArray<SelectorRow>>([]);
     const [selectorsLoading, setSelectorsLoading] = useState(false);
+    const [selfTestRunning, setSelfTestRunning] = useState(false);
+
+    const handleSelfTest = useCallback(async () => {
+        setSelfTestRunning(true);
+        try {
+            const result = await runRecorderSelfTest(projectSlug);
+            await reload();
+            toast.success(
+                `Self-test passed — wrote StepId ${result.InsertedStepId}, verified, cleaned up (${result.DurationMs}ms)`,
+            );
+        } catch (err) {
+            const phase = err instanceof RecorderSelfTestError ? err.Phase : "unknown";
+            const msg = err instanceof Error ? err.message : "Self-test failed";
+            toast.error(`Recorder self-test failed (${phase}): ${msg}`);
+            logError(
+                "RecorderVisualisationPanel.selfTest",
+                `runRecorderSelfTest failed at phase='${phase}' for project='${projectSlug}': ${msg}`,
+                err,
+            );
+        } finally {
+            setSelfTestRunning(false);
+        }
+    }, [projectSlug, reload]);
 
     /* Auto-select the first Step when data loads / refreshes. */
     useEffect(() => {
@@ -276,7 +300,22 @@ export default function RecorderVisualisationPanel({ projectSlug }: Props) {
                         </Badge>
                     ))
                 )}
-                <div className="ml-auto">
+                <div className="ml-auto flex items-center gap-2">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1.5"
+                        onClick={() => { void handleSelfTest(); }}
+                        disabled={selfTestRunning}
+                        title="Insert a dummy step, verify it appears, and clean it up. Failures land in the Error Drawer."
+                    >
+                        {selfTestRunning ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                        ) : (
+                            <FlaskConical className="h-3.5 w-3.5" />
+                        )}
+                        Run self-test
+                    </Button>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                             <Button
