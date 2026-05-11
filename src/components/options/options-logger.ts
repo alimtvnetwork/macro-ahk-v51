@@ -64,7 +64,7 @@ export function logError(scope: string, message: string, caught?: unknown): void
             errorCode: scope.toUpperCase().replace(/[^A-Z0-9_]+/g, "_"),
             message: composed,
             stackTrace: safeStack(caught),
-        } as MessageRequest).catch(() => {
+        } as Parameters<typeof sendMessage>[0]).catch(() => {
             /* Background not reachable (preview / SW asleep) — already on console. */
         });
     } catch {
