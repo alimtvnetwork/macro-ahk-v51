@@ -86,15 +86,26 @@ export default function RecorderVisualisationPanel({ projectSlug }: Props) {
 
     const handleRename = useCallback(
         async (stepId: number, newName: string) => {
-            await sendMessage({
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                type: "RECORDER_STEP_RENAME" as any,
-                projectSlug,
-                stepId,
-                newVariableName: newName,
-            });
-            toast.success(`Renamed step #${stepId} → ${newName}`);
-            await reload();
+            try {
+                await sendMessage({
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                    type: "RECORDER_STEP_RENAME" as any,
+                    projectSlug,
+                    stepId,
+                    newVariableName: newName,
+                });
+                toast.success(`Renamed step #${stepId} → ${newName}`);
+                await reload();
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : "Failed to rename step";
+                toast.error(msg);
+                logError(
+                    "RecorderVisualisationPanel.rename",
+                    `RECORDER_STEP_RENAME failed for project='${projectSlug}' stepId=${stepId} newName='${newName}': ${msg}`,
+                    err,
+                );
+                throw err;
+            }
         },
         [projectSlug, reload],
     );
