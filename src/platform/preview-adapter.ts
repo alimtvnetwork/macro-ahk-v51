@@ -652,6 +652,7 @@ function getMockResponse(message: MessagePayload): string | number | boolean | n
                 { id: "12", name: "Next Tasks", text: "Next, list out the remaining tasks always.", order: 11, isDefault: true, category: "automation", createdAt: "2026-03-21T00:00:00Z", updatedAt: "2026-03-21T00:00:00Z" },
                 { id: "13", name: "Deploy Check", text: "Verify the deployment pipeline is green and all checks pass before merging.", order: 12, isDefault: false, category: "Deploy", createdAt: "2026-03-15T10:00:00Z", updatedAt: "2026-03-15T10:00:00Z" },
                 { id: "14", name: "Context Dump", text: "Print the full context of the current file and its dependencies for review.", order: 13, isDefault: false, category: "Debug", isFavorite: true, createdAt: "2026-03-16T08:00:00Z", updatedAt: "2026-03-16T08:00:00Z" },
+                { id: "15", name: "Read Memory", text: "Mandatory AI onboarding sequence — read .lovable/overview.md, strictly-avoid.md, memory/index.md, plan.md, suggestions.md; then spec/17-consolidated-guidelines/ and spec/01-spec-authoring-guide/; then CI/CD issues. Trigger phrase: 'read memory'.", order: 14, isDefault: true, category: "onboarding", createdAt: "2026-05-14T00:00:00Z", updatedAt: "2026-05-14T00:00:00Z" },
             ],
         },
         RESEED_PROMPTS: { isOk: true },

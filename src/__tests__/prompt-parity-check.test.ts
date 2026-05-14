@@ -26,6 +26,7 @@ const DB_SEEDED_IDS = [
   'default-code-coverage-details',
   'default-next-tasks',
   'default-unit-test-issues-v2-enhanced',
+  'default-read-memory',
 ];
 
 // ── prompt-loader.ts DEFAULT_PROMPTS ids ──
