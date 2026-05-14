@@ -16,7 +16,7 @@
  *     visible UI rows + activity-log entries.
  */
 
-import { cPanelBg, cPrimary, cPrimaryBgA, cPrimaryLighter, cPanelFgDim, loopCreditState, CREDIT_API_BASE } from '../shared-state';
+import { cPanelBg, cPrimary, cPrimaryBgA, cPrimaryLighter, cPanelFgDim, loopCreditState, CREDIT_API_BASE, VERSION } from '../shared-state';
 import { sendToExtension } from './prompt-loader';
 import { log } from '../logging';
 import { logError } from '../error-utils';
