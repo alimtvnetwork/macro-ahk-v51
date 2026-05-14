@@ -386,3 +386,179 @@ function escapeHtml(s: string): string {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#39;');
 }
+
+// ── CSV Export ──
+
+interface ProjectGitInfo {
+    repo: string;
+    branch: string;
+    lastMessageAt: string;
+    error: string;
+}
+
+interface ExportRow {
+    workspaceId: string;
+    workspaceName: string;
+    creditsUsed: number;
+    creditsTotal: number;
+    projectId: string;
+    projectName: string;
+    isOpenInChrome: string;
+    gitRepo: string;
+    gitBranch: string;
+    lastCommunication: string;
+    gitFetchError: string;
+    extensionVersion: string;
+    exportedAt: string;
+}
+
+const EXPORT_HEADERS: ReadonlyArray<keyof ExportRow> = [
+    'workspaceId', 'workspaceName', 'creditsUsed', 'creditsTotal',
+    'projectId', 'projectName', 'isOpenInChrome',
+    'gitRepo', 'gitBranch', 'lastCommunication', 'gitFetchError',
+    'extensionVersion', 'exportedAt',
+];
+
+async function exportCsv(statusEl: HTMLElement): Promise<void> {
+    if (state.exporting) return;
+
+    const blocks = state.blocks;
+    const tabIndex = state.tabIndex;
+    if (blocks.length === 0 || !tabIndex) {
+        statusEl.style.color = '#fca5a5';
+        statusEl.textContent = '⚠ No workspaces loaded yet — wait for the list to populate.';
+        return;
+    }
+
+    const tasks: Array<{ ws: WorkspaceCredit; project: ProjectEntry }> = [];
+    for (const b of blocks) {
+        if (!b.projects) continue;
+        for (const p of b.projects) tasks.push({ ws: b.ws, project: p });
+    }
+
+    if (tasks.length === 0) {
+        statusEl.style.color = '#fca5a5';
+        statusEl.textContent = '⚠ No projects to export.';
+        return;
+    }
+
+    state.exporting = true;
+    setExportButtonDisabled(true);
+    statusEl.style.color = '#94a3b8';
+    statusEl.textContent = 'Fetching git info: 0 / ' + tasks.length + '…';
+
+    const exportedAt = new Date().toISOString();
+    const rows: ExportRow[] = [];
+
+    // Sequential fetch — mem://constraints/no-retry-policy (fail-fast, single attempt per project).
+    let i = 0;
+    for (const task of tasks) {
+        i++;
+        const tabIsOpen = isOpen(task.project.id, tabIndex);
+        const git = await fetchProjectGitInfo(task.project.id);
+        rows.push({
+            workspaceId: task.ws.id,
+            workspaceName: task.ws.fullName || task.ws.name || task.ws.id,
+            creditsUsed: task.ws.totalCreditsUsed ?? task.ws.used ?? 0,
+            creditsTotal: task.ws.totalCredits ?? task.ws.limit ?? 0,
+            projectId: task.project.id,
+            projectName: task.project.name,
+            isOpenInChrome: tabIsOpen ? 'yes' : 'no',
+            gitRepo: git.repo,
+            gitBranch: git.branch,
+            lastCommunication: git.lastMessageAt,
+            gitFetchError: git.error,
+            extensionVersion: VERSION,
+            exportedAt,
+        });
+        statusEl.textContent = 'Fetching git info: ' + i + ' / ' + tasks.length
+            + ' (' + Math.round((i / tasks.length) * 100) + '%)';
+    }
+
+    const csv = buildCsv(rows);
+    const filename = 'marco-projects-' + exportedAt.replace(/[:.]/g, '-') + '.csv';
+    downloadCsv(filename, csv);
+
+    state.exporting = false;
+    setExportButtonDisabled(false);
+    statusEl.style.color = '#10b981';
+    statusEl.textContent = '✓ Exported ' + rows.length + ' project'
+        + (rows.length === 1 ? '' : 's') + ' → ' + filename;
+    log('Projects: CSV export complete (' + rows.length + ' rows)', 'info');
+}
+
+async function fetchProjectGitInfo(projectId: string): Promise<ProjectGitInfo> {
+    const blank: ProjectGitInfo = { repo: '', branch: '', lastMessageAt: '', error: '' };
+    const sdk = window.marco;
+    if (!sdk?.api?.projects || typeof sdk.api.projects.get !== 'function') {
+        return { ...blank, error: 'sdk.projects.get unavailable' };
+    }
+    try {
+        const resp = await sdk.api.projects.get(projectId, { baseUrl: CREDIT_API_BASE });
+        if (!resp.ok) {
+            const msg = 'HTTP ' + resp.status;
+            logError('Projects', 'projects.get HTTP ' + resp.status + ' for project=' + projectId);
+            return { ...blank, error: msg };
+        }
+        // Tolerate either { project: {...} } or {...} shapes.
+        const data = resp.data as Record<string, unknown>;
+        const inner = (data.project && typeof data.project === 'object')
+            ? data.project as Record<string, unknown>
+            : data;
+        const repo = pickString(inner, ['github_repo', 'githubRepo', 'github_full_name', 'repo_full_name']);
+        const branch = pickString(inner, ['github_branch', 'githubBranch', 'default_branch', 'branch']);
+        const lastMessageAt = pickString(inner, ['last_message_at', 'lastMessageAt', 'updated_at', 'updatedAt']);
+        return { repo, branch, lastMessageAt, error: '' };
+    } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : String(err);
+        logError('Projects', 'projects.get threw for project=' + projectId + ': ' + msg);
+        return { ...blank, error: msg };
+    }
+}
+
+function pickString(obj: Record<string, unknown>, keys: ReadonlyArray<string>): string {
+    for (const k of keys) {
+        const v = obj[k];
+        if (typeof v === 'string' && v.length > 0) return v;
+    }
+    return '';
+}
+
+function buildCsv(rows: ReadonlyArray<ExportRow>): string {
+    const lines: string[] = [];
+    lines.push(EXPORT_HEADERS.map(escapeCsv).join(','));
+    for (const row of rows) {
+        lines.push(EXPORT_HEADERS.map(function (h) { return escapeCsv(String(row[h] ?? '')); }).join(','));
+    }
+    return lines.join('\r\n') + '\r\n';
+}
+
+function escapeCsv(value: string): string {
+    if (value === '' || !/[",\r\n]/.test(value)) return value;
+    return '"' + value.replace(/"/g, '""') + '"';
+}
+
+function downloadCsv(filename: string, csv: string): void {
+    try {
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    } catch (err) {
+        logError('Projects', 'CSV download failed: ' + String(err));
+    }
+}
+
+function setExportButtonDisabled(disabled: boolean): void {
+    const btn = document.getElementById('marco-projects-export-btn') as HTMLButtonElement | null;
+    if (!btn) return;
+    btn.disabled = disabled;
+    btn.style.opacity = disabled ? '0.5' : '1';
+    btn.style.cursor = disabled ? 'wait' : 'pointer';
+    btn.textContent = disabled ? '⏳ Exporting…' : '⬇ Export CSV';
+}
