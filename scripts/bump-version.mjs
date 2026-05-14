@@ -92,7 +92,7 @@ function getTargets(ver) {
     {
       path: "standalone-scripts/macro-controller/src/instruction.ts",
       replacements: [
-        { pattern: /([Vv]ersion:\s*")[\d.]+(")/,               replacement: `$1${ver}$2` },
+        { pattern: /(\b[Vv]ersion:\s*")[\d.]+(")/,             replacement: `$1${ver}$2` },
       ],
     },
     {
@@ -105,7 +105,7 @@ function getTargets(ver) {
     {
       path: "standalone-scripts/marco-sdk/src/instruction.ts",
       replacements: [
-        { pattern: /([Vv]ersion:\s*")[\d.]+(")/,               replacement: `$1${ver}$2` },
+        { pattern: /(\b[Vv]ersion:\s*")[\d.]+(")/,             replacement: `$1${ver}$2` },
       ],
     },
     {
@@ -118,7 +118,7 @@ function getTargets(ver) {
     {
       path: "standalone-scripts/xpath/src/instruction.ts",
       replacements: [
-        { pattern: /([Vv]ersion:\s*")[\d.]+(")/,               replacement: `$1${ver}$2` },
+        { pattern: /(\b[Vv]ersion:\s*")[\d.]+(")/,             replacement: `$1${ver}$2` },
       ],
     },
     {
@@ -132,19 +132,19 @@ function getTargets(ver) {
       // P20 — Lovable Owner Switch / User Add / Common (registered for unified bump)
       path: "standalone-scripts/lovable-common/src/instruction.ts",
       replacements: [
-        { pattern: /([Vv]ersion:\s*")[\d.]+(")/,               replacement: `$1${ver}$2` },
+        { pattern: /(\b[Vv]ersion:\s*")[\d.]+(")/,             replacement: `$1${ver}$2` },
       ],
     },
     {
       path: "standalone-scripts/lovable-owner-switch/src/instruction.ts",
       replacements: [
-        { pattern: /([Vv]ersion:\s*")[\d.]+(")/,               replacement: `$1${ver}$2` },
+        { pattern: /(\b[Vv]ersion:\s*")[\d.]+(")/,             replacement: `$1${ver}$2` },
       ],
     },
     {
       path: "standalone-scripts/lovable-user-add/src/instruction.ts",
       replacements: [
-        { pattern: /([Vv]ersion:\s*")[\d.]+(")/,               replacement: `$1${ver}$2` },
+        { pattern: /(\b[Vv]ersion:\s*")[\d.]+(")/,             replacement: `$1${ver}$2` },
       ],
     },
   ];
