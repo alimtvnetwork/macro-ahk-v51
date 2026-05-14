@@ -445,7 +445,7 @@ async function exportCsv(statusEl: HTMLElement): Promise<void> {
     state.exporting = true;
     setExportButtonDisabled(true);
     statusEl.style.color = '#94a3b8';
-    statusEl.textContent = 'Fetching git info: 0 / ' + tasks.length + '…';
+    statusEl.textContent = 'Fetching git + last communication: 0 / ' + tasks.length + '…';
 
     const exportedAt = new Date().toISOString();
     const rows: ExportRow[] = [];
