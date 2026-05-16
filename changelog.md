@@ -6,6 +6,28 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [v2.244.0] — 2026-05-16 URL trigger gate + DOM sentinel cache (audit U-1…U-3, U-8)
+
+### Added
+- **URL trigger gate** (`src/background/url-trigger.ts`): single module wires the three — and only three — re-evaluation triggers per the user contract:
+  - **T1 — initial load** via `webNavigation.onCompleted` (frameId 0)
+  - **T2 — refresh** via `webNavigation.onCommitted` where `transitionType === "reload"`
+  - **T3 — tab activate** via `chrome.tabs.onActivated`
+  Each trigger fingerprints the URL with `urlFingerprint()` (origin + pathname + sorted query, hash stripped) and consults `tabDecisionCache` via `isSameDecisionFingerprint()`. Cache hit → short-circuit, zero work. No polling, no observers, no retry.
+- **DOM sentinel** `<div id="__marco_sentinel__">` injected into the page MAIN world with `data-fp`, `data-projects`, `data-can-run`, `data-trigger`, `data-decided-at` so page-side checks become O(1) `document.getElementById()` lookups. Page-side reader at `src/content-scripts/sentinel-reader.ts` exposes `readSentinel()` / `isExtensionApplicableHere()`. Sentinel is a HINT — background `tabDecisionCache` remains authoritative.
+- **`src/background/url-fingerprint.ts`** — stable URL fingerprint utility + unit tests (`__tests__/url-fingerprint.test.ts`): hash-strip, query-sort, malformed-URL fallback.
+- **`state-manager.ts`**: new `TabDecision` type + `tabDecisionCache: Map<tabId, TabDecision>` with `getTabDecision`, `setTabDecision`, `clearTabDecision`, `isSameDecisionFingerprint`. Memory-only by design — SW restart re-warms from the next trigger. `removeTabInjection(tabId)` now also clears the decision-cache entry.
+
+### Fixed
+- **U-2 SPA pushState storm** (`src/background/spa-reinject.ts`): added per-tab `lastProbedFingerprint` map. Bursts of `pushState`/`replaceState` on the same effective URL (React routers re-syncing query params) now collapse into a single marker probe + `executeScript` round-trip instead of one per event.
+- **U-8 cookie watcher fan-out** (`src/background/cookie-watcher.ts`): added 200 ms trailing debounce keyed by cookie name. A session refresh that rotates 3 cookies in <100 ms now triggers ONE `tabs.query()` instead of three. No retry, no exponential backoff (No-Retry policy upheld).
+
+### Notes
+- Hard rules captured in `mem://architecture/url-trigger-sentinel-cache`: never throw from a chrome event listener, sub-frames always ignored, no polling, no backoff inside gates.
+- Audit & resolution: `.lovable/audits/2026-05-16-url-trigger-and-energy-audit.md`.
+
+---
+
 ## [v2.243.0] — 2026-05-15 Loop and leak fixes (audit L-1…L-5)
 
 ### Fixed
