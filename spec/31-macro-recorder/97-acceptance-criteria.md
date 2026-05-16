@@ -6,7 +6,7 @@
 > is load-bearing for cross-document traceability.
 
 **Source**: `spec/31-macro-recorder/19-url-tabs-appearance-waits-conditions.md`
-**Status**: Spec'd; implementation phased per `.lovable/plan.md` rows 19.1 (✅) / 19.2 / 19.3 / 19.4 (✅) / 19.5 / 19.6.
+**Status**: All Spec 19 tasks (19.1–19.6) implemented as of 2026-05-16. See "Implementation status" table at the bottom for per-task status and AC coverage.
 
 ---
 
