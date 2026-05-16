@@ -209,4 +209,4 @@ Documents three behaviours with full acceptance criteria (AC-19.1.x / AC-19.2.x 
 | 19.3 | `validateCondition` save-time rules + structured `ConditionFailureRecord` shape (AC-19.3.1–10) | 📋 Spec'd |
 | 19.4 | Migration `005` — seed `StepKind (9, 'UrlTabClick')` | ✅ 2026-04-27 (`recorder-db-schema.ts` seed + `StepKindId.UrlTabClick = 9`; tests 10/10) |
 | 19.5 | Step inspector UI for `UrlTabClick` editor | 📋 Spec'd |
-| 19.6 | Append AC-19.* into `97-acceptance-criteria.md` + LlmGuide cookbook | 📋 Spec'd |
+| 19.6 | Append AC-19.* into `97-acceptance-criteria.md` + LlmGuide cookbook | ✅ 2026-05-16 (new `spec/31-macro-recorder/97-acceptance-criteria.md` consolidates AC-19.1.1..10 + AC-19.2.1..7 + AC-19.3.1..10 with implementation-status table; `llm-guide.md` §11 "Spec 19 Cookbook" added with capture/replay/validate recipes; §10 "Where to Read Next" links to new AC file. Test-writing convention `it("AC-19.x.y: …")` documented.) |
