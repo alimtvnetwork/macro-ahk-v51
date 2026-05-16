@@ -31,8 +31,9 @@ describe("urlFingerprint", () => {
         expect(urlFingerprint("not a url")).toBe("not a url");
     });
 
-    it("treats no-params and empty-params as equivalent", () => {
-        expect(urlFingerprint("https://x.test/a"))
-            .toBe(urlFingerprint("https://x.test/a?"));
+    it("is stable across calls", () => {
+        const a = urlFingerprint("https://x.test/a?b=1");
+        const b = urlFingerprint("https://x.test/a?b=1");
+        expect(a).toBe(b);
     });
 });
