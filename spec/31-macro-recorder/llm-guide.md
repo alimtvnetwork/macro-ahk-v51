@@ -230,8 +230,83 @@ Current coverage: **83 / 83** tests passing across:
    table reference.
 2. `spec/31-macro-recorder/02-phases.md` — phase-by-phase implementation
    history (12 phases, all ✅).
-3. `spec/32-app-performance/01-performance-findings.md` — perf budget the
+3. `spec/31-macro-recorder/97-acceptance-criteria.md` — every `AC-19.*`
+   identifier in one place (cite verbatim in PRs, tests, and bug reports).
+4. `spec/32-app-performance/01-performance-findings.md` — perf budget the
    recorder must respect (PERF-R1..R7 + inherited PERF-9..13).
-4. `mem://preferences/deferred-workstreams.md` — what is intentionally
+5. `mem://preferences/deferred-workstreams.md` — what is intentionally
    skipped this iteration (UI shadow-root toolbar, manual browser testing,
    React component tests).
+
+---
+
+## 11. Spec 19 Cookbook — URL Tabs, Appearance Waits, Condition Rules
+
+Quick reference for the three behaviors introduced in
+`spec/31-macro-recorder/19-url-tabs-appearance-waits-conditions.md`.
+Full contract + acceptance criteria live in spec 19 and
+`97-acceptance-criteria.md`.
+
+### 11.1 Adding a `UrlTabClick` step (StepKindId = 9)
+
+```ts
+// capture-to-step-bridge.ts — deriveUrlTabClickParams() already handles
+// the three common shapes: <a target="_blank">, window.open(...), and
+// a same-tab navigating click whose final URL differs from the start URL.
+//
+// Persisted shape (Step.ParamsJson — see spec 19 §1.2):
+{
+  Mode: "OpenNew" | "FocusExisting" | "OpenOrFocus",
+  UrlPattern: { Dialect: "Exact" | "Prefix" | "Glob" | "Regex", Value: string },
+  DirectOpen: boolean,         // true → skip the click and just open the URL
+  Url: string,                 // required when DirectOpen=true (AC-19.1.6)
+  TimeoutMs: number            // pattern-match window (AC-19.1.8)
+}
+```
+
+Replay primitive: `executeUrlTabClick(step, ctx)` in
+`src/background/recorder/url-tab-click.ts`. **Always** rebind
+`ctx.activeTabId` to the resolved tab before returning (AC-19.1.10) —
+the next step will target the wrong tab otherwise.
+
+### 11.2 Replacing ad-hoc waits with `waitForCondition`
+
+Every element-appearance wait — `Step.WaitFor`, `Step.Gate`, implicit
+post-actuation settle — goes through one function:
+
+```ts
+waitForCondition(condition: ConditionTree, {
+  TimeoutMs: number,
+  PollMs: number,           // ≥ 1, AC-19.2.5
+  OnTimeout: "Fail" | "Skip" // AC-19.2.2 / AC-19.2.3
+}): Promise<ConditionResult>
+```
+
+Legacy `WaitFor`-only rows are read as `{ Condition: Exists(sel) }`
+gates by the runner — **do not migrate them** (AC-19.2.4). The waiter
+guarantees at least two probes even on tiny budgets (AC-19.2.6).
+
+### 11.3 Validating condition trees at save time
+
+`validateCondition(tree)` runs **before** the row hits SQLite:
+
+- Auto-detects `SelectorKind` from leading `/` or `(` → `XPath`,
+  everything else → `Css` (AC-19.3.1 / AC-19.3.2).
+- Rejects trees deeper than 8 with `ConditionTooDeep` (AC-19.3.6).
+- Rejects `TextRegex` patterns that fail to compile (AC-19.3.7).
+- Rejects any leaf whose `SelectorId` is foreign to the project (AC-19.3.10).
+
+Failed evaluations return a `ConditionFailureRecord` (AC-19.3.8) — the
+same shape `failure-report.ts` already expects, no new logger path.
+
+### 11.4 Test-writing checklist
+
+When adding a Spec-19 test, cite the AC ID in the `it()` description:
+
+```ts
+it("AC-19.1.6: DirectOpen=true with empty Url fails InvalidUrlPattern", ...)
+```
+
+This keeps the `97-acceptance-criteria.md` table auto-greppable and
+prevents drift between spec, code, and test names.
+
