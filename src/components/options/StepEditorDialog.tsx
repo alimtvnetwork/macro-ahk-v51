@@ -189,6 +189,7 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
             setTargetGroupId(null);
             setHotkeyChords([]);
             setHotkeyWaitMs("");
+            setUrlTabClick({ ...URL_TAB_CLICK_DEFAULTS });
         } else {
             setKind(mode.Step.StepKindId);
             setLabel(mode.Step.Label ?? "");
@@ -208,6 +209,12 @@ export default function StepEditorDialog(props: StepEditorDialogProps): JSX.Elem
                 setHotkeyChords([]);
                 setHotkeyWaitMs("");
             }
+            // Hydrate UrlTabClick form from PayloadJson when editing.
+            setUrlTabClick(
+                mode.Step.StepKindId === StepKindId.UrlTabClick
+                    ? hydrateUrlTabClickForm(mode.Step.PayloadJson)
+                    : { ...URL_TAB_CLICK_DEFAULTS },
+            );
         }
     }, [open, mode]);
 
