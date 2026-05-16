@@ -593,8 +593,13 @@ function buildJsonProjectEntry(name, result) {
     };
 
     const canonical = buildArtifact(result.canonical, result.canonicalResult, "PascalCase");
-    const compat = buildArtifact(result.compat, result.compatResult, "camelCase");
-    const exitCode = canonical.ok && compat.ok && !canonical.parseError && !compat.parseError && !canonical.walkAborted && !compat.walkAborted ? 0 : 1;
+    const compat = result.compat && result.compatResult
+        ? buildArtifact(result.compat, result.compatResult, "camelCase")
+        : null;
+    const compatOk = compat === null
+        ? true
+        : (compat.ok && !compat.parseError && !compat.walkAborted);
+    const exitCode = canonical.ok && compatOk && !canonical.parseError && !canonical.walkAborted ? 0 : 1;
 
     return {
         name,
