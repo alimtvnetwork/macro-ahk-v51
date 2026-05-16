@@ -333,18 +333,25 @@ function checkProject(projectName) {
     if (!existsSync(tsPath)) {
         return { skipped: true, reason: "no src/instruction.ts" };
     }
-    if (!existsSync(canonical) || !existsSync(compat)) {
+    if (!existsSync(canonical)) {
         return {
             missingArtifact: true,
-            canonicalExists: existsSync(canonical),
+            canonicalExists: false,
             compatExists: existsSync(compat),
             distDir,
         };
     }
 
     const canonicalResult = scanArtifact(canonical, isLegalPascalKey, "PascalCase");
-    const compatResult = scanArtifact(compat, isLegalCamelKey, "camelCase");
-    return { canonical, compat, canonicalResult, compatResult };
+    // Phase 2c: the compat artifact is no longer emitted by
+    // compile-instruction.mjs. We still scan it when it happens to be
+    // present (e.g. truncation-test fixtures, stale dist from before
+    // the migration) so any lingering camelCase shape is verified;
+    // when it's absent the canonical-only path is the steady state.
+    const compatResult = existsSync(compat)
+        ? scanArtifact(compat, isLegalCamelKey, "camelCase")
+        : null;
+    return { canonical, compat: existsSync(compat) ? compat : null, canonicalResult, compatResult };
 }
 
 /* ----------------------------------------------------------------- */
