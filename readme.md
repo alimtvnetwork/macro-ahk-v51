@@ -45,7 +45,7 @@ curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v33/releases/download/v2.2
 
 **Pinned version:** `v2.249.5` &nbsp;•&nbsp; **Macro Controller:** `v2.249.5`
 
-> **v2.249.5 release-asset fix:** the previous release pipeline pointed at a legacy `chrome-extension/dist/` subfolder that no longer exists (the unpacked extension is built into `chrome-extension/` itself — see `vite.config.extension.ts` and `powershell.json → distDir`). That mismatch caused `marco-extension-{VER}.zip` to be silently absent from the GitHub Releases page. The workflow now zips `chrome-extension/` directly and fails fast if the extension zip is missing or `< 10 KiB`. RCA: [`mem://constraints/chrome-extension-dist-path`](.lovable/memory/constraints/chrome-extension-dist-path.md).
+> **v2.243.0 release-asset fix (historical):** the previous release pipeline pointed at a legacy `chrome-extension/dist/` subfolder that no longer exists (the unpacked extension is built into `chrome-extension/` itself — see `vite.config.extension.ts` and `powershell.json → distDir`). That mismatch caused `marco-extension-{VER}.zip` to be silently absent from the GitHub Releases page. The workflow now zips `chrome-extension/` directly and fails fast if the extension zip is missing or `< 10 KiB`. RCA: [`mem://constraints/chrome-extension-dist-path`](.lovable/memory/constraints/chrome-extension-dist-path.md).
 
 > Jump straight to your platform: **[🪟 Install on Windows (PowerShell)](#-install-on-windows-powershell)** &nbsp;•&nbsp; **[🐧 Install on Linux / macOS (Bash)](#-install-on-linux--macos-bash)** &nbsp;•&nbsp; **[Full Quick Start](#quick-start)**
 
