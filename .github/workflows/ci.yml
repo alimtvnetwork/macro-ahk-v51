@@ -2100,7 +2100,7 @@ jobs:
 
       - name: Verify no source maps in dist
         run: |
-          MAP_FILES=$(find chrome-extension/dist -name '*.map' 2>/dev/null || true)
+          MAP_FILES=$(find chrome-extension -name '*.map' 2>/dev/null || true)
           if [ -n "$MAP_FILES" ]; then
             echo "::error::Source map files found in dist — production builds must not include .map files:"
             echo "$MAP_FILES"
