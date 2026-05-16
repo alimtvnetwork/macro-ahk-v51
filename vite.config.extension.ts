@@ -392,13 +392,12 @@ function copyProjectScripts(): Plugin {
                 const projectRootDir = resolve(standaloneDir, folder.name);
                 const sourceInstructionPath = resolve(projectRootDir, "src", "instruction.ts");
                 const instructionPath = resolve(projectRootDir, "dist", "instruction.json");
-                // Phase 2b: this plugin still reads camelCase keys
-                // (`assets.configs`, `displayName`, `version`). It therefore
-                // consumes the transitional camelCase compat snapshot
-                // emitted alongside the canonical PascalCase file by
-                // scripts/compile-instruction.mjs. Phase 2c will migrate
-                // this plugin to PascalCase and drop the compat read.
-                const instructionCompatPath = resolve(projectRootDir, "dist", "instruction.compat.json");
+                // Phase 2c: this plugin reads the canonical PascalCase
+                // instruction.json directly (Assets.{Configs,Templates,
+                // Prompts,Css,Scripts}; DisplayName; Version; per-asset
+                // File / Key). The transitional camelCase compat snapshot
+                // is no longer consumed here. See
+                // mem://standards/pascalcase-json-keys.
 
                 if (!existsSync(instructionPath) && existsSync(sourceInstructionPath)) {
                     try {
@@ -414,16 +413,13 @@ function copyProjectScripts(): Plugin {
                 if (!existsSync(instructionPath)) continue;
 
                 try {
-                    // Read the camelCase compat snapshot for this plugin's
-                    // legacy key access. Fall back to the canonical file
-                    // ONLY for top-level pass-through if the compat file
-                    // is somehow missing (e.g. stale dist from before
-                    // Phase 2b) — in that case the canonical PascalCase
-                    // shape will fail the camelCase reads below and
-                    // surface a clear error.
-                    const instructionForCamelReads = existsSync(instructionCompatPath)
-                        ? JSON.parse(readFileSync(instructionCompatPath, "utf-8"))
-                        : JSON.parse(readFileSync(instructionPath, "utf-8"));
+                    // Canonical PascalCase read. The dist-copy loop below
+                    // still copies every dist artifact (including the
+                    // transitional `instruction.compat.json` when present)
+                    // so consumers reading the compat snapshot via
+                    // web_accessible_resources keep working until Phase 2c
+                    // also retires the dual-emit.
+                    const instruction = JSON.parse(readFileSync(instructionPath, "utf-8"));
                     const distDir = resolve(projectRootDir, "dist");
 
                     // Per-project subfolder
@@ -431,10 +427,6 @@ function copyProjectScripts(): Plugin {
                     mkdirSync(projectDir, { recursive: true });
 
                     // Copy ALL dist/ artifacts into the project subfolder.
-                    // This includes BOTH `instruction.json` (canonical
-                    // PascalCase) and `instruction.compat.json` (camelCase
-                    // transitional snapshot), so consumers reading either
-                    // shape from web_accessible_resources keep working.
                     if (existsSync(distDir)) {
                         const distFiles = readdirSync(distDir).filter(
                             (f) => !f.startsWith("."),
@@ -448,15 +440,15 @@ function copyProjectScripts(): Plugin {
                     }
 
                     const declaredAssets = [
-                        ...(instructionForCamelReads.assets?.configs ?? []),
-                        ...(instructionForCamelReads.assets?.templates ?? []),
-                        ...(instructionForCamelReads.assets?.prompts ?? []),
-                        ...(instructionForCamelReads.assets?.css ?? []),
-                        ...(instructionForCamelReads.assets?.scripts ?? []),
-                    ] as Array<{ file: string; key?: string }>;
+                        ...(instruction.Assets?.Configs ?? []),
+                        ...(instruction.Assets?.Templates ?? []),
+                        ...(instruction.Assets?.Prompts ?? []),
+                        ...(instruction.Assets?.Css ?? []),
+                        ...(instruction.Assets?.Scripts ?? []),
+                    ] as Array<{ File: string; Key?: string }>;
 
                     for (const asset of declaredAssets) {
-                        const dest = resolve(projectDir, asset.file);
+                        const dest = resolve(projectDir, asset.File);
                         if (existsSync(dest)) {
                             continue;
                         }
@@ -464,17 +456,17 @@ function copyProjectScripts(): Plugin {
                         const source = resolveDeclaredAssetSource(
                             projectRootDir,
                             distDir,
-                            asset.file,
-                            asset.key,
+                            asset.File,
+                            asset.Key,
                         );
 
                         if (!source) {
-                            console.warn(`[copy-project-scripts] Missing declared asset for ${folder.name}: ${asset.file}`);
+                            console.warn(`[copy-project-scripts] Missing declared asset for ${folder.name}: ${asset.File}`);
                             continue;
                         }
 
                         copyFileSync(source, dest);
-                        console.log(`[copy-project-scripts]   + ${folder.name}/${asset.file} (declared asset)`);
+                        console.log(`[copy-project-scripts]   + ${folder.name}/${asset.File} (declared asset)`);
                     }
 
                     // Copy the canonical instruction.json itself (the
@@ -484,7 +476,7 @@ function copyProjectScripts(): Plugin {
                     copyFileSync(instructionPath, resolve(projectDir, "instruction.json"));
 
                     copiedCount++;
-                    console.log(`[copy-project-scripts] ✓ ${folder.name} (${instructionForCamelReads.displayName || folder.name} v${instructionForCamelReads.version || "?"})`);
+                    console.log(`[copy-project-scripts] ✓ ${folder.name} (${instruction.DisplayName || folder.name} v${instruction.Version || "?"})`);
                 } catch (e) {
                     console.warn(`[copy-project-scripts] Failed to process ${folder.name}: ${e}`);
                 }
