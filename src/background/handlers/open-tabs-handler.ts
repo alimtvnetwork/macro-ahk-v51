@@ -22,6 +22,20 @@ import { STORAGE_KEY_ALL_PROJECTS } from "../../shared/constants";
 import type { StoredProject, UrlRule } from "../../shared/project-types";
 import { getTabInjections } from "../state-manager";
 import { isUrlMatch } from "../url-matcher";
+import { BgLogTag, logBgError } from "../bg-logger";
+
+/**
+ * Short, machine-grep-able failure classification for the workspace probe.
+ * Conforms to the mandatory failure-log shape (Core memory: every failure MUST
+ * log `Reason` + `ReasonDetail`). "NoReceiver" is the common benign case where
+ * the controller hasn't been injected into the tab yet.
+ */
+export type ProbeFailureReason =
+    | "NoTabId"
+    | "NoReceiver"
+    | "EmptyResponse"
+    | "ProbeFailed"
+    | "Exception";
 
 export type DetectedWorkspaceSource = "api" | "cache" | "dom" | "none";
 
