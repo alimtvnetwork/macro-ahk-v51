@@ -162,7 +162,7 @@ Implementation is gated on the user's "next" — at that point we tackle U-1, U-
 | U-1 | ✅ Fixed | New `src/background/url-trigger.ts` wires T1 `webNavigation.onCompleted` with `tabDecisionCache` dedup gate. Legacy `auto-injector.ts` left in manual-only mode (unchanged); URL evaluation now flows through the new gate. |
 | U-2 | ✅ Fixed | `spa-reinject.ts` now stores per-tab `lastProbedFingerprint` and skips probe+executeScript when the SPA event resolves to the same fingerprint. |
 | U-3 | ✅ Fixed | `url-trigger.ts` registers `chrome.tabs.onActivated` (T3) and evaluates on cache miss only. |
-| U-4 | 🟡 Deferred (P2) | `extractProjectIdFromUrl()` call-sites unchanged in this loop; centralization tracked as follow-up. Page-side scripts can now consume the sentinel’s `data-projects` instead. |
+| U-4 | ✅ Fixed (v2.246.0) | `extractProjectIdFromUrl()` memoized per `window.location.href`; `invalidateProjectIdCache()` invoked from spa-route-guard. ~10 callers now hit the cache after first read per page. |
 | U-5 | 🟡 Deferred (P2) | macro-controller `popstate` teardown is a separate refactor inside the standalone script; sentinel `data-fp` change is the signal hook to add when that work lands. |
 | U-6 | ✅ Already OK | Hot-reload remains dev-gated. |
 | U-7 | ✅ Already OK | Keepalive untouched. |
