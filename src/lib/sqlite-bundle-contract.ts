@@ -21,13 +21,23 @@
  *   - Required tables are ALWAYS present in a valid bundle.
  *     Optional tables may be absent (e.g. prompts-only export).
  *
- * Format version: '5' (current). v4 still accepted for read-back compat.
+ * Format version: '6' (current). v4/v5 still accepted for read-back compat.
  *
  * v5 additions vs v4 (all optional, additive — v4 bundles still validate):
  *   - Projects: Slug, Cookies, Dependencies, IsGlobal, IsRemovable
  *   - Scripts:  UpdateUrl, LastUpdateCheck
  *   - Prompts:  Slug is now actually emitted (was contract-allowed in v4
  *               but never written — see audit Pr-1 / Task Next resolver).
+ *
+ * v6 additions vs v5 (all optional, additive — v5 bundles still validate):
+ *   - Dependencies (new table): row-per-dependency promotion of the
+ *     Projects.Dependencies JSON blob. JSON blob still emitted for
+ *     backward read by v4/v5-only builds.
+ *   - Variables (new table): row-per-variable promotion of the
+ *     Projects.Settings.variables JSON map. Settings JSON still emitted
+ *     for backward read.
+ *   - Projects.SchemaVersion default bumped 1 → 2 on emit (readers that
+ *     understand row-tables prefer them when SchemaVersion >= 2).
  *
  * See also:
  *   - docs/diagrams/sqlite-bundle-erd.mmd
@@ -95,6 +105,29 @@ export const BUNDLE_SCHEMA: Readonly<Record<string, BundleTableContract>> = {
         required: ["Id", "Key", "Value"],
         optional: [],
     },
+    /**
+     * v6: row-per-dependency promotion of Projects.Dependencies JSON blob.
+     * Optional table (absent in v4/v5 bundles, present in v6+ emits).
+     */
+    Dependencies: {
+        required: [
+            "Id", "ProjectUid", "DependsOnProjectId",
+            "CreatedAt", "UpdatedAt",
+        ],
+        optional: ["Uid", "Version"],
+    },
+    /**
+     * v6: row-per-variable promotion of Projects.Settings.variables map.
+     * Value is JSON-stringified to preserve non-string types (objects,
+     * arrays, booleans, null) on round-trip. Optional table.
+     */
+    Variables: {
+        required: [
+            "Id", "ProjectUid", "Name",
+            "CreatedAt", "UpdatedAt",
+        ],
+        optional: ["Uid", "Value"],
+    },
 } as const;
 
 /** Tables that MUST exist in a full bundle. */
@@ -142,9 +175,9 @@ export interface BundleValidationError {
  * additions are all OPTIONAL columns — a v4 DB satisfies the v5 contract,
  * it just round-trips the new fields as undefined).
  */
-export const SUPPORTED_FORMAT_VERSIONS = ["4", "5"] as const;
+export const SUPPORTED_FORMAT_VERSIONS = ["4", "5", "6"] as const;
 /** Version this build emits when exporting a fresh bundle. */
-export const CURRENT_FORMAT_VERSION = "5" as const;
+export const CURRENT_FORMAT_VERSION = "6" as const;
 
 /* ------------------------------------------------------------------ */
 /*  Validator (db-shape-agnostic — works on any sql.js-compatible db)  */

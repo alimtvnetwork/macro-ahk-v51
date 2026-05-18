@@ -124,6 +124,40 @@ const CREATE_PROMPTS_TABLE = `
   );
 `;
 
+/**
+ * v6: row-per-dependency promotion of Projects.Dependencies JSON blob.
+ * Projects.Dependencies JSON blob is still emitted so v4/v5 readers
+ * keep round-tripping. v6+ readers prefer this table when populated.
+ */
+const CREATE_DEPENDENCIES_TABLE = `
+  CREATE TABLE IF NOT EXISTS Dependencies (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Uid TEXT,
+    ProjectUid TEXT NOT NULL,
+    DependsOnProjectId TEXT NOT NULL,
+    Version TEXT,
+    CreatedAt TEXT NOT NULL,
+    UpdatedAt TEXT NOT NULL
+  );
+`;
+
+/**
+ * v6: row-per-variable promotion of Projects.Settings.variables map.
+ * Value is JSON-stringified to preserve non-string types on round-trip.
+ * Projects.Settings JSON still emitted for v4/v5 read-back.
+ */
+const CREATE_VARIABLES_TABLE = `
+  CREATE TABLE IF NOT EXISTS Variables (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Uid TEXT,
+    ProjectUid TEXT NOT NULL,
+    Name TEXT NOT NULL,
+    Value TEXT,
+    CreatedAt TEXT NOT NULL,
+    UpdatedAt TEXT NOT NULL
+  );
+`;
+
 /* ------------------------------------------------------------------ */
 /*  Init sql.js                                                        */
 /* ------------------------------------------------------------------ */
@@ -155,7 +189,11 @@ function insertProjects(db: Database, projects: StoredProject[]): void {
   for (const p of projects) {
     stmt.run([
       p.id ?? null,
-      p.schemaVersion ?? 1,
+      // v6: this build always writes row-table promotions (Dependencies,
+      // Variables), so the emitted SchemaVersion is at least 2 regardless
+      // of the source row's prior value. Importers gate row-table reads
+      // on SchemaVersion >= 2.
+      Math.max(p.schemaVersion ?? 2, 2),
       p.name ?? "",
       p.slug ?? null,
       p.version ?? "1.0.0",
@@ -265,6 +303,66 @@ function insertPrompts(db: Database, prompts: PromptEntry[]): void {
   stmt.free();
 }
 
+/**
+ * v6: write each project's dependencies as its own row in the new
+ * Dependencies table. Projects.Dependencies JSON blob is ALSO still
+ * emitted by insertProjects() so v4/v5-only readers keep round-tripping.
+ */
+function insertDependencies(db: Database, projects: ReadonlyArray<StoredProject>): void {
+  const stmt = db.prepare(`
+    INSERT INTO Dependencies (Uid, ProjectUid, DependsOnProjectId, Version, CreatedAt, UpdatedAt)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+  const now = new Date().toISOString();
+  for (const p of projects) {
+    const deps = Array.isArray(p.dependencies) ? p.dependencies : [];
+    for (const dep of deps) {
+      const d = dep as unknown as Record<string, unknown>;
+      const dependsOn = typeof d.projectId === "string" ? d.projectId : "";
+      if (!dependsOn) continue;
+      stmt.run([
+        null,
+        p.id ?? "",
+        dependsOn,
+        typeof d.version === "string" ? d.version : null,
+        now,
+        now,
+      ]);
+    }
+  }
+  stmt.free();
+}
+
+/**
+ * v6: write each project's settings.variables entry as its own row.
+ * Value is JSON-stringified to preserve non-string types. Settings
+ * JSON blob is still emitted by insertProjects() for v4/v5 read-back.
+ */
+function insertVariables(db: Database, projects: ReadonlyArray<StoredProject>): void {
+  const stmt = db.prepare(`
+    INSERT INTO Variables (Uid, ProjectUid, Name, Value, CreatedAt, UpdatedAt)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+  const now = new Date().toISOString();
+  for (const p of projects) {
+    const settings = (p.settings ?? {}) as Record<string, unknown>;
+    const rawVars = settings.variables;
+    if (rawVars == null || typeof rawVars !== "object") continue;
+    const vars = rawVars as Record<string, unknown>;
+    for (const [name, value] of Object.entries(vars)) {
+      stmt.run([
+        null,
+        p.id ?? "",
+        name,
+        value == null ? null : JSON.stringify(value),
+        now,
+        now,
+      ]);
+    }
+  }
+  stmt.free();
+}
+
 /** Fetches all data, builds a SQLite DB, zips it, and triggers download. */
 // eslint-disable-next-line max-lines-per-function
 export async function exportAllAsSqliteZip(): Promise<void> {
@@ -300,11 +398,15 @@ export async function exportAllAsSqliteZip(): Promise<void> {
   db.run(CREATE_CONFIGS_TABLE);
   db.run(CREATE_PROMPTS_TABLE);
   db.run(CREATE_META_TABLE);
+  db.run(CREATE_DEPENDENCIES_TABLE);
+  db.run(CREATE_VARIABLES_TABLE);
 
   insertProjects(db, projRes.projects);
   insertScripts(db, scriptsRes.scripts);
   insertConfigs(db, configsRes.configs);
   insertPrompts(db, prompts);
+  insertDependencies(db, projRes.projects);
+  insertVariables(db, projRes.projects);
   insertMeta(db);
 
   const dbData = db.export();
@@ -360,10 +462,14 @@ export async function exportProjectAsSqliteZip(project: StoredProject): Promise<
   db.run(CREATE_CONFIGS_TABLE);
   db.run(CREATE_PROMPTS_TABLE);
   db.run(CREATE_META_TABLE);
+  db.run(CREATE_DEPENDENCIES_TABLE);
+  db.run(CREATE_VARIABLES_TABLE);
 
   insertProjects(db, [project]);
   insertScripts(db, relatedScripts);
   insertConfigs(db, relatedConfigs);
+  insertDependencies(db, [project]);
+  insertVariables(db, [project]);
   insertMeta(db);
 
   const dbData = db.export();
@@ -442,10 +548,14 @@ export async function exportProjectsAsSqliteZip(
   db.run(CREATE_CONFIGS_TABLE);
   db.run(CREATE_PROMPTS_TABLE);
   db.run(CREATE_META_TABLE);
+  db.run(CREATE_DEPENDENCIES_TABLE);
+  db.run(CREATE_VARIABLES_TABLE);
 
   insertProjects(db, [...projects]);
   insertScripts(db, relatedScripts);
   insertConfigs(db, relatedConfigs);
+  insertDependencies(db, projects);
+  insertVariables(db, projects);
   insertMeta(db);
 
   const dbData = db.export();
@@ -483,6 +593,56 @@ function resolveUid(obj: Record<string, unknown>): string {
   return String(id ?? "");
 }
 
+/**
+ * v6: read row-per-dependency entries from the Dependencies table, grouped
+ * by ProjectUid. Empty map if the table is absent (v4/v5 bundles).
+ */
+function readDependenciesTable(db: Database): Map<string, Array<{ projectId: string; version: string }>> {
+  const out = new Map<string, Array<{ projectId: string; version: string }>>();
+  let rows;
+  try { rows = db.exec("SELECT * FROM Dependencies"); } catch { return out; }
+  if (rows.length === 0 || rows[0].values.length === 0) return out;
+  const cols = rows[0].columns;
+  for (const row of rows[0].values) {
+    const obj = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
+    const projectUid = String(obj["ProjectUid"] ?? "");
+    const dependsOn = String(obj["DependsOnProjectId"] ?? "");
+    if (!projectUid || !dependsOn) continue;
+    const version = obj["Version"] != null ? String(obj["Version"]) : "";
+    const list = out.get(projectUid) ?? [];
+    list.push({ projectId: dependsOn, version });
+    out.set(projectUid, list);
+  }
+  return out;
+}
+
+/**
+ * v6: read row-per-variable entries from the Variables table, grouped by
+ * ProjectUid. Values are JSON.parse'd to restore non-string types.
+ */
+function readVariablesTable(db: Database): Map<string, Record<string, unknown>> {
+  const out = new Map<string, Record<string, unknown>>();
+  let rows;
+  try { rows = db.exec("SELECT * FROM Variables"); } catch { return out; }
+  if (rows.length === 0 || rows[0].values.length === 0) return out;
+  const cols = rows[0].columns;
+  for (const row of rows[0].values) {
+    const obj = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
+    const projectUid = String(obj["ProjectUid"] ?? "");
+    const name = String(obj["Name"] ?? "");
+    if (!projectUid || !name) continue;
+    const rawValue = obj["Value"];
+    let parsed: unknown = null;
+    if (rawValue != null) {
+      try { parsed = JSON.parse(String(rawValue)); } catch { parsed = String(rawValue); }
+    }
+    const map = out.get(projectUid) ?? {};
+    map[name] = parsed;
+    out.set(projectUid, map);
+  }
+  return out;
+}
+
 function readProjects(db: Database): StoredProject[] {
   let rows;
   try { rows = db.exec("SELECT * FROM Projects"); } catch {
@@ -491,12 +651,30 @@ function readProjects(db: Database): StoredProject[] {
   const hasRows = rows.length > 0 && rows[0].values.length > 0;
   if (!hasRows) return [];
 
+  // v6 row-table maps (empty for v4/v5 bundles — fall back to JSON blobs).
+  const depsByProject = readDependenciesTable(db);
+  const varsByProject = readVariablesTable(db);
+
   const cols = rows[0].columns;
   return rows[0].values.map((row: SqlValue[]) => {
     const obj = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
+    const projectUid = resolveUid(obj);
+    const schemaVersion = (col(obj, "SchemaVersion", "schema_version") as number) ?? 1;
+    // v6 row-table promotion: when SchemaVersion >= 2 AND the rows exist,
+    // prefer them over the legacy JSON blob (which is still emitted for
+    // backward compatibility with v4/v5 readers).
+    const depRows = depsByProject.get(projectUid);
+    const dependencies = depRows && schemaVersion >= 2
+      ? depRows
+      : safeJsonParse(obj["Dependencies"] as string ?? null, [] as Array<{ projectId: string; version: string }>);
+    const settingsFromBlob = safeJsonParse(col(obj, "Settings", "settings") as string, {} as Record<string, unknown>);
+    const varRows = varsByProject.get(projectUid);
+    const settings = varRows && schemaVersion >= 2
+      ? { ...settingsFromBlob, variables: varRows }
+      : settingsFromBlob;
     return {
-      id: resolveUid(obj),
-      schemaVersion: (col(obj, "SchemaVersion", "schema_version") as number) ?? 1,
+      id: projectUid,
+      schemaVersion,
       name: (col(obj, "Name", "name") as string),
       slug: (obj["Slug"] as string) ?? undefined,
       version: (col(obj, "Version", "version") as string),
@@ -504,16 +682,11 @@ function readProjects(db: Database): StoredProject[] {
       targetUrls: safeJsonParse(col(obj, "TargetUrls", "target_urls") as string, []),
       scripts: safeJsonParse(col(obj, "Scripts", "scripts") as string, []),
       configs: safeJsonParse(col(obj, "Configs", "configs") as string, []),
-      // v5: read both cookies (modern) and cookieRules (deprecated). v4
-      // bundles lack the Cookies column entirely — safeJsonParse(null, [])
-      // returns [], which matches the runtime "no bindings" sentinel.
       cookies: safeJsonParse(obj["Cookies"] as string ?? null, []),
       cookieRules: safeJsonParse(col(obj, "CookieRules", "cookie_rules") as string, []),
-      dependencies: safeJsonParse(obj["Dependencies"] as string ?? null, []),
-      settings: safeJsonParse(col(obj, "Settings", "settings") as string, {}),
+      dependencies,
+      settings,
       isGlobal: obj["IsGlobal"] === 1,
-      // Default to TRUE when column absent (v4 bundles) — preserves the
-      // pre-v5 behaviour where every imported project was deletable.
       isRemovable: obj["IsRemovable"] == null ? true : obj["IsRemovable"] === 1,
       createdAt: (col(obj, "CreatedAt", "created_at") as string),
       updatedAt: (col(obj, "UpdatedAt", "updated_at") as string),
