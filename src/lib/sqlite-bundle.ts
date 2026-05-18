@@ -124,6 +124,40 @@ const CREATE_PROMPTS_TABLE = `
   );
 `;
 
+/**
+ * v6: row-per-dependency promotion of Projects.Dependencies JSON blob.
+ * Projects.Dependencies JSON blob is still emitted so v4/v5 readers
+ * keep round-tripping. v6+ readers prefer this table when populated.
+ */
+const CREATE_DEPENDENCIES_TABLE = `
+  CREATE TABLE IF NOT EXISTS Dependencies (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Uid TEXT,
+    ProjectUid TEXT NOT NULL,
+    DependsOnProjectId TEXT NOT NULL,
+    Version TEXT,
+    CreatedAt TEXT NOT NULL,
+    UpdatedAt TEXT NOT NULL
+  );
+`;
+
+/**
+ * v6: row-per-variable promotion of Projects.Settings.variables map.
+ * Value is JSON-stringified to preserve non-string types on round-trip.
+ * Projects.Settings JSON still emitted for v4/v5 read-back.
+ */
+const CREATE_VARIABLES_TABLE = `
+  CREATE TABLE IF NOT EXISTS Variables (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Uid TEXT,
+    ProjectUid TEXT NOT NULL,
+    Name TEXT NOT NULL,
+    Value TEXT,
+    CreatedAt TEXT NOT NULL,
+    UpdatedAt TEXT NOT NULL
+  );
+`;
+
 /* ------------------------------------------------------------------ */
 /*  Init sql.js                                                        */
 /* ------------------------------------------------------------------ */
