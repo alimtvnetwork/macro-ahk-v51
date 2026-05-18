@@ -189,7 +189,9 @@ function insertProjects(db: Database, projects: StoredProject[]): void {
   for (const p of projects) {
     stmt.run([
       p.id ?? null,
-      p.schemaVersion ?? 1,
+      // v6: bump default schema version 1 → 2 so importers know the
+      // row-table promotion (Dependencies, Variables) is authoritative.
+      p.schemaVersion ?? 2,
       p.name ?? "",
       p.slug ?? null,
       p.version ?? "1.0.0",
