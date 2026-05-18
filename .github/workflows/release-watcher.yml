@@ -14,10 +14,12 @@
 #   On every push to main that touches `.gitmap/release/v*.json`,
 #   it reads the version from the descriptor, verifies the matching
 #   `vX.Y.Z` tag exists on origin, and dispatches the canonical
-#   release.yml workflow with that version. release.yml's
-#   workflow_dispatch path then checks out the exact tag, builds
-#   every asset, gates on the required-asset verification step,
-#   and uploads to the GitHub Release.
+#   release.yml workflow from main with that version. This is deliberate:
+#   dispatching with `--ref refs/tags/<tag>` runs the workflow file as it
+#   existed at that old tag, so fixes on main are ignored and recovery can
+#   still publish no assets. release.yml's workflow_dispatch path then
+#   checks out the exact tag for packaging, builds every asset, gates on the
+#   required-asset verification step, and uploads to the GitHub Release.
 #
 # This makes asset publication deterministic regardless of how
 # the tag was created.
@@ -107,9 +109,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ steps.resolve.outputs.tag }}
+          WORKFLOW_REF: ${{ github.ref_name }}
         run: |
           set -euo pipefail
           gh workflow run release.yml \
-            --ref "refs/tags/${TAG}" \
+            --ref "${WORKFLOW_REF}" \
             -f version="${TAG}"
-          echo "Dispatched release.yml for ${TAG}"
+          echo "Dispatched release.yml from ${WORKFLOW_REF} for ${TAG}"
