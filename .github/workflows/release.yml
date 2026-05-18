@@ -304,6 +304,7 @@ jobs:
   build-prompts:
     name: Build · Prompts
     needs: setup
+    if: needs.setup.outputs.skip != 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -341,6 +342,7 @@ jobs:
   release:
     name: Build · Extension · Release
     needs: [setup, build-sdk, build-xpath, build-macro-controller, build-prompts]
+    if: needs.setup.outputs.skip != 'true'
     runs-on: ubuntu-latest
 
     steps:
