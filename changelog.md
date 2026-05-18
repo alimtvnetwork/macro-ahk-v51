@@ -6,7 +6,7 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [v3.3.0] — 2026-05-18 Release create-event trigger hardening
+## [v3.4.0] — 2026-05-18 Release create-event trigger hardening
 
 ### Why
 Creating a `release/*` branch or `vX.Y.Z` tag in GitHub can emit a `create`
@@ -25,8 +25,8 @@ and leave the Release page with no built ZIPs or installer assets.
   tag.
 
 ### Changed
-- Root `readme.md` install snippets pinned to `v3.3.0`.
-- All version-carrying files bumped `3.2.0` → `3.3.0`.
+- Root `readme.md` install snippets pinned to `v3.4.0`.
+- All version-carrying files bumped `3.2.0` → `3.4.0`.
 
 ---
 
