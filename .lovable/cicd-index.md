@@ -16,6 +16,7 @@ _None — all known CI/CD issues resolved._
 | # | File | Title | Pipeline | Status | Resolved |
 |---|---|---|---|---|---|
 | 01 | [`01-installer-contract-not-in-ci.md`](./cicd-issues/01-installer-contract-not-in-ci.md) | `check:installer-contract` not wired into installer-tests workflow | `.github/workflows/installer-tests.yml` | ✅ Resolved | 2026-04-24 |
+| 02 | [`02-release-page-missing-built-assets.md`](./cicd-issues/02-release-page-missing-built-assets.md) | Release page missing built assets (only tag + source archives) | `.github/workflows/release.yml` | ✅ Resolved | 2026-05-18 |
 
 ---
 
