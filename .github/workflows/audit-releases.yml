@@ -1,0 +1,105 @@
+# ──────────────────────────────────────────────────────────────
+# Marco Extension — Release Asset Audit
+#
+# Verifies every published `v*` GitHub Release has the required
+# built assets (not just the auto source archives). Distinguishes
+# user-uploaded assets from GitHub's automatic source code archives.
+#
+# See:
+#   - .github/workflows/release.yml
+#   - mem://constraints/release-assets-publish-contract
+#   - plan.md Step 5
+# ──────────────────────────────────────────────────────────────
+
+name: Audit Releases
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Specific tag to audit (e.g. v2.250.0). Leave blank to audit all v* releases.'
+        required: false
+        type: string
+  schedule:
+    # Weekly Monday 02:00 UTC
+    - cron: '0 2 * * 1'
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    name: Audit released assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Audit GitHub Releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SINGLE_TAG: ${{ github.event.inputs.tag }}
+        run: |
+          set -e
+          REQUIRED_PATTERNS=(
+            "marco-extension-VER.zip"
+            "macro-controller-VER.zip"
+            "marco-sdk-VER.zip"
+            "xpath-VER.zip"
+            "install.ps1"
+            "install.sh"
+            "VERSION.txt"
+            "changelog.md"
+            "checksums.txt"
+          )
+
+          if [ -n "$SINGLE_TAG" ]; then
+            TAGS="$SINGLE_TAG"
+          else
+            TAGS=$(gh release list --repo "$REPO" --limit 200 \
+              --json tagName --jq '.[].tagName' \
+              | grep -E '^v[0-9]' || true)
+          fi
+
+          if [ -z "$TAGS" ]; then
+            echo "No v* releases found"
+            exit 0
+          fi
+
+          FAIL=0
+          {
+            echo "## Release Asset Audit"
+            echo ""
+            echo "| Tag | Status | Missing assets |"
+            echo "|-----|--------|----------------|"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          for TAG in $TAGS; do
+            VER="$TAG"
+            ASSETS=$(gh release view "$TAG" --repo "$REPO" \
+              --json assets --jq '.assets[].name' 2>/dev/null || true)
+            if [ -z "$ASSETS" ]; then
+              echo "::error::$TAG — no uploaded assets (only GitHub source archives)"
+              echo "| \`$TAG\` | ❌ | (no uploaded assets) |" >> "$GITHUB_STEP_SUMMARY"
+              FAIL=$((FAIL+1))
+              continue
+            fi
+            MISSING=""
+            for PAT in "${REQUIRED_PATTERNS[@]}"; do
+              EXPECTED="${PAT//VER/$VER}"
+              if ! echo "$ASSETS" | grep -qx "$EXPECTED"; then
+                MISSING="${MISSING} ${EXPECTED}"
+              fi
+            done
+            if [ -n "$MISSING" ]; then
+              echo "::error::$TAG missing:$MISSING"
+              echo "| \`$TAG\` | ❌ |$MISSING |" >> "$GITHUB_STEP_SUMMARY"
+              FAIL=$((FAIL+1))
+            else
+              echo "✅ $TAG complete"
+              echo "| \`$TAG\` | ✅ | — |" >> "$GITHUB_STEP_SUMMARY"
+            fi
+          done
+
+          if [ "$FAIL" -gt 0 ]; then
+            echo "::error::${FAIL} release(s) missing required assets"
+            exit 1
+          fi
