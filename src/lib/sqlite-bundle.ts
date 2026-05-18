@@ -158,6 +158,37 @@ const CREATE_VARIABLES_TABLE = `
   );
 `;
 
+/**
+ * v6: PromptsCategory + PromptsToCategory tables preserve multi-category
+ * linkage on round-trip. Pre-v6 bundles flattened categories into the
+ * single Prompts.Category column (lossy when a prompt had >1 category).
+ * Prompts.Category is still emitted as the FIRST category for backward
+ * compat with v4/v5 readers.
+ *
+ * Junction stores PromptUid + CategoryName directly (rather than INTEGER
+ * Id pairs) so we don't need a two-phase write to resolve auto-increment
+ * Ids — bundle is a snapshot, not a relational live store.
+ */
+const CREATE_PROMPTS_CATEGORY_TABLE = `
+  CREATE TABLE IF NOT EXISTS PromptsCategory (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    Uid TEXT,
+    Name TEXT NOT NULL UNIQUE,
+    SortOrder INTEGER DEFAULT 0,
+    CreatedAt TEXT NOT NULL
+  );
+`;
+
+const CREATE_PROMPTS_TO_CATEGORY_TABLE = `
+  CREATE TABLE IF NOT EXISTS PromptsToCategory (
+    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+    PromptUid TEXT NOT NULL,
+    CategoryName TEXT NOT NULL,
+    CreatedAt TEXT NOT NULL
+  );
+`;
+
+
 /* ------------------------------------------------------------------ */
 /*  Init sql.js                                                        */
 /* ------------------------------------------------------------------ */
@@ -363,7 +394,81 @@ function insertVariables(db: Database, projects: ReadonlyArray<StoredProject>): 
   stmt.free();
 }
 
-/** Fetches all data, builds a SQLite DB, zips it, and triggers download. */
+/**
+ * v6: parse a prompt's category data into a deduplicated, ordered list.
+ * Prefers the comma-separated `categories` field (from PromptsDetails view)
+ * and falls back to the singular `category` for pre-view bundles.
+ */
+function parsePromptCategories(raw: Record<string, unknown>): string[] {
+  const joined = typeof raw.categories === "string" ? raw.categories
+    : typeof raw.category === "string" ? raw.category
+    : "";
+  if (!joined) return [];
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of joined.split(",")) {
+    const trimmed = part.trim();
+    if (!trimmed || seen.has(trimmed)) continue;
+    seen.add(trimmed);
+    out.push(trimmed);
+  }
+  return out;
+}
+
+/**
+ * v6: write PromptsCategory + PromptsToCategory rows so multi-category
+ * linkage survives round-trip. Categories are deduplicated across the
+ * whole prompt set; junction rows reference Prompts.Uid + Category Name
+ * (snapshot-friendly — no two-phase INSERT to resolve AUTOINCREMENT Ids).
+ */
+function insertPromptCategories(
+  db: Database,
+  prompts: ReadonlyArray<PromptEntry>,
+  rawPromptsByUid: Map<string, Record<string, unknown>>,
+): void {
+  const now = new Date().toISOString();
+
+  // 1) Collect ordered, unique category names across all prompts.
+  const seenCategories = new Set<string>();
+  const orderedCategories: string[] = [];
+  const promptCategoryMap = new Map<string, string[]>();
+  for (const p of prompts) {
+    const raw = rawPromptsByUid.get(p.id ?? "") ?? {};
+    const cats = parsePromptCategories(raw);
+    promptCategoryMap.set(p.id ?? "", cats);
+    for (const name of cats) {
+      if (!seenCategories.has(name)) {
+        seenCategories.add(name);
+        orderedCategories.push(name);
+      }
+    }
+  }
+
+  // 2) Insert each unique category once with its discovery order.
+  const catStmt = db.prepare(`
+    INSERT INTO PromptsCategory (Uid, Name, SortOrder, CreatedAt)
+    VALUES (?, ?, ?, ?)
+  `);
+  for (let i = 0; i < orderedCategories.length; i++) {
+    catStmt.run([null, orderedCategories[i], i, now]);
+  }
+  catStmt.free();
+
+  // 3) Insert junction rows for each (PromptUid, CategoryName).
+  const linkStmt = db.prepare(`
+    INSERT INTO PromptsToCategory (PromptUid, CategoryName, CreatedAt)
+    VALUES (?, ?, ?)
+  `);
+  for (const [promptUid, cats] of promptCategoryMap.entries()) {
+    if (!promptUid) continue;
+    for (const catName of cats) {
+      linkStmt.run([promptUid, catName, now]);
+    }
+  }
+  linkStmt.free();
+}
+
+
 // eslint-disable-next-line max-lines-per-function
 export async function exportAllAsSqliteZip(): Promise<void> {
   const [projRes, scriptsRes, configsRes, promptsRes] = await Promise.all([
@@ -373,11 +478,17 @@ export async function exportAllAsSqliteZip(): Promise<void> {
     sendMessage<{ prompts?: PromptEntry[] }>({ type: "GET_PROMPTS" }),
   ]);
 
+  // v6: keep the raw prompt records keyed by uid so insertPromptCategories
+  // can read the `categories` field (comma-separated string from the
+  // PromptsDetails view) without forcing PromptEntry to grow a new field.
+  const rawPromptsByUid = new Map<string, Record<string, unknown>>();
   const prompts: PromptEntry[] = Array.isArray(promptsRes.prompts)
     ? promptsRes.prompts.map((raw, i) => {
         const r = raw as unknown as Record<string, unknown>;
+        const uid = String(r.id ?? "");
+        rawPromptsByUid.set(uid, r);
         return {
-          id: String(r.id ?? ""),
+          id: uid,
           slug: typeof r.slug === "string" ? r.slug : undefined,
           name: (r.name as string) ?? "",
           text: (r.text as string) ?? "",
@@ -400,6 +511,8 @@ export async function exportAllAsSqliteZip(): Promise<void> {
   db.run(CREATE_META_TABLE);
   db.run(CREATE_DEPENDENCIES_TABLE);
   db.run(CREATE_VARIABLES_TABLE);
+  db.run(CREATE_PROMPTS_CATEGORY_TABLE);
+  db.run(CREATE_PROMPTS_TO_CATEGORY_TABLE);
 
   insertProjects(db, projRes.projects);
   insertScripts(db, scriptsRes.scripts);
@@ -407,6 +520,7 @@ export async function exportAllAsSqliteZip(): Promise<void> {
   insertPrompts(db, prompts);
   insertDependencies(db, projRes.projects);
   insertVariables(db, projRes.projects);
+  insertPromptCategories(db, prompts, rawPromptsByUid);
   insertMeta(db);
 
   const dbData = db.export();
@@ -747,6 +861,26 @@ function readConfigs(db: Database): StoredConfig[] {
   });
 }
 
+/**
+ * v6: read PromptsToCategory junction grouped by PromptUid. Empty map
+ * for v4/v5 bundles — readers fall back to Prompts.Category (singular).
+ */
+function readPromptCategoriesTable(db: Database): Map<string, string[]> {
+  const out = new Map<string, string[]>();
+  let rows;
+  try { rows = db.exec("SELECT PromptUid, CategoryName FROM PromptsToCategory"); } catch { return out; }
+  if (rows.length === 0 || rows[0].values.length === 0) return out;
+  for (const row of rows[0].values) {
+    const uid = String(row[0] ?? "");
+    const name = String(row[1] ?? "");
+    if (!uid || !name) continue;
+    const list = out.get(uid) ?? [];
+    list.push(name);
+    out.set(uid, list);
+  }
+  return out;
+}
+
 function readPrompts(db: Database): PromptEntry[] {
   try {
     let rows;
@@ -756,11 +890,22 @@ function readPrompts(db: Database): PromptEntry[] {
     const hasRows = rows.length > 0 && rows[0].values.length > 0;
     if (!hasRows) return [];
 
+    // v6 junction (empty in v4/v5 bundles).
+    const catsByPromptUid = readPromptCategoriesTable(db);
+
     const cols = rows[0].columns;
     return rows[0].values.map((row: SqlValue[]) => {
       const obj = Object.fromEntries(cols.map((c: SqlValue, i: number) => [c, row[i]]));
+      const uid = resolveUid(obj);
+      const junctionCats = catsByPromptUid.get(uid);
+      // v6 preferred: rebuild comma-separated list from junction.
+      // Fallback: pre-v6 Prompts.Category single value.
+      const singularCategory = (col(obj, "Category", "category") as string) ?? undefined;
+      const category = junctionCats && junctionCats.length > 0
+        ? junctionCats.join(", ")
+        : singularCategory;
       return {
-        id: resolveUid(obj),
+        id: uid,
         // v5 — Slug column is now actually written. v4 bundles return
         // undefined here, which the Task Next resolver treats as "no slug".
         slug: (obj["Slug"] as string) ?? undefined,
@@ -769,7 +914,7 @@ function readPrompts(db: Database): PromptEntry[] {
         order: (col(obj, "RunOrder", "run_order") as number) ?? 0,
         isDefault: col(obj, "IsDefault", "is_default") === 1,
         isFavorite: col(obj, "IsFavorite", "is_favorite") === 1,
-        category: (col(obj, "Category", "category") as string) ?? undefined,
+        category,
         createdAt: (col(obj, "CreatedAt", "created_at") as string),
         updatedAt: (col(obj, "UpdatedAt", "updated_at") as string),
       } as PromptEntry;
@@ -1031,11 +1176,14 @@ function safeJsonParse<T>(raw: string | null, fallback: T): T {
 /** Exports all prompts as a SQLite ZIP. */
 export async function exportPromptsAsSqliteZip(): Promise<void> {
   const result = await sendMessage<{ prompts?: PromptEntry[] }>({ type: "GET_PROMPTS" });
+  const rawPromptsByUid = new Map<string, Record<string, unknown>>();
   const prompts: PromptEntry[] = Array.isArray(result.prompts)
     ? result.prompts.map((raw, i) => {
         const r = raw as unknown as Record<string, unknown>;
+        const uid = String(r.id ?? "");
+        rawPromptsByUid.set(uid, r);
         return {
-          id: String(r.id ?? ""),
+          id: uid,
           slug: typeof r.slug === "string" ? r.slug : undefined,
           name: (r.name as string) ?? "",
           text: (r.text as string) ?? "",
@@ -1052,7 +1200,10 @@ export async function exportPromptsAsSqliteZip(): Promise<void> {
   const db = await initDb();
   db.run(CREATE_PROMPTS_TABLE);
   db.run(CREATE_META_TABLE);
+  db.run(CREATE_PROMPTS_CATEGORY_TABLE);
+  db.run(CREATE_PROMPTS_TO_CATEGORY_TABLE);
   insertPrompts(db, prompts);
+  insertPromptCategories(db, prompts, rawPromptsByUid);
   insertMeta(db);
 
   const dbData = db.export();
