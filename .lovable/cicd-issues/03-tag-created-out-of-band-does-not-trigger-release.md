@@ -46,11 +46,11 @@ Added `.github/workflows/release-watcher.yml`:
 - Reads the target tag from the changed `.gitmap/release/v*.json` descriptor,
   falling back to `.gitmap/release/latest.json` for manual replay.
 - Verifies the tag exists on origin.
-- Dispatches `release.yml` via `gh workflow run release.yml --ref
-  refs/tags/<tag> -f version=<tag>`.
+- Dispatches the current fixed `release.yml` via `gh workflow run release.yml
+  --ref <current-branch> -f version=<tag>`.
 
 `release.yml`'s existing `workflow_dispatch` path then checks out the exact
-tag, builds every asset, runs the required-asset verification gate, and
+tag for packaging, builds every asset, runs the required-asset verification gate, and
 uploads to the existing Release object (idempotent — `softprops/action-gh-release@v2`
 updates in place).
 
