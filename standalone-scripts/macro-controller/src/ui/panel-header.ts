@@ -92,7 +92,8 @@ function _buildTitleElements(deps: PanelBuilderDeps, plCtx: PanelLayoutCtx) {
     };
   });
 
-  const settingsBtn = buildSettingsButton();
+  // v3.4.3 (task 10) — Settings (gear) button removed from workspace section per spec 113.
+  // The Macro Settings modal exposed credits/grace-period fields the user cannot modify.
 
   const panelToggleSpan = document.createElement('span');
   panelToggleSpan.style.cssText = CssFragment.FontSize + tFontTiny + ';color:' + cNeutral500 + ';cursor:pointer;margin-right:4px;white-space:nowrap;flex-shrink:0;';
