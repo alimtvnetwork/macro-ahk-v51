@@ -376,8 +376,8 @@ async function executeSwitchContext(
 
           return;
         }
-      } catch {
-        // fall through to handleMoveNoToken // allow-swallow: Auth recovery failure is intentionally handled by the no-token fallback path below.
+      } catch { // allow-swallow: Auth recovery failure is intentionally handled by the no-token fallback path below.
+        // fall through to handleMoveNoToken
       }
 
       handleMoveNoToken();
