@@ -1,5 +1,5 @@
 {
-  "GeneratedAt": "2026-05-19T14:35:40.992Z",
+  "GeneratedAt": "2026-05-19T16:23:03.356Z",
   "Items": [
     {
       "Id": "9dd821df248f",
@@ -24,33 +24,6 @@
       "Severity": "P1",
       "File": "src/background/recorder/url-tab-click.ts",
       "Line": 293,
-      "Rule": "no-empty-catch",
-      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
-      "Snippet": "catch {"
-    },
-    {
-      "Id": "7c5d2f13499c",
-      "Severity": "P1",
-      "File": "src/background/recorder/xpath-of-element.ts",
-      "Line": 47,
-      "Rule": "no-empty-catch",
-      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
-      "Snippet": "catch {"
-    },
-    {
-      "Id": "3a77cee059e6",
-      "Severity": "P1",
-      "File": "src/background/status-handler.ts",
-      "Line": 60,
-      "Rule": "no-empty-catch",
-      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
-      "Snippet": "catch {"
-    },
-    {
-      "Id": "b3bf6757397f",
-      "Severity": "P1",
-      "File": "src/background/url-trigger.ts",
-      "Line": 256,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
@@ -191,10 +164,10 @@
       "Snippet": "catch {"
     },
     {
-      "Id": "acdefe475612",
+      "Id": "b9395252c12e",
       "Severity": "P2",
       "File": "src/components/options/ProjectDetailView.tsx",
-      "Line": 1110,
+      "Line": 1111,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
