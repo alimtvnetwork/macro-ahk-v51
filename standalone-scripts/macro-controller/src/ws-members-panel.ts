@@ -118,17 +118,30 @@ function headerHtml(wsName: string, state: PanelState): string {
   } else {
     countText = 'error';
   }
+  // v3.4.3 (task 11) — Rename-style popup chrome: compact header "Members — <ws>" + ×
   return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border-bottom:1px solid ' + cPanelBorder + ';background:rgba(0,0,0,0.25);">'
     + '<div style="min-width:0;">'
-    +   '<div style="font-size:12px;font-weight:700;color:#f1f5f9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">👥 ' + escHtml(wsName) + '</div>'
+    +   '<div style="font-size:12px;font-weight:700;color:#f1f5f9;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Members — ' + escHtml(wsName) + '</div>'
     +   '<div style="font-size:9px;color:#94a3b8;letter-spacing:0.3px;text-transform:uppercase;">' + countText + ' · sorted by credits used</div>'
     + '</div>'
     + '<div style="display:flex;gap:4px;flex-shrink:0;">'
     +   '<button type="button" data-marco-action="refresh" title="Refresh"'
     +     ' style="background:rgba(0,122,204,0.25);color:#bae6fd;border:1px solid ' + cPrimary + ';border-radius:3px;padding:2px 6px;font-size:11px;cursor:pointer;line-height:1;">↻</button>'
     +   '<button type="button" data-marco-action="close" title="Close (Esc)"'
-    +     ' style="background:rgba(100,116,139,0.35);color:#e2e8f0;border:1px solid ' + cPanelBorder + ';border-radius:3px;padding:2px 7px;font-size:11px;cursor:pointer;line-height:1;">✕</button>'
+    +     ' style="background:rgba(100,116,139,0.35);color:#e2e8f0;border:1px solid ' + cPanelBorder + ';border-radius:3px;padding:2px 7px;font-size:11px;cursor:pointer;line-height:1;">×</button>'
     + '</div>'
+    + '</div>';
+}
+
+// v3.4.3 (task 11) — Footer scaffold. Task 13 wires the +Add member form.
+function footerHtml(): string {
+  return '<div data-marco-section="members-footer" '
+    + 'style="padding:6px 10px;border-top:1px solid ' + cPanelBorder + ';background:rgba(0,0,0,0.2);">'
+    +   '<button type="button" data-marco-action="add-member-toggle" '
+    +     'style="width:100%;background:rgba(0,122,204,0.18);color:#bae6fd;border:1px dashed ' + cPrimary + ';'
+    +     'border-radius:3px;padding:4px 6px;font-size:11px;cursor:pointer;line-height:1.2;">'
+    +     '+ Add member'
+    +   '</button>'
     + '</div>';
 }
 
@@ -164,6 +177,9 @@ function ensurePanelEl(): HTMLDivElement {
     'box-shadow:0 12px 32px rgba(0,0,0,0.6)',
     'font-family:system-ui,-apple-system,sans-serif', 'font-size:11px',
     'display:none',
+    // v3.4.3 (task 11) — Rename-style open animation: fade + slide-down
+    'opacity:0', 'transform:translateY(-4px)',
+    'transition:opacity 120ms ease-out, transform 120ms ease-out',
   ].join(';') + ';';
   document.body.appendChild(el);
   return el;
@@ -184,10 +200,16 @@ function positionPanel(el: HTMLElement, x: number, y: number): void {
   el.style.left = left + 'px';
   el.style.top = top + 'px';
   el.style.visibility = 'visible';
+  // v3.4.3 (task 11) — play open animation on next frame
+  requestAnimationFrame(function () {
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  });
 }
 
 function render(el: HTMLElement, wsName: string, state: PanelState): void {
-  el.innerHTML = headerHtml(wsName, state) + buildBodyHtml(state);
+  // v3.4.3 (task 11) — 3-section chrome: header + body + footer (Rename-style)
+  el.innerHTML = headerHtml(wsName, state) + buildBodyHtml(state) + footerHtml();
 }
 
 function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): void {
@@ -288,5 +310,10 @@ export function showWsMembersPanel(wsId: string, wsName: string, x: number, y: n
 export function hideWsMembersPanel(): void {
   detachDismissHandlers();
   const el = document.getElementById(PANEL_ID);
-  if (el) el.style.display = 'none';
+  if (el) {
+    // v3.4.3 (task 11) — reset animation state so next open re-plays the slide
+    el.style.display = 'none';
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(-4px)';
+  }
 }
