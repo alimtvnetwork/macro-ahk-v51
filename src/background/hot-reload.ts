@@ -116,7 +116,7 @@ async function pollBuildMeta(): Promise<void> {
             );
             chrome.runtime.reload();
         }
-    } catch {
-        // Silently ignore fetch failures (file missing, network error, etc.)
+    } catch { // allow-swallow: build-meta.json polling is dev-only best-effort; missing file/network errors are expected in deploy windows
+        // ignored
     }
 }

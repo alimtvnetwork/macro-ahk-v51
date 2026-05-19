@@ -179,7 +179,7 @@ export async function handleGetSdkSelfTest(): Promise<{ snapshot: SdkSelfTestSna
 export async function __resetSdkSelfTestForTests(): Promise<void> {
     try {
         await chrome.storage.local.remove(STORAGE_KEY);
-    } catch {
-        /* tests provide a stub; failure is benign */
+    } catch { // allow-swallow: test seam — chrome.storage stubs may be partial; failure is benign in test contexts
+        /* benign */
     }
 }

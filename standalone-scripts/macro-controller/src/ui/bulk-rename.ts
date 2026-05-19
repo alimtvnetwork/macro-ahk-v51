@@ -150,8 +150,8 @@ async function _autoSave(inputs: RenameInputsResult): Promise<void> {
     const store = getRenamePresetStore();
     const preset = _readUiToPreset(inputs);
     await store.savePreset(_activePresetName, preset);
-  } catch {
-    // Silent — auto-save is best-effort
+  } catch { // allow-swallow: auto-save is best-effort; user will see explicit save errors on manual save
+    // silent
   }
 }
 
@@ -222,7 +222,7 @@ async function _initPresetUi(body: HTMLElement, inputs: RenameInputsResult): Pro
       const previousName = _activePresetName;
       const previousPreset = _readUiToPreset(inputs);
       store.savePreset(previousName, previousPreset)
-        .catch(function () { /* best-effort — never block switch */ })
+        .catch(function () { /* best-effort — never block switch */ }) // allow-swallow: pre-switch save failure must not block preset switch; data preserved in memory
         .finally(function () {
           _activePresetName = name;
           store.setActivePresetName(name);
