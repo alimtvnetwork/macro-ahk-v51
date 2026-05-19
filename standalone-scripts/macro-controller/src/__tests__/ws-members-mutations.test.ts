@@ -14,10 +14,11 @@ vi.mock('../logging', () => ({ log: vi.fn() }));
 vi.mock('../error-utils', () => ({ logError: vi.fn() }));
 vi.mock('../shared-state', () => ({ CREDIT_API_BASE: 'https://api.test.com' }));
 
-const clearMembersCacheSpy = vi.fn();
-vi.mock('../ws-members-fetch', () => ({ clearMembersCache: clearMembersCacheSpy }));
+vi.mock('../ws-members-fetch', () => ({ clearMembersCache: vi.fn() }));
 
 import { inviteMember, removeMember, updateMemberRole } from '../ws-members-mutations';
+import { clearMembersCache } from '../ws-members-fetch';
+const clearMembersCacheSpy = clearMembersCache as unknown as ReturnType<typeof vi.fn>;
 
 interface MembershipsApi {
   invite: ReturnType<typeof vi.fn>;
