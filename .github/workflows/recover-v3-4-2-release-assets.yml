@@ -112,7 +112,7 @@ jobs:
           echo "${VER}" > release-assets/VERSION.txt
           cp changelog.md release-assets/changelog.md
 
-          (cd release-assets && sha256sum * > checksums.txt)
+          (cd release-assets && sha256sum -- * > checksums.txt)
 
       - name: Generate release notes
         run: |
@@ -194,7 +194,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          gh release upload "${VER}" release-assets/* --repo "${GITHUB_REPOSITORY}" --clobber
+          gh release upload "${VER}" --repo "${GITHUB_REPOSITORY}" --clobber -- release-assets/*
           gh release edit "${VER}" --repo "${GITHUB_REPOSITORY}" --title "Release ${VER}" --notes-file release-assets/RELEASE_NOTES.md --latest
 
       - name: Verify live GitHub Release assets
