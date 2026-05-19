@@ -72,8 +72,8 @@ function getNotify(): MarcoNotify | null {
     if (hasToast) {
       return notify!;
     }
-  } catch {
-    /* SDK not loaded */ // allow-swallow: SDK probe — absence is expected on non-target tabs and during load; caller handles null.
+  } catch { // allow-swallow: SDK probe — absence is expected on non-target tabs and during load; caller handles null.
+    /* SDK not loaded */
   }
 
   return null;
