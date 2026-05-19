@@ -473,13 +473,18 @@ function ensureCardElement(): HTMLDivElement {
   el = document.createElement('div');
   el.id = HOVERCARD_ID;
   el.style.cssText = [
-    'position:fixed', 'z-index:2147483646', 'pointer-events:none',
+    'position:fixed', 'z-index:2147483646', 'pointer-events:auto',
     'min-width:240px', 'max-width:320px', 'padding:8px 10px',
     'background:rgba(15,23,42,0.97)', 'border:1px solid rgba(103,232,249,0.35)',
     'border-radius:6px', 'box-shadow:0 8px 24px rgba(0,0,0,0.5)',
     'color:#e2e8f0', 'font-family:system-ui,-apple-system,sans-serif',
     'line-height:1.4', 'display:none',
   ].join(';') + ';';
+  // Hide on leaving the card itself so the <details> toggle can be clicked
+  // without dismissing the panel.
+  el.addEventListener('mouseleave', hideCard);
+  document.body.appendChild(el);
+  return el;
   document.body.appendChild(el);
   return el;
 }
