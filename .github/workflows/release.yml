@@ -53,12 +53,21 @@ on:
         description: 'Existing tag to (re)publish, e.g. v2.192.0'
         required: true
         type: string
+      source_ref:
+        description: 'Optional source ref/SHA to build from while uploading to the existing version tag. Use only to recover a stale broken tag.'
+        required: false
+        type: string
   workflow_call:
     inputs:
       version:
         description: 'Existing tag to (re)publish, e.g. v2.192.0'
         required: true
         type: string
+      source_ref:
+        description: 'Optional source ref/SHA to build from while uploading to the existing version tag. Use only to recover a stale broken tag.'
+        required: false
+        type: string
+        default: ''
 
 # Release builds must NEVER be cancelled — every release commit
 # must produce a GitHub Release regardless of newer commits.
@@ -82,6 +91,7 @@ jobs:
     outputs:
       version: ${{ steps.version.outputs.version }}
       ref: ${{ steps.version.outputs.ref }}
+      publish_tag: ${{ steps.version.outputs.publish_tag }}
       skip: ${{ steps.version.outputs.skip }}
 
     steps:
@@ -116,13 +126,15 @@ jobs:
               REF="refs/heads/${EVENT_REF}"
             else
               echo "Create event for ${{ github.event.ref_type }} '${{ github.event.ref }}' is not a release ref; skipping."
-              echo "version=skip" >> "$GITHUB_OUTPUT"
-              echo "ref=${GITHUB_REF}" >> "$GITHUB_OUTPUT"
+            echo "version=skip" >> "$GITHUB_OUTPUT"
+            echo "ref=${GITHUB_REF}" >> "$GITHUB_OUTPUT"
+            echo "publish_tag=skip" >> "$GITHUB_OUTPUT"
               echo "skip=true" >> "$GITHUB_OUTPUT"
               exit 0
             fi
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" || "${{ github.event_name }}" == "workflow_call" ]]; then
             VERSION="${{ inputs.version || github.event.inputs.version }}"
+            SOURCE_REF="${{ inputs.source_ref || github.event.inputs.source_ref }}"
             if [[ -z "$VERSION" ]]; then
               echo "::error::${{ github.event_name }} invoked without a version input"
               exit 1
@@ -135,7 +147,19 @@ jobs:
               echo "::error::workflow_dispatch version '${VERSION}' — tag refs/tags/${VERSION} not found on remote"
               exit 1
             fi
-            REF="refs/tags/${VERSION}"
+            if [[ -n "$SOURCE_REF" ]]; then
+              REF="$SOURCE_REF"
+              if ! git rev-parse --verify "${REF}^{commit}" >/dev/null 2>&1; then
+                git fetch origin "$REF" --depth=1 2>/dev/null || true
+              fi
+              if ! git rev-parse --verify "${REF}^{commit}" >/dev/null 2>&1; then
+                echo "::error::source_ref '${SOURCE_REF}' could not be resolved to a commit"
+                exit 1
+              fi
+              echo "Recovery mode: building source_ref=${SOURCE_REF}, publishing to tag=${VERSION}"
+            else
+              REF="refs/tags/${VERSION}"
+            fi
           elif [[ "$GITHUB_REF" == refs/tags/* ]]; then
             VERSION="${GITHUB_REF_NAME}"
             REF="${GITHUB_REF}"
@@ -148,6 +172,7 @@ jobs:
           fi
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "ref=${REF}" >> "$GITHUB_OUTPUT"
+          echo "publish_tag=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "skip=false" >> "$GITHUB_OUTPUT"
           echo "Resolved version: ${VERSION} (ref=${REF})"
 
@@ -449,7 +474,7 @@ jobs:
       # ── Package assets ────────────────────────────────────
       - name: Package release assets
         env:
-          VER: ${{ needs.setup.outputs.version }}
+          VER: ${{ needs.setup.outputs.publish_tag }}
         run: |
           mkdir -p release-assets
 
@@ -528,7 +553,7 @@ jobs:
       - name: Generate release notes
         id: changelog
         env:
-          VER: ${{ needs.setup.outputs.version }}
+          VER: ${{ needs.setup.outputs.publish_tag }}
         run: |
           # Find the previous release tag
           # Find the previous release tag — EXCLUDE the current ${VER} so the
@@ -663,7 +688,7 @@ jobs:
       # See plan.md Step 3 and mem://constraints/release-assets-publish-contract.
       - name: Verify required release assets
         env:
-          VER: ${{ needs.setup.outputs.version }}
+          VER: ${{ needs.setup.outputs.publish_tag }}
         run: |
           set -e
           REQUIRED=(
@@ -716,10 +741,10 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ needs.setup.outputs.version }}
-          name: "Marco Extension ${{ needs.setup.outputs.version }}"
+          tag_name: ${{ needs.setup.outputs.publish_tag }}
+          name: "Marco Extension ${{ needs.setup.outputs.publish_tag }}"
           body_path: release-assets/RELEASE_NOTES.md
           files: release-assets/*
           draft: false
-          prerelease: ${{ contains(needs.setup.outputs.version, '-') }}
-          make_latest: ${{ !contains(needs.setup.outputs.version, '-') }}
+          prerelease: ${{ contains(needs.setup.outputs.publish_tag, '-') }}
+          make_latest: ${{ !contains(needs.setup.outputs.publish_tag, '-') }}
