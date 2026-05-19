@@ -443,6 +443,14 @@ jobs:
           name: prompts-dist
           path: standalone-scripts/prompts/
 
+      - name: Build support plugin outputs
+        run: |
+          set -euo pipefail
+          pnpm run build:payment-banner-hider
+          pnpm run build:lovable-common
+          pnpm run build:lovable-owner-switch
+          pnpm run build:lovable-user-add
+
       - name: Build Chrome extension
         run: pnpm run build:extension
 
