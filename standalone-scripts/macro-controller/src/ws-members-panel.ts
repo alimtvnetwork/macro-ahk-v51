@@ -200,6 +200,11 @@ function positionPanel(el: HTMLElement, x: number, y: number): void {
   el.style.left = left + 'px';
   el.style.top = top + 'px';
   el.style.visibility = 'visible';
+  // v3.4.3 (task 11) — play open animation on next frame
+  requestAnimationFrame(function () {
+    el.style.opacity = '1';
+    el.style.transform = 'translateY(0)';
+  });
 }
 
 function render(el: HTMLElement, wsName: string, state: PanelState): void {
