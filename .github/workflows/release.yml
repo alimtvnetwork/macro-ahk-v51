@@ -589,10 +589,10 @@ jobs:
 
           if [ -n "$PREV_TAG" ]; then
             echo "Generating changelog: ${PREV_TAG}..${VER} (HEAD)"
-            RANGE="${PREV_TAG}..HEAD"
+            LOG_RANGE=("${PREV_TAG}..HEAD")
           else
             echo "No previous tag found — using full history"
-            RANGE=""
+            LOG_RANGE=()
           fi
 
           REPO="${GITHUB_REPOSITORY}"
@@ -619,7 +619,7 @@ jobs:
             echo ""
 
             # Features
-            FEATS=$(git log $RANGE --pretty=format:"- %s (%h)" --grep="^feat" -i 2>/dev/null || true)
+            FEATS=$(git log "${LOG_RANGE[@]}" --pretty=format:"- %s (%h)" --grep="^feat" -i 2>/dev/null || true)
             if [ -n "$FEATS" ]; then
               echo "#### Features"
               echo "$FEATS"
@@ -627,7 +627,7 @@ jobs:
             fi
 
             # Fixes
-            FIXES=$(git log $RANGE --pretty=format:"- %s (%h)" --grep="^fix" -i 2>/dev/null || true)
+            FIXES=$(git log "${LOG_RANGE[@]}" --pretty=format:"- %s (%h)" --grep="^fix" -i 2>/dev/null || true)
             if [ -n "$FIXES" ]; then
               echo "#### Bug Fixes"
               echo "$FIXES"
@@ -635,7 +635,7 @@ jobs:
             fi
 
             # Refactors / chores / docs
-            OTHER=$(git log $RANGE --pretty=format:"- %s (%h)" --grep="^refactor\|^chore\|^docs\|^style\|^perf\|^test\|^ci\|^build" -i 2>/dev/null || true)
+            OTHER=$(git log "${LOG_RANGE[@]}" --pretty=format:"- %s (%h)" --grep="^refactor\|^chore\|^docs\|^style\|^perf\|^test\|^ci\|^build" -i 2>/dev/null || true)
             if [ -n "$OTHER" ]; then
               echo "#### Maintenance"
               echo "$OTHER"
