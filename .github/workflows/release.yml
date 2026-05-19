@@ -512,17 +512,22 @@ jobs:
             cd ../..
           fi
 
-          cd standalone-scripts/macro-controller
-          zip -r "../../release-assets/macro-controller-${VER}.zip" .
-          cd ../..
-
-          cd standalone-scripts/marco-sdk
-          zip -r "../../release-assets/marco-sdk-${VER}.zip" .
-          cd ../..
-
-          cd standalone-scripts/xpath
-          zip -r "../../release-assets/xpath-${VER}.zip" .
-          cd ../..
+          PLUGINS=(
+            "macro-controller"
+            "marco-sdk"
+            "xpath"
+            "payment-banner-hider"
+            "lovable-common"
+            "lovable-owner-switch"
+            "lovable-user-add"
+          )
+          for plugin in "${PLUGINS[@]}"; do
+            if [ ! -d "standalone-scripts/${plugin}" ]; then
+              echo "::error file=standalone-scripts/${plugin}::Required plugin folder missing; release page must include every plugin ZIP"
+              exit 1
+            fi
+            (cd "standalone-scripts/${plugin}" && zip -r "../../release-assets/${plugin}-${VER}.zip" .)
+          done
 
           # ── Unified installer (URL-pinned when fetched from this release) ──
           # No stamping needed: install.{ps1,sh} parse the version from their
@@ -636,6 +641,10 @@ jobs:
             echo "| \`macro-controller-${VER}.zip\` | Standalone macro controller |"
             echo "| \`marco-sdk-${VER}.zip\` | SDK library |"
             echo "| \`xpath-${VER}.zip\` | XPath utility |"
+            echo "| \`payment-banner-hider-${VER}.zip\` | Payment banner hider plugin |"
+            echo "| \`lovable-common-${VER}.zip\` | Lovable common plugin |"
+            echo "| \`lovable-owner-switch-${VER}.zip\` | Lovable owner switch plugin |"
+            echo "| \`lovable-user-add-${VER}.zip\` | Lovable user add plugin |"
             echo "| \`prompts-${VER}.zip\` | Prompt templates |"
             echo "| \`changelog.md\` | Full project changelog |"
             echo "| \`install.ps1\` | Unified PowerShell installer (URL-pinned to this release when fetched here) |"
