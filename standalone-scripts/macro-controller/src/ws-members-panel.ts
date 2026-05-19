@@ -365,6 +365,12 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
     } else if (action === 'add-member-cancel') {
       e.stopPropagation();
       swapFooter(el, false);
+    } else if (action === 'member-menu') {
+      e.stopPropagation();
+      const userId = target.getAttribute('data-marco-user-id') || '';
+      const role = (target.getAttribute('data-marco-user-role') || 'member').toLowerCase();
+      const label = target.getAttribute('data-marco-user-label') || userId;
+      openMemberActionMenu(el, target, wsId, wsName, userId, role, label);
     }
   };
 
