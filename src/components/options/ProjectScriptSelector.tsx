@@ -57,6 +57,8 @@ interface Props {
   selectedScripts: ScriptBinding[];
   onChange: (scripts: ScriptBinding[]) => void;
   linkMap?: LibraryLinkMap;
+  /** Names of bindings that don't match any library script — render an Unbound badge. */
+  unboundScriptNames?: Set<string>;
 }
 
 /* ------------------------------------------------------------------ */
