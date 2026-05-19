@@ -135,7 +135,7 @@ function _assembleTitleRow(titleRow: HTMLElement, els: Record<string, HTMLElemen
   titleRow.appendChild(els.wsNameEl);
   titleRow.appendChild(els.versionSpan);
   titleRow.appendChild(els.remixSplit);
-  titleRow.appendChild(els.settingsBtn);
+  // settingsBtn intentionally not appended — removed per spec 113 (task 10).
   titleRow.appendChild(els.authBadge);
   titleRow.appendChild(els.panelToggleSpan);
   titleRow.appendChild(els.hideBtn);
