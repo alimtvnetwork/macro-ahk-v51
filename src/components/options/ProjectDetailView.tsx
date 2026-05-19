@@ -1691,6 +1691,7 @@ function ScriptsTabContent({ project, availableScripts, availableConfigs, onSave
         availableConfigs={availableConfigs}
         selectedScripts={pendingBindings ?? bindings}
         onChange={handleChange}
+        unboundScriptNames={unboundPaths}
       />
       <div className="flex items-center justify-end gap-2">
         {isDirty && (
