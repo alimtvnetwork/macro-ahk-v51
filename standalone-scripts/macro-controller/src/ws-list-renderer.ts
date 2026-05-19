@@ -355,7 +355,9 @@ function buildStatusPillHtml(status: WorkspaceStatus): string {
     + ';background:' + style.bg
     + ';border:1px solid ' + style.border
     + ';padding:1px 5px;border-radius:3px;font-weight:700;margin-left:5px;vertical-align:middle;letter-spacing:0.3px;text-transform:uppercase;"'
-    + ' title="' + tip + '">' + status.label + '</span>';
+    // Native title= intentionally omitted (spec/22-app-issues/113): custom
+    // hover card in ws-hover-card.ts carries this content. Avoid double-tip.
+    + ' data-marco-tip="' + tip + '">' + status.label + '</span>';
 }
 
 /** Build the inner HTML for a workspace row. */
@@ -386,7 +388,8 @@ function buildWsRowInnerHtml(
       if (startDate) tipParts.push('since ' + startDate);
       if (duration) tipParts.push('(' + duration + ')');
       const tip = tipParts.join(' ').replace(/"/g, '&quot;');
-      tierBadge += '<span style="font-size:10px;color:#fca5a5;background:rgba(127,29,29,0.55);padding:2px 5px;border-radius:3px;font-weight:600;margin-left:3px;vertical-align:middle;" title="' + tip + '">·' + days + 'd</span>';
+      // Native title= omitted — see spec/22-app-issues/113.
+      tierBadge += '<span style="font-size:10px;color:#fca5a5;background:rgba(127,29,29,0.55);padding:2px 5px;border-radius:3px;font-weight:600;margin-left:3px;vertical-align:middle;" data-marco-tip="' + tip + '">·' + days + 'd</span>';
     }
   }
   const nameColor = isCurrent ? '#67e8f9' : '#e2e8f0';
@@ -416,6 +419,11 @@ function buildWsRow(
   const selEl = document.getElementById(DomId.LoopWsSelected);
   const isSel = selEl ? selEl.getAttribute(DataAttr.SelectedId) === wsId : false;
   const isChecked = !!getLoopWsCheckedIds()[wsId];
+  // spec/22-app-issues/113: the custom hover card (ws-hover-card.ts) is the
+  // single source of truth for workspace hover info. Stash the fallback text
+  // on a data- attribute (consumed by the hover card / debug tools) instead
+  // of `row.title`, which would re-introduce the native browser tooltip and
+  // produce the duplicate-tooltip bug.
   const tooltip = buildLoopTooltipText(ws).replace(/"/g, '&quot;');
 
   const row = document.createElement('div');
@@ -425,7 +433,7 @@ function buildWsRow(
   row.setAttribute(DataAttr.WsCurrent, isCurrent ? 'true' : 'false');
   row.setAttribute('data-ws-idx', String(count));
   row.setAttribute('data-ws-raw-idx', String(wsIndex));
-  row.title = tooltip;
+  row.setAttribute('data-marco-tip', tooltip);
   // v2.195.0: padding bumped 5px/6px → 7px/8px to give the larger EXPIRED
   // badge room to breathe without crowding adjacent rows.
   row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 8px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background 0.15s;font-size:11px;' + wsRowBgStyle(isCurrent, isSel);
