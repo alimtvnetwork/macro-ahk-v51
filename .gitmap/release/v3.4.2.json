@@ -1,0 +1,16 @@
+{
+  "version": "3.4.2",
+  "branch": "release/v3.4.2",
+  "sourceBranch": "main",
+  "commit": "828ad9f0521a70f8a029374d823a1e756465dd66",
+  "tag": "v3.4.2",
+  "assets": [],
+  "changelog": [
+    "Bumped extension, SDK, and standalone-script versions to **3.4.2**.",
+    "Synced `manifest.json`, `src/shared/constants.ts`, `readme.md`, and all"
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-05-19T03:39:52Z",
+  "isLatest": false
+}
