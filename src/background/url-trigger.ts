@@ -133,12 +133,42 @@ async function handleActivated(
 /*  Shared gate                                                        */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Returns true for URLs Chrome forbids scripting into (chrome://, the
+ * Web Store, other extensions, devtools, file://, view-source:, blank).
+ * Avoids logging predictable "restricted URL" errors on every nav.
+ */
+function isRestrictedUrl(url: string): boolean {
+    if (url.length === 0) return true;
+    if (url === "about:blank") return true;
+    if (url.startsWith("chrome://")) return true;
+    if (url.startsWith("chrome-search://")) return true;
+    if (url.startsWith("chrome-extension://")) return true;
+    if (url.startsWith("edge://")) return true;
+    if (url.startsWith("brave://")) return true;
+    if (url.startsWith("opera://")) return true;
+    if (url.startsWith("about:")) return true;
+    if (url.startsWith("devtools://")) return true;
+    if (url.startsWith("view-source:")) return true;
+    if (url.startsWith("file://")) return true;
+    if (url.startsWith("https://chrome.google.com/webstore")) return true;
+    if (url.startsWith("https://chromewebstore.google.com")) return true;
+    return false;
+}
+
 /** Single source of truth for the dedup gate + decision write + sentinel. */
 async function runGate(
     tabId: number,
     url: string,
     trigger: TabDecision["trigger"],
 ): Promise<void> {
+    if (isRestrictedUrl(url)) {
+        // Scripting is forbidden here — clear any stale decision and exit
+        // silently. Logging would flood on chrome:// and Web Store tabs.
+        clearTabDecision(tabId);
+        return;
+    }
+
     const fp = urlFingerprint(url);
 
     const isDuplicate = isSameDecisionFingerprint(tabId, fp);
