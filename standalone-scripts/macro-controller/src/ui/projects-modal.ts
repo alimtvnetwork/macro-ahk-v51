@@ -72,8 +72,37 @@ interface ModalState {
     exporting: boolean;
     /** Free-text filter, lowercased; empty string = no filter. */
     searchQuery: string;
+    /** Workspace IDs whose section is collapsed. Persisted across opens. */
+    collapsed: Set<string>;
 }
-const state: ModalState = { blocks: [], tabIndex: null, exporting: false, searchQuery: '' };
+const state: ModalState = {
+    blocks: [], tabIndex: null, exporting: false,
+    searchQuery: '', collapsed: new Set<string>(),
+};
+
+const COLLAPSED_STORAGE_KEY = 'marco_projects_modal_collapsed_v1';
+
+async function loadCollapsedState(): Promise<void> {
+    try {
+        if (typeof chrome === 'undefined' || !chrome.storage?.local) return;
+        const r = await chrome.storage.local.get(COLLAPSED_STORAGE_KEY);
+        const raw = r[COLLAPSED_STORAGE_KEY];
+        if (Array.isArray(raw)) {
+            state.collapsed = new Set(raw.filter(function (x): x is string { return typeof x === 'string'; }));
+        }
+    } catch (err: unknown) {
+        log('Projects: collapsed-state load failed: ' + String(err), 'warn');
+    }
+}
+
+function saveCollapsedState(): void {
+    try {
+        if (typeof chrome === 'undefined' || !chrome.storage?.local) return;
+        void chrome.storage.local.set({ [COLLAPSED_STORAGE_KEY]: Array.from(state.collapsed) });
+    } catch (err: unknown) {
+        log('Projects: collapsed-state save failed: ' + String(err), 'warn');
+    }
+}
 
 export function showProjectsModal(): void {
     removeProjectsModal();
