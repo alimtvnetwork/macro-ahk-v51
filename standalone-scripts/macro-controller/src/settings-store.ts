@@ -59,6 +59,9 @@ function sanitize(raw: unknown): SettingsOverrides {
   if (isFiniteNonNegative(r.proZeroCreditBalanceCacheTtlMinutes)) {
     out.proZeroCreditBalanceCacheTtlMinutes = Math.floor(r.proZeroCreditBalanceCacheTtlMinutes);
   }
+  if (typeof r.enableCanceledCreditOverride === 'boolean') {
+    out.enableCanceledCreditOverride = r.enableCanceledCreditOverride;
+  }
   return out;
 }
 
