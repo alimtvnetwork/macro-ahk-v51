@@ -632,7 +632,7 @@ await RiseupAsiaMacroExt.require("Project.Script");
 
 ## CI/CD Release Pipeline
 
-Creating or pushing a `release/*` branch (e.g., `release/v3.5.0`) or creating a
+Creating or pushing a `release/*` branch (e.g., `release/v3.6.0`) or creating a
 `v*` tag automatically enters release mode and:
 
 1. Installs dependencies with pnpm; if `pnpm-lock.yaml` is absent it falls back to `pnpm install --no-frozen-lockfile --lockfile=false`
