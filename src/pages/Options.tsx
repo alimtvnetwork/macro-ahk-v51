@@ -395,6 +395,7 @@ const OptionsPage = () => {
       <div className="min-h-screen flex w-full">
         {stateMarker}
         <Toaster />
+        <HttpFailFastBanner />
         {hideFloatingControllerForE2E ? null : <FloatingControllerHost />}
         <OptionsSidebar selection={selection} onSelect={handleSidebarSelect} onErrorDrawerOpen={() => setErrorDrawerOpen(true)} />
 
