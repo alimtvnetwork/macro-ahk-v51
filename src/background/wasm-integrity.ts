@@ -120,6 +120,12 @@ async function loadChecksumManifest(checksumUrl: string): Promise<
         };
     }
     if (!response.ok) {
+        // HEFF: report non-2xx. No retry. Outcome is "missing" so caller can
+        // surface a fix-step banner; no method-swap, no re-fetch loop.
+        console.warn(
+            `[HEFF] HTTP ${response.status} on GET ${checksumUrl} — checksum manifest unavailable; ` +
+            `do NOT retry. Loop halted. Awaiting user instruction.`,
+        );
         return { kind: "missing", httpStatus: response.status, fetchError: null };
     }
 
