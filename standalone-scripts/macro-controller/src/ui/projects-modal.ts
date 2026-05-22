@@ -70,8 +70,10 @@ interface ModalState {
     blocks: WorkspaceBlock[];
     tabIndex: OpenTabIndex | null;
     exporting: boolean;
+    /** Free-text filter, lowercased; empty string = no filter. */
+    searchQuery: string;
 }
-const state: ModalState = { blocks: [], tabIndex: null, exporting: false };
+const state: ModalState = { blocks: [], tabIndex: null, exporting: false, searchQuery: '' };
 
 export function showProjectsModal(): void {
     removeProjectsModal();
