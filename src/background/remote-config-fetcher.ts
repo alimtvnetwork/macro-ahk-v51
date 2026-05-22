@@ -148,12 +148,16 @@ async function handleSuccessfulFetch(
     return json;
 }
 
-/** Handles a non-OK HTTP response. */
+/** Handles a non-OK HTTP response. HEFF: single attempt, log and fall back to cache. */
 function handleFailedFetch(
     status: number,
 ): Record<string, unknown> | null {
     lastFetchError = `HTTP ${status}`;
-    logBgWarnError(BgLogTag.REMOTE_CONFIG, `Fetch failed: HTTP ${status}`);
+    logBgWarnError(
+        BgLogTag.REMOTE_CONFIG,
+        `HEFF: HTTP ${status} on GET <remote-config endpoint> — do NOT retry. ` +
+        `Falling back to cached config. Loop halted. Awaiting user instruction.`,
+    );
 
     return getCachedConfig();
 }

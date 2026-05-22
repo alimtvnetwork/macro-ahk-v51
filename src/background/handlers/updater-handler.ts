@@ -271,7 +271,11 @@ async function fetchVersionInfo(
     });
 
     if (!response.ok) {
-        throw new Error(`VersionInfo fetch failed: ${response.status} ${response.statusText}`);
+        // HEFF: single attempt, no retry.
+        throw new Error(
+            `HEFF: HTTP ${response.status} on GET ${url} — VersionInfo fetch failed (${response.statusText}). ` +
+            `Loop halted. Awaiting user instruction.`,
+        );
     }
 
     const json = await response.json() as VersionInfoResponse;
@@ -296,7 +300,11 @@ export async function fetchInstructions(
     });
 
     if (!response.ok) {
-        throw new Error(`Instruction fetch failed: ${response.status}`);
+        // HEFF: single attempt, no retry.
+        throw new Error(
+            `HEFF: HTTP ${response.status} on GET ${url} — Instruction fetch failed. ` +
+            `Loop halted. Awaiting user instruction.`,
+        );
     }
 
     const json = await response.json() as InstructionResponse;

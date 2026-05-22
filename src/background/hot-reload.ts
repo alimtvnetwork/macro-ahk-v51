@@ -80,9 +80,16 @@ async function pollBuildMeta(): Promise<void> {
     try {
         const metaUrl = chrome.runtime.getURL(BUILD_META_URL);
         const response = await fetch(metaUrl, { cache: "no-store" });
-        const isNotFound = !response.ok;
 
-        if (isNotFound) {
+        if (!response.ok) {
+            // HEFF: a non-2xx from build-meta.json means the file is gone or
+            // mis-served. Do NOT keep polling once per second — stop the loop
+            // and surface the status so the dev sees it.
+            console.warn(
+                `[HEFF] HTTP ${response.status} on GET ${metaUrl} — build-meta poll halted. ` +
+                `Awaiting user instruction (reload extension after rebuild).`,
+            );
+            stopHotReload();
             return;
         }
 
