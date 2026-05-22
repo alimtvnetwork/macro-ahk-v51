@@ -34,6 +34,8 @@ export interface SettingsOverrides {
   refillWarningThresholdDays?: number;
   /** pro_0 credit-balance IndexedDB cache TTL (minutes). Spec §9.1 / §11. */
   proZeroCreditBalanceCacheTtlMinutes?: number;
+  /** Projects-list SQLite cache TTL (hours). Default 48. */
+  projectsCacheTtlHours?: number;
   /** Master switch for the canceled/expired credit override. Default true. */
   enableCanceledCreditOverride?: boolean;
   /** Show inline status labels under each workspace row. */
