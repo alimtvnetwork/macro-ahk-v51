@@ -15,6 +15,7 @@ import { state } from '../shared-state';
 import { taskNextState, saveTaskNextSettings, type TaskNextDeps } from './task-next-ui';
 import type { ExtensionResponse, ResolvedPromptsConfig } from '../types';
 import { updateLogConfig, type LogManagerConfig } from '../log-manager';
+import { saveSettingsOverrides, getSettingsOverrides } from '../settings-store';
 import type { XPathPanelResult, TimingPanelResult, TaskNextPanelResult, LoggingPanelResult, ConfigDbPanelResult, GeneralPanelResult } from './settings-tab-panels';
 
 import {
