@@ -52,6 +52,11 @@ const cache: Record<string, CacheEntry> = {};
 /** Default cache TTL (5 minutes). */
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
+/** Default page size (matches legacy "top 20" behavior). */
+export const DEFAULT_MEMBERS_PAGE_LIMIT = 20;
+/** Allowed "Load more" page sizes the panel cycles through. */
+export const MEMBERS_PAGE_LIMIT_STEPS: number[] = [20, 50, 100];
+
 /**
  * Defensive numeric coercion — server occasionally returns null/undefined for
  * `total_credits_used*` fields. Treat missing values as 0 for sort purposes.
