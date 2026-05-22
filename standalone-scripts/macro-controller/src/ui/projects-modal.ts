@@ -399,6 +399,20 @@ function renderProjectRow(p: ProjectEntry, tabIndex: OpenTabIndex, isOpenFlag: b
     const fontWeight = isOpenFlag ? '700' : '400';
     const bg = isOpenFlag ? 'background:rgba(16,185,129,0.08);' : '';
     const idLabel = '<span style="color:#64748b;font-size:9px;">' + escapeHtml(p.id) + '</span>';
+    const repoBadge = p.githubRepo
+        ? ('<span title="' + escapeHtml(p.githubRepo + (p.githubBranch ? '@' + p.githubBranch : ''))
+            + '" style="display:inline-flex;align-items:center;gap:2px;padding:1px 5px;border-radius:8px;'
+            + 'background:rgba(124,58,237,0.18);color:#c4b5fd;font-size:9px;max-width:140px;overflow:hidden;'
+            + 'text-overflow:ellipsis;white-space:nowrap;">⎇ ' + escapeHtml(shortRepo(p.githubRepo))
+            + (p.githubBranch ? ':' + escapeHtml(p.githubBranch) : '') + '</span>')
+        : '';
+    const openIcon = '<span data-open-url="' + escapeHtml(url) + '" '
+        + 'title="Open in new tab" '
+        + 'style="color:' + (isOpenFlag ? '#10b981' : '#64748b') + ';font-size:12px;padding:0 4px;cursor:pointer;'
+        + 'border-radius:3px;" '
+        + 'onmouseover="this.style.background=\'rgba(124,58,237,0.25)\';this.style.color=\'#a78bfa\'" '
+        + 'onmouseout="this.style.background=\'transparent\';this.style.color=\''
+        + (isOpenFlag ? '#10b981' : '#64748b') + '\'">↗</span>';
     return ''
         + '<div data-open-url="' + escapeHtml(url) + '" '
         +   'title="' + escapeHtml(p.name) + (isOpenFlag ? '\n(open in Chrome)' : '') + '\nClick to open" '
@@ -407,8 +421,15 @@ function renderProjectRow(p: ProjectEntry, tabIndex: OpenTabIndex, isOpenFlag: b
         +   'onmouseout="this.style.background=\'' + (isOpenFlag ? 'rgba(16,185,129,0.08)' : 'transparent') + '\'">'
         +   dot
         +   '<span style="color:' + nameColor + ';font-weight:' + fontWeight + ';flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escapeHtml(p.name) + '</span>'
+        +   repoBadge
         +   idLabel
+        +   openIcon
         + '</div>';
+}
+
+function shortRepo(full: string): string {
+    const slash = full.lastIndexOf('/');
+    return slash >= 0 ? full.slice(slash + 1) : full;
 }
 
 function isOpen(projectId: string, tabIndex: OpenTabIndex): boolean {
