@@ -7,7 +7,7 @@
  * @see spec/21-app/02-features/misc-features/cross-project-sync.md §8 Groups
  */
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { sendMessage } from "@/lib/message-client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import type { StoredProject } from "@/hooks/use-projects-scripts";
 import {
   Dialog,
   DialogContent,
@@ -63,7 +65,8 @@ interface ProjectGroup {
 interface ProjectGroupMember {
   Id: number;
   GroupId: number;
-  ProjectId: number;
+  /** v9+ contract: UUID string referencing StoredProject.id (chrome.storage.local). */
+  ProjectIdUuid: string;
 }
 
 interface ProjectGroupPanelProps {
@@ -186,6 +189,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [removeMember, setRemoveMember] = useState<ProjectGroupMember | null>(null);
   const [cascading, setCascading] = useState(false);
+  const [allProjects, setAllProjects] = useState<StoredProject[]>([]);
 
   const loadMembers = useCallback(async () => {
     setLoading(true);
@@ -207,10 +211,32 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   // during initial mount — switching groups stranded stale member lists.
   useEffect(() => { loadMembers(); }, [loadMembers]);
 
+  // Load full project roster from chrome.storage.local for the picker dropdown.
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await sendMessage<{ projects: StoredProject[] }>({ type: "GET_ALL_PROJECTS" as never } as never);
+        setAllProjects(res.projects ?? []);
+      } catch (err) {
+        logError("ProjectGroupPanel.loadProjects", "Failed to fetch project list for picker", err);
+      }
+    })();
+  }, []);
+
+  const memberIdSet = useMemo(() => new Set(members.map(m => m.ProjectIdUuid)), [members]);
+  const projectsById = useMemo(() => {
+    const map = new Map<string, StoredProject>();
+    for (const p of allProjects) map.set(p.id, p);
+    return map;
+  }, [allProjects]);
+  const availableProjects = useMemo(
+    () => allProjects.filter(p => !memberIdSet.has(p.id)),
+    [allProjects, memberIdSet],
+  );
+
   const handleAddMember = useCallback(async () => {
-    const pid = parseInt(addProjectId, 10);
-    if (isNaN(pid) || pid <= 0) {
-      toast.error("Enter a valid project ID");
+    if (!addProjectId) {
+      toast.error("Select a project");
       return;
     }
     setAdding(true);
@@ -218,9 +244,10 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
       await sendMessage({
         type: "LIBRARY_ADD_GROUP_MEMBER" as never,
         groupId: group.Id,
-        projectId: pid,
+        projectId: addProjectId,
       } as never);
-      toast.success(`Project #${pid} added to group`);
+      const name = projectsById.get(addProjectId)?.name ?? addProjectId;
+      toast.success(`"${name}" added to group`);
       setAddProjectId("");
       loadMembers();
     } catch (err) {
@@ -228,22 +255,23 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
     } finally {
       setAdding(false);
     }
-  }, [addProjectId, group.Id, loadMembers]);
+  }, [addProjectId, group.Id, loadMembers, projectsById]);
 
   const handleRemoveMember = useCallback(async (member: ProjectGroupMember) => {
     try {
       await sendMessage({
         type: "LIBRARY_REMOVE_GROUP_MEMBER" as never,
         groupId: group.Id,
-        projectId: member.ProjectId,
+        projectId: member.ProjectIdUuid,
       } as never);
-      toast.success(`Project #${member.ProjectId} removed`);
+      const name = projectsById.get(member.ProjectIdUuid)?.name ?? member.ProjectIdUuid;
+      toast.success(`"${name}" removed`);
       setRemoveMember(null);
       loadMembers();
     } catch (err) {
       toast.error("Remove failed: " + (err instanceof Error ? err.message : String(err)));
     }
-  }, [group.Id, loadMembers]);
+  }, [group.Id, loadMembers, projectsById]);
 
   const handleDeleteGroup = useCallback(async () => {
     try {
@@ -342,15 +370,19 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
 
       {/* Add Member */}
       <div className="flex items-center gap-2">
-        <Input
-          value={addProjectId}
-          onChange={e => setAddProjectId(e.target.value)}
-          placeholder="Project ID"
-          className="h-8 text-sm w-32 font-mono"
-          type="number"
-          min={1}
-        />
-        <Button size="sm" onClick={handleAddMember} disabled={adding || !addProjectId.trim()}>
+        <Select value={addProjectId} onValueChange={setAddProjectId} disabled={availableProjects.length === 0}>
+          <SelectTrigger className="h-8 text-sm w-64">
+            <SelectValue placeholder={availableProjects.length === 0 ? "All projects already in group" : "Select a project…"} />
+          </SelectTrigger>
+          <SelectContent>
+            {availableProjects.map(p => (
+              <SelectItem key={p.id} value={p.id} className="text-sm">
+                {p.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button size="sm" onClick={handleAddMember} disabled={adding || !addProjectId}>
           {adding ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : <UserPlus className="h-3.5 w-3.5 mr-1" />}
           Add Member
         </Button>
@@ -365,32 +397,38 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
       ) : members.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-10 text-muted-foreground gap-2">
           <Users className="h-8 w-8 opacity-30" />
-          <p className="text-sm">No members yet. Add a project by ID.</p>
+          <p className="text-sm">No members yet. Add a project from the dropdown above.</p>
         </div>
       ) : (
         <ScrollArea className="h-[300px]">
           <div className="space-y-2">
-            {members.map(member => (
-              <div
-                key={member.Id}
-                className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-card/50 hover:bg-card/80 transition-colors"
-              >
-                <div className="flex items-center gap-3">
-                  <Badge variant="outline" className="text-[11px] font-mono px-2">
-                    #{member.ProjectId}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">Project {member.ProjectId}</span>
-                </div>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                  onClick={() => setRemoveMember(member)}
+            {members.map(member => {
+              const project = projectsById.get(member.ProjectIdUuid);
+              const displayName = project?.name ?? "(unknown project)";
+              return (
+                <div
+                  key={member.Id}
+                  className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-card/50 hover:bg-card/80 transition-colors"
                 >
-                  <UserMinus className="h-3.5 w-3.5" />
-                </Button>
-              </div>
-            ))}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <Badge variant="outline" className="text-[11px] font-mono px-2 shrink-0">
+                      {member.ProjectIdUuid.slice(0, 8)}
+                    </Badge>
+                    <span className={"text-sm truncate " + (project ? "" : "text-muted-foreground italic")}>
+                      {displayName}
+                    </span>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                    onClick={() => setRemoveMember(member)}
+                  >
+                    <UserMinus className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              );
+            })}
           </div>
         </ScrollArea>
       )}
@@ -427,7 +465,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
       <AlertDialog open={!!removeMember} onOpenChange={(v) => { if (!v) setRemoveMember(null); }}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove Project #{removeMember?.ProjectId}?</AlertDialogTitle>
+            <AlertDialogTitle>Remove "{projectsById.get(removeMember?.ProjectIdUuid ?? "")?.name ?? removeMember?.ProjectIdUuid}"?</AlertDialogTitle>
             <AlertDialogDescription>
               This project will no longer inherit shared settings from this group.
             </AlertDialogDescription>

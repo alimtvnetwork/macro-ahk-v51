@@ -340,16 +340,16 @@ describe("GroupMember CRUD", () => {
   });
 
   it("adds and retrieves members", async () => {
-    await handleAddGroupMember({ groupId, projectId: 100 });
-    await handleAddGroupMember({ groupId, projectId: 200 });
+    await handleAddGroupMember({ groupId, projectId: "uuid-100" });
+    await handleAddGroupMember({ groupId, projectId: "uuid-200" });
 
     const { members } = await handleGetGroupMembers({ groupId });
     expect(members).toHaveLength(2);
   });
 
   it("removes a member", async () => {
-    await handleAddGroupMember({ groupId, projectId: 100 });
-    await handleRemoveGroupMember({ groupId, projectId: 100 });
+    await handleAddGroupMember({ groupId, projectId: "uuid-100" });
+    await handleRemoveGroupMember({ groupId, projectId: "uuid-100" });
 
     const { members } = await handleGetGroupMembers({ groupId });
     expect(members).toHaveLength(0);
@@ -364,12 +364,12 @@ describe("Import / Export", () => {
   it("round-trips assets and groups", async () => {
     await handleSaveSharedAsset({ asset: { Type: "prompt", Name: "P1", Slug: "p1", ContentJson: '{"text":"hello"}' } });
     const { groupId } = await handleSaveProjectGroup({ group: { Name: "G1" } });
-    await handleAddGroupMember({ groupId, projectId: 42 });
+    await handleAddGroupMember({ groupId, projectId: "uuid-42" });
 
     const { bundle } = await handleExportLibrary();
     expect(bundle.assets).toHaveLength(1);
     expect(bundle.groups).toHaveLength(1);
-    expect(bundle.groups[0].memberProjectIds).toContain(42);
+    expect(bundle.groups[0].memberProjectIds).toContain("uuid-42");
 
     // Import into fresh DB
     const SQL = await initSqlJs();

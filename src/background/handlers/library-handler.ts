@@ -29,7 +29,7 @@ interface ReplaceMsg { assetId: number; contentJson: string; name?: string }
 interface ForkMsg { originalSlug: string; name: string; type: AssetType; contentJson: string }
 interface GroupMsg { group: Partial<ProjectGroup> & { Name: string } }
 interface GroupIdMsg { groupId: number }
-interface GroupMemberMsg { groupId: number; projectId: number }
+interface GroupMemberMsg { groupId: number; projectId: string }
 interface VersionIdMsg { assetId: number; versionId: number }
 interface ImportMsg { bundle: LibraryExport }
 
@@ -103,7 +103,8 @@ export interface ProjectGroup {
 export interface ProjectGroupMember {
     Id: number;
     GroupId: number;
-    ProjectId: number;
+    /** UUID string referencing StoredProject.id (chrome.storage.local). v9+ contract. */
+    ProjectIdUuid: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -486,7 +487,7 @@ export async function handleAddGroupMember(msg: GroupMemberMsg): Promise<{ membe
     const { groupId, projectId } = msg;
     const db = getDb();
     db.run(
-        `INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectId) VALUES (?, ?)`,
+        `INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectIdUuid) VALUES (?, ?)`,
         [groupId, projectId],
     );
     const idResult = db.exec(SQL_LAST_INSERT_ROWID);
@@ -498,7 +499,7 @@ export async function handleAddGroupMember(msg: GroupMemberMsg): Promise<{ membe
 export async function handleRemoveGroupMember(msg: GroupMemberMsg): Promise<{ isOk: true }> {
     const { groupId, projectId } = msg;
     const db = getDb();
-    db.run("DELETE FROM ProjectGroupMember WHERE GroupId = ? AND ProjectId = ?", [groupId, projectId]);
+    db.run("DELETE FROM ProjectGroupMember WHERE GroupId = ? AND ProjectIdUuid = ?", [groupId, projectId]);
     markDirty();
     return { isOk: true };
 }
@@ -520,12 +521,12 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
         return 0;
     }
 
-    // Get all member project IDs
-    const memberStmt = db.prepare("SELECT ProjectId FROM ProjectGroupMember WHERE GroupId = ?");
+    // Get all member project IDs (UUID strings, v9 contract)
+    const memberStmt = db.prepare("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?");
     memberStmt.bind([groupId]);
-    const projectIds: number[] = [];
+    const projectIds: string[] = [];
     while (memberStmt.step()) {
-        projectIds.push(memberStmt.get()[0] as number);
+        projectIds.push(memberStmt.get()[0] as string);
     }
     memberStmt.free();
 
@@ -637,7 +638,7 @@ export interface LibraryExport {
     groups: Array<{
         name: string;
         sharedSettings: JsonValue;
-        memberProjectIds: number[];
+        memberProjectIds: string[];
     }>;
 }
 
@@ -659,8 +660,8 @@ function exportGroups(db: SqlJsDatabase): LibraryExport["groups"] {
     const groups: LibraryExport["groups"] = [];
     while (stmt.step()) {
         const row = stmt.getAsObject() as ProjectGroup;
-        const memberResult = db.exec("SELECT ProjectId FROM ProjectGroupMember WHERE GroupId = ?", [row.Id]);
-        const memberProjectIds = memberResult.length > 0 ? memberResult[0].values.map((v) => v[0] as number) : [];
+        const memberResult = db.exec("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?", [row.Id]);
+        const memberProjectIds = memberResult.length > 0 ? memberResult[0].values.map((v) => v[0] as string) : [];
         let sharedSettings: JsonValue = null;
         if (row.SharedSettingsJson) {
             try { sharedSettings = JSON.parse(row.SharedSettingsJson); } catch { sharedSettings = row.SharedSettingsJson; }
@@ -722,7 +723,7 @@ function importGroups(db: SqlJsDatabase, groups: LibraryExport["groups"]): void 
         );
         const groupId = db.exec(SQL_LAST_INSERT_ROWID)[0].values[0][0] as number;
         for (const projectId of group.memberProjectIds) {
-            db.run(`INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectId) VALUES (?, ?)`, [groupId, projectId]);
+            db.run(`INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectIdUuid) VALUES (?, ?)`, [groupId, projectId]);
         }
     }
 }
