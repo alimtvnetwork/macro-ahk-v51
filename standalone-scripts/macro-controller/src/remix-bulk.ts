@@ -32,6 +32,9 @@ import { CREDIT_API_BASE } from './shared-state';
 
 interface ProjectEntry { id: string; name: string }
 
+/** Confirm before bulk-remixing this many or more workspaces. */
+const BULK_CONFIRM_THRESHOLD = 4;
+
 async function fetchProjects(wsId: string): Promise<ProjectEntry[]> {
   const sdk = window.marco;
   if (!sdk || !sdk.api || !sdk.api.projects || typeof sdk.api.projects.list !== 'function') {
@@ -83,6 +86,18 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
     return;
   }
 
+  // Accidental-fire safeguard: confirm when remixing 4+ workspaces.
+  if (checked.length >= BULK_CONFIRM_THRESHOLD) {
+    const ok = window.confirm(
+      'Bulk Remix Next will remix the most recent project in '
+      + checked.length + ' checked workspaces.\n\nProceed?',
+    );
+    if (!ok) {
+      showToast('Bulk Remix Next — cancelled', 'info');
+      return;
+    }
+  }
+
   const perWs = loopCreditState.perWorkspace || [];
   const wsById = new Map<string, { id: string; name: string }>();
   for (const ws of perWs) {
@@ -101,6 +116,8 @@ export async function actionBulkRemixNext(hint: BulkRemixSourceHint = {}): Promi
   for (let i = 0; i < checked.length; i++) {
     const wsId = checked[i];
     const wsLabel = wsById.get(wsId)?.name || wsId;
+    const progress = '[' + (i + 1) + '/' + checked.length + ']';
+    showToast('🔀 ' + progress + ' ' + wsLabel + '…', 'info');
     try {
       const projects = await fetchProjects(wsId);
       const target = pickTargetProject(projects, sourceBase);
