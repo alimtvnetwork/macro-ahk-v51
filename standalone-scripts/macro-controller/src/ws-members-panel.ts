@@ -17,7 +17,7 @@
  */
 
 import { cPanelBg, cPanelFg, cPanelBorder, cPrimary, cPrimaryLight, lDropdownRadius } from './shared-state';
-import { fetchWorkspaceMembers, clearMembersCache, type WorkspaceMember } from './ws-members-fetch';
+import { fetchWorkspaceMembers, clearMembersCache, DEFAULT_MEMBERS_PAGE_LIMIT, MEMBERS_PAGE_LIMIT_STEPS, type WorkspaceMember } from './ws-members-fetch';
 import { logError } from './error-utils';
 import { formatDateDDMMMYY } from './workspace-status';
 import { inviteMember, removeMember, updateMemberRole } from './ws-members-mutations';
