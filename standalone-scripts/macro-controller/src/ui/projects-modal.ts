@@ -130,7 +130,7 @@ export function showProjectsModal(): void {
     panel.appendChild(footer);
 
     document.body.appendChild(panel);
-    void loadAndRender(body);
+    void loadCollapsedState().then(function () { void loadAndRender(body); });
 }
 
 /** Render the current blocks + filter into the body element. */
