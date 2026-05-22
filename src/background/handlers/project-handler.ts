@@ -205,7 +205,16 @@ export async function handleSaveProject(
     // No error swallowing — unresolved paths are logged via Logger.error.
     const healed = await healProjectScriptBindings(project);
 
-    const saved = upsertProject(projects, healed);
+    // Phase 2b: AND-gated auto-attach (mem://features/auto-attach-policy.md).
+    // Only attaches when project.settings.autoStart === true AND every C1..C8
+    // condition holds for a given library script. Every skip is logged.
+    const library = await readStoredScripts();
+    const { project: withAutoAttached, attached } = runAutoAttach(healed, library);
+    if (attached.length > 0) {
+        console.info(`${BgLogTag.SCRIPT_RESOLVER} auto-attach added ${attached.length} script(s) to project "${withAutoAttached.name}": ${attached.map((a) => a.path).join(", ")}`);
+    }
+
+    const saved = upsertProject(projects, withAutoAttached);
     await writeAllProjects(projects);
 
     // ✅ 15.8: Rebuild namespace cache on save (fire-and-forget)
