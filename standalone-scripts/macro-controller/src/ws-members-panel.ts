@@ -614,6 +614,15 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
       e.stopPropagation();
       clearMembersCache(wsId);
       loadAndRender(el, wsId, wsName);
+    } else if (action === 'export-csv') {
+      e.stopPropagation();
+      const store = el as HTMLElement & PanelHandlerStore;
+      const latest = store._marcoMembersLatest;
+      if (!latest || latest.members.length === 0) {
+        showToast('⏳ Members not loaded yet', 'info');
+        return;
+      }
+      exportMembersCsv(latest.wsName, latest.members);
     } else if (action === 'add-member-toggle') {
       e.stopPropagation();
       swapFooter(el, true);
