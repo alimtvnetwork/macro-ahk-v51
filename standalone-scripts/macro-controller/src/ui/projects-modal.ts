@@ -256,14 +256,36 @@ function renderEmpty(text: string): string {
     return '<div style="color:' + cPanelFgDim + ';font-size:11px;padding:6px;">' + escapeHtml(text) + '</div>';
 }
 
-function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex, capturedAt: string | null): string {
+function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex, capturedAt: string | null, query: string): void | string {
+    const q = (query || '').trim().toLowerCase();
+    const filtered: WorkspaceBlock[] = q
+        ? blocks.map(function (b) {
+            if (!b.projects) return b;
+            const projects = b.projects.filter(function (p) {
+                return p.name.toLowerCase().includes(q)
+                    || p.id.toLowerCase().includes(q)
+                    || p.githubRepo.toLowerCase().includes(q)
+                    || p.githubBranch.toLowerCase().includes(q);
+            });
+            return { ws: b.ws, projects, error: b.error, loading: b.loading };
+        })
+        : blocks.slice();
+
     const totalOpen = tabIndex.byProjectId.size + tabIndex.byUrlProjectId.size;
+    const matchCount = q
+        ? filtered.reduce(function (acc, b) { return acc + (b.projects?.length ?? 0); }, 0)
+        : 0;
     let html = '<div style="font-size:10px;color:#94a3b8;padding:0 0 6px 0;">'
         + blocks.length + ' workspace' + (blocks.length === 1 ? '' : 's')
         + ' · ' + totalOpen + ' open project tab' + (totalOpen === 1 ? '' : 's')
+        + (q ? ' · <span style="color:#fbbf24;">' + matchCount + ' match' + (matchCount === 1 ? '' : 'es') + '</span>' : '')
         + (capturedAt ? ' · ' + escapeHtml(capturedAt) : '')
         + '</div>';
-    for (const b of blocks) html += renderBlock(b, tabIndex);
+    for (const b of filtered) {
+        // Hide workspace block entirely when filter is active and yields no projects.
+        if (q && (b.projects?.length ?? 0) === 0 && !b.loading && !b.error) continue;
+        html += renderBlock(b, tabIndex);
+    }
     return html;
 }
 
