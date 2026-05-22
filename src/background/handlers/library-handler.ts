@@ -29,7 +29,7 @@ interface ReplaceMsg { assetId: number; contentJson: string; name?: string }
 interface ForkMsg { originalSlug: string; name: string; type: AssetType; contentJson: string }
 interface GroupMsg { group: Partial<ProjectGroup> & { Name: string } }
 interface GroupIdMsg { groupId: number }
-interface GroupMemberMsg { groupId: number; projectId: number }
+interface GroupMemberMsg { groupId: number; projectId: string }
 interface VersionIdMsg { assetId: number; versionId: number }
 interface ImportMsg { bundle: LibraryExport }
 
@@ -103,7 +103,8 @@ export interface ProjectGroup {
 export interface ProjectGroupMember {
     Id: number;
     GroupId: number;
-    ProjectId: number;
+    /** UUID string referencing StoredProject.id (chrome.storage.local). v9+ contract. */
+    ProjectIdUuid: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -486,7 +487,7 @@ export async function handleAddGroupMember(msg: GroupMemberMsg): Promise<{ membe
     const { groupId, projectId } = msg;
     const db = getDb();
     db.run(
-        `INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectId) VALUES (?, ?)`,
+        `INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectIdUuid) VALUES (?, ?)`,
         [groupId, projectId],
     );
     const idResult = db.exec(SQL_LAST_INSERT_ROWID);
@@ -498,7 +499,7 @@ export async function handleAddGroupMember(msg: GroupMemberMsg): Promise<{ membe
 export async function handleRemoveGroupMember(msg: GroupMemberMsg): Promise<{ isOk: true }> {
     const { groupId, projectId } = msg;
     const db = getDb();
-    db.run("DELETE FROM ProjectGroupMember WHERE GroupId = ? AND ProjectId = ?", [groupId, projectId]);
+    db.run("DELETE FROM ProjectGroupMember WHERE GroupId = ? AND ProjectIdUuid = ?", [groupId, projectId]);
     markDirty();
     return { isOk: true };
 }
@@ -520,12 +521,12 @@ function cascadeSettingsToMembers(db: ReturnType<typeof getDb>, groupId: number,
         return 0;
     }
 
-    // Get all member project IDs
-    const memberStmt = db.prepare("SELECT ProjectId FROM ProjectGroupMember WHERE GroupId = ?");
+    // Get all member project IDs (UUID strings, v9 contract)
+    const memberStmt = db.prepare("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?");
     memberStmt.bind([groupId]);
-    const projectIds: number[] = [];
+    const projectIds: string[] = [];
     while (memberStmt.step()) {
-        projectIds.push(memberStmt.get()[0] as number);
+        projectIds.push(memberStmt.get()[0] as string);
     }
     memberStmt.free();
 
