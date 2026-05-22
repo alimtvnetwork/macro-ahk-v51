@@ -103,6 +103,23 @@ function buildWrappedCode(
     const wrapperNonce = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 
     return `;${sdkLine};(function() {
+    // Per-page dedup via <body data-marco-injected="id1,id2,..."> marker.
+    // See mem://features/auto-attach-policy.md §2. Logged, never silent.
+    try {
+        var __mBody = document.body;
+        if (__mBody) {
+            var __mAttr = __mBody.getAttribute("data-marco-injected") || "";
+            var __mList = __mAttr ? __mAttr.split(",") : [];
+            if (__mList.indexOf(${safeScriptId}) !== -1) {
+                console.info("[Marco] INJECT_SKIPPED_ALREADY_MARKED script=" + ${safeScriptId});
+                return;
+            }
+            __mList.push(${safeScriptId});
+            __mBody.setAttribute("data-marco-injected", __mList.join(","));
+        }
+    } catch (__mDedupErr) {
+        console.warn("[Marco] body-marker dedup failed for " + ${safeScriptId} + ":", __mDedupErr);
+    }
     ${configLine}${themeLine}try {
         ${userCode}
     } catch (__marcoErr) {
