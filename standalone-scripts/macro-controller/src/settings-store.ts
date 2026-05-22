@@ -30,6 +30,10 @@ export interface SettingsOverrides {
   proZeroCreditBalanceCacheTtlMinutes?: number;
   /** Master switch for the canceled/expired credit override. Default true. */
   enableCanceledCreditOverride?: boolean;
+  /** Show inline status labels under each workspace row. */
+  enableWorkspaceStatusLabels?: boolean;
+  /** Show the rich hover-card with credit details on workspace rows. */
+  enableWorkspaceHoverDetails?: boolean;
 }
 
 type SettingsListener = (overrides: SettingsOverrides) => void;
