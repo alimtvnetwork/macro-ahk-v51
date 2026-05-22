@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/collapsible";
 import { ShieldOff, Timer, ChevronDown } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
+import { logError } from "./options-logger";
 import {
     loadDiagnosticsCache,
     saveDiagnosticsCache,
@@ -115,8 +116,8 @@ export function TokenSeederStatusIndicator() {
             });
             setData(res);
             saveDiagnosticsCache(res);
-        } catch {
-            // Background may not be ready — silently skip this poll
+        } catch (caught) {
+            logError("TokenSeederStatusIndicator.fetchDiagnostics", "GET_TOKEN_SEEDER_DIAGNOSTICS failed — background may not be ready, will retry on next poll", caught);
         }
     }, []);
 

@@ -35,6 +35,7 @@ import {
 import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
 import { DEFAULT_CHATBOX_XPATH } from "@/shared/defaults";
+import { logError } from "./options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -133,8 +134,8 @@ export function SettingsView() {
         if (result.settings) {
           setSettings({ ...DEFAULT_SETTINGS, ...result.settings });
         }
-      } catch {
-        // Use defaults if settings not available
+      } catch (caught) {
+        logError("SettingsView.load", "GET_SETTINGS failed — using DEFAULT_SETTINGS", caught);
       } finally {
         setLoading(false);
       }

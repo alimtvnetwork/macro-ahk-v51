@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Variable, Plus, Trash2, Save, Copy } from "lucide-react";
 import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
+import { logError } from "./options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -40,8 +41,8 @@ export function PromptVariablesCard() {
           .filter(([k]) => !builtInSet.has(k))
           .map(([key, value]) => ({ key, value }));
         setCustomVars(customs);
-      } catch {
-        // silent
+      } catch (caught) {
+        logError("PromptVariablesCard.load", "GET_PROMPT_VARIABLES failed — card will render with empty custom vars list", caught);
       }
     };
     void load();

@@ -129,6 +129,7 @@ import { CsvInputDialog } from "./CsvInputDialog";
 import WebhookSettingsDialog from "./WebhookSettingsDialog";
 import InputSourceDialog from "./InputSourceDialog";
 import StepWaitDialog from "./StepWaitDialog";
+import { logError } from "./options-logger";
 import {
     readAllStepWaits,
     type WaitConfig,
@@ -1672,8 +1673,8 @@ function StepRowItem(props: StepRowItemProps): JSX.Element {
             if (payload.stepGroupId !== stepGroupId) return;
             if (payload.stepId === s.StepId) return;
             onDropReorder(stepGroupId, payload.stepId, s.StepId);
-        } catch {
-            /* malformed payload — ignore */
+        } catch (caught) {
+            logError("StepGroupLibraryPanel.handleDropReorder.step", "Malformed drag payload — DataTransfer JSON.parse failed", caught);
         }
     };
 
@@ -1856,8 +1857,8 @@ function TreeNodeRow(props: TreeNodeRowProps) {
             }
             if (payload.id === id) return;
             onDropReorder(parentId, payload.id, id);
-        } catch {
-            /* malformed payload — ignore */
+        } catch (caught) {
+            logError("StepGroupLibraryPanel.handleDropReorder.group", "Malformed drag payload — DataTransfer JSON.parse failed", caught);
         }
     };
 

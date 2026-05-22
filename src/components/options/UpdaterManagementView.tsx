@@ -52,6 +52,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { sendMessage } from "@/lib/message-client";
 import { toast } from "sonner";
+import { logError } from "./options-logger";
 
 /* ------------------------------------------------------------------ */
 /*  Interval Options                                                   */
@@ -167,8 +168,8 @@ export function UpdaterManagementView() {
     try {
       const res = await sendMessage<{ settings: GlobalSettings }>({ type: "GET_UPDATE_SETTINGS" });
       if (res.settings) setGlobalSettings(res.settings);
-    } catch {
-      // Use defaults
+    } catch (caught) {
+      logError("UpdaterManagementView.loadSettings", "GET_UPDATE_SETTINGS failed — keeping default globalSettings", caught);
     }
   }, []);
 

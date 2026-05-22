@@ -10,6 +10,7 @@
  */
 
 import { sendMessage } from "@/lib/message-client";
+import { logError } from "../options-logger";
 
 /** SelectorKindId.Css per src/background/recorder-db-schema.ts */
 const SELECTOR_KIND_CSS = 3;
@@ -80,7 +81,10 @@ export async function runRecorderSelfTest(projectSlug: string): Promise<SelfTest
         };
     } catch (err) {
         // Best-effort cleanup; do not mask the original error.
-        await deleteStep(projectSlug, insertedStepId).catch(() => undefined);
+        await deleteStep(projectSlug, insertedStepId).catch((cleanupErr: unknown) => {
+            logError("recorderSelfTest.cleanup", `deleteStep failed for insertedStepId=${insertedStepId} during error-recovery cleanup — original error will still be rethrown`, cleanupErr);
+            return undefined;
+        });
         throw err;
     }
 }

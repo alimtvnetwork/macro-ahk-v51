@@ -1,4 +1,5 @@
 import type { JsonValue, JsonObject, JsonArray } from "./json-tree-types";
+import { logError } from "../options-logger";
 
 /** Safely parse a JSON string, returning null on failure. */
 export function safeParse(str: string): JsonValue {
@@ -68,7 +69,7 @@ function parseAsJsonOrString(trimmed: string): JsonValue {
     const isComplex = typeof parsed === "object";
     if (isComplex) return parsed;
   } catch (jsonParseError: unknown) {
-    // Not JSON — treat as string
+    logError("jsonTreeHelpers.parseAsJsonOrString", "JSON.parse failed — treating value as plain string (expected for non-JSON cell values)", jsonParseError);
   }
 
   return trimmed;

@@ -11,6 +11,7 @@
  * MAX cooldown window are discarded because every blocked tab will
  * have either retried or been cleared by the background by then.
  */
+import { logError } from "./options-logger";
 
 export interface InaccessibleSeedTargetCacheEntry {
     tabId: number;
@@ -81,8 +82,8 @@ export function saveDiagnosticsCache(snapshot: TokenSeederDiagnosticsCache | nul
             return;
         }
         storage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
-    } catch {
-        // Storage quota or serialization failure — non-fatal.
+    } catch (caught) {
+        logError("tokenSeederDiagnosticsCache.save", "localStorage quota or serialization failure — cache write skipped (non-fatal)", caught);
     }
 }
 
@@ -91,7 +92,7 @@ export function clearDiagnosticsCache(): void {
     if (!storage) return;
     try {
         storage.removeItem(STORAGE_KEY);
-    } catch {
-        // ignore
+    } catch (caught) {
+        logError("tokenSeederDiagnosticsCache.clear", "localStorage.removeItem failed — cache entry may persist until next overwrite", caught);
     }
 }
