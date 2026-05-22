@@ -35,7 +35,10 @@ const fakeKv = {
     async delete(key) { kvCalls.delete++; store.delete(key); },
 };
 
-globalThis.window = { marco: { kv: fakeKv } };
+globalThis.window = {
+    marco: { kv: fakeKv },
+    location: { pathname: '/verify', href: 'http://verify/', hostname: 'verify' },
+};
 // Stub `document` so the shared `log()` (which fans out to the activity-log
 // DOM updater) is a no-op in this Node/Bun verification environment.
 globalThis.document = { getElementById: () => null, createElement: () => ({ style: {}, appendChild() {}, setAttribute() {} }) };
