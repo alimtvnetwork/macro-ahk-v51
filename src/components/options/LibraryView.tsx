@@ -686,17 +686,21 @@ export function LibraryView() {
   // shows the latest groups/assets/links without a manual refresh.
   // Debounce because import/cascade can fire many markDirty() calls in a burst.
   useEffect(() => {
-    if (typeof chrome === "undefined" || !chrome.runtime?.onMessage) return;
+    const runtime = (typeof chrome !== "undefined" ? chrome.runtime : undefined) as
+      | { onMessage?: { addListener: (fn: (msg: unknown) => void) => void; removeListener: (fn: (msg: unknown) => void) => void } }
+      | undefined;
+    if (!runtime?.onMessage) return;
     let timer: ReturnType<typeof setTimeout> | null = null;
-    const listener = (msg: { type?: string }) => {
+    const listener = (message: unknown) => {
+      const msg = message as { type?: string } | null;
       if (msg?.type !== "LIBRARY_CHANGED") return;
       if (timer) clearTimeout(timer);
       timer = setTimeout(() => { void loadData(); }, 150);
     };
-    chrome.runtime.onMessage.addListener(listener);
+    runtime.onMessage.addListener(listener);
     return () => {
       if (timer) clearTimeout(timer);
-      chrome.runtime.onMessage.removeListener(listener);
+      runtime.onMessage!.removeListener(listener);
     };
   }, [loadData]);
 
