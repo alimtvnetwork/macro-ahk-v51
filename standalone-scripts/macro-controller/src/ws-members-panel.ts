@@ -17,7 +17,7 @@
  */
 
 import { cPanelBg, cPanelFg, cPanelBorder, cPrimary, cPrimaryLight, lDropdownRadius } from './shared-state';
-import { fetchWorkspaceMembers, clearMembersCache, type WorkspaceMember } from './ws-members-fetch';
+import { fetchWorkspaceMembers, clearMembersCache, DEFAULT_MEMBERS_PAGE_LIMIT, MEMBERS_PAGE_LIMIT_STEPS, type WorkspaceMember } from './ws-members-fetch';
 import { logError } from './error-utils';
 import { formatDateDDMMMYY } from './workspace-status';
 import { inviteMember, removeMember, updateMemberRole } from './ws-members-mutations';
@@ -266,7 +266,27 @@ function buildBodyHtml(state: PanelState): string {
     return acc + (Number.isFinite(m.total_credits_used) ? m.total_credits_used : 0);
   }, 0);
   const rows = state.members.map(function (m, i) { return memberRowHtml(m, i, sumLoaded); }).join('');
-  return '<div style="max-height:380px;overflow-y:auto;">' + rows + '</div>';
+  return '<div style="max-height:380px;overflow-y:auto;">' + rows + loadMoreRowHtml(state) + '</div>';
+}
+
+function loadMoreRowHtml(state: PanelStateSuccess): string {
+  const nextLimit = nextPageLimit(state.limit);
+  if (nextLimit === null) return '';
+  if (state.members.length >= state.total) return '';
+  const label = 'Load more (top ' + nextLimit + ' of ' + state.total + ')';
+  return '<button type="button" data-marco-action="load-more" '
+    + 'style="display:block;width:calc(100% - 16px);margin:8px;padding:6px 10px;'
+    + 'background:rgba(0,122,204,0.18);color:#bae6fd;border:1px dashed ' + cPrimary + ';'
+    + 'border-radius:3px;font-size:11px;cursor:pointer;line-height:1.2;">'
+    + escHtml(label)
+    + '</button>';
+}
+
+function nextPageLimit(current: number): number | null {
+  for (const step of MEMBERS_PAGE_LIMIT_STEPS) {
+    if (step > current) return step;
+  }
+  return null;
 }
 
 function headerHtml(wsName: string, state: PanelState): string {
@@ -345,7 +365,7 @@ function footerHtml(expanded = false): string {
 
 interface PanelStateLoading { kind: 'loading'; }
 interface PanelStateError { kind: 'error'; error: string; }
-interface PanelStateSuccess { kind: 'success'; members: WorkspaceMember[]; total: number; }
+interface PanelStateSuccess { kind: 'success'; members: WorkspaceMember[]; total: number; limit: number; }
 type PanelState = PanelStateLoading | PanelStateError | PanelStateSuccess;
 
 /* ------------------------------------------------------------------ */
@@ -356,7 +376,8 @@ interface PanelHandlerStore {
   _marcoMembersOutsideClick?: (e: MouseEvent) => void;
   _marcoMembersKey?: (e: KeyboardEvent) => void;
   _marcoMembersSubmit?: (e: Event) => void;
-  _marcoMembersLatest?: { wsName: string; members: WorkspaceMember[]; total: number };
+  _marcoMembersLatest?: { wsName: string; members: WorkspaceMember[]; total: number; limit: number };
+  _marcoMembersLimit?: number;
 }
 
 function ensurePanelEl(): HTMLDivElement {
@@ -614,6 +635,14 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
       e.stopPropagation();
       clearMembersCache(wsId);
       loadAndRender(el, wsId, wsName);
+    } else if (action === 'load-more') {
+      e.stopPropagation();
+      const store = el as HTMLElement & PanelHandlerStore;
+      const current = store._marcoMembersLimit ?? DEFAULT_MEMBERS_PAGE_LIMIT;
+      const next = nextPageLimit(current);
+      if (next === null) return;
+      store._marcoMembersLimit = next;
+      loadAndRender(el, wsId, wsName);
     } else if (action === 'export-csv') {
       e.stopPropagation();
       const store = el as HTMLElement & PanelHandlerStore;
@@ -710,13 +739,14 @@ function detachDismissHandlers(): void {
 /* ------------------------------------------------------------------ */
 
 function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
+  const store = el as HTMLElement & PanelHandlerStore;
+  const limit = store._marcoMembersLimit ?? DEFAULT_MEMBERS_PAGE_LIMIT;
   render(el, wsName, { kind: 'loading' });
-  fetchWorkspaceMembers(wsId)
+  fetchWorkspaceMembers(wsId, false, limit)
     .then(function (entry) {
       if (!document.getElementById(PANEL_ID)) return; // panel was closed
-      const store = el as HTMLElement & PanelHandlerStore;
-      store._marcoMembersLatest = { wsName: wsName, members: entry.members, total: entry.total };
-      render(el, wsName, { kind: 'success', members: entry.members, total: entry.total });
+      store._marcoMembersLatest = { wsName: wsName, members: entry.members, total: entry.total, limit: limit };
+      render(el, wsName, { kind: 'success', members: entry.members, total: entry.total, limit: limit });
     })
     .catch(function (err: unknown) {
       if (!document.getElementById(PANEL_ID)) return;
@@ -734,8 +764,9 @@ function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
 export function showWsMembersPanel(wsId: string, wsName: string, x: number, y: number): void {
   if (!wsId) return;
   const el = ensurePanelEl();
-  // Reset attach state before re-rendering for a different workspace.
+  // Reset attach state + page-size before re-rendering for a different workspace.
   detachDismissHandlers();
+  (el as HTMLElement & PanelHandlerStore)._marcoMembersLimit = DEFAULT_MEMBERS_PAGE_LIMIT;
   attachActionHandlers(el, wsId, wsName);
   loadAndRender(el, wsId, wsName);
   // First render to measure, then position.

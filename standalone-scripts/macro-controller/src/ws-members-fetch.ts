@@ -52,6 +52,11 @@ const cache: Record<string, CacheEntry> = {};
 /** Default cache TTL (5 minutes). */
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
+/** Default page size (matches legacy "top 20" behavior). */
+export const DEFAULT_MEMBERS_PAGE_LIMIT = 20;
+/** Allowed "Load more" page sizes the panel cycles through. */
+export const MEMBERS_PAGE_LIMIT_STEPS: number[] = [20, 50, 100];
+
 /**
  * Defensive numeric coercion — server occasionally returns null/undefined for
  * `total_credits_used*` fields. Treat missing values as 0 for sort purposes.
@@ -87,10 +92,15 @@ function normalizeMember(raw: Record<string, unknown>): WorkspaceMember {
  * Throws on any non-2xx HTTP status, missing SDK, or network failure. The
  * panel UI catches and renders an error state.
  */
-export async function fetchWorkspaceMembers(wsId: string, force = false): Promise<CacheEntry> {
+export async function fetchWorkspaceMembers(
+  wsId: string,
+  force = false,
+  limit: number = DEFAULT_MEMBERS_PAGE_LIMIT,
+): Promise<CacheEntry> {
   if (!wsId) throw new Error('fetchWorkspaceMembers: wsId is required');
 
-  const existing = cache[wsId];
+  const cacheKey = wsId + ':' + limit;
+  const existing = cache[cacheKey];
   if (!force && existing && Date.now() - existing.fetchedAt < CACHE_TTL_MS) {
     return existing;
   }
@@ -100,9 +110,12 @@ export async function fetchWorkspaceMembers(wsId: string, force = false): Promis
     throw new Error('marco.api.memberships is not available — SDK not loaded');
   }
 
-  log('[Members] GET /workspaces/' + wsId + '/memberships/search', 'delegate');
+  log('[Members] GET /workspaces/' + wsId + '/memberships/search?limit=' + limit, 'delegate');
 
-  const resp = await sdk.api.memberships.search(wsId, { baseUrl: CREDIT_API_BASE });
+  const resp = await sdk.api.memberships.search(wsId, {
+    baseUrl: CREDIT_API_BASE,
+    params: { status: 'active', limit: String(limit) },
+  });
 
   if (!resp.ok) {
     const bodyPreview = JSON.stringify(resp.data).substring(0, 200);
@@ -125,15 +138,17 @@ export async function fetchWorkspaceMembers(wsId: string, force = false): Promis
     total: typeof data.total === 'number' ? data.total : normalized.length,
     fetchedAt: Date.now(),
   };
-  cache[wsId] = entry;
-  log('[Members] ✅ ' + normalized.length + ' members (total=' + entry.total + ')', 'success');
+  cache[cacheKey] = entry;
+  log('[Members] ✅ ' + normalized.length + ' members (total=' + entry.total + ', limit=' + limit + ')', 'success');
   return entry;
 }
 
-/** Drop the cache entry for a workspace (or all when wsId omitted). */
+/** Drop the cache entry for a workspace (or all when wsId omitted). Clears every page-size variant. */
 export function clearMembersCache(wsId?: string): void {
   if (wsId) {
-    delete cache[wsId];
+    for (const key of Object.keys(cache)) {
+      if (key === wsId || key.startsWith(wsId + ':')) delete cache[key];
+    }
     return;
   }
   for (const key of Object.keys(cache)) {
@@ -142,6 +157,6 @@ export function clearMembersCache(wsId?: string): void {
 }
 
 /** Read-only peek at cached members — used by the panel for instant render. */
-export function peekCachedMembers(wsId: string): CacheEntry | null {
-  return cache[wsId] || null;
+export function peekCachedMembers(wsId: string, limit: number = DEFAULT_MEMBERS_PAGE_LIMIT): CacheEntry | null {
+  return cache[wsId + ':' + limit] || null;
 }
