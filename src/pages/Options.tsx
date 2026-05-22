@@ -18,6 +18,7 @@ import { useProjects, useScripts, useConfigs, type StoredProject } from "@/hooks
 import { useOnboarding } from "@/hooks/use-onboarding";
 import { OnboardingFlow } from "@/components/onboarding/OnboardingFlow";
 import { Toaster } from "@/components/ui/sonner";
+import { HttpFailFastBanner } from "@/components/HttpFailFastBanner";
 import { toast } from "sonner";
 import { PanelRightOpen, Loader2 } from "lucide-react";
 
@@ -285,6 +286,7 @@ const OptionsPage = () => {
       <>
         {stateMarker}
         <Toaster />
+        <HttpFailFastBanner />
         <OnboardingFlow onComplete={completeOnboarding} />
       </>
     );
@@ -393,6 +395,7 @@ const OptionsPage = () => {
       <div className="min-h-screen flex w-full">
         {stateMarker}
         <Toaster />
+        <HttpFailFastBanner />
         {hideFloatingControllerForE2E ? null : <FloatingControllerHost />}
         <OptionsSidebar selection={selection} onSelect={handleSidebarSelect} onErrorDrawerOpen={() => setErrorDrawerOpen(true)} />
 

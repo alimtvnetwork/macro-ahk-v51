@@ -5,6 +5,7 @@ import { AuthDiagnosticsBar } from "@/components/popup/AuthDiagnosticsBar";
 import { usePopupActions } from "@/hooks/use-popup-actions";
 import { VersionMismatchBanner } from "@/components/popup/VersionMismatchBanner";
 import { BootFailureBanner } from "@/components/popup/BootFailureBanner";
+import { HttpFailFastBanner } from "@/components/HttpFailFastBanner";
 import { ProjectSelector } from "@/components/popup/ProjectSelector";
 import { PopupStatusBar } from "@/components/popup/PopupStatusBar";
 import { PopupHeader } from "@/components/popup/PopupHeader";
@@ -246,6 +247,7 @@ const PopupPage = () => {
           />
         </Suspense>
         <Toaster position="top-center" richColors closeButton />
+        <HttpFailFastBanner />
       </div>
     </TooltipProvider>
   );
