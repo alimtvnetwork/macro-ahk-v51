@@ -394,49 +394,100 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
         </Button>
       </div>
 
-      {/* Members List */}
+      {/* Draggable available-project chip rail (drag source for drag-to-assign UX) */}
+      {availableProjects.length > 0 && (
+        <div className="space-y-1.5">
+          <p className="text-[11px] text-muted-foreground uppercase tracking-wider">
+            Drag a project onto the members list to assign
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            {availableProjects.map(p => (
+              <Badge
+                key={p.id}
+                variant="outline"
+                draggable
+                onDragStart={(e) => {
+                  e.dataTransfer.setData("application/x-marco-project-uuid", p.id);
+                  e.dataTransfer.effectAllowed = "copy";
+                }}
+                className="cursor-grab active:cursor-grabbing select-none text-xs px-2 py-1 hover:bg-primary/10 hover:border-primary/40 transition-colors"
+                title={`Drag to assign "${p.name}"`}
+              >
+                {p.name}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Members List (drop target) */}
       {loading ? (
         <div className="flex items-center justify-center py-10 text-muted-foreground gap-2">
           <Loader2 className="h-5 w-5 animate-spin" />
           <span className="text-sm">Loading members…</span>
         </div>
-      ) : members.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-10 text-muted-foreground gap-2">
-          <Users className="h-8 w-8 opacity-30" />
-          <p className="text-sm">No members yet. Add a project from the dropdown above.</p>
-        </div>
       ) : (
-        <ScrollArea className="h-[300px]">
-          <div className="space-y-2">
-            {members.map(member => {
-              const project = projectsById.get(member.ProjectIdUuid);
-              const displayName = project?.name ?? "(unknown project)";
-              return (
-                <div
-                  key={member.Id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-card/50 hover:bg-card/80 transition-colors"
-                >
-                  <div className="flex items-center gap-3 min-w-0">
-                    <Badge variant="outline" className="text-[11px] font-mono px-2 shrink-0">
-                      {member.ProjectIdUuid.slice(0, 8)}
-                    </Badge>
-                    <span className={"text-sm truncate " + (project ? "" : "text-muted-foreground italic")}>
-                      {displayName}
-                    </span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                    onClick={() => setRemoveMember(member)}
-                  >
-                    <UserMinus className="h-3.5 w-3.5" />
-                  </Button>
-                </div>
-              );
-            })}
-          </div>
-        </ScrollArea>
+        <div
+          onDragOver={(e) => {
+            if (e.dataTransfer.types.includes("application/x-marco-project-uuid")) {
+              e.preventDefault();
+              e.dataTransfer.dropEffect = "copy";
+              if (!dropActive) setDropActive(true);
+            }
+          }}
+          onDragLeave={() => setDropActive(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDropActive(false);
+            const uuid = e.dataTransfer.getData("application/x-marco-project-uuid");
+            if (uuid) void addMemberById(uuid);
+          }}
+          className={
+            "rounded-lg border-2 border-dashed transition-colors " +
+            (dropActive ? "border-primary bg-primary/5" : "border-border/40")
+          }
+        >
+          {members.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-10 text-muted-foreground gap-2">
+              <Users className="h-8 w-8 opacity-30" />
+              <p className="text-sm">
+                {dropActive ? "Drop to add to group" : "No members yet. Drag a project here, or use the dropdown."}
+              </p>
+            </div>
+          ) : (
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-2 p-2">
+                {members.map(member => {
+                  const project = projectsById.get(member.ProjectIdUuid);
+                  const displayName = project?.name ?? "(unknown project)";
+                  return (
+                    <div
+                      key={member.Id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-border/60 bg-card/50 hover:bg-card/80 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <Badge variant="outline" className="text-[11px] font-mono px-2 shrink-0">
+                          {member.ProjectIdUuid.slice(0, 8)}
+                        </Badge>
+                        <span className={"text-sm truncate " + (project ? "" : "text-muted-foreground italic")}>
+                          {displayName}
+                        </span>
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-7 w-7 text-muted-foreground hover:text-destructive"
+                        onClick={() => setRemoveMember(member)}
+                      >
+                        <UserMinus className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </ScrollArea>
+          )}
+        </div>
       )}
 
       {/* Edit dialog */}
