@@ -143,10 +143,12 @@ export async function fetchWorkspaceMembers(
   return entry;
 }
 
-/** Drop the cache entry for a workspace (or all when wsId omitted). */
+/** Drop the cache entry for a workspace (or all when wsId omitted). Clears every page-size variant. */
 export function clearMembersCache(wsId?: string): void {
   if (wsId) {
-    delete cache[wsId];
+    for (const key of Object.keys(cache)) {
+      if (key === wsId || key.startsWith(wsId + ':')) delete cache[key];
+    }
     return;
   }
   for (const key of Object.keys(cache)) {
@@ -155,6 +157,6 @@ export function clearMembersCache(wsId?: string): void {
 }
 
 /** Read-only peek at cached members — used by the panel for instant render. */
-export function peekCachedMembers(wsId: string): CacheEntry | null {
-  return cache[wsId] || null;
+export function peekCachedMembers(wsId: string, limit: number = DEFAULT_MEMBERS_PAGE_LIMIT): CacheEntry | null {
+  return cache[wsId + ':' + limit] || null;
 }
