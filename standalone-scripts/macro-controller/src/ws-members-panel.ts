@@ -57,6 +57,66 @@ function copyToClipboard(value: string, label: string): void {
   }
 }
 
+/** Escape a single CSV field per RFC 4180 (quote if needed, double inner quotes). */
+function csvField(value: string | number): string {
+  const s = value == null ? '' : String(value);
+  if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+/** Slugify a workspace name for use in a download filename. */
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'workspace';
+}
+
+/** Build a CSV blob for the loaded members and trigger a browser download. */
+function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
+  if (!members.length) {
+    showToast('⚠️ No members to export', 'info');
+    return;
+  }
+  const headers = [
+    'rank', 'display_name', 'username', 'email', 'role',
+    'total_credits_used', 'total_credits_used_in_billing_period',
+    'joined_at', 'invited_at', 'user_id',
+  ];
+  const lines = [headers.join(',')];
+  members.forEach(function (m, i) {
+    lines.push([
+      i + 1,
+      csvField(m.display_name),
+      csvField(m.username),
+      csvField(m.email),
+      csvField(m.role),
+      m.total_credits_used,
+      m.total_credits_used_in_billing_period,
+      csvField(m.joined_at),
+      csvField(m.invited_at),
+      csvField(m.user_id),
+    ].join(','));
+  });
+  // BOM so Excel opens UTF-8 cleanly.
+  const csv = '\uFEFF' + lines.join('\r\n') + '\r\n';
+  const stamp = new Date().toISOString().slice(0, 10);
+  const filename = 'members-' + slugify(wsName) + '-' + stamp + '.csv';
+  try {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    showToast('📄 Exported ' + members.length + ' members → ' + filename, 'success');
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    showToast('❌ CSV export failed: ' + msg, 'error');
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /*  HTML helpers                                                       */
 /* ------------------------------------------------------------------ */
