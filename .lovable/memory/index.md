@@ -19,6 +19,7 @@ Updated: just now
 - **No Explicit Unknown**: No `unknown` except in `CaughtError`. Function params must use designed types.
 - **Error Handling**: Defensive property access (`?.`, `??`) required. CQ14 (braces), CQ15 (newlines).
 - **No Silent Failures**: Anything broken MUST be logged. Default to ERROR for obvious failure conditions (missing script/file/config, URL match without resolution, etc.). Downgrade later if proven benign — never silence by default. See `mem://standards/no-silent-failures`.
+- **Auto-attach gated on `autoStart`**: Auto-attaching library scripts to a project happens ONLY when `project.autoStart === true`. Before injecting, check `document.body[data-marco-injected]` CSV for the scriptId; skip if present, stamp after success. See `mem://features/auto-attach-policy`.
 - **HTTP fail-fast**: On ANY 4xx/5xx (esp. 404/405) from scripted/automated calls, STOP the loop immediately. No retry, no fanout, no heavy follow-up. Emit `HTTP <status> on <METHOD> <url>` + reason + `Loop halted. Awaiting user instruction.` then wait. See `mem://constraints/http-error-fail-fast`.
 - **Auth Contract**: Use single-path `getBearerToken()` contract. No legacy auth methods.
 - **Installer Contract**: All install scripts MUST conform to `spec/14-update/01-generic-installer-behavior.md` — strict on `--version`/release-URL, latest→main fallback otherwise, opt-in parallel sibling-repo discovery.
@@ -31,6 +32,7 @@ Updated: just now
 
 ## Memories
 - [⛔ readme.txt prohibitions (SP-1..SP-8)](mem://constraints/readme-txt-prohibitions) — Sequenced hard ban; honor one-shot explicit writes only; mirrors strictly-avoid.md and spec/01-spec-authoring-guide/09-exceptions.md
+- [Auto-attach policy](mem://features/auto-attach-policy) — Auto-attach only when `project.autoStart === true`; body `data-marco-injected` CSV marker for already-injected detection
 - [Chrome-extension dist path](mem://constraints/chrome-extension-dist-path) — Extension build output is `chrome-extension/` itself (NOT `chrome-extension/dist/`); release/CI must never reference legacy `/dist` subpath. RCA for v2.242.0 missing-asset regression.
 - [Release assets publish contract](mem://constraints/release-assets-publish-contract) — GitHub Release must contain built ZIPs/installers/checksums/notes; tag/source archives alone are invalid; workflow_dispatch must check out requested tag and notes must exclude current tag from previous-tag range.
 - [URL trigger + sentinel cache](mem://architecture/url-trigger-sentinel-cache) — v2.244.0: only 3 URL re-eval triggers (load/refresh/activate), per-tab `tabDecisionCache` fingerprint gate, `__marco_sentinel__` DOM marker; no polling, no retry, never throw from listener.
