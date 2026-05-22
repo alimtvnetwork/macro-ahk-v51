@@ -638,7 +638,7 @@ export interface LibraryExport {
     groups: Array<{
         name: string;
         sharedSettings: JsonValue;
-        memberProjectIds: number[];
+        memberProjectIds: string[];
     }>;
 }
 
@@ -660,8 +660,8 @@ function exportGroups(db: SqlJsDatabase): LibraryExport["groups"] {
     const groups: LibraryExport["groups"] = [];
     while (stmt.step()) {
         const row = stmt.getAsObject() as ProjectGroup;
-        const memberResult = db.exec("SELECT ProjectId FROM ProjectGroupMember WHERE GroupId = ?", [row.Id]);
-        const memberProjectIds = memberResult.length > 0 ? memberResult[0].values.map((v) => v[0] as number) : [];
+        const memberResult = db.exec("SELECT ProjectIdUuid FROM ProjectGroupMember WHERE GroupId = ?", [row.Id]);
+        const memberProjectIds = memberResult.length > 0 ? memberResult[0].values.map((v) => v[0] as string) : [];
         let sharedSettings: JsonValue = null;
         if (row.SharedSettingsJson) {
             try { sharedSettings = JSON.parse(row.SharedSettingsJson); } catch { sharedSettings = row.SharedSettingsJson; }
@@ -723,7 +723,7 @@ function importGroups(db: SqlJsDatabase, groups: LibraryExport["groups"]): void 
         );
         const groupId = db.exec(SQL_LAST_INSERT_ROWID)[0].values[0][0] as number;
         for (const projectId of group.memberProjectIds) {
-            db.run(`INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectId) VALUES (?, ?)`, [groupId, projectId]);
+            db.run(`INSERT OR IGNORE INTO ProjectGroupMember (GroupId, ProjectIdUuid) VALUES (?, ?)`, [groupId, projectId]);
         }
     }
 }
