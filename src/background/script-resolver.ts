@@ -12,8 +12,8 @@ import type { InjectableScript, SkipReason } from "../shared/injection-types";
 import type { ScriptBindingResolved } from "../shared/types";
 import { STORAGE_KEY_ALL_SCRIPTS, STORAGE_KEY_ALL_CONFIGS } from "../shared/constants";
 import { getCachedScriptCode, cacheScriptCode } from "./injection-cache";
-import { persistInjectionWarn } from "./injection-diagnostics";
-import { logCaughtError, logBgWarnError, logBgWarnSampled, BgLogTag} from "./bg-logger";
+import { persistInjectionWarn, persistInjectionError } from "./injection-diagnostics";
+import { logCaughtError, logBgError, logBgWarnError, logBgWarnSampled, BgLogTag} from "./bg-logger";
 
 /* ------------------------------------------------------------------ */
 /*  File-path code loading                                             */
