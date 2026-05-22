@@ -266,7 +266,27 @@ function buildBodyHtml(state: PanelState): string {
     return acc + (Number.isFinite(m.total_credits_used) ? m.total_credits_used : 0);
   }, 0);
   const rows = state.members.map(function (m, i) { return memberRowHtml(m, i, sumLoaded); }).join('');
-  return '<div style="max-height:380px;overflow-y:auto;">' + rows + '</div>';
+  return '<div style="max-height:380px;overflow-y:auto;">' + rows + loadMoreRowHtml(state) + '</div>';
+}
+
+function loadMoreRowHtml(state: PanelStateSuccess): string {
+  const nextLimit = nextPageLimit(state.limit);
+  if (nextLimit === null) return '';
+  if (state.members.length >= state.total) return '';
+  const label = 'Load more (top ' + nextLimit + ' of ' + state.total + ')';
+  return '<button type="button" data-marco-action="load-more" '
+    + 'style="display:block;width:calc(100% - 16px);margin:8px;padding:6px 10px;'
+    + 'background:rgba(0,122,204,0.18);color:#bae6fd;border:1px dashed ' + cPrimary + ';'
+    + 'border-radius:3px;font-size:11px;cursor:pointer;line-height:1.2;">'
+    + escHtml(label)
+    + '</button>';
+}
+
+function nextPageLimit(current: number): number | null {
+  for (const step of MEMBERS_PAGE_LIMIT_STEPS) {
+    if (step > current) return step;
+  }
+  return null;
 }
 
 function headerHtml(wsName: string, state: PanelState): string {
