@@ -211,6 +211,18 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
     showToast('Fields reset to current values', 'info');
   };
 
+  const exportBtn = document.createElement('button');
+  exportBtn.textContent = '⬇ Export';
+  exportBtn.title = 'Download current overrides as JSON';
+  exportBtn.style.cssText = btnStyle + CssFragment.Background + cNeutral600 + ';color:' + cPanelFg + ';padding:6px 12px;font-size:12px;';
+  exportBtn.onclick = function() { _exportOverridesJson(showToast); };
+
+  const importBtn = document.createElement('button');
+  importBtn.textContent = '⬆ Import';
+  importBtn.title = 'Load overrides from a JSON file';
+  importBtn.style.cssText = btnStyle + CssFragment.Background + cNeutral600 + ';color:' + cPanelFg + ';padding:6px 12px;font-size:12px;';
+  importBtn.onclick = function() { _importOverridesJson(generalResult, showToast, overlay, deps); };
+
   const saveBtn2 = document.createElement('button');
   saveBtn2.textContent = '💾 Save';
   saveBtn2.style.cssText = btnStyle + CssFragment.Background + cSuccess + ';color:#1e1e2e;padding:6px 20px;font-size:12px;font-weight:600;';
@@ -227,8 +239,58 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
 
   footer.appendChild(cancelBtn2);
   footer.appendChild(resetBtn);
+  footer.appendChild(exportBtn);
+  footer.appendChild(importBtn);
   footer.appendChild(saveBtn2);
   return footer;
+}
+
+function _exportOverridesJson(showToast: (m: string, l?: string) => void): void {
+  const overrides = getSettingsOverrides();
+  const payload = JSON.stringify({ kind: 'macro-controller.settings-overrides', version: 1, overrides }, null, 2);
+  const blob = new Blob([payload], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  a.href = url;
+  a.download = 'marco-settings-overrides-' + stamp + '.json';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function() { URL.revokeObjectURL(url); }, 1000);
+  showToast('✅ Overrides exported', 'info');
+}
+
+function _importOverridesJson(
+  generalResult: GeneralPanelResult,
+  showToast: (m: string, l?: string) => void,
+  overlay: HTMLElement,
+  deps: SettingsDeps,
+): void {
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'application/json,.json';
+  input.onchange = function() {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    file.text().then(function(text: string) {
+      const parsed = JSON.parse(text) as { kind?: string; overrides?: Record<string, unknown> };
+      if (parsed.kind !== 'macro-controller.settings-overrides' || !parsed.overrides) {
+        showToast('❌ Invalid overrides file', 'error');
+        return;
+      }
+      return saveSettingsOverrides(parsed.overrides).then(function() {
+        deps.log('Settings overrides imported', 'success');
+        showToast('✅ Overrides imported — reopen Settings to refresh', 'info');
+        overlay.remove();
+      });
+    }).catch(function(err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      showToast('❌ Import failed: ' + msg, 'error');
+    });
+  };
+  input.click();
+  void generalResult;
 }
 
 async function _persistOverrideToggles(generalResult: GeneralPanelResult): Promise<void> {
