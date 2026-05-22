@@ -57,6 +57,66 @@ function copyToClipboard(value: string, label: string): void {
   }
 }
 
+/** Escape a single CSV field per RFC 4180 (quote if needed, double inner quotes). */
+function csvField(value: string | number): string {
+  const s = value == null ? '' : String(value);
+  if (/[",\r\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
+  return s;
+}
+
+/** Slugify a workspace name for use in a download filename. */
+function slugify(s: string): string {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'workspace';
+}
+
+/** Build a CSV blob for the loaded members and trigger a browser download. */
+function exportMembersCsv(wsName: string, members: WorkspaceMember[]): void {
+  if (!members.length) {
+    showToast('⚠️ No members to export', 'info');
+    return;
+  }
+  const headers = [
+    'rank', 'display_name', 'username', 'email', 'role',
+    'total_credits_used', 'total_credits_used_in_billing_period',
+    'joined_at', 'invited_at', 'user_id',
+  ];
+  const lines = [headers.join(',')];
+  members.forEach(function (m, i) {
+    lines.push([
+      i + 1,
+      csvField(m.display_name),
+      csvField(m.username),
+      csvField(m.email),
+      csvField(m.role),
+      m.total_credits_used,
+      m.total_credits_used_in_billing_period,
+      csvField(m.joined_at),
+      csvField(m.invited_at),
+      csvField(m.user_id),
+    ].join(','));
+  });
+  // BOM so Excel opens UTF-8 cleanly.
+  const csv = '\uFEFF' + lines.join('\r\n') + '\r\n';
+  const stamp = new Date().toISOString().slice(0, 10);
+  const filename = 'members-' + slugify(wsName) + '-' + stamp + '.csv';
+  try {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    showToast('📄 Exported ' + members.length + ' members → ' + filename, 'success');
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    showToast('❌ CSV export failed: ' + msg, 'error');
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /*  HTML helpers                                                       */
 /* ------------------------------------------------------------------ */
@@ -229,6 +289,8 @@ function headerHtml(wsName: string, state: PanelState): string {
     + '<div style="display:flex;gap:4px;flex-shrink:0;">'
     +   '<button type="button" data-marco-action="refresh" title="Refresh"'
     +     ' style="background:rgba(0,122,204,0.25);color:#bae6fd;border:1px solid ' + cPrimary + ';border-radius:3px;padding:2px 6px;font-size:11px;cursor:pointer;line-height:1;">↻</button>'
+    +   '<button type="button" data-marco-action="export-csv" title="Export loaded members as CSV"'
+    +     ' style="background:rgba(16,185,129,0.22);color:#bbf7d0;border:1px solid #10b981;border-radius:3px;padding:2px 6px;font-size:11px;cursor:pointer;line-height:1;">⬇ CSV</button>
     +   '<button type="button" data-marco-action="close" title="Close (Esc)"'
     +     ' style="background:rgba(100,116,139,0.35);color:#e2e8f0;border:1px solid ' + cPanelBorder + ';border-radius:3px;padding:2px 7px;font-size:11px;cursor:pointer;line-height:1;">×</button>'
     + '</div>'
@@ -294,6 +356,7 @@ interface PanelHandlerStore {
   _marcoMembersOutsideClick?: (e: MouseEvent) => void;
   _marcoMembersKey?: (e: KeyboardEvent) => void;
   _marcoMembersSubmit?: (e: Event) => void;
+  _marcoMembersLatest?: { wsName: string; members: WorkspaceMember[]; total: number };
 }
 
 function ensurePanelEl(): HTMLDivElement {
@@ -551,6 +614,15 @@ function attachActionHandlers(el: HTMLElement, wsId: string, wsName: string): vo
       e.stopPropagation();
       clearMembersCache(wsId);
       loadAndRender(el, wsId, wsName);
+    } else if (action === 'export-csv') {
+      e.stopPropagation();
+      const store = el as HTMLElement & PanelHandlerStore;
+      const latest = store._marcoMembersLatest;
+      if (!latest || latest.members.length === 0) {
+        showToast('⏳ Members not loaded yet', 'info');
+        return;
+      }
+      exportMembersCsv(latest.wsName, latest.members);
     } else if (action === 'add-member-toggle') {
       e.stopPropagation();
       swapFooter(el, true);
@@ -642,6 +714,8 @@ function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
   fetchWorkspaceMembers(wsId)
     .then(function (entry) {
       if (!document.getElementById(PANEL_ID)) return; // panel was closed
+      const store = el as HTMLElement & PanelHandlerStore;
+      store._marcoMembersLatest = { wsName: wsName, members: entry.members, total: entry.total };
       render(el, wsName, { kind: 'success', members: entry.members, total: entry.total });
     })
     .catch(function (err: unknown) {
