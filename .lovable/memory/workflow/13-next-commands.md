@@ -60,7 +60,7 @@ Trigger phrases the user may type to query this file:
 - [ ] A. **"Load more" pagination** if `has_more=true` (raise 20 → 50 → 100)
 - [ ] B. **CSV export** of the member list from the panel header
 - [x] C. **Click-to-copy** member email or user_id — 2026-05-22, email row + @username row now copy on click with toast preview
-- [ ] D. **Inline credit-share bar** showing each member's % of workspace total
+- [x] D. **Inline credit-share bar** — 2026-05-22, per-row % bar against loaded-members sum with color ramp (slate→cyan→emerald→amber)
 - [ ] E. **Auto-refresh** when the workspace credit poll cycle runs
 
 ## P3 — Optional Follow-ups (canceled-credit override, v2.215.0)
