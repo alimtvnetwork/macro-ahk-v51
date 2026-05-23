@@ -472,6 +472,20 @@ export function buildWorkspaceHoverHtml(
 /* DOM mount + positioning                                             */
 /* ------------------------------------------------------------------ */
 
+let hideTimer: number | null = null;
+
+function cancelHideTimer(): void {
+  if (hideTimer !== null) {
+    window.clearTimeout(hideTimer);
+    hideTimer = null;
+  }
+}
+
+function scheduleHide(): void {
+  cancelHideTimer();
+  hideTimer = window.setTimeout(hideCard, 220);
+}
+
 function ensureCardElement(): HTMLDivElement {
   let el = document.getElementById(HOVERCARD_ID) as HTMLDivElement | null;
   if (el) return el;
@@ -485,31 +499,41 @@ function ensureCardElement(): HTMLDivElement {
     'color:#e2e8f0', 'font-family:system-ui,-apple-system,sans-serif',
     'line-height:1.4', 'display:none',
   ].join(';') + ';';
-  // Hide on leaving the card itself so the <details> toggle can be clicked
-  // without dismissing the panel.
-  el.addEventListener('mouseleave', hideCard);
+  // Keep card open while pointer is inside it so <details> can be clicked.
+  el.addEventListener('mouseenter', cancelHideTimer);
+  el.addEventListener('mouseleave', scheduleHide);
   document.body.appendChild(el);
   return el;
 }
 
+/**
+ * Position the card to the RIGHT of the hovered row by default so it does not
+ * cover the workspace list or its action icons. Flips to the left when there is
+ * no room on the right, then clamps vertically to stay on screen.
+ */
 function positionCard(card: HTMLElement, anchor: HTMLElement): void {
   const r = anchor.getBoundingClientRect();
-  // Show below-right of the name span by default; flip up if no room.
   card.style.visibility = 'hidden';
   card.style.display = 'block';
   const cardRect = card.getBoundingClientRect();
   const vw = window.innerWidth;
   const vh = window.innerHeight;
-  let left = r.left;
-  let top = r.bottom + 6;
-  if (left + cardRect.width > vw - 8) left = Math.max(8, vw - cardRect.width - 8);
-  if (top + cardRect.height > vh - 8) top = Math.max(8, r.top - cardRect.height - 6);
+  const GAP = 8;
+  let left = r.right + GAP;
+  if (left + cardRect.width > vw - 8) {
+    const leftSide = r.left - cardRect.width - GAP;
+    left = leftSide >= 8 ? leftSide : Math.max(8, vw - cardRect.width - 8);
+  }
+  let top = r.top;
+  if (top + cardRect.height > vh - 8) top = Math.max(8, vh - cardRect.height - 8);
+  if (top < 8) top = 8;
   card.style.left = left + 'px';
   card.style.top = top + 'px';
   card.style.visibility = 'visible';
 }
 
 function hideCard(): void {
+  cancelHideTimer();
   const el = document.getElementById(HOVERCARD_ID);
   if (el) el.style.display = 'none';
 }
@@ -551,10 +575,11 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
     if (!wsId) return;
     const ws = lookup(wsId);
     if (!ws) return;
+    cancelHideTimer();
     const status = getEffectiveStatus(ws, cfg);
     const card = ensureCardElement();
     card.innerHTML = buildWorkspaceHoverHtml(ws, status, cfg);
-    positionCard(card, nameEl);
+    positionCard(card, item);
   };
 
   const outHandler = function (e: MouseEvent): void {
@@ -563,10 +588,13 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
     if (!target.closest(SEL_WS_NAME)) return;
     const related = e.relatedTarget as HTMLElement | null;
     if (related && related.closest(SEL_WS_NAME)) return;
-    // Don't hide if the pointer moved onto the hover card itself —
-    // allow user to expand <details>.
-    if (related && related.closest('#' + HOVERCARD_ID)) return;
-    hideCard();
+    // Don't hide immediately — give the user time to move onto the card and
+    // click <details> or copy IDs. The card's own mouseenter cancels the timer.
+    if (related && related.closest('#' + HOVERCARD_ID)) {
+      cancelHideTimer();
+      return;
+    }
+    scheduleHide();
   };
 
   store._wsHoverCardOver = overHandler;
@@ -579,3 +607,4 @@ export function attachWorkspaceHoverCard(listEl: HTMLElement, lookup: WsLookup):
 export function hideWorkspaceHoverCard(): void {
   hideCard();
 }
+
