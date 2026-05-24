@@ -48,12 +48,18 @@ function getByXPathAsElement(xpath: string): Element | null {
 setRenderDropdownFn(renderPromptsDropdown);
 
 // CQ16: Keep the inline Task Next panel visible inside the prompts dropdown.
+// Handles both bottom overflow (open-down) and top overflow (open-up flip from Step 3).
 function keepTaskNextSubInView(promptsDropdown: HTMLElement, taskNextSub: HTMLElement): void {
   window.requestAnimationFrame(function () {
     const dropRect = promptsDropdown.getBoundingClientRect();
     const subRect = taskNextSub.getBoundingClientRect();
+    const PAD = 6;
     if (subRect.bottom > dropRect.bottom) {
-      promptsDropdown.scrollTop += Math.ceil(subRect.bottom - dropRect.bottom + 6);
+      promptsDropdown.scrollTop += Math.ceil(subRect.bottom - dropRect.bottom + PAD);
+      return;
+    }
+    if (subRect.top < dropRect.top) {
+      promptsDropdown.scrollTop -= Math.ceil(dropRect.top - subRect.top + PAD);
     }
   });
 }
