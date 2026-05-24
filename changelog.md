@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.9.1] — 2026-05-24 First-Attach Toast UX
+
+- **Added** in-page first-attach toast (MAIN-world) asking the user once per origin whether to keep auto-attaching here. Actions: *Yes keep*, *Not now* (tab-scoped dismiss), *Don't ask for this site* (persistent dismiss).
+- **Added** `src/background/seen-origins.ts` — persistent `marco_seen_origins` set in `chrome.storage.local`, sync hot-path read after boot preload.
+- **Added** `src/background/first-attach-toast.ts` — toast renderer + ISOLATED-world bridge + runtime message handler (`MARCO_FIRST_ATTACH_ACTION`).
+- **Wired** boot preload + bridge registration; auto-injector fires toast post-injection (no-op if seen or dismissed).
+- Dark-theme styled, self-removes on click or 30s timeout. Single attempt, no retry.
+
 ## [v3.9.0] — 2026-05-24 Auto-Attach C9 Gate + Restricted-URL Hardening
 
 ### Added
