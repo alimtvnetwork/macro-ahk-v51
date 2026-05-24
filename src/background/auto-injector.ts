@@ -138,6 +138,7 @@ export function registerAutoInjector(): void {
     try {
         chrome.tabs.onRemoved.addListener((tabId) => {
             clearTabDecision(tabId);
+            clearDismissedOriginsForTab(tabId);
         });
     } catch (err) {
         logCaughtError(BgLogTag.MARCO, "tabs.onRemoved cache-clear registration failed", err);
