@@ -96,15 +96,19 @@ describe('ws-hover-card — interaction (positioning + stay-clickable)', () => {
     vi.useFakeTimers();
     Object.defineProperty(window, 'innerWidth', { value: 1280, configurable: true });
     Object.defineProperty(window, 'innerHeight', { value: 800, configurable: true });
-    setWorkspaceLifecycleConfigOverride({
-      enableWorkspaceHoverDetails: true,
-      hoverCardHideGracePeriodMs: HIDE_GRACE_MS,
-    });
+    window.__MARCO_CONFIG__ = {
+      creditStatus: {
+        lifecycle: {
+          enableWorkspaceHoverDetails: true,
+          hoverCardHideGracePeriodMs: HIDE_GRACE_MS,
+        },
+      },
+    };
   });
 
   afterEach(() => {
     hideWorkspaceHoverCard();
-    setWorkspaceLifecycleConfigOverride(null);
+    delete window.__MARCO_CONFIG__;
     vi.useRealTimers();
     document.body.innerHTML = '';
   });
