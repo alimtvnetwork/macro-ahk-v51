@@ -673,13 +673,12 @@ function partitionBySyntax(
         }
         const errorMessage = `Script "${script.injectable.name ?? script.injectable.id}" has a syntax error: ${syntaxError}`;
         logBgWarnError(BgLogTag.INJECTION, `3/4 SYNTAX — ${errorMessage}`);
-        syntaxFailures.push({
-            scriptId: script.injectable.id,
-            scriptName: script.injectable.name,
-            isSuccess: false,
-            durationMs: Date.now() - startTime,
+        syntaxFailures.push(buildSyntaxFailureResult(
+            script.injectable.id,
+            script.injectable.name,
             errorMessage,
-        });
+            startTime,
+        ));
         logInjectionFailure(script.injectable, projectId, new SyntaxError(syntaxError)).catch((logErr) => {
             logCaughtError(BgLogTag.INJECTION, `logInjectionFailure self-failed for "${script.injectable.name ?? script.injectable.id}" (syntax stage)`, logErr);
         });
