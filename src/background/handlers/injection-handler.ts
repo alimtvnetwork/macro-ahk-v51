@@ -761,12 +761,7 @@ async function injectSingleScript(
     }
 }
 
-/** Extracts the VERSION constant from macro-looping script code. */
-function extractMacroVersion(code: string): string | null {
-    // Match patterns like: VERSION = '2.94.0' or VERSION="1.72.0"
-    const match = code.match(/VERSION\s*=\s*['"](\d+\.\d+\.\d+)['"]/);
-    return match?.[1] ?? null;
-}
+// extractMacroVersion moved to ./injection-result-builder (PERF-R2b step 3).
 
 /** Logs a successful script injection to the logs DB. */
 // eslint-disable-next-line max-lines-per-function
