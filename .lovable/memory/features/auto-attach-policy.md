@@ -86,3 +86,59 @@ A **ninth** gate sits in front of C1..C8 at the auto-injector entrypoint. When t
 - Tests: `src/background/__tests__/dismissed-origins.test.ts`
 
 Wired into `src/background/auto-injector.ts` at the top of both `handleNavigationCompleted` (T1) and `handleTabActivated` (T3), ahead of the existing dedup cache.
+
+---
+
+## C10 — First-attach intent / seen-origins gate (added 2026-05-24)
+
+Before the first-attach toast has ever surfaced for an origin, C1..C9 may all be true and auto-attach proceeds silently. After the toast is shown once, `seen-origins` records the origin so the toast never re-appears. This gate ensures the toast fires at most once per origin per profile.
+
+- Module: `src/background/seen-origins.ts`
+- Storage key (persistent): `marco_seen_origins` in `chrome.storage.local` (array of origin strings)
+- Hot-path API: `isOriginSeen(url): boolean` (sync, no I/O; returns `true` for unparseable URLs as a safety fallback)
+- Mutators: `markOriginSeen(url)` (idempotent, async fire-and-forget)
+- Boot hook: call `preloadSeenOrigins()` once at SW startup to hydrate the in-memory Set
+- Tests: `src/background/__tests__/seen-origins.test.ts`
+
+The toast itself is injected via `maybeShowFirstAttachToast(tabId, url)` in `src/background/first-attach-toast.ts`, called from the auto-injector immediately after successful script injection. It checks `isOriginDismissedForTab` (C9) and `isOriginSeen` (C10) before injecting; on success it optimistically marks the origin seen to prevent burst re-fire.
+
+---
+
+## First-attach toast contract (added 2026-05-24)
+
+When auto-attach injects for the *first time* on an origin, an in-page toast asks the user whether to keep attaching. The toast is a self-contained DOM element injected via `chrome.scripting.executeScript`.
+
+### Architecture
+
+| Layer | World | Role |
+|-------|-------|------|
+| `toastPagePayload` | `MAIN` | Renders the toast DOM, handles clicks, posts `window.postMessage` |
+| `bridgePagePayload` | `ISOLATED` | Listens to `window.postMessage`, forwards via `chrome.runtime.sendMessage` |
+| `registerFirstAttachToastBridge` | Background | Receives runtime messages, updates `seen-origins` / `dismissed-origins` state |
+
+### User actions
+
+| Button | Action value | Background effect |
+|--------|-------------|-------------------|
+| Yes, keep attaching | `accept` | `markOriginSeen(url)` |
+| Not now | `dismiss-tab` | `dismissOriginForTab(tabId, url)` + `markOriginSeen(url)` |
+| Don't ask for this site | `dismiss-persist` | `persistDismissOrigin(url)` + `markOriginSeen(url)` |
+
+All three actions remove the toast immediately. The toast auto-removes after 30s if untouched.
+
+### Styling
+
+Dark theme matching the extension: `#1a1a2e` background, `#e8edf3` text, `#4f46e5` primary button, `z-index: 2147483647`. Zero external dependencies; all styles inline.
+
+### Error handling
+
+- Restricted URLs (chrome://, chrome-extension://, etc.) are skipped; `executeScript` throws and we log once, no retry.
+- No retry/backoff on any I/O (per mem://constraints/no-retry-policy).
+
+### Related
+
+- `src/background/first-attach-toast.ts` — toast + bridge + background handler
+- `src/background/seen-origins.ts` — C10 gate
+- `src/background/dismissed-origins.ts` — C9 gate
+- `src/background/auto-injector.ts` — triggers toast after injection
+- `src/components/options/DismissedSitesCard.tsx` — UI to manage dismissed origins
