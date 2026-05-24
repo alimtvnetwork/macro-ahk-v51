@@ -419,6 +419,8 @@ function buildWsRowInnerHtml(
       tierBadge += '<span style="font-size:10px;color:#fca5a5;background:rgba(127,29,29,0.55);padding:2px 5px;border-radius:3px;font-weight:600;margin-left:3px;vertical-align:middle;" data-marco-tip="' + tip + '">·' + days + 'd</span>';
     }
   }
+  // v3.10.0: Inline `R Nd` refill badge — only when refill is within window.
+  tierBadge += buildRefillBadgeHtml(ws);
   const nameColor = isCurrent ? '#67e8f9' : '#e2e8f0';
   const nameBold = isCurrent ? 'font-weight:800;' : 'font-weight:500;';
 
