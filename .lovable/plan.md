@@ -1,23 +1,44 @@
 # Plan
 
-**Active workstream:** **v3.10.0 — Refill Priority Filter + Button Overflow Fix + GitHub Open**.
-Detailed 10-step plan: `.lovable/plans/v3.10.0-refill-priority-and-github-open.md`.
+**Active workstream:** None — all current items blocked or deferred.
+
+**Recently shipped:** **v3.10.0 — Refill Priority Filter + Button Overflow Fix + GitHub Open** (2026-05-24).
+Detailed plan: `.lovable/plans/v3.10.0-refill-priority-and-github-open.md`.
 Specs:
 - `spec/22-app-issues/refill-priority-filter/01-overview.md`
 - `spec/22-app-issues/workspace-github-open/01-overview.md` (+ `02-api-sample.md`)
 
-Status: planning complete (this turn). Implementation starts on next `next`.
+---
 
+## Remaining tasks (blocked or deferred)
 
-All remaining items are **blocked on user input or deferred**:
-
-- **P0 — Task 1.2** — E2E Chrome verification (manual smoke pass on installer build). *Blocked: manual Chrome testing avoided per user policy.*
-- **P0 — Dashboard "scripts not available" Phase 2b** — ✅ shipped 2026-05-24 (v3.9.2). Root cause was `AutoInject: false` on macro-controller/lovable-owner-switch/lovable-user-add seeds; changed to `true` so they pass C4 and auto-attach to projects by default.
+### Blocked on user input / secrets
 - **P1 — Release installer hardening v0.2** — SLSA + minisign signing. *Blocked on `MINISIGN_SECRET_KEY` GitHub secret.*
-- **P2 — P Store spec** — deferred (discuss-later mode).
-- **Deferred (do NOT auto-recommend)** — React component tests, E2E React UI verification, Prompt Click E2E (52/53), Cross-Project Sync & Shared Library (depends on P Store).
+  - Plan: `.lovable/plans/release-installer.md`
+  - Needs: `MINISIGN_SECRET_KEY` added to GitHub secrets so the release workflow can sign the installer.
+
+### Blocked on user policy
+- **P0 — Task 1.2** — E2E Chrome verification (manual smoke pass on installer build). *Blocked: manual Chrome testing avoided per user policy (`mem://preferences/deferred-workstreams`).*
+
+### Deferred
+- **P2 — P Store spec** — *Discuss-later mode per user instruction.*
+- **Macro recorder phases / React component tests** — *Deferred per user policy.*
+- **Prompt Click E2E (52/53)** — *Deferred.*
+- **Cross-Project Sync & Shared Library** — *Depends on P Store.*
+
+### In-memory audit not yet on active backlog
+- **Idle loop perf audit (2026-04-25)** — 8 issues documented in `mem://performance/idle-loop-audit-2026-04-25`. PERF-1 (hot-reload loop running in prod) is flagged critical. Full RCA in `spec/32-app-performance/`.
+
+---
 
 ## Completed workstreams (recent)
+
+### v3.10.2 — Refill Priority + GitHub Open (2026-05-24)
+- Button row overflow hardened (`min-width:0`, `overflow:visible`)
+- `REFILL_PRIORITY_WINDOW_DAYS = 10` + score/sort helper + 9 unit tests
+- "Refill priority" filter toggle with `R Nd` inline badge (sky/amber/slate)
+- GitHub repo open via right-click with `marco.kv` gitsync cache (negative-result memoization)
+- Minor bump 3.9.3 → 3.10.0 + changelog + README pin
 
 ### Prompt Section Enhancements (v?.?.?) — 2026-05-22
 All 15 steps done: `Plan Task` inline submenu + template, `Filter` multi-select submenu, copy/paste hint removed, Load button moved, CRUD fixed via `rerenderPromptsDropdown()` helper, dark-theme tokens, typecheck clean.
