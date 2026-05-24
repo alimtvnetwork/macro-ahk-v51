@@ -37,6 +37,12 @@ import { getDisplayProjectName } from './logging';
 import { DataAttr, DomId } from './types';
 import { PRO_ZERO_BALANCE_JSON_FIELD, PRO_ZERO_SOURCE_FIELD } from './pro-zero/pro-zero-enrichment';
 import { MacroCreditSource } from './pro-zero/macro-credit-source';
+import {
+  getGitsyncCache,
+  setGitsyncCache,
+  invalidateGitsyncCache,
+} from './gitsync-cache';
+import { fetchGitsyncConfig } from './gitsync-api';
 
 // ── Centralized DOM IDs / classnames ──
 const ID_CTX_MENU = 'loop-ws-ctx-menu';
