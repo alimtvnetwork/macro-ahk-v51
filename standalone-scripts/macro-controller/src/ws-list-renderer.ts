@@ -52,6 +52,8 @@ import { sortByRefillPriority, daysToRefillForWs } from './workspace-refill-prio
 import { classifyFromStatus, type WorkspaceDisplayStatus } from './workspace-display-status';
 import { resolveBadgeStyle } from './workspace-badge-styles';
 
+const CSS_BG = ';background:';
+
 // ============================================
 // CQ11/CQ17: Encapsulated view-filter state
 // ============================================
@@ -391,7 +393,7 @@ function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit): stri
 
   return '<span class="marco-ws-status-pill marco-ws-status-' + display.kind
     + '" style="font-size:9px;color:' + style.fg
-    + ';background:' + style.bg
+    + CSS_BG + style.bg
     + ';border:1px solid ' + style.border
     + ';padding:1px 5px;border-radius:3px;font-weight:700;margin-left:5px;vertical-align:middle;letter-spacing:0.3px;text-transform:none;"'
     + ' data-marco-tip="' + tip + '">' + display.label + '</span>';
@@ -420,7 +422,7 @@ function buildRefillBadgeHtml(ws: WorkspaceCredit): string {
     fg = '#fde68a'; bg = 'rgba(180,83,9,0.45)'; border = '#f59e0b';
   }
   return '<span class="loop-ws-refill-badge" style="font-size:9px;color:' + fg
-    + ';background:' + bg + ';border:1px solid ' + border
+    + CSS_BG + bg + ';border:1px solid ' + border
     + ';padding:1px 5px;border-radius:3px;font-weight:700;margin-left:5px;vertical-align:middle;letter-spacing:0.3px;">R '
     + days + 'd</span>';
 }
@@ -435,7 +437,7 @@ function buildWsRowInnerHtml(
   // v2.195.0: Bumped from 7px → 10px text + 2px/5px padding for readability.
   // Cleanup workflows scan many rows quickly, so the badge needs to register
   // at a glance without dominating the row.
-  let tierBadge = '<span style="font-size:10px;color:' + tierMeta.fg + ';background:' + tierMeta.bg + ';padding:2px 5px;border-radius:3px;font-weight:700;margin-left:6px;vertical-align:middle;letter-spacing:0.3px;">' + tierMeta.label + '</span>';
+  let tierBadge = '<span style="font-size:10px;color:' + tierMeta.fg + CSS_BG + tierMeta.bg + ';padding:2px 5px;border-radius:3px;font-weight:700;margin-left:6px;vertical-align:middle;letter-spacing:0.3px;">' + tierMeta.label + '</span>';
 
   // Phase 3 (workspace-status-tooltip v2.211.0): unified lifecycle status pill.
   // Replaces the legacy "·Nd" chip — `daysSince` and dates now live in the pill tooltip.
@@ -474,7 +476,7 @@ function buildWsRowInnerHtml(
     + '<div style="display:flex;align-items:center;gap:4px;margin-top:2px;">' + creditBarHtml + '</div>'
     + '</div>';
   if (isCurrent) {
-    html += '<span style="font-size:8px;color:' + cPrimaryLight + ';background:' + cPrimaryBgAL + ';padding:1px 4px;border-radius:3px;font-weight:700;">NOW</span>';
+    html += '<span style="font-size:8px;color:' + cPrimaryLight + CSS_BG + cPrimaryBgAL + ';padding:1px 4px;border-radius:3px;font-weight:700;">NOW</span>';
   }
   return html;
 }
