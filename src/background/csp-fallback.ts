@@ -127,7 +127,7 @@ export async function configureUserScriptWorld(): Promise<void> {
         }
 
         try {
-            await chrome.userScripts.configureWorld({
+            await (chrome.userScripts.configureWorld as (p: unknown) => Promise<void>)({
                 worldId: USER_SCRIPT_WORLD_ID,
                 csp: "script-src 'self' 'unsafe-inline' 'unsafe-eval'; object-src 'self';",
                 messaging: false,
@@ -363,7 +363,7 @@ async function attemptUserScriptFallback(
                     executeArgs.worldId = USER_SCRIPT_WORLD_ID;
                 }
 
-                await chrome.userScripts.execute(executeArgs as chrome.userScripts.Injection);
+                await (chrome.userScripts.execute as (i: unknown) => Promise<unknown>)(executeArgs);
 
                 if (userScriptsWorldIdEnabled) {
                     console.log("[injection:csp] ✅ userScripts.execute() succeeded in tab %d (worldId=%s)", tabId, USER_SCRIPT_WORLD_ID);

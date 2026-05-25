@@ -186,8 +186,8 @@ export function setPersistenceMode(mode: TransientState["persistenceMode"]): voi
 
 /** Restores transient state from chrome.storage.session on wake. */
 export async function rehydrateState(): Promise<void> {
-    const stored = await chrome.storage.session.get(SESSION_KEY);
-    const state: TransientState = stored[SESSION_KEY] ?? getDefaultState();
+    const stored = await (chrome.storage as unknown as { session: { get: (k: string) => Promise<Record<string, unknown>> } }).session.get(SESSION_KEY);
+    const state: TransientState = (stored[SESSION_KEY] as TransientState | undefined) ?? getDefaultState();
 
     activeProjectId = state.activeProjectId;
     tabInjections = state.tabInjections;
@@ -213,7 +213,7 @@ function getDefaultState(): TransientState {
 
 /** Removes injection entries for tabs that no longer exist. */
 async function pruneClosedTabs(): Promise<void> {
-    const tabs = await chrome.tabs.query({});
+    const tabs = await (chrome.tabs.query as (q: unknown) => Promise<Array<{ id?: number }>>)({});
     const validTabIds = new Set(tabs.map((t) => t.id));
 
     for (const tabIdStr of Object.keys(tabInjections)) {
@@ -241,5 +241,5 @@ export async function saveTransientState(): Promise<void> {
         lastFlushTimestamp: new Date().toISOString(),
     };
 
-    await chrome.storage.session.set({ [SESSION_KEY]: state });
+    await (chrome.storage as unknown as { session: { set: (i: Record<string, unknown>) => Promise<void> } }).session.set({ [SESSION_KEY]: state });
 }
