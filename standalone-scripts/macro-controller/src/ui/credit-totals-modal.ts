@@ -126,19 +126,22 @@ function buildRow(ws: WorkspaceCredit): HTMLElement {
   name.textContent = ws.fullName || ws.name || ws.id;
 
   const plan = document.createElement('span');
-  plan.style.cssText = 'color:' + cPanelFgDim + ';';
+  plan.style.cssText = 'color:#67e8f9;font-weight:600;font-size:10px;';
   plan.textContent = ws.plan || '—';
 
+  const usedN = Number(ws.totalCreditsUsed);
   const used = document.createElement('span');
-  used.style.cssText = 'text-align:right;';
-  used.textContent = formatCount(Number(ws.totalCreditsUsed));
+  used.style.cssText = 'text-align:right;color:#fb923c;font-weight:700;font-size:11px;';
+  used.textContent = formatCount(usedN);
 
+  const remN = Number(ws.available);
   const rem = document.createElement('span');
-  rem.style.cssText = 'text-align:right;color:' + (Number(ws.available) > 0 ? '#86efac' : cPanelFgDim) + ';';
-  rem.textContent = formatCount(Number(ws.available));
+  const remColor = remN <= 0 ? cPanelFgDim : remN < 100 ? '#fbbf24' : '#86efac';
+  rem.style.cssText = 'text-align:right;color:' + remColor + ';font-weight:700;font-size:11px;';
+  rem.textContent = formatCount(remN);
 
   const total = document.createElement('span');
-  total.style.cssText = 'text-align:right;';
+  total.style.cssText = 'text-align:right;color:#a78bfa;font-weight:700;font-size:11px;';
   total.textContent = formatCount(Number(ws.totalCredits));
 
   row.appendChild(name);
