@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.15.1] — 2026-05-25
+
+### Changed
+- Version bump: 3.15.0 → 3.15.1 — pinned root `readme.md` install commands and badges to the new tag for release v3.15.1 (no functional code changes).
+
+
+---
+
 ## [v3.15.0] — 2026-05-25
 
 ### Fixed
