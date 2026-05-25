@@ -161,6 +161,81 @@ export function reorderArray<T>(arr: ReadonlyArray<T>, from: number, to: number)
   return next;
 }
 
+/** Active filter predicates for the breakdown table (Step 11). */
+export interface FilterState {
+  low: boolean;
+  empty: boolean;
+  free: boolean;
+}
+
+/** Pure: apply active chip filters to the workspace list. */
+export function applyFilters(
+  workspaces: ReadonlyArray<WorkspaceCredit>,
+  filters: FilterState,
+): ReadonlyArray<WorkspaceCredit> {
+  const anyActive = filters.low || filters.empty || filters.free;
+  if (!anyActive) return workspaces;
+  return workspaces.filter((ws) => {
+    const rem = Number(ws.available);
+    if (filters.low && rem < 100 && rem > 0) return true;
+    if (filters.empty && rem <= 0) return true;
+    if (filters.free && ws.hasFree) return true;
+    return false;
+  });
+}
+
+/** Build a single filter chip pill. */
+function buildChip(
+  label: string,
+  active: boolean,
+  onToggle: () => void,
+): HTMLButtonElement {
+  const btn = document.createElement('button');
+  btn.textContent = label;
+  btn.setAttribute('data-active', active ? 'true' : 'false');
+  const bg = active ? 'rgba(124,58,237,0.35)' : 'transparent';
+  const fg = active ? '#ffffff' : cPanelFgDim;
+  btn.style.cssText =
+    'background:' + bg +
+    ';border:1px solid ' + (active ? cPrimaryLighter : 'rgba(124,58,237,0.35)') +
+    ';color:' + fg +
+    ';padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer;font-family:monospace;transition:background 120ms,color 120ms;';
+  btn.onmouseover = function () { if (!active) btn.style.background = 'rgba(124,58,237,0.15)'; };
+  btn.onmouseout = function () { if (!active) btn.style.background = 'transparent'; };
+  btn.onclick = function () { onToggle(); };
+  return btn;
+}
+
+/** Build the filter chips bar above the breakdown table. */
+function buildFilterBar(
+  filters: FilterState,
+  onChange: (next: FilterState) => void,
+): HTMLElement {
+  const bar = document.createElement('div');
+  bar.setAttribute('data-credit-totals-filters', '1');
+  bar.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;padding:6px 8px;';
+
+  const chipLow = buildChip('⚠ Low', filters.low, function () {
+    onChange({ ...filters, low: !filters.low });
+  });
+  chipLow.setAttribute('data-chip', 'low');
+
+  const chipEmpty = buildChip('🅾 Empty', filters.empty, function () {
+    onChange({ ...filters, empty: !filters.empty });
+  });
+  chipEmpty.setAttribute('data-chip', 'empty');
+
+  const chipFree = buildChip('🆓 Free', filters.free, function () {
+    onChange({ ...filters, free: !filters.free });
+  });
+  chipFree.setAttribute('data-chip', 'free');
+
+  bar.appendChild(chipLow);
+  bar.appendChild(chipEmpty);
+  bar.appendChild(chipFree);
+  return bar;
+}
+
 /** Build the per-workspace breakdown table. */
 export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>): HTMLElement {
   ensureRowStyles();
@@ -171,7 +246,17 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
   let sortState: SortState = { key: 'rem', dir: 'none' };
   // Mutable manual order (Step 10). Drag-drop edits this; sort uses it as input.
   let order: ReadonlyArray<WorkspaceCredit> = workspaces.slice();
-  
+  let filters: FilterState = { low: false, empty: false, free: false };
+
+  let filterBar: HTMLElement;
+  function handleFilterChange(next: FilterState): void {
+    filters = next;
+    const newBar = buildFilterBar(filters, handleFilterChange);
+    wrap.replaceChild(newBar, filterBar);
+    filterBar = newBar;
+    renderBody();
+  }
+  filterBar = buildFilterBar(filters, handleFilterChange);
 
   const header = document.createElement('div');
   header.setAttribute('data-credit-totals-header', '1');
@@ -253,7 +338,15 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
       body.appendChild(empty);
       return;
     }
-    const sorted = sortWorkspaces(order, sortState);
+    const filtered = applyFilters(order, filters);
+    const sorted = sortWorkspaces(filtered, sortState);
+    if (sorted.length === 0) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'padding:14px 10px;text-align:center;color:' + cPanelFgDim + ';font-size:11px;font-style:italic;';
+      empty.textContent = 'No workspaces match the active filters.';
+      body.appendChild(empty);
+      return;
+    }
     sorted.forEach((ws, idx) => {
       const row = buildRow(ws, idx);
       attachDrag(row, idx);
@@ -263,6 +356,7 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
 
   renderHeader();
   renderBody();
+  wrap.appendChild(filterBar);
   wrap.appendChild(header);
   wrap.appendChild(body);
   return wrap;
