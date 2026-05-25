@@ -105,13 +105,37 @@ export function renderPromptsDropdown(ctx: PromptContext, taskNextDeps: TaskNext
 // Dropdown header with Load button
 // ============================================
 
-/** Build the dropdown header row with only the manual Load button (hint text removed). */
+/** Build the dropdown header row: Tasks toggle (left) + Load button (right). */
 function buildDropdownHeader(ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
   const header = document.createElement('div');
-  header.style.cssText = 'display:flex;align-items:center;justify-content:flex-end;padding:4px 8px;border-bottom:1px solid #7c3aed;';
+  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;gap:6px;padding:4px 8px;border-bottom:1px solid #7c3aed;';
+  header.appendChild(buildTasksToggleButton());
   header.appendChild(buildLoadButton(ctx, taskNextDeps));
   return header;
 }
+
+/** Build the "🎯 Tasks ▾" toggle that shows/hides the Plan Task + Task Next submenus group. */
+function buildTasksToggleButton(): HTMLElement {
+  const btn = document.createElement('span');
+  btn.setAttribute('data-tasks-toggle', '1');
+  btn.textContent = '🎯 Tasks ▸';
+  btn.title = 'Plan Task + Task Next controls';
+  btn.style.cssText = 'cursor:pointer;padding:3px 8px;border-radius:4px;font-size:9px;font-weight:600;color:' + cPrimaryLight + ';background:rgba(124,58,237,0.18);border:1px solid rgba(124,58,237,0.35);user-select:none;';
+  btn.onmouseover = function() { btn.style.background = 'rgba(124,58,237,0.32)'; };
+  btn.onmouseout = function() { btn.style.background = 'rgba(124,58,237,0.18)'; };
+  btn.onclick = function(e: Event) {
+    e.stopPropagation();
+    const dropdown = btn.closest('[data-prompts-dropdown]') as HTMLElement | null
+      ?? (btn.parentElement?.parentElement as HTMLElement | null);
+    const group = dropdown?.querySelector('[data-tasks-group]') as HTMLElement | null;
+    if (!group) return;
+    const open = group.style.display !== 'none';
+    group.style.display = open ? 'none' : 'block';
+    btn.textContent = open ? '🎯 Tasks ▸' : '🎯 Tasks ▾';
+  };
+  return btn;
+}
+
 
 /** Build the manual "Load" button for refreshing prompts from DB. */
 function buildLoadButton(ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
