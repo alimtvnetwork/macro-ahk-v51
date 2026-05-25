@@ -182,6 +182,12 @@ function buildFilterRowConfigs(deps: WsFilterMenuDeps): FilterRowConfig[] {
       onToggle: function (active: boolean) { deps.setLoopWsExpiredWithCredits(active); },
     },
     {
+      id: ID_REFILL_SOON_FILTER, icon: '🔁', label: 'Refill soon',
+      hint: 'about-to-refill only',
+      initialActive: deps.getLoopWsRefillSoon(),
+      onToggle: function (active: boolean) { deps.setLoopWsRefillSoon(active); },
+    },
+    {
       id: ID_REFILL_PRIORITY_FILTER, icon: '⏳', label: 'Refill priority',
       hint: 'sort by urgency × credits',
       initialActive: deps.getLoopWsRefillPriority(),
