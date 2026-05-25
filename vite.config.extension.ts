@@ -523,12 +523,19 @@ function copyProjectScripts(): Plugin {
             // Regenerate seed-manifest.json AFTER emptyOutDir cleanup + project copy.
             // This is the runtime source the background seeder reads.
             try {
-                execSync(
-                    `node scripts/generate-seed-manifest.mjs --out "${resolve(DIST_DIR, "projects", "seed-manifest.json")}"`,
-                    { cwd: __dirname, stdio: "inherit" },
+                runNodeScriptSafe(
+                    "generate-seed-manifest",
+                    [
+                        "scripts/generate-seed-manifest.mjs",
+                        "--out",
+                        resolve(DIST_DIR, "projects", "seed-manifest.json"),
+                    ],
+                    __dirname,
                 );
             } catch (e) {
-                console.warn("[copy-project-scripts] seed-manifest.json generation failed:", e);
+                // HARD fail — missing seed-manifest blocks the background seeder.
+                console.error("[copy-project-scripts] seed-manifest.json FATAL:", e);
+                throw e;
             }
         },
     };
