@@ -36,6 +36,9 @@ import { configureUserScriptWorld } from "./csp-fallback";
 import { markInitialized, drainBuffer } from "./message-buffer";
 import { cacheScriptCode, getCachedScriptCode, purgeStaleEntries, syncCacheWithBuildId, invalidateCacheOnDeploy } from "./injection-cache";
 import { invalidateNamespaceCache } from "./namespace-cache";
+import { preloadDismissedOrigins } from "./dismissed-origins";
+import { preloadSeenOrigins } from "./seen-origins";
+import { registerFirstAttachToastBridge } from "./first-attach-toast";
 import { logCaughtError, logBgWarnError, logSampledDebug, BgLogTag} from "./bg-logger";
 
 const BUILD_META_URL = "build-meta.json";
@@ -94,7 +97,6 @@ export async function boot(): Promise<void> {
         // auto-injector's C9 gate is hot from the first navigation.
         // See: mem://features/auto-attach-policy (C9).
         try {
-            const { preloadDismissedOrigins } = await import("./dismissed-origins");
             await preloadDismissedOrigins();
         } catch (err) {
             logCaughtError(
@@ -104,9 +106,7 @@ export async function boot(): Promise<void> {
             );
         }
         try {
-            const { preloadSeenOrigins } = await import("./seen-origins");
             await preloadSeenOrigins();
-            const { registerFirstAttachToastBridge } = await import("./first-attach-toast");
             registerFirstAttachToastBridge();
         } catch (err) {
             logCaughtError(

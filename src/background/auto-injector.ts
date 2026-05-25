@@ -34,6 +34,7 @@ import {
     isOriginDismissedForTab,
     clearDismissedOriginsForTab,
 } from "./dismissed-origins";
+import { maybeShowFirstAttachToast } from "./first-attach-toast";
 import { STORAGE_KEY_ALL_SCRIPTS } from "../shared/constants";
 import { ensureBuiltinScriptsExist } from "./builtin-script-guard";
 import { persistInjectionError, persistInjectionWarn } from "./injection-diagnostics";
@@ -302,7 +303,6 @@ async function processPageNavigation(
     // First-attach toast (C-UI): show once per origin asking the user
     // whether to keep auto-attaching here. No-op if seen or dismissed.
     try {
-        const { maybeShowFirstAttachToast } = await import("./first-attach-toast");
         await maybeShowFirstAttachToast(tabId, url);
     } catch (err) {
         logCaughtError(BgLogTag.MARCO, "first-attach toast inject failed", err);
