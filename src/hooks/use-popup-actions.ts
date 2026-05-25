@@ -89,13 +89,16 @@ export function usePopupActions() {
         return;
       }
 
-      console.log("[popup:handleRun] Sending INJECT_SCRIPTS for tab %d with %d scripts...%s", tabId, scripts.length, isForce ? " forceReload=true" : "");
+      // v3.18.0 — manual Run ALWAYS forces re-injection. Background's
+      // "already injected" cache only exists to dedupe passive/auto-injects;
+      // a user pressing Run must always execute, even after closing the panel.
+      console.log("[popup:handleRun] Sending INJECT_SCRIPTS for tab %d with %d scripts (manual → forceReload=true)", tabId, scripts.length);
       const rawResult = await sendMessage<InjectScriptsResponse>({
         type: "INJECT_SCRIPTS",
         tabId,
         scripts,
         launchSource: "manual",
-        ...(isForce ? { forceReload: true } : {}),
+        forceReload: true,
       });
       // Normalize tolerates older backgrounds that omit
       // `inlineSyntaxErrorDetected` — without this, downstream
