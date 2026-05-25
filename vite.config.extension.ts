@@ -20,7 +20,7 @@ import {
     writeFileSync,
     readdirSync,
 } from "fs";
-import { execSync, execFileSync } from "node:child_process";
+import { execFileSync } from "node:child_process";
 
 /**
  * Windows-safe replacement for `execSync(cmd, { stdio: "inherit" })` inside
