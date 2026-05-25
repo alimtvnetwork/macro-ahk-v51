@@ -1,6 +1,6 @@
 # Plan
 
-**Active workstream:** None — all current items blocked or deferred.
+**Active workstream:** Issue 114 — pro_0 Credit Balance Calculation (v3.11.1)
 
 **Recently shipped:** **v3.10.0 — Refill Priority Filter + Button Overflow Fix + GitHub Open** (2026-05-24).
 Detailed plan: `.lovable/plans/v3.10.0-refill-priority-and-github-open.md`.
