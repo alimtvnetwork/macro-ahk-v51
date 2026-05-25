@@ -379,10 +379,7 @@ function copyPrompts(): Plugin {
         name: "copy-prompts",
         writeBundle() {
             try {
-                execSync(
-                    `node scripts/aggregate-prompts.mjs`,
-                    { cwd: __dirname, stdio: "inherit" },
-                );
+                runNodeScriptSafe("copy-prompts", ["scripts/aggregate-prompts.mjs"], __dirname);
                 // aggregate-prompts.mjs writes into chrome-extension/prompts/ directly,
                 // so this copy step is a no-op when src===dest, but we keep the explicit
                 // copy as a safety net for the case where a future contributor changes
@@ -396,7 +393,9 @@ function copyPrompts(): Plugin {
                     }
                 }
             } catch (e) {
-                console.warn("[copy-prompts] failed:", e);
+                // HARD fail — missing prompts blocks the extension at runtime.
+                console.error("[copy-prompts] FATAL:", e);
+                throw e;
             }
         },
     };
