@@ -70,8 +70,10 @@ export const enum BgLogTag {
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
-/** Caught error type — an Error, a string message, or an object with message. */
-export type CaughtError = Error | string | { message?: string };
+/** Caught error type — unknown is the only allowed unknown per memory rule.
+ *  Accepts anything `catch` can produce (Error, string, DOMException, null, etc.).
+ *  Logger helpers narrow internally via `instanceof Error` checks. */
+export type CaughtError = unknown;
 
 export interface BgErrorContext {
     scriptId?: string;
