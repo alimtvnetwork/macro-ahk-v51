@@ -19,6 +19,7 @@ import { createMenuItem, createMenuSep, createSubmenu } from './menu-helpers';
 import { showAboutModal } from './about-modal';
 import { showChangelogModal } from './changelog-modal';
 import { showProjectsModal } from './projects-modal';
+import { showCreditTotalsModal } from './credit-totals-modal';
 import { resolveAutoAttachConfig, runAutoAttachGroup } from './auto-attach';
 import { logError } from '../error-utils';
 import { sendToExtension } from './prompt-manager';
