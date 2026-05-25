@@ -49,12 +49,11 @@ Trigger phrases the user may type to query this file:
 - [ ] **P Store** — owner spec pending (deferred — discuss-later mode per user)
 - [x] **TS Migration V2 Phase 03** — React feasibility (S-051) — re-evaluated 2026-04-23, **NOT PROCEEDING** (UIManager 58 lines, UI total 15,223 lines under 20K threshold)
 
-## Deferred — Do NOT auto-recommend (per user, 2026-04-23)
+## Deferred — Do NOT auto-recommend (per user)
 
-- [ ] **React component tests (target 900+)** — skip in `next` rotation
-- [ ] **E2E React UI verification (Step 10)** — manual Chrome testing avoided (closed via 74 Playwright CI tests, 2026-04-22)
-- [ ] **Prompt Click E2E (Issues 52/53)** — manual Chrome testing avoided
+- [ ] **P Store** — owner spec pending (discuss-later mode per user)
 - [ ] **Cross-Project Sync & Shared Library** — depends on P Store
+- [ ] **Prompt Click E2E (Issues 52/53)** — deferred (manual Chrome testing)
 
 ## P3 — Optional Follow-ups (members panel, v2.216.0)
 
