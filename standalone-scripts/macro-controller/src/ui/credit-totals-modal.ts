@@ -161,14 +161,14 @@ export function buildBody(totals: CreditTotals, workspaces: ReadonlyArray<Worksp
   const cardsRow = document.createElement('div');
   cardsRow.style.cssText = 'display:flex;gap:8px;flex-wrap:wrap;';
   cardsRow.appendChild(buildCard('This Billing Cycle', [
-    { label: 'Used', value: formatCount(totals.used) },
+    { label: 'Used', value: formatCount(totals.used), tone: 'used' },
     { label: 'Remaining', value: formatCount(totals.remaining), tone: 'ok' },
-    { label: 'Total grant', value: formatCount(totals.granted), tone: 'muted' },
+    { label: 'Total grant', value: formatCount(totals.granted), tone: 'total' },
   ]));
   cardsRow.appendChild(buildCard('Free Daily Credits', [
     { label: 'Today remaining', value: totals.freeDailyRemaining + ' / ' + totals.freeDailyCap, tone: totals.freeDailyRemaining > 0 ? 'ok' : 'muted' },
-    { label: 'Resets at', value: formatMytReset(totals.resetAtMyt), tone: 'muted' },
-    { label: 'Workspaces', value: formatCount(totals.totalCount), tone: 'muted' },
+    { label: 'Resets at', value: formatMytReset(totals.resetAtMyt), tone: 'accent' },
+    { label: 'Workspaces', value: formatCount(totals.totalCount), tone: 'total' },
   ]));
   body.appendChild(cardsRow);
 
