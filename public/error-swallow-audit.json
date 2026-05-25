@@ -1,11 +1,11 @@
 {
-  "GeneratedAt": "2026-05-25T14:36:53.212Z",
+  "GeneratedAt": "2026-05-25T14:37:09.851Z",
   "Items": [
     {
-      "Id": "6d8e1696aebe",
+      "Id": "b2cdfb970617",
       "Severity": "P1",
       "File": "standalone-scripts/macro-controller/scripts/verify-http-fail-fast.mjs",
-      "Line": 120,
+      "Line": 121,
       "Rule": "no-empty-catch",
       "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
       "Snippet": "catch {"
