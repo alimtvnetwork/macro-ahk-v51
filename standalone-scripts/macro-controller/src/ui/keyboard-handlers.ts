@@ -17,6 +17,7 @@
  */
 
 import { log } from '../logging';
+import { markUserGesture } from '../user-gesture-guard';
 import { state } from '../shared-state';
 import { showSettingsDialog } from './settings-ui';
 import { positionLoopController } from './panel-layout';
