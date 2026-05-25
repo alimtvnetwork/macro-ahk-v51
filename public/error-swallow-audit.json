@@ -1,4 +1,59 @@
 {
-  "GeneratedAt": "2026-05-22T03:45:07.485Z",
-  "Items": []
+  "GeneratedAt": "2026-05-25T14:34:49.045Z",
+  "Items": [
+    {
+      "Id": "dd343f19a0c8",
+      "Severity": "P1",
+      "File": "src/background/first-attach-toast.ts",
+      "Line": 152,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    },
+    {
+      "Id": "6d8e1696aebe",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/scripts/verify-http-fail-fast.mjs",
+      "Line": 120,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    },
+    {
+      "Id": "9c968244eb7a",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/scripts/verify-projects-cache.mjs",
+      "Line": 48,
+      "Rule": "no-noop-promise-catch",
+      "Message": "Promise .catch() handler is a no-op — rejection is silently swallowed.",
+      "Snippet": ".catch(() => null)"
+    },
+    {
+      "Id": "d7fa346b70ec",
+      "Severity": "P1",
+      "File": "standalone-scripts/macro-controller/src/ui/credit-totals-modal.ts",
+      "Line": 520,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    },
+    {
+      "Id": "3c2f68a95282",
+      "Severity": "P2",
+      "File": "src/components/HttpFailFastBanner.tsx",
+      "Line": 41,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    },
+    {
+      "Id": "b17b7a569734",
+      "Severity": "P2",
+      "File": "src/shared/http-fail-fast.ts",
+      "Line": 52,
+      "Rule": "no-empty-catch",
+      "Message": "Empty catch block — error is silently dropped, no Logger.error() call.",
+      "Snippet": "catch {"
+    }
+  ]
 }
