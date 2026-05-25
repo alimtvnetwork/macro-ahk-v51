@@ -175,7 +175,9 @@ export function showCreditTotalsModal(): void {
     + ';border-radius:8px;padding:0;min-width:460px;max-width:640px;'
     + 'box-shadow:0 8px 32px rgba(0,0,0,.6);font-family:monospace;overflow:hidden;';
   panel.setAttribute('role', 'dialog');
+  panel.setAttribute('aria-modal', 'true');
   panel.setAttribute('aria-label', 'Credit Totals');
+  panel.tabIndex = -1;
 
   panel.appendChild(buildTitleBar());
 
@@ -185,12 +187,48 @@ export function showCreditTotalsModal(): void {
   panel.appendChild(buildFooter(totals));
 
   document.body.appendChild(panel);
+  installA11yHandlers(panel);
+  // Focus the panel so ESC works immediately.
+  try { panel.focus(); } catch { /* ignore */ }
+}
+
+/** ESC-to-close + focus trap. Idempotent; cleaned up by removeCreditTotalsModal. */
+function installA11yHandlers(panel: HTMLElement): void {
+  function onKey(e: KeyboardEvent): void {
+    if (e.key === 'Escape') {
+      e.stopPropagation();
+      removeCreditTotalsModal();
+      return;
+    }
+    if (e.key !== 'Tab') return;
+    const focusables = panel.querySelectorAll<HTMLElement>(
+      'button, [href], [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusables.length === 0) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    const active = document.activeElement as HTMLElement | null;
+    if (e.shiftKey && active === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && active === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  }
+  document.addEventListener('keydown', onKey, true);
+  // Stash cleanup on the element so removeCreditTotalsModal can run it.
+  (panel as HTMLElement & { __marcoCleanup?: () => void }).__marcoCleanup = function (): void {
+    document.removeEventListener('keydown', onKey, true);
+  };
 }
 
 /** Public: remove the modal if present. */
 export function removeCreditTotalsModal(): void {
   const existing = document.getElementById(DIALOG_ID);
   if (existing && existing.parentNode) {
+    const cleanup = (existing as HTMLElement & { __marcoCleanup?: () => void }).__marcoCleanup;
+    if (typeof cleanup === 'function') cleanup();
     existing.parentNode.removeChild(existing);
   }
 }
