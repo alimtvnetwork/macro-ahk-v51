@@ -20,7 +20,41 @@ import {
     writeFileSync,
     readdirSync,
 } from "fs";
-import { execSync } from "node:child_process";
+import { execSync, execFileSync } from "node:child_process";
+
+/**
+ * Windows-safe replacement for `execSync(cmd, { stdio: "inherit" })` inside
+ * Rollup's PARALLEL writeBundle hook. Multiple child Node processes sharing
+ * the parent's inherited stdout handle on Windows (especially when the
+ * caller is piping through PowerShell `Tee-Object`) can crash one child
+ * with NTSTATUS 0xC0000409 (STATUS_STACK_BUFFER_OVERRUN, decimal
+ * 3221226505). Piped stdio gives each child a private OS pipe; we surface
+ * captured output only on failure so successful runs stay quiet.
+ *
+ * See .lovable/question-and-ambiguity/56-windows-vite-build-failed-opaque.md
+ */
+function runNodeScriptSafe(label: string, nodeArgs: string[], cwd: string): void {
+    try {
+        execFileSync(process.execPath, nodeArgs, {
+            cwd,
+            stdio: ["ignore", "pipe", "pipe"],
+            encoding: "utf8",
+            maxBuffer: 32 * 1024 * 1024,
+        });
+    } catch (e: unknown) {
+        const err = e as { stdout?: string; stderr?: string; status?: number; message?: string };
+        const out = (err.stdout ?? "").trim();
+        const errOut = (err.stderr ?? "").trim();
+        const status = typeof err.status === "number" ? err.status : "n/a";
+        const msg = [
+            `[${label}] node script failed (exit ${status})`,
+            `  cmd: node ${nodeArgs.join(" ")}`,
+            out ? `  stdout (tail):\n${out.split(/\r?\n/).slice(-20).map((l) => "    " + l).join("\n")}` : "",
+            errOut ? `  stderr (tail):\n${errOut.split(/\r?\n/).slice(-20).map((l) => "    " + l).join("\n")}` : "",
+        ].filter(Boolean).join("\n");
+        throw new Error(msg);
+    }
+}
 
 const EXT_DIR = __dirname;
 // NOTE: The unpacked Chrome extension is written DIRECTLY into ./chrome-extension/
