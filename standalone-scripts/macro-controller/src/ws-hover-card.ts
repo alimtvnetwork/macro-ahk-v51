@@ -457,7 +457,7 @@ export function buildWorkspaceHoverHtml(
     + '<span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'
     + escHtml(ws.fullName || ws.name) + '</span>'
     + planChipHtml(ws)
-    + pillHtml(status)
+    + pillHtml(status, ws)
     + '</div>';
   const priority = creditsCompactRow(ws)
     + refillCompactRow(ws, status)
