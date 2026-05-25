@@ -27,6 +27,7 @@ const STORAGE_KEY = 'marco_settings_overrides_v1';
 export interface PerWorkspaceLifecycleOverride {
   expiryGracePeriodDays?: number;
   refillWarningThresholdDays?: number;
+  hoverCardHideGracePeriodMs?: number;
 }
 
 export interface SettingsOverrides {
