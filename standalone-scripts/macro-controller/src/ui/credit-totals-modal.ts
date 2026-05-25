@@ -139,7 +139,8 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   row.style.cssText = 'display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 0.7fr 0.7fr;gap:6px;padding:5px 8px;font-size:10px;color:#cbd5e1;border-bottom:1px solid rgba(124,58,237,0.08);font-variant-numeric:tabular-nums;';
 
   const name = document.createElement('span');
-  name.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+  name.setAttribute('data-cell', 'name');
+  name.style.cssText = 'overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e2e8f0;font-weight:600;';
   name.title = ws.fullName || ws.name;
   name.textContent = ws.fullName || ws.name || ws.id;
 
