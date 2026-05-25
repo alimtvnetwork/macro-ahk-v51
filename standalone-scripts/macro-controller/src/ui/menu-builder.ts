@@ -7,6 +7,7 @@
  */
 
 import { log } from '../logging';
+import { markUserGesture } from '../user-gesture-guard';
 import { showDatabaseModal } from './database-modal';
 import { exportWorkspacesAsCsv } from '../logging';
 import { VERSION, cPanelBg, cPanelFgDim, cPanelFgMuted, cPrimary, cBtnMenuBg, cBtnMenuFg, cSectionHeader, lDropdownRadius, lDropdownShadow, tFontSm, trFast, autoAttachCfg, state } from '../shared-state';
