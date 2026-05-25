@@ -27,6 +27,7 @@ const STORAGE_KEY = 'marco_settings_overrides_v1';
 export interface PerWorkspaceLifecycleOverride {
   expiryGracePeriodDays?: number;
   refillWarningThresholdDays?: number;
+  hoverCardHideGracePeriodMs?: number;
 }
 
 export interface SettingsOverrides {
@@ -42,6 +43,8 @@ export interface SettingsOverrides {
   enableWorkspaceStatusLabels?: boolean;
   /** Show the rich hover-card with credit details on workspace rows. */
   enableWorkspaceHoverDetails?: boolean;
+  /** Delay before the workspace hover card disappears after mouseleave (ms). Default 220. */
+  hoverCardHideGracePeriodMs?: number;
   /**
    * Per-workspace lifecycle overrides keyed by workspace id (string UUID).
    * Values here override the global `expiryGracePeriodDays` /
@@ -80,7 +83,10 @@ function sanitizePerWorkspace(
     if (isFiniteNonNegative(v.refillWarningThresholdDays)) {
       entry.refillWarningThresholdDays = Math.floor(v.refillWarningThresholdDays);
     }
-    if (entry.expiryGracePeriodDays !== undefined || entry.refillWarningThresholdDays !== undefined) {
+    if (isFiniteNonNegative(v.hoverCardHideGracePeriodMs)) {
+      entry.hoverCardHideGracePeriodMs = Math.floor(v.hoverCardHideGracePeriodMs);
+    }
+    if (entry.expiryGracePeriodDays !== undefined || entry.refillWarningThresholdDays !== undefined || entry.hoverCardHideGracePeriodMs !== undefined) {
       out[wsId] = entry;
     }
   }
@@ -111,6 +117,9 @@ function sanitize(raw: unknown): SettingsOverrides {
   }
   if (typeof r.enableWorkspaceHoverDetails === 'boolean') {
     out.enableWorkspaceHoverDetails = r.enableWorkspaceHoverDetails;
+  }
+  if (isFiniteNonNegative(r.hoverCardHideGracePeriodMs)) {
+    out.hoverCardHideGracePeriodMs = Math.floor(r.hoverCardHideGracePeriodMs);
   }
   const perWs = sanitizePerWorkspace(r.perWorkspace);
   if (perWs) {
