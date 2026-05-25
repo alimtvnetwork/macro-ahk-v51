@@ -147,6 +147,7 @@ export function nextSortDir(key: SortKey, current: SortState): SortState {
 const COLUMNS: ReadonlyArray<{ key: SortKey; label: string; align: 'left' | 'right' }> = [
   { key: 'name', label: 'Workspace', align: 'left' },
   { key: 'plan', label: 'Plan', align: 'left' },
+  { key: 'projects', label: 'Prj', align: 'right' },
   { key: 'used', label: 'Used', align: 'right' },
   { key: 'rem', label: 'Rem', align: 'right' },
   { key: 'total', label: 'Total', align: 'right' },
