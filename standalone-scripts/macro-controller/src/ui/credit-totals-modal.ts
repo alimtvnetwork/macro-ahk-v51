@@ -210,7 +210,6 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
     if (!isManualOrder) return;
 
     row.addEventListener('dragstart', (e: DragEvent) => {
-      dragFromIndex = dispIdx;
       row.style.opacity = '0.4';
       if (e.dataTransfer) {
         e.dataTransfer.effectAllowed = 'move';
@@ -219,7 +218,6 @@ export function buildBreakdownTable(workspaces: ReadonlyArray<WorkspaceCredit>):
     });
     row.addEventListener('dragend', () => {
       row.style.opacity = '';
-      dragFromIndex = -1;
       body.querySelectorAll<HTMLElement>('[data-drop-target="1"]').forEach((el) => {
         el.removeAttribute('data-drop-target');
         el.style.borderTop = '';
