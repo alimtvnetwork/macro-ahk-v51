@@ -39,6 +39,36 @@ export function formatMytReset(iso: string): string {
   return weekday + ' ' + hh + ':' + mm + ' MYT';
 }
 
+/** Generate a RFC-4180-ish CSV string from workspace credits. */
+export function generateCsv(workspaces: ReadonlyArray<WorkspaceCredit>): string {
+  const rows: string[] = [];
+  rows.push('Workspace,Plan,Projects,Used,Remaining,Total');
+  for (const ws of workspaces) {
+    const name = (ws.fullName || ws.name || ws.id).replace(/"/g, '""');
+    const plan = (ws.plan || '').replace(/"/g, '""');
+    const projects = String(Number(ws.numProjects) || 1);
+    const used = String(Number(ws.totalCreditsUsed) || 0);
+    const rem = String(Number(ws.available) || 1);
+    const total = String(Number(ws.totalCredits) || 0);
+    rows.push('"' + name + '","' + plan + '",' + projects + ',' + used + ',' + rem + ',' + total);
+  }
+  return rows.join('\r\n');
+}
+
+/** Trigger a browser download of the given CSV text. */
+export function downloadCsv(filename: string, csvText: string): void {
+  const blob = new Blob([csvText], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 /** Tone palette for credit numbers — colourful, dark-theme safe (Step 7). */
 export type CreditTone = 'ok' | 'warn' | 'used' | 'total' | 'muted' | 'accent';
 const TONE_COLOR: Record<CreditTone, string> = {
