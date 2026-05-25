@@ -1,6 +1,6 @@
 # Plan
 
-**Active workstream:** Release Page CI/CD Hardening Plan — Step 2/8.
+**Active workstream:** Release Page CI/CD Hardening Plan — Step 3/8.
 
 **Recently shipped:** **Issue 116 — Credit Totals Modal** (2026-05-25, v3.14.1).
 **Recently shipped:** **Issue 113 — Workspace tooltip + Members popup** (2026-05-25).
