@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.17.1] — 2026-05-25
+
+### Fixed
+- **Error-swallow audit cleared (Total → 0)**: swept the 4 remaining P1 + 1 P2 sites flagged by `scripts/check-no-swallowed-errors.mjs`. Block-comment `/* allow-swallow: */` waivers were never recognised by the checker (regex requires `//`); converted to line-comment style with full rationale in: `src/background/first-attach-toast.ts`, `src/components/HttpFailFastBanner.tsx`, `src/shared/http-fail-fast.ts`, `standalone-scripts/macro-controller/src/ui/credit-totals-modal.ts`, `standalone-scripts/macro-controller/scripts/verify-projects-cache.mjs`, `standalone-scripts/macro-controller/scripts/verify-http-fail-fast.mjs`.
+
+### Changed
+- Documented waiver contract (line-comment only, same or previous line) in `mem://features/error-swallow-audit-generator`.
+- Version bump: 3.17.0 → 3.17.1 (all version files synced)
+
+---
+
 ## [v3.17.0] — 2026-05-25
 
 ### Fixed
