@@ -308,20 +308,28 @@ function isRefillSoonWs(ws: WorkspaceCredit): boolean {
   }
 }
 
+/** Check text match against workspace name / fullName. */
+function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean {
+  if (!filter) return true;
+  return ws.fullName.toLowerCase().indexOf(filter.toLowerCase()) !== -1 ||
+    ws.name.toLowerCase().indexOf(filter.toLowerCase()) !== -1;
+}
+
+/** Check expired-with-credits filter sub-conditions. */
+function matchesExpiredWithCreditsFilter(ws: WorkspaceCredit): boolean {
+  if (!isExpiredWs(ws)) return false;
+  if ((ws.available || 0) <= EXPIRED_WITH_CREDITS_MIN) return false;
+  return true;
+}
+
 /** Check if a workspace passes all active filters. */
 function passesFilters(ws: WorkspaceCredit, fs: WsFilterState): boolean {
-  const matchesText = !fs.filter ||
-    ws.fullName.toLowerCase().indexOf(fs.filter.toLowerCase()) !== -1 ||
-    ws.name.toLowerCase().indexOf(fs.filter.toLowerCase()) !== -1;
-  if (!matchesText) return false;
+  if (!matchesTextFilter(ws, fs.filter || '')) return false;
   if (fs.freeOnly && (ws.dailyFree || 0) <= 0) return false;
   if (fs.rolloverOnly && (ws.rollover || 0) <= 0) return false;
   if (fs.billingOnly && (ws.billingAvailable || 0) <= 0) return false;
   if (fs.minCredits > 0 && (ws.available || 0) < fs.minCredits) return false;
-  if (fs.expiredWithCredits) {
-    if (!isExpiredWs(ws)) return false;
-    if ((ws.available || 0) <= EXPIRED_WITH_CREDITS_MIN) return false;
-  }
+  if (fs.expiredWithCredits && !matchesExpiredWithCreditsFilter(ws)) return false;
   if (fs.refillSoon && !isRefillSoonWs(ws)) return false;
   return true;
 }
