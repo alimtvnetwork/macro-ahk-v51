@@ -534,7 +534,7 @@ function buildWsRow(
 function computeMaxTotalCredits(workspaces: WorkspaceCredit[]): number {
   let maxTotalCredits = 1;
   for (const ws of workspaces) {
-    const mtc = Math.round(ws.totalCredits || calcTotalCredits(ws.freeGranted, ws.dailyLimit, ws.limit, ws.topupLimit, ws.rolloverLimit, ws.plan));
+    const mtc = Math.round(ws.totalCredits ?? calcTotalCredits(ws.freeGranted, ws.dailyLimit, ws.limit, ws.topupLimit, ws.rolloverLimit, ws.plan));
     if (mtc > maxTotalCredits) maxTotalCredits = mtc;
   }
   return maxTotalCredits;
