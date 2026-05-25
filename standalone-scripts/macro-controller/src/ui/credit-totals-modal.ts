@@ -368,7 +368,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   const row = document.createElement('div');
   row.setAttribute('data-credit-totals-row', '1');
   if (index % 2 === 1) row.setAttribute('data-zebra', '1');
-  row.style.cssText = 'display:grid;grid-template-columns:1.6fr 0.7fr 0.7fr 0.7fr 0.7fr;gap:6px;padding:5px 8px;font-size:10px;color:#cbd5e1;border-bottom:1px solid rgba(124,58,237,0.08);font-variant-numeric:tabular-nums;';
+  row.style.cssText = 'display:grid;grid-template-columns:1.6fr 0.7fr 1.6fr 0.7fr 0.7fr 0.7fr;gap:6px;padding:5px 8px;font-size:10px;color:#cbd5e1;border-bottom:1px solid rgba(124,58,237,0.08);font-variant-numeric:tabular-nums;';
 
   const name = document.createElement('span');
   name.setAttribute('data-cell', 'name');
