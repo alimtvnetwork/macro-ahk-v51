@@ -1,6 +1,6 @@
 # Macro Controller — Changelog
 
-## v3.14.0 (2026-05-25)
+## v3.14.1 (2026-05-25)
 
 ### Added
 - **Credit Totals Modal** (Issue 116) — `💰 Credit Totals` right-click menu entry opens a summary modal:

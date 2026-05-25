@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
-## [v3.14.0] — 2026-05-25
+## [v3.14.1] — 2026-05-25
 
 ### Added
 - **Credit Totals Modal** (Issue 116). Right-click menu item `💰 Credit Totals` opens a modal summarizing all workspace credits:
@@ -20,7 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 - 25 unit tests covering credit calculation, modal rendering, dialog lifecycle, and a11y handlers.
 
 ### Internal
-- Version bump: 3.13.0 → 3.14.0 (manifest, constants, shared-state, instruction, readme pinned).
+- Version bump: 3.13.0 → 3.14.1 (manifest, constants, shared-state, instruction, readme pinned).
 
 ---
 
