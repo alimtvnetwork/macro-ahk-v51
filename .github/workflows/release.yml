@@ -189,6 +189,10 @@ jobs:
           } >> "$GITHUB_OUTPUT"
           echo "Resolved version: ${VERSION} (ref=${REF})"
 
+      - name: Checkout resolved ref
+        if: steps.version.outputs.skip != 'true'
+        run: git checkout "${{ steps.version.outputs.ref }}"
+
       - name: Enforce lowercase .md filenames
         if: steps.version.outputs.skip != 'true'
         run: |
