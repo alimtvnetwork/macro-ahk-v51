@@ -50,6 +50,16 @@ if (!project || !(project in PROJECTS)) {
     process.exit(2);
 }
 
+// Windows tsc OOM / stack-overflow guard.
+// Three standalone projects (lovable-common, lovable-owner-switch, xpath) intermittently
+// fail under `tsc --noEmit` on Windows with exit codes:
+//   -2147483645 (0x80000003 — V8 breakpoint after Fatal "out of memory: Zone")
+//   -1073741571 (0xC00000FD — Windows STATUS_STACK_OVERFLOW)
+// Reason: default V8 heap (~4 GB) + small stack (~984 KB) are insufficient for the
+// shared type graph these projects pull in via lovable-common/sdk barrel re-exports.
+// Fix: bump V8 heap + stack for the tsc child only; vite/node children are unaffected.
+const TSC_NODE_OPTIONS = "--max-old-space-size=8192 --stack-size=8000";
+
 for (const [cmd, args] of PROJECTS[project]) {
     const finalArgs = cmd === "vite" && mode === "development" ? [...args, "--mode", "development"] : args;
     console.log(`[build-step] ${project}: ${cmd} ${finalArgs.join(" ")}`);
@@ -62,7 +72,12 @@ for (const [cmd, args] of PROJECTS[project]) {
         console.error(`[FAIL] ${project}: missing item=${localBinary}; Reason=DependencyBinaryMissing; ReasonDetail=run pnpm install before standalone builds`);
         process.exit(2);
     }
-    const result = spawnSync(resolvedCommand, resolvedArgs, { stdio: "inherit", shell: false });
+    const childEnv = { ...process.env };
+    if (cmd === "tsc") {
+        const existing = childEnv.NODE_OPTIONS ? childEnv.NODE_OPTIONS + " " : "";
+        childEnv.NODE_OPTIONS = existing + TSC_NODE_OPTIONS;
+    }
+    const result = spawnSync(resolvedCommand, resolvedArgs, { stdio: "inherit", shell: false, env: childEnv });
     if (result.error) {
         console.error(`[FAIL] ${project}: could not start ${cmd}: ${result.error.message}`);
         process.exit(2);
