@@ -1082,7 +1082,8 @@ export async function mergeFromSqliteZip(file: File): Promise<ImportResult> {
   };
 }
 
-async function extractBundle(file: File) {
+async function extractBundle(file: File, options?: ImportOptions) {
+  const strict = options?.strictPascalCase ?? false;
   const arrayBuffer = await file.arrayBuffer();
   const JSZipCtor = await loadJSZip(); const zip = await JSZipCtor.loadAsync(arrayBuffer);
   const dbFile = zip.file(DB_FILENAME);
@@ -1099,12 +1100,12 @@ async function extractBundle(file: File) {
     throw new Error(formatValidationError(validation));
   }
 
-  const projects = readProjects(db);
-  const scripts = readScripts(db);
-  const configs = readConfigs(db);
+  const projects = readProjects(db, strict);
+  const scripts = readScripts(db, strict);
+  const configs = readConfigs(db, strict);
   // Prompts table is optional in "full" mode — readPrompts() already
   // returns [] when absent, so older v4 bundles without Prompts still work.
-  const prompts = readPrompts(db);
+  const prompts = readPrompts(db, strict);
   db.close();
   return { projects, scripts, configs, prompts };
 }
