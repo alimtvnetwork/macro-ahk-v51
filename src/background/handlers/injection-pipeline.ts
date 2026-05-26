@@ -294,7 +294,7 @@ export async function injectSingleScript(
         configJson !== null, resolvedThemeJson !== null, script.code.length);
 
     try {
-        const wrappedCode = wrapWithIsolation(script, configJson, resolvedThemeJson, launchSource);
+        const wrappedCode = wrapWithIsolation(script, configJson, resolvedThemeJson, launchSource, forceReload);
         console.log("[injection] 3/4 WRAP     — wrapped code length: %d chars", wrappedCode.length);
 
         const execStart = performance.now();
