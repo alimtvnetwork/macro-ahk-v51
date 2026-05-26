@@ -508,7 +508,9 @@ export function showCreditTotalsModal(): void {
   panel.setAttribute(ATTR_ARIA_LABEL, 'Credit Totals');
   panel.tabIndex = -1;
 
-  panel.appendChild(buildTitleBar());
+  const titleBar = buildTitleBar();
+  panel.appendChild(titleBar);
+  makeDraggable(panel, titleBar);
 
   const workspaces = loopCreditState.perWorkspace || [];
   const totals = aggregateCreditTotals(workspaces);
