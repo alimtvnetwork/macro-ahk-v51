@@ -75,6 +75,16 @@ export function isExpiredTier(tier: string | null | undefined): boolean {
 }
 
 /**
+ * True when the workspace tier resolves to FREE. Free workspaces never carry a
+ * paid subscription, so any `canceled` / `expired` subscription_status on them
+ * is a no-op and must NOT surface as an Expired/Canceled badge anywhere in the
+ * UI (Issue: free-plan expiry suppression).
+ */
+export function isFreeTier(tier: string | null | undefined): boolean {
+  return (tier || '').toUpperCase().trim() === WsTierValue.FREE;
+}
+
+/**
  * Aggregate: subscription_status indicates the workspace is in any
  * expired-ish state (canceled OR past_due OR unpaid). Used by
  * `isExpiredWs` filter / sort logic.
