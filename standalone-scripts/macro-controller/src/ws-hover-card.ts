@@ -36,6 +36,7 @@ import { explainEffectiveStatus, type StatusExplanation } from './status-explain
 const HOVERCARD_ID = 'marco-ws-hovercard';
 const SEL_WS_ITEM = '.loop-ws-item';
 const SEL_WS_NAME = '.loop-ws-name';
+const LABEL_PAST_DUE_SINCE = 'Past due since';
 
 /** Lookup workspace by id from the cached credit state. */
 type WsLookup = (wsId: string) => WorkspaceCredit | null;
