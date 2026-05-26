@@ -12,6 +12,7 @@
  * No DOM access. No side effects. Stays in lockstep with `getEffectiveStatus`.
  */
 import type { WorkspaceCredit } from './types';
+import { isCanceledStatus, isPastDueStatus, isExpiredTier, WsTierValue } from './types/subscription-status';
 import type { WorkspaceLifecycleConfig } from './workspace-lifecycle-config';
 import type { WorkspaceStatus, WorkspaceStatusKind } from './workspace-status';
 import { daysBetween, daysUntil, getEffectiveStatus } from './workspace-status';
