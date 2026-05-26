@@ -200,7 +200,7 @@ describe('applyCanceledCreditOverride', () => {
     expect(ws.available).toBe(165);
   });
 
-  it('Issue 117: shouldApplyCanceledOverride no longer fires for past_due', () => {
+  it('Issue 118: shouldApplyCanceledOverride no longer fires for past_due', () => {
     const ws = makeWs({
       subscriptionStatus: 'past_due',
       subscriptionStatusChangedAt: '2026-04-16T10:05:11Z',
@@ -208,11 +208,11 @@ describe('applyCanceledCreditOverride', () => {
       available: 0, rollover: 0, billingAvailable: 0,
     });
     const status = getEffectiveStatus(ws, CFG, NOW);
-    expect(status.kind).toBe('about-to-expire');
+    expect(status.kind).toBe('past-due-expiring');
     expect(shouldApplyCanceledOverride(status)).toBe(false);
   });
 
-  it('Issue 117: past_due with live grants keeps credits intact', () => {
+  it('Issue 118: past_due with live grants keeps credits intact', () => {
     const ws = makeWs({
       subscriptionStatus: 'past_due',
       tier: 'EXPIRED',
