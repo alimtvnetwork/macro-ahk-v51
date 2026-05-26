@@ -138,7 +138,7 @@ export async function injectAllScripts(
     if (hasCssScript) {
         console.log("[injection] 3/4 ORDER    — CSS-bearing chain detected, forcing sequential ordered injection (%d scripts)", orderedScripts.length);
         for (const script of orderedScripts) {
-            const result = await injectSingleScript(tabId, script.injectable, script.configJson, script.themeJson, script.codeSource, launchSource);
+            const result = await injectSingleScript(tabId, script.injectable, script.configJson, script.themeJson, script.codeSource, launchSource, forceReload);
             results.push(result);
         }
         return results;
