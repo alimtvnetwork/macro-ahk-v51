@@ -951,7 +951,11 @@ function readPrompts(db: Database, strict = false): PromptEntry[] {
 
 /** Reads a .zip and returns a preview of its contents (with diff against existing data) without importing. */
 // eslint-disable-next-line max-lines-per-function
-export async function previewSqliteZip(file: File): Promise<BundlePreview> {
+export async function previewSqliteZip(
+  file: File,
+  options?: ImportOptions,
+): Promise<BundlePreview> {
+  const strict = options?.strictPascalCase ?? false;
   const arrayBuffer = await file.arrayBuffer();
   const JSZipCtor = await loadJSZip(); const zip = await JSZipCtor.loadAsync(arrayBuffer);
 
@@ -971,18 +975,24 @@ export async function previewSqliteZip(file: File): Promise<BundlePreview> {
     throw new Error(formatValidationError(validation));
   }
 
-  const projects = readProjects(db);
-  const scripts = readScripts(db);
-  const configs = readConfigs(db);
+  const projects = readProjects(db, strict);
+  const scripts = readScripts(db, strict);
+  const configs = readConfigs(db, strict);
 
   // Read exported_at from Meta
   let exportedAt: string | undefined;
   try {
     let metaRows: { columns: string[]; values: SqlValue[][] }[];
-    try { metaRows = db.exec("SELECT Value FROM Meta WHERE Key = 'exported_at'"); } catch (errPascal) {
-      console.warn("[sqlite-bundle] Meta (PascalCase) exported_at query failed, trying legacy lowercase", errPascal);
-      try { metaRows = db.exec("SELECT value FROM meta WHERE key = 'exported_at'"); } catch (errLower) {
-        console.warn("[sqlite-bundle] legacy meta exported_at query failed; treating as absent", errLower);
+    try {
+      metaRows = db.exec("SELECT Value FROM Meta WHERE Key = 'exported_at'");
+    } catch (errPascal) {
+      if (!strict) {
+        console.warn("[sqlite-bundle] Meta (PascalCase) exported_at query failed, trying legacy lowercase", errPascal);
+        try { metaRows = db.exec("SELECT value FROM meta WHERE key = 'exported_at'"); } catch (errLower) {
+          console.warn("[sqlite-bundle] legacy meta exported_at query failed; treating as absent", errLower);
+          metaRows = [];
+        }
+      } else {
         metaRows = [];
       }
     }
