@@ -146,7 +146,7 @@ function buildSubscriptionSection(ws: WorkspaceCredit): string {
     if (isHealthyStatus(norm)) color = '#34d399';
     else if (isPastDueStatus(norm)) color = '#fde68a';
     else if (isCanceledStatus(norm) || norm === SubscriptionStatus.EXPIRED) color = '#fca5a5';
-    out.push(rowHtml('Status', escHtml(subStatus), color));
+    out.push(rowHtml(LABEL_STATUS, escHtml(subStatus), color));
   }
   if (changedIso) {
     const date = formatDateDDMMMYY(changedIso);
@@ -242,7 +242,7 @@ function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): strin
     if (status.kind === 'about-to-expire' || status.kind === KIND_PAST_DUE_EXPIRING) color = '#fde68a';
     out.push(rowHtml(expiryLabelFor(status.kind), date + ' (' + dur + ')', color));
   } else {
-    out.push(rowHtml('Status', escHtml(status.label), '#fca5a5'));
+    out.push(rowHtml(LABEL_STATUS, escHtml(status.label), '#fca5a5'));
   }
   if (ws.billingPeriodEndAt) {
     out.push(rowHtml('Billing period ends', formatDateDDMMMYY(ws.billingPeriodEndAt)));
@@ -258,7 +258,7 @@ function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): strin
 function buildPastDueSection(ws: WorkspaceCredit, status: WorkspaceStatus): string {
   if (status.kind !== KIND_PAST_DUE_EXPIRING) return '';
   const out: string[] = [sectionHeaderHtml('Past Due')];
-  out.push(rowHtml('Status', 'Grants remain active', '#34d399'));
+  out.push(rowHtml(LABEL_STATUS, 'Grants remain active', '#34d399'));
   if (ws.billingPeriodEndAt) {
     out.push(rowHtml('Grants live until', formatDateDDMMMYY(ws.billingPeriodEndAt)));
   }
@@ -453,7 +453,7 @@ function pastDueCompactRow(status: WorkspaceStatus): string {
   const days = status.daysSince || 0;
   const html = SPAN_COLOR_OPEN + C_DESTRUCTIVE + ';font-weight:700;">past due ' + formatDayCount(days) + '</span>'
     + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> — pay to keep credits</span>';
-  return compactRow('Status', html);
+  return compactRow(LABEL_STATUS, html);
 }
 
 function buildPriorityDetailsHtml(
