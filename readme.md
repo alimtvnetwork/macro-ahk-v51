@@ -120,13 +120,13 @@ The unified installer auto-derives the pinned version from its download URL. Use
 #### 🔒 Pinned to a specific release
 
 ```powershell
-# PowerShell (Windows) — replace v3.20.0 with any released tag
-irm https://github.com/alimtvnetwork/macro-ahk-v39/releases/download/v3.20.0/install.ps1 | iex
+# PowerShell (Windows) — replace v3.21.0 with any released tag
+irm https://github.com/alimtvnetwork/macro-ahk-v39/releases/download/v3.21.0/install.ps1 | iex
 ```
 
 ```bash
 # Bash (Linux / macOS)
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v39/releases/download/v3.20.0/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v39/releases/download/v3.21.0/install.sh | bash
 ```
 
 #### 🌊 Latest channel (auto-update)
