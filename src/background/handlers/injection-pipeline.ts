@@ -115,6 +115,7 @@ export async function injectAllScripts(
     tabId: number,
     scripts: PreparedScript[],
     launchSource: InjectionLaunchSource = "manual",
+    forceReload = false,
 ): Promise<InjectionResult[]> {
     if (scripts.length === 0) return [];
 
