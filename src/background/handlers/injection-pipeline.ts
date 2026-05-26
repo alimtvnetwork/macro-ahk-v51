@@ -160,7 +160,7 @@ export async function injectAllScripts(
             const scriptMeta: PipelineCacheMeta[] = [];
 
             for (const script of goodScripts) {
-                const wrapped = wrapWithIsolation(script.injectable, script.configJson, script.themeJson, launchSource);
+                const wrapped = wrapWithIsolation(script.injectable, script.configJson, script.themeJson, launchSource, forceReload);
                 wrappedParts.push(wrapped);
                 scriptMeta.push({
                     id: script.injectable.id,
