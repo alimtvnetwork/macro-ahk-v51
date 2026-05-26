@@ -95,25 +95,48 @@ describe('classifyWorkspaceDisplayStatus — refill-soon', () => {
   });
 });
 
-describe('classifyWorkspaceDisplayStatus — expire boundary', () => {
-  it('past_due, daysSince=0 → expire-soon', () => {
+describe('classifyWorkspaceDisplayStatus — past-due-expiring (Issue 118)', () => {
+  it('past_due, daysSince=0 → past-due-expiring / Expire / Today / warning', () => {
     const ws = makeWs({
       subscriptionStatus: 'past_due',
       subscriptionStatusChangedAt: new Date(NOW).toISOString(),
     });
     const d = classifyWorkspaceDisplayStatus(ws, CFG, NOW);
-    expect(d.kind).toBe('expire-soon');
+    expect(d.kind).toBe('past-due-expiring');
+    expect(d.label).toBe('Expire');
+    expect(d.sublabel).toBe('Today');
     expect(d.tone).toBe('warning');
   });
 
-  it('past_due, daysSince=2 → expired / "Expired 2d"', () => {
+  it('past_due, daysSince=2 → past-due-expiring / Expire / Passed 2d / warning', () => {
     const ws = makeWs({
       subscriptionStatus: 'past_due',
       subscriptionStatusChangedAt: new Date(NOW - 2 * 86_400_000).toISOString(),
     });
     const d = classifyWorkspaceDisplayStatus(ws, CFG, NOW);
-    expect(d.kind).toBe('expired');
-    expect(d.label).toBe('Expired 2d');
+    expect(d.kind).toBe('past-due-expiring');
+    expect(d.label).toBe('Expire');
+    expect(d.sublabel).toBe('Passed 2d');
+    expect(d.tone).toBe('warning');
+  });
+
+  it('past_due, daysSince=7 → past-due-expiring / orange tone', () => {
+    const ws = makeWs({
+      subscriptionStatus: 'past_due',
+      subscriptionStatusChangedAt: new Date(NOW - 7 * 86_400_000).toISOString(),
+    });
+    const d = classifyWorkspaceDisplayStatus(ws, CFG, NOW);
+    expect(d.kind).toBe('past-due-expiring');
+    expect(d.tone).toBe('orange');
+  });
+
+  it('past_due, daysSince=12 → past-due-expiring / danger tone', () => {
+    const ws = makeWs({
+      subscriptionStatus: 'past_due',
+      subscriptionStatusChangedAt: new Date(NOW - 12 * 86_400_000).toISOString(),
+    });
+    const d = classifyWorkspaceDisplayStatus(ws, CFG, NOW);
+    expect(d.kind).toBe('past-due-expiring');
     expect(d.tone).toBe('danger');
   });
 });
