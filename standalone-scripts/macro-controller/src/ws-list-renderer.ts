@@ -650,7 +650,7 @@ function filterAndSortWorkspaces(
 function updateWsCountLabel(count: number, total: number, filter: string): void {
   const countLabel = document.getElementById('loop-ws-count-label');
   if (!countLabel) return;
-  countLabel.textContent = (filter || getLoopWsFreeOnly() || getLoopWsExpiredWithCredits() || getLoopWsRefillSoon() || count !== total)
+  countLabel.textContent = (filter || getLoopWsFreeOnly() || getLoopWsExpiredWithCredits() || getLoopWsExpiring() || getLoopWsRefillSoon() || count !== total)
     ? 'Workspaces (' + count + '/' + total + ')'
     : 'Workspaces (' + total + ')';
 }
