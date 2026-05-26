@@ -247,6 +247,22 @@ function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): strin
   return out.join('');
 }
 
+/**
+ * Issue 118: Past-due warning section.
+ * Shows context that grants are still active but will be lost if the
+ * subscription remains unpaid. Only renders for `past-due-expiring` rows.
+ */
+function buildPastDueSection(ws: WorkspaceCredit, status: WorkspaceStatus): string {
+  if (status.kind !== 'past-due-expiring') return '';
+  const out: string[] = [sectionHeaderHtml('Past Due')];
+  out.push(rowHtml('Status', 'Grants remain active', '#34d399'));
+  if (ws.billingPeriodEndAt) {
+    out.push(rowHtml('Grants live until', formatDateDDMMMYY(ws.billingPeriodEndAt)));
+  }
+  out.push(rowHtml('Warning', 'Credits will be lost if unpaid', '#fca5a5'));
+  return out.join('');
+}
+
 function buildMetaSection(ws: WorkspaceCredit): string {
   if (!ws.createdAt && !ws.id) return '';
   const out: string[] = [sectionHeaderHtml('Meta')];
