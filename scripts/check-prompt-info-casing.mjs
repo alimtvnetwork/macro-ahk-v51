@@ -2,7 +2,7 @@
 /**
  * check-prompt-info-casing.mjs
  *
- * Validates that every `standalone-scripts/prompts/*/info.json` uses
+ * Validates that every standalone-scripts/prompts/*/info.json uses
  * strictly PascalCase keys (no camelCase / snake_case leftovers).
  *
  * Exit 0 = all clean.
@@ -48,19 +48,19 @@ async function main() {
     const badKeys = Object.keys(info).filter((k) => !isPascalCase(k));
     if (badKeys.length > 0) {
       console.error(
-        `[FAIL] ${folder.name}/info.json has non-PascalCase keys: ${badKeys.join(", ")}`,
+        "[FAIL] " + folder.name + "/info.json has non-PascalCase keys: " + badKeys.join(", "),
       );
       errors += 1;
     }
   }
 
   if (errors > 0) {
-    console.error(`\n[FAIL] ${errors} prompt info.json file(s) have casing violations.`);
+    console.error("\n[FAIL] " + errors + " prompt info.json file(s) have casing violations.");
     console.error("       All top-level keys must be PascalCase (e.g. Id, Title, CreatedAt).");
     process.exit(1);
   }
 
-  console.log(`[OK] ${folders.length} prompt info.json files are PascalCase-compliant.`);
+  console.log("[OK] " + folders.length + " prompt info.json files are PascalCase-compliant.");
 }
 
 main().catch((err) => {
