@@ -37,6 +37,7 @@ const HOVERCARD_ID = 'marco-ws-hovercard';
 const SEL_WS_ITEM = '.loop-ws-item';
 const SEL_WS_NAME = '.loop-ws-name';
 const LABEL_PAST_DUE_SINCE = 'Past due since';
+const LABEL_STATUS = 'Status';
 const KIND_PAST_DUE_EXPIRING: WorkspaceStatus['kind'] = 'past-due-expiring';
 
 /** Lookup workspace by id from the cached credit state. */
