@@ -68,9 +68,9 @@ function formatError(e: ErrorEntry, i: number): string {
   const project = e.project_id ? ` project=${e.project_id}` : "";
   const cleanedStack = e.stack_trace ? cleanStackTrace(e.stack_trace) : "";
   const stack = cleanedStack ? `\n      Stack: ${cleanedStack}` : "";
-  const ctx = e.context ? `\n      Context: ${e.context}` : "";
+  const contextLine = e.context ? `\n      Context: ${e.context}` : "";
 
-  return `  ${i + 1}. ${ts}  ${code}${file}${script}${project}\n      ${msg}${stack}${ctx}`;
+  return `  ${i + 1}. ${ts}  ${code}${file}${script}${project}\n      ${msg}${stack}${contextLine}`;
 }
 
 function formatLog(l: SessionLog): string {
