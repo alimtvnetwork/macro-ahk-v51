@@ -19,6 +19,11 @@ import {
 import { logSub } from '../logging';
 import { logError } from '../error-utils';
 import { DataAttr } from '../types';
+import {
+  getLoopWsCreditSortMode,
+  setLoopWsCreditSortMode,
+  type CreditSortMode,
+} from '../ws-list-renderer';
 
 // ── Centralized DOM IDs (single source of truth) ──
 const ID_FILTER_MENU_BTN = 'loop-ws-filter-menu-btn';
@@ -32,6 +37,19 @@ const ID_REFILL_SOON_FILTER = 'loop-ws-refill-soon-filter';
 const ID_REFILL_PRIORITY_FILTER = 'loop-ws-refill-priority-filter';
 const ID_COMPACT_TOGGLE = 'loop-ws-compact-toggle';
 const ID_MIN_CREDITS_INPUT = 'loop-ws-min-credits';
+
+// ── Credit-sort mode (v3.30.0) — radio-style rows ──
+const ID_CREDIT_SORT_HIGH = 'loop-ws-credit-sort-high';
+const ID_CREDIT_SORT_LOW = 'loop-ws-credit-sort-low';
+const ID_CREDIT_SORT_PRO_HIGH = 'loop-ws-credit-sort-pro-high';
+const ID_CREDIT_SORT_PRO_LOW = 'loop-ws-credit-sort-pro-low';
+
+const CREDIT_SORT_ROW_IDS: ReadonlyArray<{ id: string; mode: CreditSortMode }> = [
+  { id: ID_CREDIT_SORT_HIGH, mode: 'high' },
+  { id: ID_CREDIT_SORT_LOW, mode: 'low' },
+  { id: ID_CREDIT_SORT_PRO_HIGH, mode: 'pro-high' },
+  { id: ID_CREDIT_SORT_PRO_LOW, mode: 'pro-low' },
+];
 
 export interface WsFilterMenuDeps {
   populateLoopWorkspaceDropdown: () => void;
