@@ -297,6 +297,7 @@ function readFilterState(filter: string): WsFilterState {
     billingOnly: billingEl?.getAttribute(DataAttr.Active) === 'true',
     minCredits: minEl ? parseInt((minEl as HTMLInputElement).value, 10) || 0 : 0,
     expiredWithCredits: viewState().getExpiredWithCredits(),
+    expiring: viewState().getExpiring(),
     refillSoon: viewState().getRefillSoon(),
   };
 }
