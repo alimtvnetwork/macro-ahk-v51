@@ -73,6 +73,31 @@ jobs:
         run: |
           set -euo pipefail
           CANDIDATES=()
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            # Self-heal: a Release was published (possibly out-of-band with no assets).
+            # Skip descriptor lookup entirely and dispatch the canonical build.
+            TAG="${{ github.event.release.tag_name }}"
+            if [[ -z "$TAG" ]]; then
+              echo "::error::release event fired without a tag_name"
+              exit 1
+            fi
+            git fetch origin "refs/tags/${TAG}:refs/tags/${TAG}" 2>/dev/null || true
+            if ! git rev-parse --verify "refs/tags/${TAG}" >/dev/null 2>&1; then
+              echo "::error::release event for ${TAG} — tag not found on remote"
+              exit 1
+            fi
+            TAG_COMMIT=$(git rev-list -n 1 "refs/tags/${TAG}")
+            HEAD_COMMIT=$(git rev-parse HEAD)
+            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+            if [[ "${TAG_COMMIT}" != "${HEAD_COMMIT}" ]]; then
+              echo "source_ref=${HEAD_COMMIT}" >> "$GITHUB_OUTPUT"
+            else
+              echo "source_ref=" >> "$GITHUB_OUTPUT"
+            fi
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "Self-heal: dispatching release.yml for ${TAG}"
+            exit 0
+          fi
           if [[ "${{ github.event_name }}" == "push" ]]; then
             BEFORE="${{ github.event.before }}"
             AFTER="${{ github.sha }}"
@@ -92,6 +117,7 @@ jobs:
               fi
             done <<< "$CHANGED"
           fi
+
 
           if [[ "${#CANDIDATES[@]}" -eq 0 && -f ".gitmap/release/latest.json" ]]; then
             CANDIDATES+=(".gitmap/release/latest.json")
