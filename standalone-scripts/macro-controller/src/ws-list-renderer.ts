@@ -11,6 +11,7 @@ import type {
   WorkspaceCredit,
   HTMLElementWithHandlers,
 } from './types';
+import { WsTierValue, isExpiredTier } from './types/subscription-status';
 import {
   loopCreditState,
   state,
