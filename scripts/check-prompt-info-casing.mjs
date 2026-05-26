@@ -40,8 +40,8 @@ async function main() {
       info = JSON.parse(
         await readFile(join(dir, "info.json"), "utf-8"),
       );
-    } catch {
-      console.error(`[SKIP] ${folder.name}: missing or unreadable info.json`);
+    } catch (e) {
+      console.error("[SKIP] " + folder.name + ": missing or unreadable info.json");
       continue;
     }
 
