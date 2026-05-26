@@ -48,6 +48,7 @@ const STATUS_LABELS: Record<WorkspaceStatusKind, string> = {
   'expired-canceled': 'Expired (Canceled)',
   'expired':         'Expired',
   'about-to-expire': 'About To Expire',
+  'past-due-expiring': 'Past Due',
   'about-to-refill': 'About To Refill',
   'normal':          '',
 };
