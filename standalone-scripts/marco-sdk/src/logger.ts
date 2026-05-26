@@ -60,7 +60,7 @@ export class NamespaceLogger {
      * Log an unexpected/hard error.
      * Always includes stack trace when an Error object is provided.
      */
-    static error(fn: string, msg: string, error?: unknown): void {
+    static error(fn: string, msg: string, error?: CaughtError): void {
         const base = `${PREFIX} [${fn}] ${msg}`;
         if (error !== undefined) {
             console.error(base + " — " + formatError(error));
