@@ -334,6 +334,7 @@ interface WsFilterState {
   expiredWithCredits: boolean;
   expiring: boolean;
   refillSoon: boolean;
+  creditSortMode: CreditSortMode;
 }
 
 /** Read filter state from DOM elements once, outside the loop. */
@@ -350,6 +351,7 @@ function readFilterState(filter: string): WsFilterState {
     expiredWithCredits: viewState().getExpiredWithCredits(),
     expiring: viewState().getExpiring(),
     refillSoon: viewState().getRefillSoon(),
+    creditSortMode: viewState().getCreditSortMode(),
   };
 }
 
@@ -388,6 +390,33 @@ function isExpiringWs(ws: WorkspaceCredit): boolean {
   }
 }
 
+/**
+ * Credit-sort "Pro" qualifier (v3.30.0).
+ *
+ * A workspace is "Pro & expiring" when:
+ *   1. It is NOT on the FREE tier (PRO, LITE, or EXPIRED — i.e. it had a paid
+ *      subscription at some point), AND
+ *   2. It currently classifies into a payment-lifecycle warning state:
+ *      past-due-expiring (about-to-expire) OR expired.
+ *
+ * Healthy / refill-soon / canceled rows are excluded — those are not the
+ * recovery candidates the "Pro" credit-sort filter targets.
+ */
+function isProExpiringWs(ws: WorkspaceCredit): boolean {
+  try {
+    const tier = (ws.tier || WsTierValue.FREE).toUpperCase().trim();
+    if (tier === WsTierValue.FREE) return false;
+    const cfg = getWorkspaceLifecycleConfig();
+    const source = getEffectiveStatus(ws, cfg);
+    const display = classifyFromStatus(source, ws);
+    return display.kind === 'past-due-expiring' || display.kind === 'expired';
+  } catch (e: unknown) {
+    logError('passesFilters.proExpiring',
+      'Failed to classify workspace for pro credit-sort filter', e);
+    return false;
+  }
+}
+
 /** Check text match against workspace name / fullName. */
 function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean {
   if (!filter) return true;
@@ -412,6 +441,8 @@ function passesFilters(ws: WorkspaceCredit, fs: WsFilterState): boolean {
   if (fs.expiredWithCredits && !matchesExpiredWithCreditsFilter(ws)) return false;
   if (fs.expiring && !isExpiringWs(ws)) return false;
   if (fs.refillSoon && !isRefillSoonWs(ws)) return false;
+  if ((fs.creditSortMode === 'pro-high' || fs.creditSortMode === 'pro-low')
+    && !isProExpiringWs(ws)) return false;
   return true;
 }
 
