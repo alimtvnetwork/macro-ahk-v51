@@ -212,10 +212,17 @@ export function getEffectiveStatus(
   const isCanceled = isCanceledStatus(status);
   const isPastDue = isPastDueStatus(status);
   const tierExpired = isExpiredTier(ws.tier);
+  const isFree = isFreeTier(ws.tier);
 
-  if (isCanceled) return resolveCanceledStatus(changedIso, daysSinceChange, grace);
-  if (tierExpired && !isPastDue) return resolveTierExpiredStatus(changedIso, daysSinceChange, grace);
-  if (isPastDue) return resolvePastDueStatus(changedIso, daysSinceChange);
+  // Free-plan workspaces never carry a real paid subscription. Stripe still
+  // reports `canceled` on the downgrade event, but for display purposes a FREE
+  // tier must never surface as Expired/Canceled — skip straight to the
+  // refill/normal branches. (Issue: free-plan expiry suppression.)
+  if (!isFree) {
+    if (isCanceled) return resolveCanceledStatus(changedIso, daysSinceChange, grace);
+    if (tierExpired && !isPastDue) return resolveTierExpiredStatus(changedIso, daysSinceChange, grace);
+    if (isPastDue) return resolvePastDueStatus(changedIso, daysSinceChange);
+  }
 
   const refillStatus = resolveRefillStatus(ws, cfg, nowMs);
   if (refillStatus) return refillStatus;
