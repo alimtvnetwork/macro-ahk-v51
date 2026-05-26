@@ -690,20 +690,40 @@ export async function exportProjectsAsSqliteZip(
 /*  Import                                                             */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/*  Import Options                                                     */
+/* ------------------------------------------------------------------ */
+
+/** Controls how forgiving the importer is when reading legacy bundles. */
+export interface ImportOptions {
+  /** When true, only PascalCase table/column names are accepted.
+   *  Legacy snake_case / lowercase fallbacks are skipped.
+   *  Default false (backward-compatible). */
+  strictPascalCase?: boolean;
+}
+
 /**
  * Column name resolver — supports PascalCase (v3+), legacy snake_case,
  * and the new Uid column (v4+) with fallback to old Id TEXT column.
+ * When strict mode is enabled, only PascalCase names are resolved.
  */
-function col(obj: Record<string, SqlValue>, pascalName: string, snakeName: string): SqlValue {
+function col(
+  obj: Record<string, SqlValue>,
+  pascalName: string,
+  snakeName: string,
+  strict = false,
+): SqlValue {
+  if (strict) return obj[pascalName];
   return obj[pascalName] ?? obj[snakeName];
 }
 
-/** Resolves the runtime UID: prefers Uid column (v4+), falls back to Id column (v3 TEXT PK bundles). */
-function resolveUid(obj: Record<string, unknown>): string {
-  const uid = obj["Uid"] ?? obj["uid"];
+/** Resolves the runtime UID: prefers Uid column (v4+), falls back to Id column (v3 TEXT PK bundles).
+ *  In strict mode only Uid / Id (PascalCase) are consulted; lowercase uid/id fallbacks are skipped. */
+function resolveUid(obj: Record<string, unknown>, strict = false): string {
+  const uid = strict ? obj["Uid"] : (obj["Uid"] ?? obj["uid"]);
   if (uid != null && String(uid) !== "") return String(uid);
   // Fallback for v3 bundles where Id was TEXT PK containing the runtime UUID
-  const id = obj["Id"] ?? obj["id"];
+  const id = strict ? obj["Id"] : (obj["Id"] ?? obj["id"]);
   return String(id ?? "");
 }
 
