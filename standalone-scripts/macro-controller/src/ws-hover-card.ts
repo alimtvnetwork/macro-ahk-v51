@@ -444,6 +444,15 @@ function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string
   return compactRow('Expires', html);
 }
 
+/** Issue 118: compact past-due warning row for the hover card header. */
+function pastDueCompactRow(status: WorkspaceStatus): string {
+  if (status.kind !== 'past-due-expiring') return '';
+  const days = status.daysSince || 0;
+  const html = SPAN_COLOR_OPEN + C_DESTRUCTIVE + ';font-weight:700;">past due ' + formatDayCount(days) + '</span>'
+    + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> — pay to keep credits</span>';
+  return compactRow('Status', html);
+}
+
 function buildPriorityDetailsHtml(
   ws: WorkspaceCredit,
   status: WorkspaceStatus,
