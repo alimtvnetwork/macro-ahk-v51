@@ -203,4 +203,7 @@ function main() {
     process.exit(1);
 }
 
-main();
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
+    main();
+}
+
