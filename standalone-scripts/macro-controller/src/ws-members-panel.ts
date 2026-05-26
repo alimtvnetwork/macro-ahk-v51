@@ -431,6 +431,9 @@ function positionPanel(el: HTMLElement, x: number, y: number): void {
 function render(el: HTMLElement, wsName: string, state: PanelState): void {
   // v3.4.3 (task 11) — 3-section chrome: header + body + footer (Rename-style)
   el.innerHTML = headerHtml(wsName, state) + buildBodyHtml(state) + footerHtml();
+  // v3.30.0 — make the panel draggable by its header.
+  const handle = el.querySelector('[data-marco-drag-handle="1"]') as HTMLElement | null;
+  if (handle) makeDraggable(el, handle);
 }
 
 function findFooter(el: HTMLElement): HTMLElement | null {
