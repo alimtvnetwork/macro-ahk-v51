@@ -56,13 +56,13 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v39/main/scripts/d
 
 ```powershell
 # Pin a version + custom folder name (env-var form, works with `irm | iex`)
-$env:MARCO_DL_VERSION='v3.20.0'; $env:MARCO_DL_FOLDER='marco'; `
+$env:MARCO_DL_VERSION='v3.21.0'; $env:MARCO_DL_FOLDER='marco'; `
   irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v39/main/scripts/download-extension.ps1 | iex
 ```
 
 ```powershell
 # Or run a local clone with explicit flags
-.\scripts\download-extension.ps1 -Version v3.20.0 -FolderName marco-extension
+.\scripts\download-extension.ps1 -Version v3.21.0 -FolderName marco-extension
 ```
 
 After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`.
