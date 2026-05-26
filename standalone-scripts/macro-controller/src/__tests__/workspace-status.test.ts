@@ -197,8 +197,38 @@ describe('applyCanceledCreditOverride', () => {
     expect(ws.available).toBe(165);
   });
 
-  it('shouldApplyCanceledOverride returns true for expired/canceled/fully-expired/about-to-expire only', () => {
-    const ws = makeWs({});
-    expect(shouldApplyCanceledOverride(getEffectiveStatus(ws, CFG, NOW))).toBe(false);
+  it('Issue 117: shouldApplyCanceledOverride no longer fires for past_due', () => {
+    const ws = makeWs({
+      subscriptionStatus: 'past_due',
+      subscriptionStatusChangedAt: '2026-04-16T10:05:11Z',
+      tier: 'EXPIRED',
+      available: 0, rollover: 0, billingAvailable: 0,
+    });
+    const status = getEffectiveStatus(ws, CFG, NOW);
+    expect(status.kind).toBe('about-to-expire');
+    expect(shouldApplyCanceledOverride(status)).toBe(false);
+  });
+
+  it('Issue 117: past_due with live grants keeps credits intact', () => {
+    const ws = makeWs({
+      subscriptionStatus: 'past_due',
+      tier: 'EXPIRED',
+      available: 225, rollover: 200, billingAvailable: 20,
+      billingPeriodEndAt: '2026-05-23T00:00:00Z',
+    });
+    const status = getEffectiveStatus(ws, CFG, NOW);
+    applyCanceledCreditOverride(ws, status);
+    expect(ws.available).toBe(225);
+    expect(ws.rollover).toBe(200);
+    expect(ws.billingAvailable).toBe(20);
+  });
+
+  it('still wipes credits for canceled workspaces', () => {
+    const status = getEffectiveStatus(makeWs({
+      subscriptionStatus: 'canceled',
+      subscriptionStatusChangedAt: '2026-04-20T00:00:00Z',
+      tier: 'EXPIRED',
+    }), CFG, NOW);
+    expect(shouldApplyCanceledOverride(status)).toBe(true);
   });
 });
