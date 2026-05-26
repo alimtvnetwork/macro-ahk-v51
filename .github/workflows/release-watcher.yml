@@ -38,7 +38,13 @@ on:
       - ".gitmap/release/latest.json"
       - ".github/workflows/release.yml"
       - ".github/workflows/release-watcher.yml"
+  # Self-heal path: catch ANY GitHub Release that lands without assets,
+  # regardless of how the tag/release was created (web UI, REST API,
+  # Lovable tooling). See changelog v3.22.0 RCA.
+  release:
+    types: [published, created, edited]
   workflow_dispatch:
+
 
 permissions:
   contents: read
@@ -67,6 +73,31 @@ jobs:
         run: |
           set -euo pipefail
           CANDIDATES=()
+          if [[ "${{ github.event_name }}" == "release" ]]; then
+            # Self-heal: a Release was published (possibly out-of-band with no assets).
+            # Skip descriptor lookup entirely and dispatch the canonical build.
+            TAG="${{ github.event.release.tag_name }}"
+            if [[ -z "$TAG" ]]; then
+              echo "::error::release event fired without a tag_name"
+              exit 1
+            fi
+            git fetch origin "refs/tags/${TAG}:refs/tags/${TAG}" 2>/dev/null || true
+            if ! git rev-parse --verify "refs/tags/${TAG}" >/dev/null 2>&1; then
+              echo "::error::release event for ${TAG} — tag not found on remote"
+              exit 1
+            fi
+            TAG_COMMIT=$(git rev-list -n 1 "refs/tags/${TAG}")
+            HEAD_COMMIT=$(git rev-parse HEAD)
+            echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+            if [[ "${TAG_COMMIT}" != "${HEAD_COMMIT}" ]]; then
+              echo "source_ref=${HEAD_COMMIT}" >> "$GITHUB_OUTPUT"
+            else
+              echo "source_ref=" >> "$GITHUB_OUTPUT"
+            fi
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+            echo "Self-heal: dispatching release.yml for ${TAG}"
+            exit 0
+          fi
           if [[ "${{ github.event_name }}" == "push" ]]; then
             BEFORE="${{ github.event.before }}"
             AFTER="${{ github.sha }}"
@@ -86,6 +117,7 @@ jobs:
               fi
             done <<< "$CHANGED"
           fi
+
 
           if [[ "${#CANDIDATES[@]}" -eq 0 && -f ".gitmap/release/latest.json" ]]; then
             CANDIDATES+=(".gitmap/release/latest.json")
@@ -140,3 +172,52 @@ jobs:
     with:
       version: ${{ needs.resolve-release.outputs.tag }}
       source_ref: ${{ needs.resolve-release.outputs.source_ref }}
+
+  release-asset-guard:
+    name: Verify release page has built assets
+    needs: run-release
+    if: always() && needs.resolve-release.outputs.skip != 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Fail fast if Release page is missing required assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          VER: ${{ needs.resolve-release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          REQUIRED=(
+            "marco-extension-${VER}.zip"
+            "macro-controller-${VER}.zip"
+            "marco-sdk-${VER}.zip"
+            "xpath-${VER}.zip"
+            "payment-banner-hider-${VER}.zip"
+            "lovable-common-${VER}.zip"
+            "lovable-owner-switch-${VER}.zip"
+            "lovable-user-add-${VER}.zip"
+            "lovable-dashboard-${VER}.zip"
+            "install.ps1"
+            "install.sh"
+            "VERSION.txt"
+            "changelog.md"
+            "checksums.txt"
+          )
+          ASSETS=$(gh release view "${VER}" --repo "${REPO}" --json assets --jq '.assets[].name' 2>/dev/null || true)
+          if [[ -z "${ASSETS}" ]]; then
+            echo "::error::Release ${VER} has NO uploaded assets — release.yml never produced or uploaded them."
+            exit 1
+          fi
+          MISSING=0
+          for a in "${REQUIRED[@]}"; do
+            if ! printf '%s\n' "${ASSETS}" | grep -qx "${a}"; then
+              echo "::error::Release ${VER} missing asset: ${a}"
+              MISSING=$((MISSING+1))
+            fi
+          done
+          if [[ "${MISSING}" -gt 0 ]]; then
+            echo "::error::${MISSING} required asset(s) missing on Release ${VER}"
+            exit 1
+          fi
+          echo "✅ Release ${VER} has all required built assets"
