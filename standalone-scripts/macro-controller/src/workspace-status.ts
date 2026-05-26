@@ -4,7 +4,7 @@
  * Spec: spec/22-app-issues/workspace-status-tooltip/01-overview.md (Phase 2)
  *
  * Single source of truth for:
- *   - Effective lifecycle status (canceled / fully-expired / expired / past-due / about-to-refill / normal)
+ *   - Effective lifecycle status (canceled / fully-expired / expired / past-due-expiring / about-to-refill / normal)
  *   - DD MMM YY date formatting
  *   - "Nd ago" / "in Nd" duration formatting
  *   - Canceled-workspace credit override (zeros billing + rollover)
@@ -48,6 +48,7 @@ const STATUS_LABELS: Record<WorkspaceStatusKind, string> = {
   'expired-canceled': 'Expired (Canceled)',
   'expired':         'Expired',
   'about-to-expire': 'About To Expire',
+  'past-due-expiring': 'Past Due',
   'about-to-refill': 'About To Refill',
   'normal':          '',
 };
@@ -232,7 +233,7 @@ export function getEffectiveStatus(
  * Scope (Issue 117): only fires for genuinely dead workspaces.
  *   - expired-canceled, fully-expired, expired — subscription has lapsed.
  *
- * `about-to-expire` (past_due / unpaid) is intentionally EXCLUDED — Stripe
+ * `past-due-expiring` (past_due / unpaid) is intentionally EXCLUDED — Stripe
  * past_due keeps grants alive until their individual `expires_at`, so wiping
  * billing+rollover would discard credits the user can still spend. The
  * billing API's `total_remaining` is the source of truth for spendability.

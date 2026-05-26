@@ -63,6 +63,7 @@ class WsListViewState {
   private static instance: WsListViewState | null = null;
   private isFreeOnly = false;
   private isExpiredWithCredits = false;
+  private isExpiring = false;
   private isRefillSoon = false;
   private isCompactMode: boolean;
   private isRefillPriority: boolean;
@@ -101,6 +102,9 @@ class WsListViewState {
 
   getExpiredWithCredits(): boolean { return this.isExpiredWithCredits; }
   setExpiredWithCredits(val: boolean): void { this.isExpiredWithCredits = val; }
+
+  getExpiring(): boolean { return this.isExpiring; }
+  setExpiring(val: boolean): void { this.isExpiring = val; }
 
   getRefillSoon(): boolean { return this.isRefillSoon; }
   setRefillSoon(val: boolean): void { this.isRefillSoon = val; }
@@ -146,6 +150,16 @@ export const EXPIRED_WITH_CREDITS_MIN = 5;
 /** Get expired-with-credits filter state. */
 export function getLoopWsExpiredWithCredits(): boolean {
   return viewState().getExpiredWithCredits();
+}
+
+/** Get expiring filter state (only show workspaces with display kind = past-due-expiring). */
+export function getLoopWsExpiring(): boolean {
+  return viewState().getExpiring();
+}
+
+/** Set expiring filter state. */
+export function setLoopWsExpiring(val: boolean): void {
+  viewState().setExpiring(val);
 }
 
 /** Get refill-soon filter state (only show workspaces with display kind = refill-soon). */
@@ -267,6 +281,7 @@ interface WsFilterState {
   billingOnly: boolean;
   minCredits: number;
   expiredWithCredits: boolean;
+  expiring: boolean;
   refillSoon: boolean;
 }
 
@@ -282,6 +297,7 @@ function readFilterState(filter: string): WsFilterState {
     billingOnly: billingEl?.getAttribute(DataAttr.Active) === 'true',
     minCredits: minEl ? parseInt((minEl as HTMLInputElement).value, 10) || 0 : 0,
     expiredWithCredits: viewState().getExpiredWithCredits(),
+    expiring: viewState().getExpiring(),
     refillSoon: viewState().getRefillSoon(),
   };
 }
@@ -308,6 +324,19 @@ function isRefillSoonWs(ws: WorkspaceCredit): boolean {
   }
 }
 
+/** Check if a workspace currently classifies as "past-due-expiring" (expiring). */
+function isExpiringWs(ws: WorkspaceCredit): boolean {
+  try {
+    const cfg = getWorkspaceLifecycleConfig();
+    const source = getEffectiveStatus(ws, cfg);
+    const display = classifyFromStatus(source, ws);
+    return display.kind === 'past-due-expiring';
+  } catch (e: unknown) {
+    logError('passesFilters.expiring', 'Failed to classify workspace for expiring filter', e);
+    return false;
+  }
+}
+
 /** Check text match against workspace name / fullName. */
 function matchesTextFilter(ws: WorkspaceCredit, filter: string): boolean {
   if (!filter) return true;
@@ -330,6 +359,7 @@ function passesFilters(ws: WorkspaceCredit, fs: WsFilterState): boolean {
   if (fs.billingOnly && (ws.billingAvailable || 0) <= 0) return false;
   if (fs.minCredits > 0 && (ws.available || 0) < fs.minCredits) return false;
   if (fs.expiredWithCredits && !matchesExpiredWithCreditsFilter(ws)) return false;
+  if (fs.expiring && !isExpiringWs(ws)) return false;
   if (fs.refillSoon && !isRefillSoonWs(ws)) return false;
   return true;
 }
@@ -383,7 +413,7 @@ function wsRowBgStyle(isCurrent: boolean, isSel: boolean): string {
  *
  * Returns empty string for `normal` rows.
  */
-function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit): string {
+export function buildStatusPillHtml(status: WorkspaceStatus, ws: WorkspaceCredit): string {
   const display: WorkspaceDisplayStatus = classifyFromStatus(status, ws);
   if (display.kind === 'normal' || !display.label) return '';
   const style = resolveBadgeStyle(display.tone);
@@ -590,6 +620,19 @@ function filterAndSortWorkspaces(
     survivors.sort(function (a, b) {
       return _expiredRecoveryScore(b.ws) - _expiredRecoveryScore(a.ws);
     });
+  } else if (fs.expiring) {
+    // Issue 118: sort expiring workspaces by urgency (days passed desc),
+    // breaking ties by available credits desc so the most critical rows
+    // surface first.
+    survivors.sort(function (a, b) {
+      const cfg = getWorkspaceLifecycleConfig();
+      const statusA = getEffectiveStatus(a.ws, cfg);
+      const statusB = getEffectiveStatus(b.ws, cfg);
+      const daysA = statusA.daysSince || 0;
+      const daysB = statusB.daysSince || 0;
+      if (daysB !== daysA) return daysB - daysA;
+      return (b.ws.available || 0) - (a.ws.available || 0);
+    });
   } else if (viewState().getRefillPriority() || fs.refillSoon) {
     // v3.16.1 bug fix — When the "Refill-soon" filter is active, ALL surviving rows
     // are refill-soon (often with identical `daysToRefill`, e.g. all "1d"), so the
@@ -607,7 +650,7 @@ function filterAndSortWorkspaces(
 function updateWsCountLabel(count: number, total: number, filter: string): void {
   const countLabel = document.getElementById('loop-ws-count-label');
   if (!countLabel) return;
-  countLabel.textContent = (filter || getLoopWsFreeOnly() || getLoopWsExpiredWithCredits() || getLoopWsRefillSoon() || count !== total)
+  countLabel.textContent = (filter || getLoopWsFreeOnly() || getLoopWsExpiredWithCredits() || getLoopWsExpiring() || getLoopWsRefillSoon() || count !== total)
     ? 'Workspaces (' + count + '/' + total + ')'
     : 'Workspaces (' + total + ')';
 }
@@ -867,6 +910,7 @@ export function populateLoopWorkspaceDropdown(): void {
     billingEl ? billingEl.getAttribute(DataAttr.Active) : '',
     minCreditsEl ? (minCreditsEl as HTMLInputElement).value : '',
     viewState().getExpiredWithCredits() ? 1 : 0,
+    viewState().getExpiring() ? 1 : 0,
     viewState().getRefillPriority() ? 1 : 0,
     checkedCount,
   ].join('|');

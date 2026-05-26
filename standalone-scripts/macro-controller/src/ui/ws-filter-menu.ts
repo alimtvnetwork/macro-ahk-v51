@@ -27,6 +27,7 @@ const ID_FREE_FILTER = 'loop-ws-free-filter';
 const ID_ROLLOVER_FILTER = 'loop-ws-rollover-filter';
 const ID_BILLING_FILTER = 'loop-ws-billing-filter';
 const ID_EXPIRED_CREDITS_FILTER = 'loop-ws-expired-credits-filter';
+const ID_EXPIRING_FILTER = 'loop-ws-expiring-filter';
 const ID_REFILL_SOON_FILTER = 'loop-ws-refill-soon-filter';
 const ID_REFILL_PRIORITY_FILTER = 'loop-ws-refill-priority-filter';
 const ID_COMPACT_TOGGLE = 'loop-ws-compact-toggle';
@@ -40,6 +41,8 @@ export interface WsFilterMenuDeps {
   setLoopWsCompactMode: (v: boolean) => void;
   getLoopWsExpiredWithCredits: () => boolean;
   setLoopWsExpiredWithCredits: (v: boolean) => void;
+  getLoopWsExpiring: () => boolean;
+  setLoopWsExpiring: (v: boolean) => void;
   getLoopWsRefillSoon: () => boolean;
   setLoopWsRefillSoon: (v: boolean) => void;
   getLoopWsRefillPriority: () => boolean;
@@ -180,6 +183,12 @@ function buildFilterRowConfigs(deps: WsFilterMenuDeps): FilterRowConfig[] {
       hint: 'available > 5, sorted desc',
       initialActive: deps.getLoopWsExpiredWithCredits(),
       onToggle: function (active: boolean) { deps.setLoopWsExpiredWithCredits(active); },
+    },
+    {
+      id: ID_EXPIRING_FILTER, icon: '⚠️', label: 'Expiring',
+      hint: 'past-due only, sorted by urgency',
+      initialActive: deps.getLoopWsExpiring(),
+      onToggle: function (active: boolean) { deps.setLoopWsExpiring(active); },
     },
     {
       id: ID_REFILL_SOON_FILTER, icon: '🔁', label: 'Refill soon',

@@ -224,6 +224,7 @@ function expiryLabelFor(kind: WorkspaceStatus['kind']): string {
   if (kind === 'expired-canceled') return 'Canceled on';
   if (kind === 'fully-expired') return 'Fully expired since';
   if (kind === 'about-to-expire') return 'Past due since';
+  if (kind === 'past-due-expiring') return 'Past due since';
   if (kind === 'expired') return 'Expired since';
   return 'Since';
 }
@@ -234,7 +235,8 @@ function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): strin
   if (status.sinceIso) {
     const date = formatDateDDMMMYY(status.sinceIso);
     const dur = formatDayCount(status.daysSince);
-    const color = status.kind === 'about-to-expire' ? '#fde68a' : '#fca5a5';
+    let color = '#fca5a5';
+    if (status.kind === 'about-to-expire' || status.kind === 'past-due-expiring') color = '#fde68a';
     out.push(rowHtml(expiryLabelFor(status.kind), date + ' (' + dur + ')', color));
   } else {
     out.push(rowHtml('Status', escHtml(status.label), '#fca5a5'));
@@ -242,6 +244,22 @@ function buildExpirySection(ws: WorkspaceCredit, status: WorkspaceStatus): strin
   if (ws.billingPeriodEndAt) {
     out.push(rowHtml('Billing period ends', formatDateDDMMMYY(ws.billingPeriodEndAt)));
   }
+  return out.join('');
+}
+
+/**
+ * Issue 118: Past-due warning section.
+ * Shows context that grants are still active but will be lost if the
+ * subscription remains unpaid. Only renders for `past-due-expiring` rows.
+ */
+function buildPastDueSection(ws: WorkspaceCredit, status: WorkspaceStatus): string {
+  if (status.kind !== 'past-due-expiring') return '';
+  const out: string[] = [sectionHeaderHtml('Past Due')];
+  out.push(rowHtml('Status', 'Grants remain active', '#34d399'));
+  if (ws.billingPeriodEndAt) {
+    out.push(rowHtml('Grants live until', formatDateDDMMMYY(ws.billingPeriodEndAt)));
+  }
+  out.push(rowHtml('Warning', 'Credits will be lost if unpaid', '#fca5a5'));
   return out.join('');
 }
 
@@ -426,6 +444,15 @@ function expiresCompactRow(ws: WorkspaceCredit, status: WorkspaceStatus): string
   return compactRow('Expires', html);
 }
 
+/** Issue 118: compact past-due warning row for the hover card header. */
+function pastDueCompactRow(status: WorkspaceStatus): string {
+  if (status.kind !== 'past-due-expiring') return '';
+  const days = status.daysSince || 0;
+  const html = SPAN_COLOR_OPEN + C_DESTRUCTIVE + ';font-weight:700;">past due ' + formatDayCount(days) + '</span>'
+    + SPAN_COLOR_OPEN + C_MUTED + ';font-weight:400;"> — pay to keep credits</span>';
+  return compactRow('Status', html);
+}
+
 function buildPriorityDetailsHtml(
   ws: WorkspaceCredit,
   status: WorkspaceStatus,
@@ -436,6 +463,7 @@ function buildPriorityDetailsHtml(
     + buildSubscriptionSection(ws)
     + buildRefillSection(ws, status, cfg)
     + buildExpirySection(ws, status)
+    + buildPastDueSection(ws, status)
     + buildMetaSection(ws)
     + buildThresholdsSection(cfg)
     + buildStatusTraceSection(explanation);
@@ -462,7 +490,8 @@ export function buildWorkspaceHoverHtml(
     + '</div>';
   const priority = creditsCompactRow(ws)
     + refillCompactRow(ws, status)
-    + expiresCompactRow(ws, status);
+    + expiresCompactRow(ws, status)
+    + pastDueCompactRow(status);
   return header + priority + buildPriorityDetailsHtml(ws, status, cfg, explanation);
 }
 
