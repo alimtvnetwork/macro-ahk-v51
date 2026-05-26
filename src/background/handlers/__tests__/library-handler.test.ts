@@ -220,6 +220,35 @@ describe("Sync Engine", () => {
     expect(result.syncedCount).toBe(0);
     expect(result.pinnedNotified).toBe(0);
   });
+
+  it("broadcasts LIBRARY_SYNC_BROADCAST with counts after sync", async () => {
+    const sendMessageSpy = vi.fn().mockResolvedValue(undefined);
+    (globalThis as { chrome?: unknown }).chrome = {
+      runtime: { sendMessage: sendMessageSpy },
+    };
+
+    const { assetId } = await handleSaveSharedAsset({
+      asset: { Type: "prompt", Name: "B", Slug: "b", ContentJson: '{"v":1}' },
+    });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 1, LinkState: "synced" } });
+    await handleSaveAssetLink({ link: { SharedAssetId: assetId, ProjectId: 2, LinkState: "pinned", PinnedVersion: "1.0.0" } });
+
+    sendMessageSpy.mockClear();
+    await handleSyncLibraryAsset({ assetId });
+
+    const syncBroadcast = sendMessageSpy.mock.calls.find(
+      (call) => (call[0] as { type?: string })?.type === "LIBRARY_SYNC_BROADCAST",
+    );
+    expect(syncBroadcast).toBeDefined();
+    expect(syncBroadcast![0]).toMatchObject({
+      type: "LIBRARY_SYNC_BROADCAST",
+      assetId,
+      syncedCount: 1,
+      pinnedNotified: 1,
+    });
+
+    delete (globalThis as { chrome?: unknown }).chrome;
+  });
 });
 
 describe("Promote Asset", () => {
