@@ -104,7 +104,7 @@ test("info.json has correct slug and version", () => {
 });
 
 test("instruction.ts exists (required for compile-instruction step)", () => {
-    assertExists("standalone-scripts/lovable-dashboard/instruction.ts", "instruction.ts");
+    assertExists("standalone-scripts/lovable-dashboard/src/instruction.ts", "instruction.ts");
 });
 
 test("lovable-dashboard dist directory structure is prepared", () => {
