@@ -1263,7 +1263,11 @@ export async function exportPromptsAsSqliteZip(): Promise<void> {
 }
 
 /** Shared extractor + strict validator for prompts-only bundles. */
-async function extractPromptsBundle(file: File): Promise<PromptEntry[]> {
+async function extractPromptsBundle(
+  file: File,
+  options?: ImportOptions,
+): Promise<PromptEntry[]> {
+  const strict = options?.strictPascalCase ?? false;
   const arrayBuffer = await file.arrayBuffer();
   const JSZipCtor = await loadJSZip(); const zip = await JSZipCtor.loadAsync(arrayBuffer);
   const dbFile = zip.file(DB_FILENAME);
@@ -1275,15 +1279,18 @@ async function extractPromptsBundle(file: File): Promise<PromptEntry[]> {
     db.close();
     throw new Error(formatValidationError(validation));
   }
-  const prompts = readPrompts(db);
+  const prompts = readPrompts(db, strict);
   db.close();
   if (prompts.length === 0) throw new Error("No prompts found in bundle");
   return prompts;
 }
 
 /** Imports prompts from a SQLite ZIP (replace mode). */
-export async function importPromptsFromSqliteZip(file: File): Promise<{ promptCount: number }> {
-  const prompts = await extractPromptsBundle(file);
+export async function importPromptsFromSqliteZip(
+  file: File,
+  options?: ImportOptions,
+): Promise<{ promptCount: number }> {
+  const prompts = await extractPromptsBundle(file, options);
 
   // Delete existing non-default prompts, then save imported ones
   const existing = await sendMessage<{ prompts?: PromptEntry[] }>({ type: "GET_PROMPTS" });
@@ -1303,8 +1310,11 @@ export async function importPromptsFromSqliteZip(file: File): Promise<{ promptCo
 }
 
 /** Merges prompts from a SQLite ZIP (no deletions). */
-export async function mergePromptsFromSqliteZip(file: File): Promise<{ promptCount: number }> {
-  const prompts = await extractPromptsBundle(file);
+export async function mergePromptsFromSqliteZip(
+  file: File,
+  options?: ImportOptions,
+): Promise<{ promptCount: number }> {
+  const prompts = await extractPromptsBundle(file, options);
   for (const p of prompts) {
     await sendMessage({ type: "SAVE_PROMPT", prompt: p });
   }
