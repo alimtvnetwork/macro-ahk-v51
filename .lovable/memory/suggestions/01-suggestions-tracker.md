@@ -39,8 +39,9 @@ When a suggestion is completed:
 - **source**: Lovable
 - **affectedProject**: Chrome extension (`tests/`) + React UI (`src/`)
 - **description**: Deeper integration tests needed. Target: 900+ tests.
-- **status**: open
+- **status**: done
 - **priority**: Medium
+- **completionNotes**: Target exceeded — 2186 tests passing as of 2026-05-25 (v3.15.0). Vitest suite covers unit, component, and E2E layers.
 
 ### S-055: P Store Backend API Implementation
 - **createdAt**: 2026-04-05
