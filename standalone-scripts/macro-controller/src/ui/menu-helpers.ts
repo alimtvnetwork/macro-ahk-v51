@@ -44,12 +44,25 @@ interface SubmenuCtx {
 }
 
 // CQ16: Extracted from createSubmenu closure
+// Step A4: auto-flip placement — opens right by default, flips left near the
+// right edge; opens down by default, flips up near the bottom edge.
 function showSub(ctx: SubmenuCtx): void {
   if (ctx.hideTimer) { clearTimeout(ctx.hideTimer); ctx.hideTimer = null; }
-  const tRect = ctx.trigger.getBoundingClientRect();
-  ctx.subPanel.style.top = tRect.top + 'px';
-  ctx.subPanel.style.left = tRect.right + 'px';
+  // Make panel measurable without flashing in the wrong spot.
+  ctx.subPanel.style.visibility = 'hidden';
   ctx.subPanel.style.display = 'block';
+  const tRect = ctx.trigger.getBoundingClientRect();
+  const sRect = ctx.subPanel.getBoundingClientRect();
+  const placement = resolveFlyoutPlacement(
+    tRect,
+    { width: sRect.width, height: sRect.height },
+    { innerWidth: window.innerWidth, innerHeight: window.innerHeight },
+  );
+  ctx.subPanel.style.top = placement.top + 'px';
+  ctx.subPanel.style.left = placement.left + 'px';
+  ctx.subPanel.setAttribute('data-marco-placement-h', placement.horizontal);
+  ctx.subPanel.setAttribute('data-marco-placement-v', placement.vertical);
+  ctx.subPanel.style.visibility = 'visible';
 }
 
 // CQ16: Extracted from createSubmenu closure
