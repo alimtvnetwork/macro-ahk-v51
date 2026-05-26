@@ -1725,6 +1725,7 @@ jobs:
       - build-lovable-common
       - build-lovable-owner-switch
       - build-lovable-user-add
+      - build-lovable-dashboard
 
     strategy:
       # Don't short-circuit the other legs when one project fails —
