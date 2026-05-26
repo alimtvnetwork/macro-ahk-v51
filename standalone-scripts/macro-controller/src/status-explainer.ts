@@ -74,8 +74,8 @@ export function explainEffectiveStatus(
   const refillWindow = cfg.refillWarningThresholdDays;
   const dToRefill = refillIso ? daysUntil(refillIso, nowMs) : -1;
 
-  const isCanceled = subStatus === 'canceled' || subStatus === 'cancelled';
-  const isPastDue = subStatus === 'past_due' || subStatus === 'unpaid';
+  const isCanceled = isCanceledStatus(subStatus);
+  const isPastDue = isPastDueStatus(subStatus);
 
   const steps: StatusTraceStep[] = [];
   const finalStatus = getEffectiveStatus(ws, cfg, nowMs);
