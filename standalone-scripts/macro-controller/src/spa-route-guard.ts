@@ -153,6 +153,31 @@ function evaluateRouteChange(source: 'history' | 'popstate'): void {
     } catch (_e: unknown) { // allow-swallow: toast UI may not be mounted at route-change time; loop-stop log above is the authoritative record.
       // Toast UI may not be mounted yet — non-fatal.
     }
+
+    // Re-resolve the workspace name from the REST API for the new project.
+    // Previously the stale workspace name from the prior project lingered in
+    // the panel until the user manually pressed Check or started the loop.
+    // Switching projects in the SPA is exactly the moment we know the
+    // workspace association may have changed — fire a fresh mark-viewed.
+    if (switchedProject && currentProjectId) {
+      triggerWorkspaceRedetect(currentProjectId);
+    }
+  }
+}
+
+/** Clear stale workspace state and run a fresh Tier 1 REST detection. */
+function triggerWorkspaceRedetect(projectId: string): void {
+  try {
+    state.workspaceFromApi = false;
+    state.workspaceName = '';
+    loopCreditState.currentWs = null;
+    const token = resolveToken();
+    log('[SpaRouteGuard] re-detecting workspace for projectId=' + projectId + ' (token=' + (token ? 'present' : 'missing') + ')', 'check');
+    autoDetectLoopCurrentWorkspace(token, { skipDialog: true }).catch(function (e: unknown) {
+      logError('SpaRouteGuard.redetect', String(e));
+    });
+  } catch (caught: unknown) {
+    logError('SpaRouteGuard.triggerWorkspaceRedetect', String(caught));
   }
 }
 
