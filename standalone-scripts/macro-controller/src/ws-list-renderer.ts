@@ -509,8 +509,8 @@ function buildLegacyExpiredBadge(ws: WorkspaceCredit): string {
 
 /** Build the inner HTML for a workspace row. Exported for tests. */
 export function buildTierBadgeHtml(ws: WorkspaceCredit): string {
-  const wsTier = ws.tier || 'FREE';
-  const tierMeta = WS_TIER_LABELS[wsTier] || WS_TIER_LABELS['FREE'];
+  const wsTier = ws.tier || WsTierValue.FREE;
+  const tierMeta = WS_TIER_LABELS[wsTier] || WS_TIER_LABELS[WsTierValue.FREE];
   const cfg = getWorkspaceLifecycleConfig();
   const { pillHtml: statusPillHtml, suppressTier: suppressTierBadge } = resolveStatusPill(ws, cfg);
 
@@ -520,7 +520,7 @@ export function buildTierBadgeHtml(ws: WorkspaceCredit): string {
 
   if (cfg.enableWorkspaceStatusLabels) {
     tierBadge += statusPillHtml;
-  } else if (wsTier === 'EXPIRED') {
+  } else if (isExpiredTier(wsTier)) {
     tierBadge += buildLegacyExpiredBadge(ws);
   }
   if (!cfg.enableWorkspaceStatusLabels) {
