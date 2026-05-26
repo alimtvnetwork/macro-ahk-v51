@@ -490,7 +490,8 @@ export function buildWorkspaceHoverHtml(
     + '</div>';
   const priority = creditsCompactRow(ws)
     + refillCompactRow(ws, status)
-    + expiresCompactRow(ws, status);
+    + expiresCompactRow(ws, status)
+    + pastDueCompactRow(status);
   return header + priority + buildPriorityDetailsHtml(ws, status, cfg, explanation);
 }
 
