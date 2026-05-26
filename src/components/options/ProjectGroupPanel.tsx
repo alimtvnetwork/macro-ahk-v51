@@ -217,7 +217,7 @@ function GroupDetailPanel({ group, onBack, onRefresh }: GroupDetailPanelProps) {
   // so a drag-assign in tab A appears in tab B without manual refresh.
   useEffect(() => {
     const runtime = (typeof chrome !== "undefined" ? chrome.runtime : undefined) as
-      | { onMessage?: { addListener: (fn: (msg: unknown) => void) => void; removeListener: (fn: (msg: unknown) => void) => void } }
+      | { onMessage?: { addListener: (handler: (msg: unknown) => void) => void; removeListener: (handler: (msg: unknown) => void) => void } }
       | undefined;
     if (!runtime?.onMessage) return;
     let timer: ReturnType<typeof setTimeout> | null = null;

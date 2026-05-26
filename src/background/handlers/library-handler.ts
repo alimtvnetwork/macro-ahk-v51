@@ -71,6 +71,32 @@ function broadcastLibraryChanged(): void {
     }
 }
 
+/**
+ * Broadcast a user-visible sync event (Phase 3 sync notifications).
+ * Receivers (other open Options tabs) surface a toast so the user knows
+ * their library state was updated by another tab. Separate from
+ * LIBRARY_CHANGED (data refresh) because we only want a toast on the
+ * narrow "explicit sync" path, not on every CRUD mutation.
+ */
+export interface LibrarySyncBroadcast {
+    type: "LIBRARY_SYNC_BROADCAST";
+    assetId: number;
+    syncedCount: number;
+    pinnedNotified: number;
+}
+
+function broadcastLibrarySynced(payload: Omit<LibrarySyncBroadcast, "type">): void {
+    try {
+        if (typeof chrome === "undefined" || !chrome.runtime?.sendMessage) return;
+        const message: LibrarySyncBroadcast = { type: "LIBRARY_SYNC_BROADCAST", ...payload };
+        chrome.runtime.sendMessage(message).catch((sendErr) => {
+            console.debug("[library] LIBRARY_SYNC_BROADCAST had no receiver:", sendErr);
+        });
+    } catch (broadcastErr) {
+        console.warn("[library] broadcastLibrarySynced failed:", broadcastErr);
+    }
+}
+
 const SQL_LAST_INSERT_ROWID = "SELECT last_insert_rowid()";
 
 /* ------------------------------------------------------------------ */
@@ -334,6 +360,7 @@ export async function handleSyncLibraryAsset(msg: AssetIdMsg): Promise<{ syncedC
     const pinnedNotified = pinnedLinks.length > 0 ? pinnedLinks[0].values.length : 0;
 
     markDirty();
+    broadcastLibrarySynced({ assetId, syncedCount, pinnedNotified });
     return { syncedCount, pinnedNotified };
 }
 

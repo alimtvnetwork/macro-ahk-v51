@@ -36,7 +36,7 @@ export function useErrorCount(pollIntervalMs = 30_000) {
 
     // Real-time listener for ERROR_COUNT_CHANGED broadcasts
     const runtime = (typeof chrome !== "undefined" ? chrome.runtime : undefined) as
-      | { onMessage?: { addListener: (fn: (msg: unknown) => void) => void; removeListener: (fn: (msg: unknown) => void) => void } }
+      | { onMessage?: { addListener: (handler: (msg: unknown) => void) => void; removeListener: (handler: (msg: unknown) => void) => void } }
       | undefined;
 
     const hasChromeRuntime = runtime?.onMessage !== undefined;
