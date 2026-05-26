@@ -692,10 +692,17 @@ export function LibraryView() {
     if (!runtime?.onMessage) return;
     let timer: ReturnType<typeof setTimeout> | null = null;
     const listener = (message: unknown) => {
-      const msg = message as { type?: string } | null;
-      if (msg?.type !== "LIBRARY_CHANGED") return;
-      if (timer) clearTimeout(timer);
-      timer = setTimeout(() => { void loadData(); }, 150);
+      const msg = message as { type?: string; syncedCount?: number; pinnedNotified?: number } | null;
+      if (msg?.type === "LIBRARY_CHANGED") {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => { void loadData(); }, 150);
+        return;
+      }
+      if (msg?.type === "LIBRARY_SYNC_BROADCAST") {
+        const synced = msg.syncedCount ?? 0;
+        const pinned = msg.pinnedNotified ?? 0;
+        toast.info(`Library synced in another tab — ${synced} project(s) updated, ${pinned} pinned notified.`);
+      }
     };
     runtime.onMessage.addListener(listener);
     return () => {
