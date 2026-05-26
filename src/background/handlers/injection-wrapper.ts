@@ -78,6 +78,7 @@ export function wrapWithIsolation(
     configJson: string | null,
     themeJson?: string | null,
     launchSource: InjectionLaunchSource = DEFAULT_LAUNCH_SOURCE,
+    forceReload = false,
 ): string {
     const sdkLine = buildSdkPreamble(script);
     const launchLine = buildLaunchPreamble(launchSource);
@@ -90,7 +91,7 @@ export function wrapWithIsolation(
         ? buildThemePreamble(themeJson)
         : "";
 
-    return buildWrappedCode(script.id, sdkLine, launchLine, configLine, themeLine, script.code);
+    return buildWrappedCode(script.id, sdkLine, launchLine, configLine, themeLine, script.code, forceReload);
 }
 
 /** Builds the full wrapped code string. Uses postMessage for error reporting (MAIN world). */
