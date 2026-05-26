@@ -51,14 +51,54 @@ describe('Issue 116 — Cancel suppresses redundant EXPIRED tier badge', () => {
     expect(html).not.toContain('#7f1d1d');
   });
 
-  it('tier=EXPIRED without cancel (past_due-style) → KEEPS EXPIRED tier badge', () => {
+  it('Issue 117: tier=EXPIRED + past_due empty wallet → suppresses EXPIRED, shows only Expire/Expired pill', () => {
     const ws = makeWs({
       tier: 'EXPIRED',
       subscriptionStatus: 'past_due',
       subscriptionStatusChangedAt: '2026-05-20T00:00:00Z',
     });
     const html = buildTierBadgeHtml(ws);
-    expect(html).toContain('>EXPIRED<');
+    expect(html).not.toContain('>EXPIRED<');
+    expect(html).not.toContain('#7f1d1d');
+    expect(html).toMatch(/marco-ws-status-(expired|expire-soon)/);
+  });
+
+  it('Issue 117: tier=EXPIRED + past_due with live grants → suppresses EXPIRED, shows Refill pill', () => {
+    const ws = makeWs({
+      tier: 'EXPIRED',
+      subscriptionStatus: 'past_due',
+      subscriptionStatusChangedAt: '2026-05-20T00:00:00Z',
+      available: 225, rollover: 200, billingAvailable: 20,
+      billingPeriodEndAt: new Date(Date.now() + 31 * 86_400_000).toISOString(),
+    });
+    const html = buildTierBadgeHtml(ws);
+    expect(html).not.toContain('>EXPIRED<');
+    expect(html).toContain('marco-ws-status-refill-soon');
+    expect(html).toMatch(/>Refill \d+d</);
+  });
+
+  it('Issue 117: tier=EXPIRED with no past_due/cancel still suppresses (collapses to Cancel pill)', () => {
+    // tier === 'EXPIRED' alone (without past_due/cancel status) is treated by
+    // the classifier as the "expired" lifecycle which collapses to display
+    // kind "canceled" — the suppression rule keeps a single muted pill.
+    const ws = makeWs({
+      tier: 'EXPIRED',
+      subscriptionStatus: 'active',
+    });
+    const html = buildTierBadgeHtml(ws);
+    expect(html).not.toContain('>EXPIRED<');
+    expect((html.match(/>Cancel</g) || []).length).toBe(1);
+  });
+
+  it('Issue 117: non-EXPIRED tier with refill-soon → tier badge KEPT (only EXPIRED is ever suppressed)', () => {
+    const ws = makeWs({
+      tier: 'PRO',
+      subscriptionStatus: 'active',
+      nextRefillAt: new Date(Date.now() + 3 * 86_400_000).toISOString(),
+    });
+    const html = buildTierBadgeHtml(ws);
+    expect(html).toContain('>PRO<');
+    expect(html).toContain('marco-ws-status-refill-soon');
   });
 
   it('tier=PRO + canceled (non-EXPIRED tier) → tier badge kept (no suppression regression)', () => {
