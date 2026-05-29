@@ -130,24 +130,26 @@ export async function seedFromManifest(): Promise<SeedResult> {
 
     const scriptResult = await seedScriptsFromManifest(manifest);
     const configResult = await seedConfigsFromManifest(manifest);
+    const projectResult = await seedProjectsFromManifest(manifest);
 
     console.log(
-        "[manifest-seeder] ✅ Seeded %d script(s), %d config(s) across %d project(s). Errors: %d",
+        "[manifest-seeder] ✅ Seeded %d script(s), %d config(s), %d project(s) across %d manifest project(s). Errors: %d",
         scriptResult.seeded,
         configResult.seeded,
+        projectResult.seeded,
         manifest.Projects.length,
-        scriptResult.errors.length + configResult.errors.length,
+        scriptResult.errors.length + configResult.errors.length + projectResult.errors.length,
     );
 
-    if (scriptResult.errors.length > 0 || configResult.errors.length > 0) {
-        logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Seed errors: ${JSON.stringify([...scriptResult.errors, ...configResult.errors])}`);
+    if (scriptResult.errors.length > 0 || configResult.errors.length > 0 || projectResult.errors.length > 0) {
+        logBgWarnError(BgLogTag.MANIFEST_SEEDER, `Seed errors: ${JSON.stringify([...scriptResult.errors, ...configResult.errors, ...projectResult.errors])}`);
     }
 
     return {
         scripts: scriptResult.seeded,
         configs: configResult.seeded,
         projects: manifest.Projects.length,
-        errors: [...scriptResult.errors, ...configResult.errors],
+        errors: [...scriptResult.errors, ...configResult.errors, ...projectResult.errors],
     };
 }
 
