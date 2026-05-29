@@ -67,6 +67,12 @@ export interface WorkspaceDisplayStatus {
   source: WorkspaceStatus;
 }
 
+type PastDueExpiringStatus = WorkspaceStatus & { kind: 'past-due-expiring' };
+
+function isPastDueExpiringStatus(source: WorkspaceStatus): source is PastDueExpiringStatus {
+  return source.kind === 'past-due-expiring';
+}
+
 /* ------------------------------------------------------------------ */
 /*  Display token map — tone names only. Renderer owns the CSS.        */
 /* ------------------------------------------------------------------ */
@@ -146,7 +152,7 @@ export function pickPastDueTone(daysPassed: number): WorkspaceDisplayTone {
  *   < grace days → two-pill amber: "Expire" + "Passed Nd".
  *   ≥ grace days → single red/white pill: "Expired Nd".
  */
-function classifyPastDueExpiring(source: WorkspaceStatus): WorkspaceDisplayStatus {
+function classifyPastDueExpiring(source: PastDueExpiringStatus): WorkspaceDisplayStatus {
   const daysPassed = source.daysSince;
   if (clampDays(daysPassed) >= PAST_DUE_GRACE_DAYS) {
     return {
@@ -194,7 +200,7 @@ export function classifyFromStatus(
     };
   }
 
-  if (source.kind === 'past-due-expiring') {
+  if (isPastDueExpiringStatus(source)) {
     return classifyPastDueExpiring(source);
   }
 
