@@ -1030,6 +1030,12 @@ export function populateLoopWorkspaceDropdown(): void {
     viewState().getExpiredWithCredits() ? 1 : 0,
     viewState().getExpiring() ? 1 : 0,
     viewState().getRefillPriority() ? 1 : 0,
+    // v3.32.1 — these were missing from the hash, so clicking a credit-sort
+    // row or the Refill-soon chip would NOT re-render the list (the dirty
+    // check early-returned). User complaint: "high credit and low credit, the
+    // filter appears later. When I click on it … no filter action immediately."
+    viewState().getRefillSoon() ? 1 : 0,
+    viewState().getCreditSortMode(),
     checkedCount,
   ].join('|');
 
