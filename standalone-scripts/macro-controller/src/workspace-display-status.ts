@@ -140,12 +140,42 @@ export function pickPastDueTone(daysPassed: number): WorkspaceDisplayTone {
 /*  Classifier                                                         */
 /* ------------------------------------------------------------------ */
 
+
+/**
+ * Issue 118 + 119: past-due-expiring.
+ *   < grace days → two-pill amber: "Expire" + "Passed Nd".
+ *   ≥ grace days → single red/white pill: "Expired Nd".
+ */
+function classifyPastDueExpiring(
+  source: Extract<WorkspaceStatus, { kind: 'past-due-expiring' }>,
+): WorkspaceDisplayStatus {
+  const daysPassed = source.daysSince;
+  if (clampDays(daysPassed) >= PAST_DUE_GRACE_DAYS) {
+    return {
+      kind: 'expired-hard',
+      label: formatExpiredLabel(daysPassed),
+      tone: 'danger',
+      tooltip: 'Past due since ' + (source.sinceIso || 'unknown') + ' — grace exhausted',
+      source,
+    };
+  }
+  return {
+    kind: 'past-due-expiring',
+    label: 'Expire',
+    sublabel: formatPassedLabel(daysPassed),
+    tone: pickPastDueTone(daysPassed),
+    tooltip: 'Past due since ' + (source.sinceIso || 'unknown'),
+    source,
+  };
+}
+
 /**
  * Collapse a granular `WorkspaceStatus` into a display row.
  *
  * Pass the same `nowMs` that drove `getEffectiveStatus` to keep day counts
  * consistent across the row.
  */
+
 export function classifyFromStatus(
   source: WorkspaceStatus,
   ws: WorkspaceCredit,
