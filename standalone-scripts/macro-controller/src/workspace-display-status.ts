@@ -28,10 +28,18 @@ import { daysBetween, getEffectiveStatus, type WorkspaceStatus } from './workspa
 export type WorkspaceDisplayKind =
   | 'canceled'
   | 'expired'
+  | 'expired-hard'
   | 'expire-soon'
   | 'past-due-expiring'
   | 'refill-soon'
   | 'normal';
+
+/**
+ * Issue 119: grace period in days after a workspace enters `past-due-expiring`
+ * before the row is considered fully expired and rendered as a single red/white
+ * `expired-hard` pill instead of the two-pill amber `Expire` + `Passed Nd`.
+ */
+export const PAST_DUE_GRACE_DAYS = 10;
 
 /** Abstract tone names. Renderer maps these to CSS. */
 export type WorkspaceDisplayTone =
@@ -66,6 +74,7 @@ export interface WorkspaceDisplayStatus {
 export const WORKSPACE_BADGE_DISPLAY: Record<WorkspaceDisplayKind, { tone: WorkspaceDisplayTone }> = {
   'canceled':           { tone: 'muted' },
   'expired':            { tone: 'danger' },
+  'expired-hard':       { tone: 'danger' },
   'expire-soon':        { tone: 'danger' },
   'past-due-expiring':  { tone: 'warning' },
   'refill-soon':        { tone: 'info' },
@@ -157,9 +166,20 @@ export function classifyFromStatus(
     };
   }
 
-  // Issue 118: past-due-expiring — always Expire + Passed Nd / Today.
+  // Issue 118 + 119: past-due-expiring.
+  //   < grace days → two-pill amber: "Expire" + "Passed Nd".
+  //   ≥ grace days → single red/white pill: "Expired Nd".
   if (source.kind === 'past-due-expiring') {
     const daysPassed = source.daysSince;
+    if (clampDays(daysPassed) >= PAST_DUE_GRACE_DAYS) {
+      return {
+        kind: 'expired-hard',
+        label: formatExpiredLabel(daysPassed),
+        tone: 'danger',
+        tooltip: 'Past due since ' + (source.sinceIso || 'unknown') + ' — grace exhausted',
+        source,
+      };
+    }
     return {
       kind: 'past-due-expiring',
       label: 'Expire',
