@@ -57,6 +57,20 @@ export interface StoredScript {
     updatedAt: string;
 }
 
+/**
+ * URL match rule with the original `MatchType` preserved.
+ *
+ * `glob`  — wildcard pattern (Chrome match-pattern style, e.g. `https://*.example.com/*`)
+ * `exact` — strict string equality on the full href
+ * `regex` — JavaScript `RegExp` source, evaluated against the full href
+ *
+ * Mirrors `standalone-scripts/types/instruction/seed/target-url.ts`.
+ */
+export interface UrlRule {
+    pattern: string;
+    matchType: "glob" | "exact" | "regex";
+}
+
 /** A stored JSON config record. */
 export interface StoredConfig {
     id: string;
