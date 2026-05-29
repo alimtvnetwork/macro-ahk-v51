@@ -1,5 +1,5 @@
 ---
-name: readme.txt strict prohibitions (SP-1..SP-7)
+name: readme.txt strict prohibitions (SP-1..SP-9)
 description: Sequenced hard ban on programmatic writes, time/clock/timestamp, date utilities, git/build update stamps, and format prompts for readme.txt; honor only explicit one-shot user writes
 type: constraint
 ---
