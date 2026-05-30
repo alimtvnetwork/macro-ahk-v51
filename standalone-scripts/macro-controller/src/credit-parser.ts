@@ -381,6 +381,28 @@ export async function applyProZeroEnrichment(): Promise<number> {
   return mutated;
 }
 
+/**
+ * Overlay cached /credit-balance values onto pro_1 rows, then re-aggregate
+ * totals + indices so downstream consumers reflect authoritative numbers.
+ * Mirrors applyProZeroEnrichment.
+ *
+ * Spec: spec/22-app-issues/122a-credit-balance-throttle-and-persistence.md
+ */
+export async function applyProOneEnrichment(): Promise<number> {
+  const perWs = loopCreditState.perWorkspace || [];
+  if (perWs.length === 0) return 0;
+  const mutated = await enrichProOneWorkspaces(perWs);
+  if (mutated === 0) return 0;
+
+  applyLifecycleOverrides(perWs);
+  aggregateCreditTotals(perWs);
+  matchCurrentWorkspace(perWs);
+  buildWsByIdIndex(perWs);
+  log('[ProOne] Enriched ' + mutated + ' workspace(s) — re-aggregated totals', 'success');
+  return mutated;
+}
+
+
 // ============================================
 // syncCreditStateFromApi — sync loop state from API data
 // ============================================
