@@ -70,23 +70,35 @@ async function runScriptsFromShortcut(forceReload: boolean): Promise<void> {
     const t0 = performance.now();
 
     try {
-        const activeTabId = await getActiveTabId();
+        const tab = await getActiveTab();
 
-        if (activeTabId === null) {
-            logBgWarnError(BgLogTag.SHORTCUT, "No active tab found — aborting");
+        if (tab === null || typeof tab.id !== "number") {
+            logBgWarnError(BgLogTag.SHORTCUT, "Aborting: no active tab found (reason=no-active-tab)");
             return;
         }
 
-        console.log("[Marco] Shortcut: active tab=%d, fetching project scripts...%s", activeTabId, forceReload ? " (FORCE RUN)" : "");
+        const activeTabId = tab.id;
+        const tabUrl = tab.url ?? "";
 
-        const scripts = await getActiveProjectScripts();
+        if (isNewTabOrBlankUrl(tabUrl)) {
+            logBgWarnError(BgLogTag.SHORTCUT, `Aborting: active tab is a new-tab/blank page (tabId=${activeTabId}, url='${tabUrl}', reason=new-tab-blank-url)`);
+            return;
+        }
+
+        console.log("[Marco] Shortcut: active tab=%d url='%s', fetching project scripts...%s", activeTabId, tabUrl, forceReload ? " (FORCE RUN)" : "");
+
+        const { scripts, source, projectLabel } = await resolveScriptsForShortcut(tabUrl);
 
         if (scripts.length === 0) {
-            logBgWarnError(BgLogTag.SHORTCUT, "No scripts in active project — aborting");
+            logBgWarnError(
+                BgLogTag.SHORTCUT,
+                `Aborting: no scripts to inject (tabId=${activeTabId}, url='${tabUrl}', project=${projectLabel}, source=${source}, reason=empty-script-set). ` +
+                `Hint: open the popup to confirm an active project is set and has enabled scripts, or add a URL rule so auto-attach can resolve scripts for this page.`,
+            );
             return;
         }
 
-        console.log("[Marco] Shortcut: injecting %d scripts into tab %d", scripts.length, activeTabId);
+        console.log("[Marco] Shortcut: injecting %d scripts into tab %d (project=%s, source=%s)", scripts.length, activeTabId, projectLabel, source);
 
         const rawResponse = await sendInternalMessage<InjectScriptsResponse>({
             type: MessageType.INJECT_SCRIPTS,
