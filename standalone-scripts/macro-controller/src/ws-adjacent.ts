@@ -17,6 +17,7 @@ import { parseLoopApiResponse } from './credit-fetch';
 import { showToast } from './toast';
 import { CREDIT_API_BASE, loopCreditState, state } from './shared-state';
 import { moveToWorkspace, updateLoopMoveStatus } from './ws-move';
+import { gatedMoveToWorkspace } from './loop-move-gate';
 import { logError } from './error-utils';
 
 function mc() { return MacroController.getInstance(); }
