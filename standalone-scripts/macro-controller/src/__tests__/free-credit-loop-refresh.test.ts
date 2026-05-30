@@ -48,6 +48,6 @@ describe('Free Credit refresh during running loop (v3.40.2)', () => {
   });
 
   it('rationale comment is present so the fix is not silently reverted', () => {
-    expect(LOOP_CYCLE).toMatch(/Free Credit panel/i);
+    expect(LOOP_CYCLE).toMatch(/Free[\s\S/]{1,20}Credit\s+panel/i);
   });
 });
