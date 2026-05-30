@@ -154,18 +154,49 @@ function _placeScriptMarker(): void {
   document.body.appendChild(marker);
 }
 
-function bootstrapPassiveAttach(deps: {
-  runCheck: () => unknown;
-  setLoopInterval: (ms: number) => void;
-  delegateComplete: () => void;
-  updateProjectButtonXPath: (xpath: string) => void;
-  updateProgressXPath: (xpath: string) => void;
-}): void {
+function bootstrapPassiveAttach(deps: Parameters<typeof bootstrap>[0]): void {
   _placeScriptMarker();
   _registerGlobals(deps);
   registerPageWorkspaceResponder();
+  registerPassiveAttachShortcut(deps);
   timingEnd('bootstrap', 'ok', 'Passive attach — no visible UI');
-  log('Startup: passive attach complete — visible panel waits for manual Run script', 'info');
+  log('Startup: passive attach complete — visible panel waits for manual Run script (Ctrl+Alt+H to attach)', 'info');
+}
+
+/**
+ * Register a one-shot Ctrl+Alt+H listener while in passive-attach mode so the
+ * user can promote the panel without going through the extension popup's
+ * "Run script" menu. Idempotent: re-registration is guarded by a window flag.
+ *
+ * Spec: spec/22-app-issues/130-passive-attach-shortcut.md
+ * Root cause of original bug: keyboard handlers were only registered inside
+ * `createUI()`, so until the panel existed there was nothing listening for
+ * Ctrl+Alt+H — the documented "attach" shortcut silently no-op'd.
+ */
+function registerPassiveAttachShortcut(deps: Parameters<typeof bootstrap>[0]): void {
+  const w = window as unknown as { __MARCO_PASSIVE_SHORTCUT__?: boolean };
+  if (w.__MARCO_PASSIVE_SHORTCUT__) return;
+  w.__MARCO_PASSIVE_SHORTCUT__ = true;
+
+  const handler = function (e: KeyboardEvent): void {
+    if (!e.ctrlKey || !e.altKey || e.shiftKey) return;
+    if (e.key.toLowerCase() !== 'h') return;
+    // Bail out if the full panel is already up — let the in-panel handler run.
+    if (document.getElementById(IDS.CONTAINER)) return;
+    e.preventDefault();
+    document.removeEventListener('keydown', handler, true);
+    w.__MARCO_PASSIVE_SHORTCUT__ = false;
+    log('Ctrl+Alt+H pressed in passive mode → promoting to full bootstrap', 'info');
+    try {
+      const marker = document.getElementById(IDS.SCRIPT_MARKER);
+      if (marker) marker.remove();
+      window.__MARCO_LAUNCH_SOURCE__ = 'manual';
+      bootstrap(deps);
+    } catch (err: unknown) {
+      logError('passive-attach-shortcut', 'Promotion failed', err);
+    }
+  };
+  document.addEventListener('keydown', handler, true);
 }
 
 /** Registers window globals + namespace dual-write (Issue 79 Phase 9A). */
