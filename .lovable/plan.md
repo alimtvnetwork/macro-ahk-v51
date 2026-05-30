@@ -1,6 +1,20 @@
 # Plan
 
-**Active workstream:** None — all queued workstreams complete as of v3.24.0.
+**Active workstream:** **Issue 129** — Prompts cache UX + Plan Task button + GitSync detection + Remix navigation. Spec: `spec/22-app-issues/129-prompts-cache-plan-task-gitsync-remix.md`. 10 sequential steps; one per `next`.
+
+### Issue 129 — remaining steps
+1. Spec authoring & plan.md sync (this entry) — DONE on planning land.
+2. Prompts cache snapshot guarantees Plan/Task-Next buttons render synchronously from HtmlCopy (zero load state).
+3. Diagnose & fix Plan Task button no-op (compare to working Task Next handler).
+4. New `gitsync/progress-probe.ts` module — `probeProgress` + `resolveConnection` (single-deadline poll, no retry).
+5. Wire progress-probe into right-click "Open GitHub Repo" menu (connected / connect / syncing states).
+6. `ensureGithubRepo` helper — probe FIRST, POST `/sync` only when not connected, persist `repo_url`.
+7. Remix flow — capture new project URL + persist new project_id into per-tab workspace cache.
+8. Remix flow — navigate active tab to new project URL (respect `isNewTabOrBlankUrl` guard).
+9. Remix flow — invalidate per-tab injection sentinel on project_id transition so auto-injector re-fires.
+10. MINOR version bump + changelog + readme + vitest/tsc/check-version-sync all green.
+
+
 
 **Recently shipped:** **v3.24.0 — Issue 117 (App): `pro_0` `past_due` workspaces showed Expired/0-credits** (2026-05-26). RCA + fix in `workspace-status.ts` (override no longer fires for `about-to-expire`; `past_due` with live grants reroutes to `about-to-refill`) + `ws-list-renderer.ts` (EXPIRED tier badge suppressed whenever any non-normal status pill renders). Tests: 35 new across `workspace-status.test.ts`, `ws-tier-badge-cancel-suppression.test.ts`, and new `past-due-credit-pipeline.test.ts` (real-pipeline integration on the exact RCA JSON, two permanent invariants encoded). Spec: `spec/22-app-issues/117-past-due-badge-credit-display-rca.md`.
 **Recently shipped:** **v3.21.0 — Lovable Dashboard standalone script** (2026-05-25).
