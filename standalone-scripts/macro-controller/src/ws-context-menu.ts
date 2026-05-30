@@ -170,7 +170,7 @@ export function showWsContextMenu(
         showToast('💰 Credit refresh throttled for "' + wsName + '"', 'info');
       })
       .catch(function (err: unknown) {
-        logError('Credit Refresh: fetchAndPersist rejected for workspaceId=' + wsId, err);
+        logError('Credit Refresh', 'fetchAndPersist rejected for workspaceId=' + wsId, err);
         showToast('💰 Credit refresh error for "' + wsName + '"', 'error');
       });
   }));

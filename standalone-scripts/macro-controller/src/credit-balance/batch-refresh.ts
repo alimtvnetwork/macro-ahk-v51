@@ -109,8 +109,11 @@ export async function batchRefreshProOneCreditBalances(
         } catch (err: unknown) {
             failed += 1;
             results.push({ workspaceId: ws.workspaceId, outcome: 'failed' });
-            logError('CreditBalance.batchRefresh: fetchAndPersist threw for workspaceId='
-                + ws.workspaceId, err);
+            logError(
+                'CreditBalance.batchRefresh',
+                'fetchAndPersist threw for workspaceId=' + ws.workspaceId,
+                err,
+            );
         }
     }
 
