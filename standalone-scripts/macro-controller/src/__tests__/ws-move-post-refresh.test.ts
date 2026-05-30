@@ -45,7 +45,9 @@ vi.mock('../credit-balance', () => ({
     clearResolvedWorkspace: vi.fn(),
 }));
 
-const fetchAndPersistSpy = vi.fn(async () => undefined);
+const { fetchAndPersistSpy } = vi.hoisted(() => ({
+    fetchAndPersistSpy: vi.fn(async () => undefined),
+}));
 vi.mock('../credit-balance/fetcher', () => ({
     fetchAndPersist: fetchAndPersistSpy,
 }));
