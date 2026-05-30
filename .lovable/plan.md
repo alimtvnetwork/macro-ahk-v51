@@ -60,7 +60,16 @@ Trigger: User reports a long-term bug where the Macro Controller toolbar buttons
 ### Completed — Ctrl+Shift+Down shortcut fix (v3.20.0) ✅
 Fixed in v3.20.0: keyboard shortcut and context-menu "Run scripts now" now always send `forceReload: true`, matching the popup Run button. Double-injection guard on forced manual launch splices script id out of body marker before dedup check.
 
-### Completed — Issue 126: Ctrl+Shift+Down script attach regression (v3.38.0) ✅
+### Completed — Issue 125: Dashboard Summary Bar, Auth Relocation & Expire Badge Color Fix (v3.38.0) ✅
+Spec: `spec/22-app-issues/125-dashboard-summary-and-auth-relocation.md`
+- [x] Step 1 — Spec.
+- [x] Step 2 — `summary-bar/` module (`compute-summary.ts`, `types.ts`, `component.ts`, `index.ts`) + `compute-summary.test.ts`.
+- [x] Step 3 — Panel wiring + Auth Diagnostics relocation into `Tools & Logs` accordion, collapsed by default. `panel.integration.test.ts`.
+- [x] Step 4 — Filter-reactive subscription via `visible-workspaces-store.ts` pub/sub.
+- [x] Step 5 — Expire badge tone fix (`expire-soon` → amber, `canceled` → muted gray, `expire` → red-orange). `classifier-tone.test.ts`.
+- [x] Rolled into v3.38.0 bump + changelog.
+
+
 Spec: `spec/22-app-issues/126-ctrl-shift-down-script-attach-shortcut.md`
 - [x] Regression fix — `runScriptsFromShortcut` now reads tab URL, applies the `isNewTabOrBlankUrl` guard, resolves scripts via `resolveScriptsForShortcut`, and always force-reloads (popup Run parity).
 - [x] Diagnostics — empty-set abort now logs `tabId`, `url`, `project="name" (id=…)`, `source`, `reason`, and a URL auto-attach candidate list so the silent-abort regression cannot recur.
