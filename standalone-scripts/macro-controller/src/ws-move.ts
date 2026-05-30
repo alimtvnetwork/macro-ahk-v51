@@ -19,6 +19,7 @@ import { extractProjectIdFromUrl } from './workspace-detection';
 import { showToast } from './toast';
 import { CREDIT_API_BASE, state } from './shared-state';
 import { clearResolvedWorkspace } from './credit-balance';
+import { fetchAndPersist } from './credit-balance/fetcher';
 import { logError } from './error-utils';
 
 import { Label } from './types';
