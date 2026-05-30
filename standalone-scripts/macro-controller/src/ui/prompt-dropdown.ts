@@ -400,6 +400,17 @@ function _appendFilteredItems(
 function _persistSnapshot(container: HTMLElement, entries: LoaderPromptEntry[], dataHash: string, categoryFilter: string | null): void {
   const snapshotHtml = container.innerHTML;
 
+  // Update the in-memory mirror immediately so subsequent renders paint sync
+  // (Issue 129 Step 2). IDB writes below remain best-effort and async.
+  _memSnapshot = {
+    html: snapshotHtml,
+    dataHash: dataHash,
+    categoryFilter: categoryFilter,
+    promptCount: entries.length,
+    scrollTop: container.scrollTop,
+  };
+  _memHydrated = true;
+
   writeUISnapshot({
     html: snapshotHtml,
     categoryFilter: categoryFilter,
