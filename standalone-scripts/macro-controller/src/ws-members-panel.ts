@@ -427,7 +427,25 @@ function positionPanel(el: HTMLElement, x: number, y: number): void {
 
 function render(el: HTMLElement, wsName: string, state: PanelState): void {
   // v3.4.3 (task 11) — 3-section chrome: header + body + footer (Rename-style)
-  el.innerHTML = headerHtml(wsName, state) + buildBodyHtml(state) + footerHtml();
+  el.innerHTML = headerHtml(wsName, state) + buildBodyHtml(state) + footerHtml((el as unknown as { _wsId?: string })._wsId || '');
+  
+  // Issue 130: Wire chip input if footer is expanded
+  const footer = findFooter(el);
+  const chipContainer = footer?.querySelector('#marco-chip-input-container');
+  if (chipContainer) {
+    const inviteBtn = footer?.querySelector('#marco-invite-submit') as HTMLButtonElement | null;
+    if (inviteBtn) inviteBtn.disabled = true;
+
+    const chipInput = createChipInput({
+      placeholder: 'Enter emails...',
+      onValidEmailsChange: (emails) => {
+        if (inviteBtn) inviteBtn.disabled = emails.length === 0;
+        (el as any)._marcoValidEmails = emails;
+      }
+    });
+    chipContainer.appendChild(chipInput);
+  }
+
   // v3.30.0 — make the panel draggable by its header.
   const handle = el.querySelector('[data-marco-drag-handle="1"]') as HTMLElement | null;
   if (handle) makeDraggable(el, handle);
@@ -440,11 +458,23 @@ function findFooter(el: HTMLElement): HTMLElement | null {
 function swapFooter(el: HTMLElement, expanded: boolean): void {
   const footer = findFooter(el);
   if (!footer) return;
-  footer.innerHTML = expanded ? footerFormHtml() : footerCollapsedHtml();
+  const wsId = (el as unknown as { _wsId?: string })._wsId || '';
+  footer.innerHTML = expanded ? footerFormHtml(wsId) : footerCollapsedHtml();
   if (expanded) {
-    const emailInput = footer.querySelector('[data-marco-field="invite-email"]') as HTMLInputElement | null;
-    if (emailInput) emailInput.focus();
+    const chipContainer = footer.querySelector('#marco-chip-input-container');
+    const inviteBtn = footer.querySelector('#marco-invite-submit') as HTMLButtonElement | null;
+    if (inviteBtn) inviteBtn.disabled = true;
+
+    const chipInput = createChipInput({
+      placeholder: 'Enter emails...',
+      onValidEmailsChange: (emails) => {
+        if (inviteBtn) inviteBtn.disabled = emails.length === 0;
+        (el as any)._marcoValidEmails = emails;
+      }
+    });
+    if (chipContainer) chipContainer.appendChild(chipInput);
   }
+
 }
 
 // v3.4.3 (task 14) — Member action menu (Promote / Demote / Remove) anchored to ⋯
@@ -582,16 +612,17 @@ function openMemberActionMenu(
 
 // v3.4.3 (task 13) — Submit invite + optimistic insert. Reverts on failure.
 function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLFormElement): void {
-  const emailInput = form.querySelector('[data-marco-field="invite-email"]') as HTMLInputElement | null;
+  const validEmails = (el as any)._marcoValidEmails || [];
   const roleSelect = form.querySelector('[data-marco-field="invite-role"]') as HTMLSelectElement | null;
   const submitBtn = form.querySelector('[data-marco-field="invite-submit"]') as HTMLButtonElement | null;
-  const email = (emailInput?.value || '').trim();
   const roleRaw = (roleSelect?.value || 'member').toLowerCase();
   const role: 'member' | 'owner' = roleRaw === 'owner' ? 'owner' : 'member';
-  if (!email) {
-    if (emailInput) emailInput.focus();
+  
+  if (validEmails.length === 0) {
+    showToast('⚠️ No valid emails to invite', 'info');
     return;
   }
+
   if (submitBtn) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Sending…';
