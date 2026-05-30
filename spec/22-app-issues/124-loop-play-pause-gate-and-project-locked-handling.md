@@ -54,8 +54,8 @@ After `moveToWorkspace` resolves successfully and the destination URL loads:
 ```
 standalone-scripts/macro-controller/src/
   loop-run-state/
-    index.ts            # public API: waitForPlayReady(), pressPlay(), pressPause(), isPlayVisible()
-    selectors.ts        # PLAY_BUTTON_XPATH, PAUSE_BUTTON_XPATH, LOCKED_BANNER_XPATH (see §5)
+    index.ts            # public API: isStopVisible(), isRunIdle(), waitForRunIdle(), pressRun()
+    selectors.ts        # SEND_OR_STOP_BUTTON_XPATH, STOP_ICON_XPATH, LOCKED_BANNER_XPATH (see §5)
     poll.ts             # pollUntil helper (re-export from existing poll-util)
   project-lock/
     detector.ts         # detectProjectLocked(response, dom) → ProjectLockEvent | null
@@ -65,27 +65,28 @@ standalone-scripts/macro-controller/src/
 
 ## 4. Wiring
 
-- `ws-adjacent.ts → moveToAdjacentWorkspace()`: gate via `waitForPlayReady()` BEFORE calling `moveToWorkspace`.
-- `ws-move.ts → moveToWorkspace()` (existing): after the existing post-move `fetchAndPersist` credit refresh, call `pressPlay()`.
-- `ws-move.ts → executeMove() / executeSwitchContext()`: on error path, run `detectProjectLocked` and `project-lock.store.persist()` if a lock is detected; then click Pause + re-enter the gate.
+- `ws-adjacent.ts → moveToAdjacentWorkspace()`: gate via `waitForRunIdle()` BEFORE calling `moveToWorkspace`.
+- `ws-move.ts → moveToWorkspace()` (existing): after post-move `fetchAndPersist` credit refresh, call `pressRun()`.
+- `ws-move.ts → executeMove() / executeSwitchContext()`: on error path, run `detectProjectLocked` + `project-lock.store.persist()`; then re-enter the gate.
 
-## 5. Selectors (BLOCKED — pending user input)
+## 5. Selectors (provided)
 
-These three XPaths are required from the user. Until provided, the modules MUST throw `Error('LoopRunState selectors not configured')` if invoked, and the wiring stays behind a feature flag `Loop.RunStateGate.Enabled = false`:
+| Constant | XPath / Source | Status |
+|----------|----------------|--------|
+| `SEND_OR_STOP_BUTTON_XPATH` | `/html/body/div[2]/main/div/div[2]/div/div/div/div[1]/div/div[2]/form/div[2]/div/button[3]` | ✅ provided |
+| `STOP_ICON_XPATH` | `/html/body/div[2]/main/div/div[2]/div/div/div/div[1]/div/div[2]/form/div[2]/div/button[3]/span[7]` (presence = run active; SVG path begins `M20.75 17`) | ✅ provided |
+| `SEND_BUTTON_ID` | `#chatinput-send-message-button` (preferred stable hook; XPaths are fallback) | ✅ provided |
+| `LOCKED_BANNER_XPATH` | DOM banner for "project is locked" | ❌ optional — API check is sufficient fallback |
 
-| Constant | Purpose | Provided? |
-|----------|---------|-----------|
-| `PLAY_BUTTON_XPATH` | The Play button visible when a run is idle/paused | ❌ pending |
-| `PAUSE_BUTTON_XPATH` | The Pause button visible during an active run | ❌ pending |
-| `LOCKED_BANNER_XPATH` | DOM banner shown when the project is locked | ❌ pending (optional — API check sufficient as fallback) |
+Detection rule: `isRunActive = exists(STOP_ICON_XPATH) && svg-path-d starts with "M20.75 17"`. `isRunIdle = !isRunActive`.
 
 ## 6. Tests (ship with feature)
 
-- `loop-run-state/__tests__/play-gate.test.ts` — `waitForPlayReady` resolves immediately when Play visible; polls + resolves when Play appears mid-wait; rejects on timeout.
-- `loop-run-state/__tests__/press-play.test.ts` — `pressPlay` clicks once; no-op + log when button missing; no retry.
-- `project-lock/__tests__/detector.test.ts` — recognises HTTP 423, body `project_locked`, body `"project is locked"`, DOM banner; returns null otherwise.
+- `loop-run-state/__tests__/run-state.test.ts` — `isStopVisible` true when STOP svg present; false when send-arrow svg present; `waitForRunIdle` resolves immediately when idle, polls until STOP disappears, rejects on timeout.
+- `loop-run-state/__tests__/press-run.test.ts` — `pressRun` clicks once when idle; no-op + log when STOP visible; no retry.
+- `project-lock/__tests__/detector.test.ts` — recognises HTTP 423, body `project_locked`, body `"project is locked"`, optional DOM banner; returns null otherwise.
 - `project-lock/__tests__/store.test.ts` — persist + list ordering; idempotent on duplicate event within 1s.
-- `ws-adjacent.integration.test.ts` — move-down with active run blocks → polls → moves once Play appears; locked response is persisted and triggers Pause + re-wait.
+- `ws-adjacent.integration.test.ts` — move-down with STOP visible blocks → polls → moves once STOP disappears; locked response is persisted and triggers re-wait.
 
 ## 7. Acceptance
 
