@@ -163,7 +163,11 @@ function processWorkspacesAndMove(
     'delegate',
   );
 
-  moveToWorkspace(targetId, target.fullName || target.name);
+  // Routed through gatedMoveToWorkspace so the Loop.RunStateGate.Enabled flag
+  // can interpose run-state wait + queue pause/resume (Issue 124). When the
+  // flag is OFF this is a direct passthrough to moveToWorkspace().
+  gatedMoveToWorkspace(targetId, target.fullName || target.name)
+    .catch((caught: unknown) => logError('processWorkspacesAndMove.gatedMove', 'gated move failed', caught));
   mc().credits.sync();
   mc().updateUI();
 }
