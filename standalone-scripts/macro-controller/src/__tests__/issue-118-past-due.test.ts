@@ -137,13 +137,10 @@ describe('Issue 118 — buildStatusPillHtml', () => {
     const ws = makeWs({ subscriptionStatus: 'past_due', subscriptionStatusChangedAt: new Date(NOW - 3 * 86_400_000).toISOString() });
     const status = getEffectiveStatus(ws, CFG, NOW);
     const html = buildStatusPillHtml(status, ws);
-    const mainMatch = html.match(/marco-ws-status-pill[^>]*background:([^;]+)/);
-    const subMatch = html.match(/marco-ws-status-sublabel[^>]*background:([^;]+)/);
-    expect(mainMatch).toBeTruthy();
-    expect(subMatch).toBeTruthy();
-    const mainAlpha = parseFloat(mainMatch![1].match(/[\d.]+$/)![0]);
-    const subAlpha = parseFloat(subMatch![1].match(/[\d.]+$/)![0]);
-    expect(subAlpha).toBeLessThan(mainAlpha);
+    // Main pill uses danger tone: rgba(127,29,29,0.85)
+    // Sublabel is diluted via diluteBadgeBg(..., 0.35) → rgba(127,29,29,0.30)
+    expect(html).toContain('rgba(127,29,29,0.85)'); // main pill bg
+    expect(html).toContain('rgba(127,29,29,0.30)'); // sublabel bg
   });
 });
 
