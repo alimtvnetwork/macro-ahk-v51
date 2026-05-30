@@ -61,6 +61,7 @@ export function resumeQueue(): QueueClickResult {
     const btn = findButton(QUEUE_PLAY_BUTTON_XPATH, QUEUE_RESUME_ARIA_LABEL);
     if (btn === null) {
         return { clicked: false, reason: 'resume-missing' };
+
     }
     btn.click();
     return { clicked: true, reason: 'ok' };
