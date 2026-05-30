@@ -200,16 +200,34 @@ export interface FilterState {
   low: boolean;
   empty: boolean;
   free: boolean;
+  /** Case-insensitive substring match against workspace name / plan / id (Issue 130). */
+  query: string;
 }
 
-/** Pure: apply active chip filters to the workspace list. */
+function wsMatchesQuery(ws: WorkspaceCredit, q: string): boolean {
+  if (!q) return true;
+  const needle = q.trim().toLowerCase();
+  if (!needle) return true;
+  const hay = (
+    (ws.fullName || '') + ' ' +
+    (ws.name || '') + ' ' +
+    (ws.id || '') + ' ' +
+    (ws.plan || '')
+  ).toLowerCase();
+  return hay.indexOf(needle) !== -1;
+}
+
+/** Pure: apply active chip filters + search query to the workspace list. */
 export function applyFilters(
   workspaces: ReadonlyArray<WorkspaceCredit>,
   filters: FilterState,
 ): ReadonlyArray<WorkspaceCredit> {
-  const anyActive = filters.low || filters.empty || filters.free;
-  if (!anyActive) return workspaces;
+  const anyChipActive = filters.low || filters.empty || filters.free;
+  const hasQuery = (filters.query || '').trim().length > 0;
+  if (!anyChipActive && !hasQuery) return workspaces;
   return workspaces.filter((ws) => {
+    if (hasQuery && !wsMatchesQuery(ws, filters.query)) return false;
+    if (!anyChipActive) return true;
     const rem = Number(ws.available);
     if (filters.low && rem < 100 && rem > 0) return true;
     if (filters.empty && rem <= 0) return true;
