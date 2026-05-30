@@ -31,7 +31,7 @@ import {
   fetchLoopCreditsWithDetect,
 } from './ws-list-renderer';
 import { showWsMembersPanel } from './ws-members-panel';
-import { showWsMembersBulkPanel } from './bulk-members-panel'; // I named it differently in the step, fixing to match plan or consistent naming
+import { showWsMembersBulkPanel } from './ws-members-bulk-panel';
 import { getSelectedWsIds, clearWsSelection } from './selected-workspaces-store';
 import { actionRemixManual, actionRemixNext } from './remix-dropdown';
 import { extractProjectIdFromUrl } from './workspace-detection';
@@ -303,8 +303,7 @@ export function showWsContextMenu(
   menu.appendChild(buildCtxMenuItem(label, function () {
     removeWsContextMenu();
     if (isBulk) {
-        showToast('👥 Bulk members panel arriving in next step...', 'info');
-        // Task 7 will implement showWsMembersBulkPanel
+        showWsMembersBulkPanel(Array.from(selected), x, y);
     } else {
         showWsMembersPanel(wsId, wsName, x, y);
     }

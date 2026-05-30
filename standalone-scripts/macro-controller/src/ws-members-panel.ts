@@ -21,6 +21,7 @@ import { fetchWorkspaceMembers, clearMembersCache, DEFAULT_MEMBERS_PAGE_LIMIT, M
 import { logError } from './error-utils';
 import { formatDateDDMMMYY } from './workspace-status';
 import { inviteMember, removeMember, updateMemberRole } from './ws-members-mutations';
+import { createChipInput } from './ws-members-chip-input';
 import { showToast } from './toast';
 import { onCreditPollTick } from './credit-poll-events';
 import { makeDraggable } from './ui/drag-window';
@@ -328,36 +329,32 @@ function footerCollapsedHtml(): string {
     + '</button>';
 }
 
-function footerFormHtml(): string {
+function footerFormHtml(wsId: string): string {
+  // We'll replace the static HTML with a container for the chip input
   return '<form data-marco-action="add-member-submit" '
     + 'style="display:flex;flex-direction:column;gap:6px;">'
-    +   '<div style="display:flex;gap:4px;">'
-    +     '<input type="email" required name="email" placeholder="user@example.com" '
-    +       'data-marco-field="invite-email" '
-    +       'style="flex:1;min-width:0;padding:3px 6px;border:1px solid ' + cPrimaryLight + ';'
-    +       'border-radius:3px;background:' + cPanelBg + ';color:' + cPanelFg + ';font-size:11px;outline:none;">'
+    +   '<div id="marco-chip-input-container"></div>'
+    +   '<div style="display:flex;gap:4px;justify-content:flex-end;align-items:center;">'
     +     '<select name="role" data-marco-field="invite-role" '
     +       'style="padding:3px 4px;border:1px solid ' + cPrimaryLight + ';border-radius:3px;'
     +       CSS_BG + cPanelBg + ';color:' + cPanelFg + ';font-size:11px;">'
     +       '<option value="member">Member</option>'
     +       '<option value="owner">Owner</option>'
     +     '</select>'
-    +   '</div>'
-    +   '<div style="display:flex;gap:4px;justify-content:flex-end;">'
     +     '<button type="button" data-marco-action="add-member-cancel" '
     +       'style="background:rgba(100,116,139,0.35);color:#e2e8f0;border:1px solid ' + cPanelBorder + ';'
     +       'border-radius:3px;padding:3px 8px;font-size:11px;cursor:pointer;">Cancel</button>'
-    +     '<button type="submit" data-marco-field="invite-submit" '
+    +     '<button type="submit" data-marco-field="invite-submit" id="marco-invite-submit" '
     +       'style="background:rgba(0,122,204,0.4);color:#e0f2fe;border:1px solid ' + cPrimary + ';'
     +       'border-radius:3px;padding:3px 10px;font-size:11px;font-weight:600;cursor:pointer;">Send invite</button>'
     +   '</div>'
     + '</form>';
 }
 
-function footerHtml(expanded = false): string {
+function footerHtml(wsId: string, expanded = false): string {
   return '<div data-marco-section="members-footer" '
     + 'style="padding:6px 10px;border-top:1px solid ' + cPanelBorder + ';background:rgba(0,0,0,0.2);">'
-    + (expanded ? footerFormHtml() : footerCollapsedHtml())
+    + (expanded ? footerFormHtml(wsId) : footerCollapsedHtml())
     + '</div>';
 }
 
