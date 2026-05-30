@@ -16,7 +16,8 @@ import { resolveToken, invalidateSessionBridgeKey, recoverAuthOnce } from './aut
 import { parseLoopApiResponse } from './credit-fetch';
 import { showToast } from './toast';
 import { CREDIT_API_BASE, loopCreditState, state } from './shared-state';
-import { moveToWorkspace, updateLoopMoveStatus } from './ws-move';
+import { updateLoopMoveStatus } from './ws-move';
+import { gatedMoveToWorkspace } from './loop-move-gate';
 import { logError } from './error-utils';
 
 function mc() { return MacroController.getInstance(); }
@@ -162,7 +163,11 @@ function processWorkspacesAndMove(
     'delegate',
   );
 
-  moveToWorkspace(targetId, target.fullName || target.name);
+  // Routed through gatedMoveToWorkspace so the Loop.RunStateGate.Enabled flag
+  // can interpose run-state wait + queue pause/resume (Issue 124). When the
+  // flag is OFF this is a direct passthrough to moveToWorkspace().
+  gatedMoveToWorkspace(targetId, target.fullName || target.name)
+    .catch((caught: unknown) => logError('processWorkspacesAndMove.gatedMove', 'gated move failed', caught));
   mc().credits.sync();
   mc().updateUI();
 }
@@ -294,7 +299,8 @@ export function moveToAdjacentWorkspaceCached(direction: string): void {
   const targetId = String((target.raw && target.raw.id) || target.id || '');
 
   log('API Move (cached fallback) ' + direction.toUpperCase() + ': -> "' + target.fullName + '"', 'delegate');
-  moveToWorkspace(targetId, target.fullName || target.name);
+  gatedMoveToWorkspace(targetId, target.fullName || target.name)
+    .catch((caught: unknown) => logError('moveToAdjacentWorkspaceCached.gatedMove', 'gated move failed', caught));
 }
 
 // ============================================
