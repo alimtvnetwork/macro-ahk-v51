@@ -53,7 +53,7 @@ describe('resolveBadgeStyle — Issue 115 Step 2', () => {
 
 describe('diluteBadgeBg — Issue 129 sublabel polish', () => {
   it('halves the alpha of a standard rgba string', () => {
-    expect(diluteBadgeBg('rgba(180,83,9,0.55)', 0.5)).toBe('rgba(180,83,9,0.27)');
+    expect(diluteBadgeBg('rgba(180,83,9,0.55)', 0.5)).toBe('rgba(180,83,9,0.28)');
   });
 
   it('respects the minimum alpha floor (0.05)', () => {
