@@ -14,6 +14,7 @@
 import { CREDIT_API_BASE } from './shared-state';
 import { log } from './logging';
 import { logError } from './error-utils';
+import { persistRemixNewProject } from './remix/new-project-cache';
 
 interface ProjectsListResponse {
   projects?: Array<{ id?: string; name?: string }>;
