@@ -43,6 +43,7 @@ import {
   invalidateGitsyncCache,
 } from './gitsync-cache';
 import { fetchGitsyncConfig } from './gitsync-api';
+import { fetchAndPersist } from './credit-balance/fetcher';
 
 // ── Centralized DOM IDs / classnames ──
 const ID_CTX_MENU = 'loop-ws-ctx-menu';
@@ -150,6 +151,30 @@ export function showWsContextMenu(
     removeWsContextMenu();
     showWsMembersPanel(wsId, wsName, x, y);
   }));
+
+  // Issue 122a: per-workspace manual Credit Refresh. Bypasses the 10s
+  // per-ws + 5s inter-ws throttle (force=true) and persists to SQLite.
+  menu.appendChild(buildCtxMenuItem('💰 Credit Refresh', function () {
+    removeWsContextMenu();
+    fetchAndPersist(wsId, { force: true, source: 'manual' })
+      .then(function (result) {
+        if (result.outcome === 'fetched') {
+          showToast('💰 Credit refreshed for "' + wsName + '"', 'success');
+          fetchLoopCreditsWithDetect(false);
+          return;
+        }
+        if (result.outcome === 'failed') {
+          showToast('💰 Credit refresh failed for "' + wsName + '" — kept last cached value', 'warn');
+          return;
+        }
+        showToast('💰 Credit refresh throttled for "' + wsName + '"', 'info');
+      })
+      .catch(function (err: unknown) {
+        logError('Credit Refresh: fetchAndPersist rejected for workspaceId=' + wsId, err);
+        showToast('💰 Credit refresh error for "' + wsName + '"', 'error');
+      });
+  }));
+
 
   // Remix entries — only meaningful for the active workspace because the
   // upstream POST requires the *current page's* project_id (URL-derived).

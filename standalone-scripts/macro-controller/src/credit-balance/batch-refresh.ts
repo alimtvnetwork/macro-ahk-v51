@@ -96,7 +96,7 @@ export async function batchRefreshProOneCreditBalances(
         try {
             const result = await fetchAndPersist(ws.workspaceId, {
                 force: false,
-                source: 'panel-credits-button',
+                source: 'batch',
             });
             results.push({ workspaceId: ws.workspaceId, outcome: result.outcome });
             if (result.outcome === 'fetched') {
