@@ -31,6 +31,7 @@ import {
   fetchLoopCreditsWithDetect,
 } from './ws-list-renderer';
 import { showWsMembersPanel } from './ws-members-panel';
+import { getSelectedWsIds, clearWsSelection } from './selected-workspaces-store';
 import { actionRemixManual, actionRemixNext } from './remix-dropdown';
 import { extractProjectIdFromUrl } from './workspace-detection';
 import { getDisplayProjectName } from './logging';
@@ -294,9 +295,18 @@ export function showWsContextMenu(
     removeWsContextMenu();
     showWorkspaceHoverCardPinned(wsId);
   }));
-  menu.appendChild(buildCtxMenuItem('👥 Show Members', function () {
+  const selected = getSelectedWsIds();
+  const isBulk = selected.size >= 2 && selected.has(wsId);
+  const label = isBulk ? '👥 Show Members (' + selected.size + ')' : '👥 Show Members';
+
+  menu.appendChild(buildCtxMenuItem(label, function () {
     removeWsContextMenu();
-    showWsMembersPanel(wsId, wsName, x, y);
+    if (isBulk) {
+        showToast('👥 Bulk members panel arriving in next step...', 'info');
+        // Task 7 will implement showWsMembersBulkPanel
+    } else {
+        showWsMembersPanel(wsId, wsName, x, y);
+    }
   }));
   menu.appendChild(buildCreditRefreshItem(wsId, wsName));
   appendRemixAndGithubItems(menu, wsId);
