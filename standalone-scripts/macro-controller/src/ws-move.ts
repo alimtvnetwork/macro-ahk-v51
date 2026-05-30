@@ -218,10 +218,9 @@ function handleMoveSuccess(targetWorkspaceName: string, label: string): void {
   mc().ui?.populateDropdown();
   mc().updateUI();
   clearDelegationState();
-
-  setTimeout(function () {
-    mc().credits.fetch(false);
-  }, 2000);
+  // Post-move credit refresh is handled by moveToWorkspace's awaited
+  // fetchAndPersist + fetchAsync chain so /credit-balance lands in SQLite
+  // BEFORE the /user/workspaces parse re-runs the pro_0/pro_1 enrichment.
 }
 
 // ============================================
