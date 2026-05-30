@@ -168,7 +168,22 @@ function handleNonAuthError(resp: SdkApiResponse): void {
   });
 }
 
-function schedulePostParseEnrichment(): void {
+/**
+ * Fire-and-forget pro_0 + pro_1 enrichment after a successful /user/workspaces
+ * parse. Each enrichment promise re-aggregates and triggers `mc().updateUI()`
+ * if it mutated any workspace row.
+ *
+ * Exported (v3.40.2) so the loop-cycle's direct fetch path (`processWorkspaceData`)
+ * can run the same enrichment chain. Previously this was only invoked by
+ * `fetchLoopCredits` → `processSuccessData`, so during an actively running
+ * loop the per-workspace `dailyFree` numbers for pro_0/pro_1 plans went stale
+ * (user complaint: "Free Credit section is not updating while the loop runs").
+ *
+ * Sequential fail-fast inside each enrichment — no retries (honors
+ * `mem://constraints/no-retry-policy`). The two enrichments may run in
+ * parallel because they touch disjoint plan tiers (pro_0 vs pro_1).
+ */
+export function schedulePostParseEnrichment(): void {
   // Fire-and-forget — pro_0 + pro_1 rows refresh asynchronously and trigger a UI update.
   applyProZeroEnrichment()
     .then(function (mutated: number): void {
