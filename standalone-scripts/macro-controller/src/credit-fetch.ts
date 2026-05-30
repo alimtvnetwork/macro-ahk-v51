@@ -370,13 +370,21 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
   const data = resp.data as Record<string, unknown>;
   parseLoopApiResponse(data);
   log('Credit API (async): parsed ' + (loopCreditState.perWorkspace || []).length + ' workspaces', 'success');
-  // Pro_0 enrichment runs in the background; awaited here so async callers
-  // (e.g. loop-cycle) see authoritative numbers before continuing.
-  const mutated = await applyProZeroEnrichment().catch(function (err: unknown): number {
+  // Pro_0 enrichment runs in the foreground; awaited so async callers
+  // (e.g. post-move flow in ws-move.ts) see authoritative numbers before
+  // continuing. v3.40.2 — also await pro_1 enrichment so the Free Credit
+  // panel reflects the destination workspace's free-credit numbers
+  // immediately after a move. Sequential fail-fast: each enrichment is
+  // independently wrapped so one failure does not block the other.
+  const proZeroMutated = await applyProZeroEnrichment().catch(function (err: unknown): number {
     logError('credit-fetch-async', 'pro_0 enrichment failed', err);
     return 0;
   });
-  if (mutated > 0) { syncCreditStateFromApi(); mc().updateUI(); }
+  const proOneMutated = await applyProOneEnrichment().catch(function (err: unknown): number {
+    logError('credit-fetch-async', 'pro_1 enrichment failed', err);
+    return 0;
+  });
+  if (proZeroMutated + proOneMutated > 0) { syncCreditStateFromApi(); mc().updateUI(); }
 }
 
 // ============================================
