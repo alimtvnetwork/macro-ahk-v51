@@ -21,7 +21,7 @@ import { nsWrite, nsCallTyped } from './api-namespace';
 import { MacroController } from './core/MacroController';
 
 import { CREDIT_API_BASE, loopCreditState } from './shared-state';
-import { parseLoopApiResponse, syncCreditStateFromApi, applyProZeroEnrichment } from './credit-parser';
+import { parseLoopApiResponse, syncCreditStateFromApi, applyProZeroEnrichment, applyProOneEnrichment } from './credit-parser';
 import { logError } from './error-utils';
 import { ApiPath } from './types';
 
@@ -168,7 +168,7 @@ function handleNonAuthError(resp: SdkApiResponse): void {
 }
 
 function schedulePostParseEnrichment(): void {
-  // Fire-and-forget — pro_0 rows refresh asynchronously and trigger a UI update on completion.
+  // Fire-and-forget — pro_0 + pro_1 rows refresh asynchronously and trigger a UI update.
   applyProZeroEnrichment()
     .then(function (mutated: number): void {
       if (mutated === 0) return;
@@ -177,6 +177,17 @@ function schedulePostParseEnrichment(): void {
     })
     .catch(function (err: unknown): void {
       logError('credit-fetch', 'pro_0 enrichment failed', err);
+    });
+
+  // pro_1 overlay from SQLite /credit-balance cache (122a).
+  applyProOneEnrichment()
+    .then(function (mutated: number): void {
+      if (mutated === 0) return;
+      syncCreditStateFromApi();
+      mc().updateUI();
+    })
+    .catch(function (err: unknown): void {
+      logError('credit-fetch', 'pro_1 enrichment failed', err);
     });
 }
 
