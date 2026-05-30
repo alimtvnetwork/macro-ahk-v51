@@ -22,7 +22,7 @@
 
 import type { WorkspaceCredit } from '../../types/credit-types';
 import type { WorkspaceDisplayKind } from '../../workspace-display-status';
-import { PRO_EXPIRING_KINDS, type DashboardSummary } from './types';
+import { PRO_EXPIRING_KINDS, type DashboardSummary, type SummaryDetails } from './types';
 
 export type DisplayKindResolver = (ws: WorkspaceCredit) => WorkspaceDisplayKind;
 
