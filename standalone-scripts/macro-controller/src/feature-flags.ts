@@ -13,7 +13,9 @@
 export type FeatureFlagName = 'Loop.RunStateGate.Enabled';
 
 const DEFAULTS: Readonly<Record<FeatureFlagName, boolean>> = {
-    'Loop.RunStateGate.Enabled': false,
+    // Enabled in v3.37.0 (Issue 124 §6). Run-state gate + queue pause/resume
+    // now wrap every adjacent move. STOP button is never clicked.
+    'Loop.RunStateGate.Enabled': true,
 };
 
 interface FlagBridge {
