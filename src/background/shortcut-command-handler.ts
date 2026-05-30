@@ -139,7 +139,7 @@ async function getActiveTab(): Promise<chrome.tabs.Tab | null> {
 interface ResolvedShortcutScripts {
     scripts: ScriptEntry[];
     /** Where the scripts came from for diagnostics. */
-    source: "active-project" | "url-auto-attach" | "none";
+    source: "active-project" | "none";
     /** Human-readable project label, e.g. `"My Project" (id=abc)` or `none`. */
     projectLabel: string;
 }
@@ -147,13 +147,9 @@ interface ResolvedShortcutScripts {
 /**
  * Resolves scripts to inject for a manual shortcut press.
  *
- * Precedence (matches popup Run behavior, with auto-attach safety net):
- *   1. Active project's scripts (if non-empty).
- *   2. URL-based auto-attach via `evaluateUrlMatches(tabUrl)` — covers the
- *      "first-press" case where the popup has never been opened so no active
- *      project is set, but the URL clearly matches one or more project rules.
- *
- * Always logs the chosen source + the reason any fallback was used.
+ * Uses the active project's scripts (mirrors popup Run). When unavailable,
+ * also probes URL-based project matches purely for diagnostics so the empty-set
+ * abort can name the missing binding / matched project candidates.
  */
 async function resolveScriptsForShortcut(tabUrl: string): Promise<ResolvedShortcutScripts> {
     const response = await sendInternalMessage<ActiveProjectResponse>({
@@ -172,24 +168,18 @@ async function resolveScriptsForShortcut(tabUrl: string): Promise<ResolvedShortc
         return { scripts: projectScripts, source: "active-project", projectLabel };
     }
 
-    // Fallback: URL-based auto-attach so a fresh install / never-opened popup
-    // still reacts to a manual shortcut press when the page matches a rule.
-    const reason = project
-        ? "active-project-has-no-scripts"
-        : "no-active-project-set";
-    console.log("[Marco] Shortcut: active-project resolution empty (reason=%s, project=%s); trying URL auto-attach for '%s'", reason, projectLabel, tabUrl);
-
-    const matches = await evaluateUrlMatches(tabUrl);
-    const fallbackScripts: ScriptEntry[] = [];
-    for (const m of matches) {
-        for (const b of m.scriptBindings ?? []) {
-            fallbackScripts.push({ path: b.path, id: b.id });
-        }
-    }
-
-    if (fallbackScripts.length > 0) {
-        console.log("[Marco] Shortcut: URL auto-attach resolved %d script binding(s) across %d matched project(s)", fallbackScripts.length, matches.length);
-        return { scripts: fallbackScripts, source: "url-auto-attach", projectLabel };
+    // Diagnostic-only probe: surface what auto-attach would have matched so
+    // the empty-set warn explains *why* nothing ran.
+    const reason = project ? "active-project-has-no-scripts" : "no-active-project-set";
+    try {
+        const matches = await evaluateUrlMatches(tabUrl);
+        const matchedProjectIds = matches.map((m) => m.projectId).filter(Boolean);
+        console.log(
+            "[Marco] Shortcut: active-project resolution empty (reason=%s, project=%s); URL '%s' would auto-attach to %d project(s): [%s]",
+            reason, projectLabel, tabUrl, matchedProjectIds.length, matchedProjectIds.join(", "),
+        );
+    } catch (probeErr) {
+        logCaughtError(BgLogTag.SHORTCUT, "URL auto-attach probe failed", probeErr);
     }
 
     return { scripts: [], source: "none", projectLabel };
