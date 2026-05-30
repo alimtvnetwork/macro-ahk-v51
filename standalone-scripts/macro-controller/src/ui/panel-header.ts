@@ -177,6 +177,8 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
       const nextTitleBarState = getTitleBarDisplayState();
       wsNameEl.style.color = nextTitleBarState.color;
       wsNameEl.style.opacity = nextTitleBarState.opacity;
+      wsNameEl.style.fontSize = nextTitleBarState.fontSize;
+      wsNameEl.style.fontWeight = nextTitleBarState.fontWeight;
       wsNameEl.textContent = nextTitleBarState.text;
       wsNameEl.title = nextTitleBarState.title;
       const ws = getCurrentWorkspaceDisplayName();
@@ -194,6 +196,8 @@ function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
         const fallbackTitleBarState = getTitleBarDisplayState();
         wsNameEl.style.color = fallbackTitleBarState.color;
         wsNameEl.style.opacity = fallbackTitleBarState.opacity;
+        wsNameEl.style.fontSize = fallbackTitleBarState.fontSize;
+        wsNameEl.style.fontWeight = fallbackTitleBarState.fontWeight;
         wsNameEl.textContent = fallbackTitleBarState.text;
         wsNameEl.title = fallbackTitleBarState.title;
       }, 2000);
