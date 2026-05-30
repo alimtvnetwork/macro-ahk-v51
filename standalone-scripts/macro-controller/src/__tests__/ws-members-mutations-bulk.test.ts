@@ -1,11 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { inviteMemberMany, updateMemberRoleMany, removeMemberMany } from '../ws-members-mutations';
 import * as mutations from '../ws-members-mutations';
-
-// Mock inviteMember, updateMemberRole, removeMember as they depend on SDK
-vi.spyOn(mutations, 'inviteMember').mockImplementation(async () => {});
-vi.spyOn(mutations, 'updateMemberRole').mockImplementation(async () => {});
-vi.spyOn(mutations, 'removeMember').mockImplementation(async () => {});
 
 describe('ws-members-mutations bulk', () => {
     const wsIds = ['ws-1', 'ws-2'];
@@ -15,20 +9,26 @@ describe('ws-members-mutations bulk', () => {
     ] as any;
 
     beforeEach(() => {
-        vi.clearAllMocks();
+        // Reset mocks to successful resolved promises by default
+        vi.spyOn(mutations, 'inviteMember').mockResolvedValue(undefined);
+        vi.spyOn(mutations, 'updateMemberRole').mockResolvedValue(undefined);
+        vi.spyOn(mutations, 'removeMember').mockResolvedValue(undefined);
     });
 
     it('should invite multiple emails to multiple workspaces', async () => {
-        const result = await inviteMemberMany(wsIds, ['a@b.com', 'c@d.com'], 'member', workspaces);
+        const result = await mutations.inviteMemberMany(wsIds, ['a@b.com', 'c@d.com'], 'member', workspaces);
         
         expect(result.success).toBe(4); // 2 ws * 2 emails
         expect(mutations.inviteMember).toHaveBeenCalledTimes(4);
     });
 
     it('should track failures in bulk invite', async () => {
-        vi.spyOn(mutations, 'inviteMember').mockRejectedValueOnce(new Error('Rate limit'));
+        // First call fails, second succeeds
+        vi.spyOn(mutations, 'inviteMember')
+            .mockRejectedValueOnce(new Error('Rate limit'))
+            .mockResolvedValueOnce(undefined);
         
-        const result = await inviteMemberMany(wsIds, ['a@b.com'], 'member', workspaces);
+        const result = await mutations.inviteMemberMany(wsIds, ['a@b.com'], 'member', workspaces);
         
         expect(result.success).toBe(1);
         expect(result.fail).toBe(1);
@@ -37,14 +37,14 @@ describe('ws-members-mutations bulk', () => {
     });
 
     it('should update role across workspaces', async () => {
-        const result = await updateMemberRoleMany(wsIds, 'user-123', 'owner', workspaces);
+        const result = await mutations.updateMemberRoleMany(wsIds, 'user-123', 'owner', workspaces);
         expect(result.success).toBe(2);
         expect(mutations.updateMemberRole).toHaveBeenCalledWith('ws-1', 'user-123', 'owner');
         expect(mutations.updateMemberRole).toHaveBeenCalledWith('ws-2', 'user-123', 'owner');
     });
 
     it('should remove member across workspaces', async () => {
-        const result = await removeMemberMany(wsIds, 'user-123', workspaces);
+        const result = await mutations.removeMemberMany(wsIds, 'user-123', workspaces);
         expect(result.success).toBe(2);
         expect(mutations.removeMember).toHaveBeenCalledTimes(2);
     });
