@@ -105,7 +105,9 @@ describe('gatedMoveToWorkspace — flag ON', () => {
     it('returns cleanly when Resume is missing (no retry, no throw)', async () => {
         mountIdleComposer();
         // No queue buttons mounted — pause + resume both missing.
-        await expect(gatedMoveToWorkspace('ws-dest', 'Dest')).resolves.toBeUndefined();
+        await expect(
+            gatedMoveToWorkspace('ws-dest', 'Dest', { resumePollTimeoutMs: 30, resumePollIntervalMs: 5 }),
+        ).resolves.toBeUndefined();
         expect(moveToWorkspace).toHaveBeenCalledTimes(1);
     });
 
