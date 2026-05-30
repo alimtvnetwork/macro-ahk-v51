@@ -19,6 +19,7 @@ import { extractProjectIdFromUrl } from './workspace-detection';
 import { showToast } from './toast';
 import { CREDIT_API_BASE, state } from './shared-state';
 import { clearResolvedWorkspace } from './credit-balance';
+import { fetchAndPersist } from './credit-balance/fetcher';
 import { logError } from './error-utils';
 
 import { Label } from './types';
@@ -452,4 +453,9 @@ export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspace
     log('No project ID in URL — using workspace-access-requests fallback', 'warn');
     await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, false);
   }
+
+  // 122a: force-refresh the destination workspace's credit balance after move
+  // (bypasses 10s throttle; persists to SQLite). Fire-and-forget.
+  fetchAndPersist(targetWorkspaceId, { force: true, source: 'manual' })
+    .catch((caught: unknown) => logError('moveToWorkspace.creditRefresh', 'post-move refresh failed', caught));
 }
