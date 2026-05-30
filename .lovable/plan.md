@@ -65,7 +65,15 @@ Spec: `spec/22-app-issues/126-ctrl-shift-down-script-attach-shortcut.md`
 - [ ] Regression fix — `Ctrl+Shift+Down` must attach/inject the active project's scripts on first press, matching popup/manual Run behavior.
 - [ ] Diagnostics — no silent empty-script abort; log exact project, tab URL, missing binding/auto-attach reason.
 - [ ] Tests — add shortcut attach regression coverage.
-- [ ] Final bump — include this in the final queued v3.38.0 bump after Issue 125 and Issue 126 are complete.
+- [ ] Final bump — include this in the final queued v3.38.0 bump after Issues 125, 126, and 127 are complete.
+
+### Queued — Issue 127: Plan button no-op + Task Next dropdown overflow + missing Plan mode
+Spec: `spec/22-app-issues/127-plan-button-and-task-next-dropdown-overflow.md`
+- [ ] Task 1 — Inspect live DOM, capture exact selectors/XPaths/HTML for Plan button and Task Next menu; finalize spec §3.
+- [ ] Task 2 — Fix Task Next menu position via shared `flipIfClipped()` helper; add 4 position unit tests.
+- [ ] Task 3 — Add `'plan'` to `ModeId`; implement `plan-mode-handler.ts` with two-way sync; unit tests.
+- [ ] Task 4 — jsdom integration test for chat↔plan↔build mode switching (no stale `aria-pressed`).
+- [ ] Task 5 — Roll into final v3.38.0 bump + changelog entries.
 
 ### Completed — Gitsync "Open GitHub repo" fix (v3.19.0) ✅
 Fixed in v3.19.0: rewrote `gitsync-api.ts` to route through `window.marco.api.call("projects.gitsync", …)` SDK path so `Authorization: Bearer` header is always attached.
