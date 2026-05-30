@@ -168,7 +168,22 @@ function handleNonAuthError(resp: SdkApiResponse): void {
   });
 }
 
-function schedulePostParseEnrichment(): void {
+/**
+ * Fire-and-forget pro_0 + pro_1 enrichment after a successful /user/workspaces
+ * parse. Each enrichment promise re-aggregates and triggers `mc().updateUI()`
+ * if it mutated any workspace row.
+ *
+ * Exported (v3.40.2) so the loop-cycle's direct fetch path (`processWorkspaceData`)
+ * can run the same enrichment chain. Previously this was only invoked by
+ * `fetchLoopCredits` → `processSuccessData`, so during an actively running
+ * loop the per-workspace `dailyFree` numbers for pro_0/pro_1 plans went stale
+ * (user complaint: "Free Credit section is not updating while the loop runs").
+ *
+ * Sequential fail-fast inside each enrichment — no retries (honors
+ * `mem://constraints/no-retry-policy`). The two enrichments may run in
+ * parallel because they touch disjoint plan tiers (pro_0 vs pro_1).
+ */
+export function schedulePostParseEnrichment(): void {
   // Fire-and-forget — pro_0 + pro_1 rows refresh asynchronously and trigger a UI update.
   applyProZeroEnrichment()
     .then(function (mutated: number): void {
@@ -355,13 +370,21 @@ async function doFetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
   const data = resp.data as Record<string, unknown>;
   parseLoopApiResponse(data);
   log('Credit API (async): parsed ' + (loopCreditState.perWorkspace || []).length + ' workspaces', 'success');
-  // Pro_0 enrichment runs in the background; awaited here so async callers
-  // (e.g. loop-cycle) see authoritative numbers before continuing.
-  const mutated = await applyProZeroEnrichment().catch(function (err: unknown): number {
+  // Pro_0 enrichment runs in the foreground; awaited so async callers
+  // (e.g. post-move flow in ws-move.ts) see authoritative numbers before
+  // continuing. v3.40.2 — also await pro_1 enrichment so the Free Credit
+  // panel reflects the destination workspace's free-credit numbers
+  // immediately after a move. Sequential fail-fast: each enrichment is
+  // independently wrapped so one failure does not block the other.
+  const proZeroMutated = await applyProZeroEnrichment().catch(function (err: unknown): number {
     logError('credit-fetch-async', 'pro_0 enrichment failed', err);
     return 0;
   });
-  if (mutated > 0) { syncCreditStateFromApi(); mc().updateUI(); }
+  const proOneMutated = await applyProOneEnrichment().catch(function (err: unknown): number {
+    logError('credit-fetch-async', 'pro_1 enrichment failed', err);
+    return 0;
+  });
+  if (proZeroMutated + proOneMutated > 0) { syncCreditStateFromApi(); mc().updateUI(); }
 }
 
 // ============================================

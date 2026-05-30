@@ -15,7 +15,7 @@ import { log, logSub } from './logging';
 import { showToast } from './toast';
 import { resolveToken } from './auth';
 import { getLastTokenSource, invalidateSessionBridgeKey, markBearerTokenExpired, recoverAuthOnce } from './auth';
-import { parseLoopApiResponse, syncCreditStateFromApi } from './credit-fetch';
+import { parseLoopApiResponse, syncCreditStateFromApi, schedulePostParseEnrichment } from './credit-fetch';
 import { MacroController } from './core/MacroController';
 import { isUserTypingInPrompt } from './dom-helpers';
 import { CREDIT_API_BASE, TIMING, loopCreditState, state } from './shared-state';
@@ -194,6 +194,12 @@ async function processWorkspaceData(
 
   syncCreditStateFromApi();
   mc().updateUI();
+  // v3.40.2 — overlay pro_0 + pro_1 /credit-balance enrichments so the Free
+  // Credit panel reflects per-workspace `dailyFree` updates DURING an active
+  // loop, not just on manual fetches. Fire-and-forget; each enrichment
+  // re-aggregates and re-renders the panel on completion. This matches the
+  // chain used by the non-loop `processSuccessData` path in credit-fetch.ts.
+  schedulePostParseEnrichment();
 
   const cws = loopCreditState.currentWs;
   const dailyFree = cws ? (cws.dailyFree || 0) : 0;
