@@ -48,6 +48,8 @@ import {
   registerKeyboardHandlers,
 } from './panel-sections';
 import { startRedockObserver } from './redock-observer';
+import { createSummaryBar } from './summary-bar/component';
+import { nsWrite } from '../api-namespace';
 
 import type { RenameHistoryEntry, UndoRenameResults } from '../types';
 import type { TaskNextDeps } from './task-next-ui';
