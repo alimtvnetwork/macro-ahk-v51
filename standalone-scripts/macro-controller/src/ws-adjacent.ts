@@ -299,7 +299,8 @@ export function moveToAdjacentWorkspaceCached(direction: string): void {
   const targetId = String((target.raw && target.raw.id) || target.id || '');
 
   log('API Move (cached fallback) ' + direction.toUpperCase() + ': -> "' + target.fullName + '"', 'delegate');
-  moveToWorkspace(targetId, target.fullName || target.name);
+  gatedMoveToWorkspace(targetId, target.fullName || target.name)
+    .catch((caught: unknown) => logError('moveToAdjacentWorkspaceCached.gatedMove', 'gated move failed', caught));
 }
 
 // ============================================
