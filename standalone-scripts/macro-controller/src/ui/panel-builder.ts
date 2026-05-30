@@ -154,9 +154,23 @@ export function createUI(deps: PanelBuilderDeps): void {
   const { toolsSection, wsDropSection, jsBody, settingsDeps } = buildToolsMasterSection(deps, btnStyle, taskNextDeps);
 
   // Dashboard Summary Bar — sits below the title row (Issue 125 §2.2).
-  // Live wiring to visibleWorkspaces$ is performed in Task 9.
+  // Subscribed to `visibleWorkspaces` store so any filter / sort change in
+  // the workspace list triggers a single O(n) recompute (Task 9).
   const summaryBar = createSummaryBar();
   nsWrite('_internal.summaryBar', summaryBar);
+  subscribeVisibleWorkspaces(function (rows) {
+    let config: ReturnType<typeof getWorkspaceLifecycleConfig> | null = null;
+    try { config = getWorkspaceLifecycleConfig(); } catch (_e: unknown) { config = null; }
+    const resolver: DisplayKindResolver = function (ws) {
+      if (!config) { return 'normal'; }
+      try {
+        return classifyWorkspaceDisplayStatus(ws, config).kind;
+      } catch (_e: unknown) {
+        return 'normal';
+      }
+    };
+    summaryBar.update(computeDashboardSummary(rows, resolver));
+  });
 
   // Track body elements for minimize/restore. Auth Diagnostics has moved
   // INSIDE Tools & Logs (Issue 125 §2.1) and is no longer a panel-root
