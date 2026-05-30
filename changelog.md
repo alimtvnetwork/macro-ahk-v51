@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.39.0] — 2026-05-30
+
+### Changed
+- Version bump: 3.38.0 → 3.39.0 (all unified-version sites synced: `manifest.json`, `src/shared/constants.ts`, `standalone-scripts/macro-controller/src/shared-state.ts`, and every `standalone-scripts/*/src/instruction.ts`).
+- Added root `version.json` artifact pinning the current unified version for downstream tooling.
+- Pinned v3.39.0 in root `readme.md` version badge.
+
+---
+
 ## [v3.38.0] — 2026-05-30
 
 ### Added
