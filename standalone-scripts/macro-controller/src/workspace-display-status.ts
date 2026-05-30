@@ -173,7 +173,7 @@ function classifyPastDueExpiring(source: PastDueExpiringStatus): WorkspaceDispla
     kind: 'past-due-expiring',
     label: 'Expire',
     sublabel: formatPassedLabel(daysPassed),
-    tone: pickPastDueTone(daysPassed),
+    tone: 'danger',
     tooltip: 'Past due since ' + (source.sinceIso || 'unknown'),
     source,
   };
