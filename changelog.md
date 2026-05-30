@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.37.0] — 2026-05-30
+
+### Added
+- **Issue 124 — Loop Run-State Gate + Queue Pause/Resume across moves.**
+  - New `loop-run-state/` module observes the Lovable composer to decide whether a prompt is currently streaming. `isRunActive()` returns true when the STOP icon (`/…/form/div[2]/div/button[3]/span[7]`, SVG `M20.75 17…`) is present OR when the Submit button (`#chatinput-send-message-button`) is missing from the DOM. `isRunIdle()` is the inverse. `waitForRunIdle({ timeoutMs = 120_000, pollMs = 1000 })` polls until idle or times out — **single-shot, no retry/backoff** per `mem://constraints/no-retry-policy`. **The composer Submit/STOP button is NEVER clicked.**
+  - New `queue-control/` module exposes `pauseQueue()` / `resumeQueue()` / `isQueuePauseVisible()` / `isQueueResumeVisible()` against the only two buttons the gate is allowed to click: `aria-label="Pause queue"` and `aria-label="Resume queue"`. Returns `{ clicked, reason: 'ok' | 'pause-missing' | 'resume-missing' }`.
+  - New `project-lock/` module: `detectProjectLocked({ workspaceId, projectId, status, body, bannerText })` classifies a move response as `api-423`, `api-body-locked`, or `dom-banner` (case-insensitive match for `project_locked` and `project is locked`). `persistProjectLockEvent()` writes to `LoopProjectLockEvent` rows via `marco.kv` with a 1s dedupe window for `(workspace, project, reason)`. `listProjectLockEvents()` returns events ordered by `DetectedAtMs` ascending.
+  - New `loop-move-gate.ts` (`gatedMoveToWorkspace`) wraps every `moveToWorkspace()` call from `ws-adjacent.ts` (both fresh-fetch and cached-fallback paths). When `Loop.RunStateGate.Enabled` is ON: waits for an idle composer (`Waiting for current prompt to finish…` toast on entry; `Prompt still active after 2 min — move cancelled` on timeout), clicks Pause on the source workspace, executes the move, then polls up to 15s for the Resume button on the destination and clicks it once. Resume-missing logs `LoopRun.queueFlip ws=<dest> outcome=resume-missing` and returns — no retry.
+  - New `feature-flags.ts` with `isFeatureFlagEnabled('Loop.RunStateGate.Enabled')` reading `window.marco.featureFlags` with safe in-memory defaults; `setFeatureFlagOverrideForTests()` for unit tests.
+- **Issue 124 — Tests (31 total, all green).**
+  - `loop-run-state/__tests__/run-state.test.ts` (7 tests): STOP svg present → active; submit button absent → active; send-arrow only → idle; detector never clicks Submit (click-spy); `waitForRunIdle` resolves immediately when idle, on submit-button reappearance, and rejects on timeout; STOP/SEND svg path prefixes match the spec.
+  - `queue-control/__tests__/queue-control.test.ts` (6 tests): `pauseQueue` clicks the Pause button when present, returns `pause-missing` when absent; `resumeQueue` symmetric; visibility helpers reflect DOM presence; both functions never click the composer Submit/STOP button (click-spy).
+  - `project-lock/__tests__/detector.test.ts` (7 tests): recognises HTTP 423, body `project_locked`, body `"project is locked"` (case-insensitive), DOM banner text; returns null on success/missing ids; HTTP 423 takes precedence over body matching.
+  - `project-lock/__tests__/store.test.ts` (6 tests): single write, 1s dedupe window on same `(workspace, project, reason)`, second write outside window, separate write when reason differs, list returns events ordered ascending by `DetectedAtMs`, empty kv yields `[]`.
+  - `__tests__/loop-move-gate.test.ts` (5 tests): flag OFF is a clean passthrough to `moveToWorkspace`; flag ON waits for idle → pauses source → moves → resumes destination; **never clicks the composer Submit/STOP button** (click-spy); returns cleanly when Resume is missing (short-timeout override); cancels the move when `waitForRunIdle` rejects.
+
+### Changed
+- **Issue 124 Task 5 — `Loop.RunStateGate.Enabled` flag default flipped to `true`** in `feature-flags.ts`. The gate + queue pause/resume now wraps every adjacent move by default. Override via `window.marco.featureFlags['Loop.RunStateGate.Enabled'] = false` to revert to pre-v3.37.0 behaviour.
+- Version bump: 3.36.0 → 3.37.0 (all version files synced).
+
+---
+
 ## [v3.36.0] — 2026-05-30
 
 ### Added
