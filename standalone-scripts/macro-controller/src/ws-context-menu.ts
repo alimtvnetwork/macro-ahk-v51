@@ -44,6 +44,8 @@ import {
 } from './gitsync-cache';
 import { fetchGitsyncConfig } from './gitsync-api';
 import { fetchAndPersist } from './credit-balance/fetcher';
+import { readCreditBalanceCache } from './credit-balance/store';
+import { showWorkspaceHoverCardPinned } from './ws-hover-card';
 
 // ── Centralized DOM IDs / classnames ──
 const ID_CTX_MENU = 'loop-ws-ctx-menu';
@@ -79,24 +81,48 @@ function buildCtxMenuItem(label: string, onClick: () => void): HTMLElement {
  *
  * Spec: spec/22-app-issues/110-macro-controller-pro-zero-credit-balance.md §10
  */
-function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): string {
+function isProOnePlan(ws: import('./types').WorkspaceCredit): boolean {
+  return String(ws.plan || '').toLowerCase().trim() === 'pro_1';
+}
+
+async function buildCopyJsonPayload(ws: import('./types').WorkspaceCredit): Promise<string> {
     const workspaceJson = JSON.stringify(ws.rawApi, null, 2);
+
+    // PRO_ZERO: append the verbatim /credit-balance JSON captured during enrichment.
     const balanceRaw = ws[PRO_ZERO_BALANCE_JSON_FIELD];
     const source = ws[PRO_ZERO_SOURCE_FIELD];
-    if (source !== MacroCreditSource.CREDIT_BALANCE || typeof balanceRaw !== 'string' || balanceRaw.length === 0) {
-        return workspaceJson;
+    if (source === MacroCreditSource.CREDIT_BALANCE && typeof balanceRaw === 'string' && balanceRaw.length > 0) {
+        return JSON.stringify({
+            Source: MacroCreditSource.CREDIT_BALANCE,
+            Workspace: JSON.parse(workspaceJson) as unknown,
+            CreditBalance: JSON.parse(balanceRaw) as unknown,
+        }, null, 2);
     }
-    const wrapped = {
-        Source: MacroCreditSource.CREDIT_BALANCE,
-        Workspace: JSON.parse(workspaceJson) as unknown,
-        CreditBalance: JSON.parse(balanceRaw) as unknown,
-    };
-    return JSON.stringify(wrapped, null, 2);
+
+    // PRO_ONE: pull cached /credit-balance row from SQLite (populated by fetcher.ts).
+    if (isProOnePlan(ws) && ws.id) {
+        const row = await readCreditBalanceCache(ws.id);
+        if (row && row.RawJson) {
+            try {
+                return JSON.stringify({
+                    Source: 'credit_balance_cache',
+                    Plan: 'pro_1',
+                    Workspace: JSON.parse(workspaceJson) as unknown,
+                    CreditBalance: JSON.parse(row.RawJson) as unknown,
+                    CreditBalanceCacheRow: row,
+                }, null, 2);
+            } catch (caught: unknown) {
+                logError('wsContextMenu.buildCopyJsonPayload', 'failed to merge pro_1 credit-balance JSON for ws=' + ws.id, caught);
+            }
+        }
+    }
+
+    return workspaceJson;
 }
 
 /**
  * Copy the verbatim raw API JSON for a single workspace to the clipboard.
- * For pro_0 workspaces, also includes the cached /credit-balance JSON.
+ * For pro_0 and pro_1 workspaces, also includes the cached /credit-balance JSON.
  */
 function copyWorkspaceJson(wsId: string, wsName: string): void {
   const perWs = loopCreditState.perWorkspace || [];
@@ -106,11 +132,12 @@ function copyWorkspaceJson(wsId: string, wsName: string): void {
     log('[CopyJSON] No rawApi for wsId=' + wsId, 'warn');
     return;
   }
-  const json = buildCopyJsonPayload(ws);
-  navigator.clipboard.writeText(json)
-    .then(function () {
-      showToast('📋 Copied JSON for "' + wsName + '" (' + json.length + ' chars)', 'success');
-      log('[CopyJSON] Copied ' + json.length + ' chars for ' + wsName, 'info');
+  buildCopyJsonPayload(ws)
+    .then(function (json) {
+      return navigator.clipboard.writeText(json).then(function () {
+        showToast('📋 Copied JSON for "' + wsName + '" (' + json.length + ' chars)', 'success');
+        log('[CopyJSON] Copied ' + json.length + ' chars for ' + wsName, 'info');
+      });
     })
     .catch(function (e: unknown) {
       logError('wsContextMenu', 'Clipboard write failed for Copy JSON', e);
@@ -191,6 +218,10 @@ export function showWsContextMenu(
   menu.appendChild(buildCtxMenuItem('📋 Copy JSON', function () {
     removeWsContextMenu();
     copyWorkspaceJson(wsId, wsName);
+  }));
+  menu.appendChild(buildCtxMenuItem('🛈 Show Tooltip', function () {
+    removeWsContextMenu();
+    showWorkspaceHoverCardPinned(wsId);
   }));
   menu.appendChild(buildCtxMenuItem('👥 Show Members', function () {
     removeWsContextMenu();

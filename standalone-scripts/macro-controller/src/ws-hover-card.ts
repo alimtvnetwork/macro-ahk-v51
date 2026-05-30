@@ -640,3 +640,43 @@ export function hideWorkspaceHoverCard(): void {
   hideCard();
 }
 
+/**
+ * Pinned-open variant: shows the rich hover card anchored to a workspace row
+ * (selected by `data-ws-id`). The card stays visible until the user clicks
+ * outside or presses Escape. Intended for the "🛈 Show Tooltip" context-menu
+ * item so users on touch devices or with the hover-card disabled can still
+ * surface workspace details.
+ */
+export function showWorkspaceHoverCardPinned(wsId: string): void {
+  const anchor = document.querySelector('[data-ws-id="' + wsId + '"]') as HTMLElement | null;
+  const row = anchor ? anchor.closest(SEL_WS_ITEM) as HTMLElement | null : null;
+  if (!row) return;
+  const sdkWindow = window as unknown as {
+    RiseupAsiaMacroExt?: { loopCreditState?: { perWorkspace?: WorkspaceCredit[] } };
+  };
+  const all = sdkWindow.RiseupAsiaMacroExt?.loopCreditState?.perWorkspace || [];
+  const ws = all.find((w) => String(w.id) === wsId);
+  if (!ws) return;
+  const config = getWorkspaceLifecycleConfig();
+  const status = getEffectiveStatus(ws, config);
+  cancelHideTimer();
+  const card = ensureCardElement();
+  card.innerHTML = buildWorkspaceHoverHtml(ws, status, config);
+  positionCard(card, row);
+  const dismiss = (e: Event): void => {
+    if (e.type === 'keydown' && (e as KeyboardEvent).key !== 'Escape') return;
+    if (e.type === 'click') {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.closest('#' + HOVERCARD_ID) || row.contains(target))) return;
+    }
+    hideCard();
+    document.removeEventListener('click', dismiss, true);
+    document.removeEventListener('keydown', dismiss, true);
+  };
+  setTimeout(() => {
+    document.addEventListener('click', dismiss, true);
+    document.addEventListener('keydown', dismiss, true);
+  }, 10);
+}
+
+
