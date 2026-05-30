@@ -150,8 +150,8 @@ function _assembleTitleRow(titleRow: HTMLElement, els: Record<string, HTMLElemen
 function buildWorkspaceNameBadge(deps: PanelBuilderDeps): HTMLElement {
   const wsNameEl = document.createElement('div');
   wsNameEl.id = 'loop-title-ws-name';
-  wsNameEl.style.cssText = CssFragment.FontSize + tFontTiny + ';color:#fbbf24;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:180px;cursor:pointer;border-bottom:1px dotted rgba(251,191,36,0.4);transition:color 0.15s;margin-right:4px;';
   const titleBarState = getTitleBarDisplayState();
+  wsNameEl.style.cssText = 'font-size:' + titleBarState.fontSize + ';color:#fbbf24;font-weight:' + titleBarState.fontWeight + ';overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:220px;cursor:pointer;border-bottom:1px dotted rgba(251,191,36,0.4);transition:color 0.15s,font-size 0.15s;margin-right:4px;line-height:1.2;';
   wsNameEl.title = titleBarState.title;
   wsNameEl.style.opacity = titleBarState.opacity;
 
