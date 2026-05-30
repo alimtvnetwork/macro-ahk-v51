@@ -180,6 +180,7 @@ function _buildToolsCollapsible(
   _deps: PanelBuilderDeps, btnStyle: string, taskNextDeps: TaskNextDeps,
   toolsSections: ReturnType<typeof buildToolsSections>,
   wsHistoryResult: { section: HTMLElement },
+  authDiagRow: HTMLElement,
 ): { toolsCol: ReturnType<typeof createCollapsibleSection>; settingsDeps: SettingsDeps } {
   const toolsCol = createCollapsibleSection('🔧 Tools & Logs', 'ml_collapse_tools_master');
   const toolsMasterBody = toolsCol.body;
