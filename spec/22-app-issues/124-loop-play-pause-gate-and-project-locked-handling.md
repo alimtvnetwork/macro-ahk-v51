@@ -17,15 +17,20 @@ Two related gaps when the macro loop moves between workspaces:
 
 ### 2.1 Pre-move gate (move-down / move-up / move-to)
 
+Run-state is detected via the chat composer's primary submit button (`#chatinput-send-message-button`, XPath `…/form/div[2]/div/button[3]`). The same button toggles its inner icon:
+
+- **Run active** → button renders a **STOP icon** (filled rounded square SVG) inside `span[7]` at `…/button[3]/span[7]`. SVG path starts with `d="M20.75 17…"`.
+- **Run idle** → same `button[3]` renders the **Send/Run (up-arrow) icon** (path `d="M11 19V7.415…"`) and is `disabled` only when the textarea is empty.
+
 Before issuing the move API call:
-1. Read the **Play button** XPath (see §5). If the Play button is present and clickable → run is paused/finished → proceed with the move.
-2. If the Play button is absent (i.e. Pause button is showing → run is in progress) → **do not move**. Show toast `"Waiting for current run to finish…"` and poll the Play button every `RUN_GATE_POLL_MS = 1000` ms up to `RUN_GATE_TIMEOUT_MS = 120_000` ms.
+1. Probe `SEND_OR_STOP_BUTTON_XPATH` = `/html/body/div[2]/main/div/div[2]/div/div/div/div[1]/div/div[2]/form/div[2]/div/button[3]`. If the STOP icon (`STOP_ICON_XPATH` = `…/button[3]/span[7]` containing the square-path SVG) is **not** present → idle → proceed with the move.
+2. If the STOP icon is present → run is streaming → **do not move**. Show toast `"Waiting for current run to finish…"` and poll every `RUN_GATE_POLL_MS = 1000` ms up to `RUN_GATE_TIMEOUT_MS = 120_000` ms until STOP disappears.
 3. On timeout → log + toast `"Run still active after 2 min — move cancelled"`. No retry, no backoff (per `mem://constraints/no-retry-policy`).
 
 ### 2.2 Project-locked detection & persistence
 
 When the move API or the post-move project-load surfaces a "project locked" condition:
-1. Detect via the response body (`error` or `message` field containing `"project is locked"`, `"project_locked"`, or HTTP 423) **or** via a DOM banner matching the locked-banner XPath (§5).
+1. Detect via the response body (`error`/`message` containing `"project is locked"`, `"project_locked"`, or HTTP 423) **or** a DOM banner matching the optional locked-banner XPath (§5).
 2. Persist the error into a new SQLite table `LoopProjectLockEvent` with columns:
    - `EventId INTEGER PK AUTOINCREMENT`
    - `WorkspaceId TEXT NOT NULL`
@@ -33,14 +38,16 @@ When the move API or the post-move project-load surfaces a "project locked" cond
    - `DetectedAtMs INTEGER NOT NULL`
    - `Reason TEXT NOT NULL` — short code: `api-423`, `api-body-locked`, `dom-banner`
    - `ReasonDetail TEXT NOT NULL` — full server message or banner text
-3. After persisting, treat the source workspace's run as paused-but-stuck: click the **Pause** button (§5) defensively, then enter the §2.1 wait loop on the destination workspace until Play is visible.
+3. After persisting, re-enter the §2.1 wait loop on the destination workspace until STOP disappears.
 
-### 2.3 Auto-press Play after successful move
+### 2.3 Auto-press Run (Send) after successful move
 
 After `moveToWorkspace` resolves successfully and the destination URL loads:
-1. Wait for the Play button to appear via `pollUntil(playSelector, { intervalMs: 500, timeoutMs: 15_000 })`.
-2. Click it once. Log `LoopRun.autoPlay ws=<id> outcome=ok`.
-3. On timeout, log `LoopRun.autoPlay outcome=play-button-missing` (no retry) and continue.
+1. Wait for `SEND_OR_STOP_BUTTON_XPATH` to be present AND for the STOP icon to be ABSENT via `pollUntil({ intervalMs: 500, timeoutMs: 15_000 })`.
+2. Click the submit button once (it acts as Run when idle). Log `LoopRun.autoRun ws=<id> outcome=ok`.
+3. On timeout, log `LoopRun.autoRun outcome=run-button-not-ready` (no retry) and continue.
+
+> Note: there is no separate Play/Pause control in Lovable's composer. The same `button[3]` toggles its inner icon between STOP (running) and Send/Run (idle). Detection is icon-based.
 
 ## 3. New modules
 
