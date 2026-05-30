@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.40.1] — 2026-05-30
+
+### Fixed
+- **Passive-attach keyboard shortcut** — `Ctrl+Alt+H` now promotes the passive-attached macro controller to a full panel bootstrap, even before the UI has been built. Previously the shortcut was only registered inside `createUI()` (panel-builder), so on a fresh page load that started in passive mode there was nothing listening for the keystroke and the documented "attach script to UI" shortcut silently no-op'd. New `registerPassiveAttachShortcut()` in `startup.ts` installs a one-shot capture-phase keydown listener that removes the stale `data-launch-source="passive"` marker, flips `__MARCO_LAUNCH_SOURCE__` to `manual`, and re-invokes `bootstrap(deps)`. Listener self-removes once the full panel takes over, and re-arms on the next passive attach.
+
+---
+
 ## [v3.40.0] — 2026-05-30
 
 ### Fixed
