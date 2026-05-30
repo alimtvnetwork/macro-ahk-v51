@@ -64,6 +64,56 @@ function keepTaskNextSubInView(promptsDropdown: HTMLElement, taskNextSub: HTMLEl
   });
 }
 
+/**
+ * Issue 127 Bug B — Anchor the Task Next sub-menu RIGHT of its row by default,
+ * fall back to a stacked-below layout when right-side viewport space is
+ * insufficient. Never let the menu clip off-screen on the left or right.
+ *
+ *   Default (right):  sub.position=fixed; left = rowRect.right + GAP; top = rowRect.top
+ *   Fallback (below): sub.position=static; menu stacks under the row
+ *
+ * Sets `data-task-next-anchor` to `right` or `below` for tests / debuggers.
+ */
+function anchorTaskNextSub(row: HTMLElement, sub: HTMLElement, host: HTMLElement): void {
+  const GAP = 6;
+  const PAD = 8;
+  const MIN_SUB_WIDTH = 180;
+
+  // Measure natural width by briefly forcing the menu visible off-screen.
+  const prevVisibility = sub.style.visibility;
+  sub.style.visibility = 'hidden';
+  sub.style.position = 'fixed';
+  sub.style.left = '-9999px';
+  sub.style.top = '0px';
+  sub.style.display = 'block';
+  const measuredWidth = Math.max(sub.getBoundingClientRect().width || 0, MIN_SUB_WIDTH);
+  sub.style.visibility = prevVisibility;
+
+  const rowRect = row.getBoundingClientRect();
+  const rightSpace = window.innerWidth - rowRect.right - PAD;
+  const fitsRight = rightSpace >= measuredWidth;
+
+  if (fitsRight) {
+    sub.style.position = 'fixed';
+    sub.style.left = (rowRect.right + GAP) + 'px';
+    sub.style.top = rowRect.top + 'px';
+    sub.style.margin = '0';
+    sub.setAttribute('data-task-next-anchor', 'right');
+    return;
+  }
+
+  // Fallback: stack below the row inside the dropdown column.
+  sub.style.position = 'static';
+  sub.style.left = '';
+  sub.style.top = '';
+  sub.style.margin = '0 6px 6px 6px';
+  sub.setAttribute('data-task-next-anchor', 'below');
+  // Keep the stacked menu visible inside the scrollable prompts dropdown.
+  keepTaskNextSubInView(host, sub);
+}
+
+
+
 // Legacy single-pick chip helper removed in favor of the new Filter menu.
 // (Multi-select state lives in prompt-loader.ts via getPromptCategoryFilterSet.)
 
