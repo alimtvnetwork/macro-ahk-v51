@@ -23,7 +23,7 @@ beforeEach(() => __resetThrottleForTests());
 
 describe('throttle.shouldFetch', () => {
     it('allows the very first fetch for a workspace', () => {
-        const d = shouldFetch(WS_A, 1_000);
+        const d = shouldFetch(WS_A, INTER_WS_GAP_MS);
         expect(d.allowed).toBe(true);
         expect(d.reason).toBe('ok');
     });
