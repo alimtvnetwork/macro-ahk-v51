@@ -24,6 +24,8 @@ import { runCycle } from './loop-cycle';
 import { logError } from './error-utils';
 import { emitCreditPollTick } from './credit-poll-events';
 import { requireUserGesture } from './user-gesture-guard';
+import { autoResumeQueueIfNeeded } from './queue-control';
+
 
 
 
