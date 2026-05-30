@@ -9,8 +9,7 @@
 import { CREDIT_API_BASE } from './shared-state';
 import { log } from './logging';
 import { logError } from './error-utils';
-import { clearMembersCache } from './ws-members-fetch';
-import { invalidateMembersCache } from './ws-members-fetch';
+import { clearMembersCache, invalidateMembersCache } from './ws-members-fetch';
 
 type MemberRole = 'member' | 'owner';
 
