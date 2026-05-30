@@ -86,7 +86,9 @@ export async function gatedMoveToWorkspace(
     await moveToWorkspace(targetWorkspaceId, targetWorkspaceName);
 
     // §2.3 — Resume on destination, best-effort (no retry).
-    const resumeReady = await pollForResumeButton(RESUME_POLL_TIMEOUT_MS, RESUME_POLL_INTERVAL_MS);
+    const resumeTimeout = options.resumePollTimeoutMs ?? RESUME_POLL_TIMEOUT_MS;
+    const resumeInterval = options.resumePollIntervalMs ?? RESUME_POLL_INTERVAL_MS;
+    const resumeReady = await pollForResumeButton(resumeTimeout, resumeInterval);
     if (!resumeReady) {
         log(
             'LoopRun.queueFlip ws=' + targetWorkspaceId +
