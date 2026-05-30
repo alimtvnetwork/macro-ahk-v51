@@ -82,17 +82,15 @@ describe('autoResumeQueueIfNeeded — policy matrix (spec §5)', () => {
 
 describe('autoResumeQueueIfNeeded — safety guards', () => {
     it('document.hidden=true short-circuits before any DOM work', () => {
-        const original = Object.getOwnPropertyDescriptor(Document.prototype, 'hidden');
         Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
         try {
             const result = autoResumeQueueIfNeeded({ isLoopRunning: () => true });
             expect(result).toEqual({ acted: false, reason: 'document-hidden' });
         } finally {
-            if (original) {
-                Object.defineProperty(Document.prototype, 'hidden', original);
-            }
+            delete (document as unknown as Record<string, unknown>).hidden;
         }
     });
+
 
     it('never throws — wraps unexpected errors and returns reason=threw', () => {
         const result = autoResumeQueueIfNeeded({
