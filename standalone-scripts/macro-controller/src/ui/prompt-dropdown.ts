@@ -444,7 +444,6 @@ function _appendFilteredItems(
 ): void {
   // 0. Render Suggestions (if no search and not in a specific category)
   if (!getPromptCategoryFilter() && !_currentSearchQuery) {
-    const { getSuggestedPrompts } = require('./prompt-loader');
     const suggestions = getSuggestedPrompts(entries);
     if (suggestions.length > 0) {
       const sugHeader = document.createElement('div');
