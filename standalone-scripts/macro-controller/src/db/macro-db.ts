@@ -8,6 +8,16 @@ import { logError } from '../error-utils';
 
 const DB_NAME = 'prompts.macro';
 
+export interface DbTask {
+  id: string;
+  projectId: string;
+  projectName: string;
+  prompt: string;
+  status: string;
+  error?: string;
+  timestamp: number;
+}
+
 /**
  * Initialize the macro database schema.
  */
@@ -26,6 +36,16 @@ export async function initMacroDb(): Promise<void> {
       Prompt TEXT,
       Response TEXT,
       Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(ProjectId) REFERENCES Projects(ProjectId)
+    );
+    CREATE TABLE IF NOT EXISTS TaskQueue (
+      Id TEXT PRIMARY KEY,
+      ProjectId TEXT,
+      ProjectName TEXT,
+      Prompt TEXT,
+      Status TEXT,
+      Error TEXT,
+      Timestamp INTEGER,
       FOREIGN KEY(ProjectId) REFERENCES Projects(ProjectId)
     );
     DROP VIEW IF EXISTS v_prompt_history;
@@ -92,5 +112,34 @@ export async function saveCommunication(projectId: string, prompt: string, respo
     log('Communication saved to Macro DB', 'info');
   } catch (err) {
     logError('MacroDb', 'saveCommunication failed', err);
+  }
+}
+
+/**
+ * Sync the entire task queue for a project to SQLite.
+ */
+export async function syncTaskQueueToDb(projectId: string, projectName: string, tasks: DbTask[]): Promise<void> {
+  if (!projectId) return;
+
+  // Clear existing queue for this project
+  const deleteSql = `DELETE FROM TaskQueue WHERE ProjectId = '${projectId.replace(/'/g, "''")}'`;
+  
+  const insertValues = tasks.map(t => {
+    return `('${t.id}', '${t.projectId.replace(/'/g, "''")}', '${t.projectName.replace(/'/g, "''")}', '${t.prompt.replace(/'/g, "''")}', '${t.status}', '${(t.error || '').replace(/'/g, "''")}', ${t.timestamp})`;
+  }).join(',');
+
+  const sql = insertValues.length > 0 
+    ? `${deleteSql}; INSERT INTO TaskQueue (Id, ProjectId, ProjectName, Prompt, Status, Error, Timestamp) VALUES ${insertValues}`
+    : deleteSql;
+
+  try {
+    await sendToExtension('PROJECT_API', {
+      project: DB_NAME,
+      method: 'SCHEMA',
+      endpoint: 'rawSql',
+      params: { sql }
+    });
+  } catch (err) {
+    logError('MacroDb', 'syncTaskQueueToDb failed', err);
   }
 }
