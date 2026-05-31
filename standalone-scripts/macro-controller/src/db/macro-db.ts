@@ -162,7 +162,7 @@ export async function forceSyncQueueToDb(): Promise<void> {
   if (!projectId) return;
 
   const queueState = await loadTaskQueue();
-  const projectName = state.projectNameFromApi || state.projectNameFromDom || 'Unknown Project';
+  // const projectName = state.projectNameFromApi || state.projectNameFromDom || 'Unknown Project';
   
   log('[MacroDb] Force-syncing task queue to SQLite...', 'check');
   await syncTaskQueueToDb(projectId, queueState.tasks);
