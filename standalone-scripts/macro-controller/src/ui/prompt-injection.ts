@@ -214,6 +214,28 @@ function _buildVariableReference(body: HTMLElement): void {
   body.appendChild(varList);
 }
 
+// ── Tags Input ──
+function _buildTagsInput(initialData: Record<string, unknown>): { tagsWrap: HTMLElement; tagsInput: HTMLInputElement } {
+  const tagsLabel = document.createElement('label');
+  tagsLabel.textContent = 'Tags (comma separated)';
+  tagsLabel.style.cssText = CssFragment.LabelBlock + cPrimaryLight + CssFragment.LabelSuffix;
+
+  const tagsWrap = document.createElement('div');
+  tagsWrap.style.cssText = 'margin-bottom:12px;';
+  tagsWrap.appendChild(tagsLabel);
+
+  const tagsInput = document.createElement('input');
+  tagsInput.type = 'text';
+  tagsInput.placeholder = 'e.g. ui, backend, logic';
+  tagsInput.value = Array.isArray(initialData.tags) ? initialData.tags.join(', ') : '';
+  tagsInput.style.cssText = 'width:100%;padding:8px 12px;background:' + cPanelBg + CssFragment.BorderSolid + cPrimaryBorderA + CssFragment.BorderRadiusColor + cPanelFg + ';font-size:13px;outline:none;box-sizing:border-box;';
+  tagsInput.onfocus = function() { (this as HTMLElement).style.borderColor = cPrimary; };
+  tagsInput.onblur = function() { (this as HTMLElement).style.borderColor = CssFragment.BorderPrimaryStrong; };
+  
+  tagsWrap.appendChild(tagsInput);
+  return { tagsWrap, tagsInput };
+}
+
 // ── Category Select ──
  
 function _buildCategorySelect(initialData: Record<string, unknown>): { catWrap: HTMLElement; catSelect: HTMLSelectElement; catCustomInput: HTMLInputElement } {
