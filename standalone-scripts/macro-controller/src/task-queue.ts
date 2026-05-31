@@ -5,7 +5,8 @@
 import { getProjectKvStore } from './project-kv-store';
 import { extractProjectIdFromUrl } from './workspace-detection';
 import { log, logSub } from './logging';
-import { StorageKey } from './types';
+import { syncTaskQueueToDb, saveProjectMetadata } from './db/macro-db';
+import { state } from './shared-state';
 
 export interface MacroTask {
   id: string;
@@ -33,25 +34,30 @@ export async function loadTaskQueue(): Promise<TaskQueueState> {
   if (!projectId) return { tasks: [], isPaused: false };
 
   const store = getProjectKvStore('macro-controller');
-  const state = await store.get<TaskQueueState>(SECTION, `${STATE_KEY}_${projectId}`);
+  const stateData = await store.get<TaskQueueState>(SECTION, `${STATE_KEY}_${projectId}`);
   
-  if (state) {
-    log(`[TaskQueue] Loaded ${state.tasks.length} tasks for project ${projectId}`, 'info');
-    return state;
+  if (stateData) {
+    log(`[TaskQueue] Loaded ${stateData.tasks.length} tasks for project ${projectId}`, 'info');
+    return stateData;
   }
   
   return { tasks: [], isPaused: false };
 }
 
 /**
- * Save the task queue for the current project to IndexedDB.
+ * Save the task queue for the current project to IndexedDB and sync to SQLite.
  */
-export async function saveTaskQueue(state: TaskQueueState): Promise<void> {
+export async function saveTaskQueue(queueState: TaskQueueState): Promise<void> {
   const projectId = extractProjectIdFromUrl();
   if (!projectId) return;
 
   const store = getProjectKvStore('macro-controller');
-  await store.set(SECTION, `${STATE_KEY}_${projectId}`, state);
+  await store.set(SECTION, `${STATE_KEY}_${projectId}`, queueState);
+
+  // Sync to SQLite for persistence across extensions/backups
+  const projectName = state.projectNameFromApi || 'Unknown Project';
+  await saveProjectMetadata(projectId, projectName, window.location.href);
+  await syncTaskQueueToDb(projectId, projectName, queueState.tasks);
 }
 
 /**
@@ -61,7 +67,7 @@ export async function addTaskToQueue(prompt: string, projectName: string): Promi
   const projectId = extractProjectIdFromUrl();
   if (!projectId) return null;
 
-  const state = await loadTaskQueue();
+  const queueState = await loadTaskQueue();
   const newTask: MacroTask = {
     id: 'task_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
     projectId,
@@ -71,8 +77,8 @@ export async function addTaskToQueue(prompt: string, projectName: string): Promi
     status: 'pending'
   };
 
-  state.tasks.push(newTask);
-  await saveTaskQueue(state);
+  queueState.tasks.push(newTask);
+  await saveTaskQueue(queueState);
   
   log(`[TaskQueue] Added task to queue: ${prompt.substring(0, 30)}...`, 'success');
   return newTask;
@@ -82,12 +88,12 @@ export async function addTaskToQueue(prompt: string, projectName: string): Promi
  * Update a task's status in the queue.
  */
 export async function updateTaskStatus(taskId: string, status: MacroTask['status'], error?: string): Promise<void> {
-  const state = await loadTaskQueue();
-  const task = state.tasks.find(t => t.id === taskId);
+  const queueState = await loadTaskQueue();
+  const task = queueState.tasks.find(t => t.id === taskId);
   if (task) {
     task.status = status;
     if (error) task.error = error;
-    await saveTaskQueue(state);
+    await saveTaskQueue(queueState);
   }
 }
 
@@ -95,11 +101,33 @@ export async function updateTaskStatus(taskId: string, status: MacroTask['status
  * Clear completed tasks from the queue.
  */
 export async function clearCompletedTasks(): Promise<void> {
-  const state = await loadTaskQueue();
-  const count = state.tasks.length;
-  state.tasks = state.tasks.filter(t => t.status !== 'completed');
-  if (state.tasks.length !== count) {
-    await saveTaskQueue(state);
-    log(`[TaskQueue] Cleared ${count - state.tasks.length} completed tasks`, 'info');
+  const queueState = await loadTaskQueue();
+  const count = queueState.tasks.length;
+  queueState.tasks = queueState.tasks.filter(t => t.status !== 'completed');
+  if (queueState.tasks.length !== count) {
+    await saveTaskQueue(queueState);
+    log(`[TaskQueue] Cleared ${count - queueState.tasks.length} completed tasks`, 'info');
   }
 }
+
+/**
+ * Check if the "Return to Extension" button is present and pause queue if so.
+ */
+export function checkForReturnButton(): boolean {
+  const XPATH = '/html/body/div[2]/main/div/div[2]/div/div/div/div[1]/div/div[2]/button';
+  const CLASS = 'ql-native-return-btn';
+  
+  const btnByXpath = document.evaluate(XPATH, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  const btnByClass = document.querySelector(`.${CLASS}`);
+  const btnById = document.getElementById('ql-native-return-btn');
+  const btnByText = Array.from(document.querySelectorAll('button')).find(b => b.textContent?.includes('Voltar à Extensão') || b.textContent?.includes('Return to Extension'));
+
+  const exists = !!(btnByXpath || btnByClass || btnById || btnByText);
+  
+  if (exists) {
+    log('[TaskQueue] "Return to Extension" button detected. Pausing queue.', 'warn');
+  }
+  
+  return exists;
+}
+
