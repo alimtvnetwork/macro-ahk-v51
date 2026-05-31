@@ -418,6 +418,69 @@ export function buildGeneralPanel(
   return { panel, inputs, toggles };
 }
 
+(window as any).marco_buildHistoryPanel = _buildHistoryPanel;
+
+/** Builds the History search panel. */
+function _buildHistoryPanel(): { panel: HTMLElement } {
+  const panel = document.createElement('div');
+  panel.style.cssText = 'display:flex;flex-direction:column;gap:12px;max-height:400px;';
+
+  const searchBox = document.createElement('input');
+  searchBox.placeholder = 'Search project history...';
+  searchBox.style.cssText = 'width:100%;padding:8px 10px;background:' + cInputBg + ';border:1px solid ' + cInputBorder + ';border-radius:6px;color:' + cInputFg + ';font-size:11px;box-sizing:border-box;';
+
+  const listContainer = document.createElement('div');
+  listContainer.style.cssText = 'flex:1;overflow-y:auto;background:' + cPanelBgAlt + ';border-radius:6px;padding:8px;border:1px solid ' + cPanelBorder + ';display:flex;flex-direction:column;gap:8px;min-height:200px;';
+  listContainer.innerHTML = '<div style="color:#64748b;font-size:11px;text-align:center;padding-top:40px;">Loading history...</div>';
+
+  async function refreshHistory(filter: string = '') {
+    const { getCommunicationHistory } = await import('../db/macro-db');
+    const { extractProjectIdFromUrl } = await import('../workspace-detection');
+    const projectId = extractProjectIdFromUrl();
+    if (!projectId) return;
+
+    const rows = await getCommunicationHistory(projectId, 100);
+    const filtered = filter 
+      ? rows.filter(r => (r.Prompt || '').toLowerCase().includes(filter.toLowerCase()) || (r.Response || '').toLowerCase().includes(filter.toLowerCase()))
+      : rows;
+
+    listContainer.innerHTML = '';
+    if (filtered.length === 0) {
+      listContainer.innerHTML = '<div style="color:#64748b;font-size:11px;text-align:center;padding-top:40px;">No history found</div>';
+      return;
+    }
+
+    filtered.forEach(row => {
+      const item = document.createElement('div');
+      item.style.cssText = 'padding:8px;border-bottom:1px solid rgba(255,255,255,0.05);cursor:pointer;';
+      const time = new Date(row.Timestamp).toLocaleString();
+      item.innerHTML = `
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:9px;color:${cPrimaryLight};font-weight:700;">${time}</span>
+        </div>
+        <div style="font-size:11px;color:${cPanelText};word-break:break-word;white-space:pre-wrap;">${row.Prompt}</div>
+      `;
+      item.onclick = () => {
+        navigator.clipboard.writeText(row.Prompt);
+        showToast('✅ Prompt copied to clipboard', 'info');
+      };
+      listContainer.appendChild(item);
+    });
+  }
+
+  searchBox.oninput = () => {
+    refreshHistory(searchBox.value);
+  };
+
+  panel.appendChild(searchBox);
+  panel.appendChild(listContainer);
+
+  // Initial load
+  setTimeout(() => refreshHistory(), 100);
+
+  return { panel };
+}
+
 /** Builds the History search panel. */
 function _buildHistoryPanel(): { panel: HTMLElement } {
   const panel = document.createElement('div');
