@@ -347,7 +347,7 @@ function _buildPromptModalFooter(
 
     const category = getSelectedCategory(catSelect, catCustomInput);
     const tags = tagsInput.value.split(',').map(t => t.trim()).filter(Boolean);
-    const promptPayload: Record<string, any> = { name: name, text: text, source: 'user' };
+    const promptPayload: Record<string, unknown> = { name: name, text: text, source: 'user' };
     if (category) promptPayload.category = category;
     if (tags.length > 0) promptPayload.tags = tags;
     if (isEdit && editPrompt!.id) promptPayload.id = editPrompt!.id;
