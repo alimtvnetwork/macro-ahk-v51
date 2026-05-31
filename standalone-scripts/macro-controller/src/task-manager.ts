@@ -53,9 +53,9 @@ export class TaskQueueManager {
         const now = Date.now();
         const nextTask = queueState.tasks.find(t => t.status === 'pending' || (t.status === 'hold' && (t.holdUntil ?? 0) <= now));
         
-        // Check for return button (indicates we should pause/delay)
+        // Check for return button or project locked
         if (checkForReturnButton() || isReturnButtonVisible()) {
-          log('[TaskQueue] "Return to Extension" button detected. Pausing processing loop.', 'warn');
+          log('[TaskQueue] Interruption detected (Return button). Pausing loop.', 'warn');
           this._isPaused = true;
           this._isProcessing = false;
           break;
