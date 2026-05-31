@@ -99,29 +99,16 @@ export async function inviteMemberMany(
     wsIds: string[], 
     emails: string[], 
     role: MemberRole,
-    workspaces: ReadonlyArray<import('./types/credit-types').WorkspaceCredit> = []
+    workspaces: ReadonlyArray<WorkspaceCredit> = []
 ): Promise<BulkOpResult> {
     const results: BulkOpResult = { success: 0, fail: 0, total: wsIds.length * emails.length, failures: [] };
     
     for (const wsId of wsIds) {
         const ws = workspaces.find(w => w.id === wsId);
         const wsName = ws?.fullName || ws?.name || wsId;
-
-        for (const email of emails) {
-            try {
-                await inviteMember(wsId, email, role);
-                results.success++;
-            } catch (e: unknown) {
-                results.fail++;
-                const reason = e instanceof Error ? e.message : String(e);
-                const reasonDetail = (e as { data?: unknown }).data ? JSON.stringify((e as { data?: unknown }).data) : undefined;
-                results.failures.push({ wsId, wsName, reason, reasonDetail });
-                logError('Members.BulkInvite', `Failed to invite ${email} to ${wsName}: ${reason}`);
-            }
-        }
+        await _bulkInviteEmails(wsId, wsName, emails, role, results);
     }
 
-    
     invalidateMembersCache();
     
     if (results.fail > 0) {
@@ -129,8 +116,23 @@ export async function inviteMemberMany(
     } else if (results.success > 0) {
         showToast(`Successfully invited to ${results.success} targets`, 'success');
     }
-
+    
     return results;
+}
+
+async function _bulkInviteEmails(wsId: string, wsName: string, emails: string[], role: MemberRole, results: BulkOpResult) {
+    for (const email of emails) {
+        try {
+            await inviteMember(wsId, email, role);
+            results.success++;
+        } catch (e: unknown) {
+            results.fail++;
+            const reason = e instanceof Error ? e.message : String(e);
+            const reasonDetail = (e as { data?: unknown }).data ? JSON.stringify((e as { data?: unknown }).data) : undefined;
+            results.failures.push({ wsId, wsName, reason, reasonDetail });
+            logError('Members.BulkInvite', `Failed to invite ${email} to ${wsName}: ${reason}`);
+        }
+    }
 }
 
 export async function updateMemberRoleMany(
