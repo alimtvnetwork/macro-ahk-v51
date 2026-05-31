@@ -768,7 +768,7 @@ function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
   const store = el as HTMLElement & PanelHandlerStore;
   const limit = store._marcoMembersLimit ?? DEFAULT_MEMBERS_PAGE_LIMIT;
   render(el, wsName, { kind: 'loading' });
-  fetchWorkspaceMembers(wsId, false, limit)
+  fetchWorkspaceMembers(wsId, limit)
     .then(function (entry) {
       if (!document.getElementById(PANEL_ID)) return; // panel was closed
       store._marcoMembersLatest = { wsName: wsName, members: entry.members, total: entry.total, limit: limit };
@@ -781,6 +781,7 @@ function loadAndRender(el: HTMLElement, wsId: string, wsName: string): void {
       render(el, wsName, { kind: 'error', error: msg });
     });
 }
+
 
 /** Silent refetch — used by the credit-poll subscription. Skips loading state. */
 function silentRefresh(el: HTMLElement, wsId: string, wsName: string): void {
