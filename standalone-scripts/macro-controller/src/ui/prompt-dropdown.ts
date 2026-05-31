@@ -7,7 +7,7 @@
 
 import { log } from '../logging';
 import { logError } from '../error-utils';
-import type { PromptEntry as LoaderPromptEntry } from '../types';
+import type { PromptEntry as LoaderPromptEntry, ResolvedPromptsConfig } from '../types';
 
 import { cPanelFg, cPanelFgDim, cPrimary, cPrimaryLight, cBtnMenuHover, lDropdownRadius } from '../shared-state';
 import { getByXPath } from '../xpath-utils';

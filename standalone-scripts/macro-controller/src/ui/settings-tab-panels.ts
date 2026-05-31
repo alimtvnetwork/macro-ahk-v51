@@ -11,6 +11,7 @@
 import { taskNextState } from './task-next-ui';
 import { getBackdropOpacity, setBackdropOpacity } from './panel-layout';
 import { getSettingsOverrides, saveSettingsOverrides, type PerWorkspaceLifecycleOverride, type SettingsOverrides } from '../settings-store';
+import type { PromptEntry } from '../types';
 import { showToast } from '../toast';
 import { logError } from '../error-utils';
 import type { ExtensionResponse, ResolvedPromptsConfig } from '../types';
@@ -336,7 +337,7 @@ export function buildConfigDbPanel(
 
     const sections: Record<string, Array<{ key: string; value: string; valueType: string }>> = {};
     for (const row of (rows || [])) {
-      const r = row as any;
+      const r = row as { section: string; key: string; value: string; valueType: string };
       if (!sections[r.section]) sections[r.section] = [];
       sections[r.section].push({ key: r.key, value: r.value, valueType: r.valueType });
     }
@@ -456,7 +457,7 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
       item.onmouseenter = () => { item.style.background = 'rgba(255,255,255,0.03)'; };
       item.onmouseleave = () => { item.style.background = 'transparent'; };
       
-      const r = row as any;
+      const r = row as { Timestamp: string; Prompt: string; Response?: string };
       const time = new Date(r.Timestamp).toLocaleString();
       item.innerHTML = `
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
