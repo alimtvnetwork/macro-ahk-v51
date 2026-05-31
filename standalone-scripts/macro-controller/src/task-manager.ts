@@ -152,7 +152,7 @@ export class TaskQueueManager {
 
       const nextRetry = retries + 1;
       const holdMs = 10000 * nextRetry; // 10s, 20s, 30s backoff
-      log(`[TaskQueue] Task ${task.id} failed (${reason}). Retry ${nextRetry}/${maxRetries} in ${holdMs / 1000}s.`, 'warn');
+      this._logExecution(`Task failed (${reason}). Retry ${nextRetry}/${maxRetries} in ${holdMs / 1000}s.`, 'warn');
       
       const queueState = await loadTaskQueue();
       const t = queueState.tasks.find(t => t.id === task.id);
