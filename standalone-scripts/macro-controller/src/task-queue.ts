@@ -14,8 +14,10 @@ export interface MacroTask {
   projectName: string;
   prompt: string;
   timestamp: number;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'hold';
   error?: string;
+  retryCount?: number;
+  holdUntil?: number;
 }
 
 export interface TaskQueueState {
