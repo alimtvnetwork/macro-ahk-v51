@@ -335,6 +335,7 @@ function _buildPromptModalFooter(
   saveBtn.onmouseover = function() { (this as HTMLElement).style.background = '#6d28d9'; };
   saveBtn.onmouseout = function() { (this as HTMLElement).style.background = '#7c3aed'; };
   saveBtn.onclick = function() {
+    const { titleInput, contentArea, catSelect, catCustomInput, tagsInput } = bodyResult;
     const name = titleInput.value.trim();
     const text = contentArea.value.trim();
     if (!name) { showPasteToast('❌ Title is required', true); titleInput.focus(); return; }
@@ -345,8 +346,10 @@ function _buildPromptModalFooter(
     saveBtn.textContent = '⏳ Saving…';
 
     const category = getSelectedCategory(catSelect, catCustomInput);
-    const promptPayload: Record<string, string> = { name: name, text: text, source: 'user' };
+    const tags = tagsInput.value.split(',').map(t => t.trim()).filter(Boolean);
+    const promptPayload: Record<string, any> = { name: name, text: text, source: 'user' };
     if (category) promptPayload.category = category;
+    if (tags.length > 0) promptPayload.tags = tags;
     if (isEdit && editPrompt!.id) promptPayload.id = editPrompt!.id;
 
     sendToExtension('SAVE_PROMPT', { prompt: promptPayload }).then(function(resp: Record<string, unknown>) {
