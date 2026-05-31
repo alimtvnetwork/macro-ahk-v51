@@ -133,10 +133,13 @@ function _buildPromptModalBody(initialData: Record<string, unknown>): PromptBody
   const catResult = _buildCategorySelect(initialData);
   body.appendChild(catResult.catWrap);
 
+  const tagsResult = _buildTagsInput(initialData);
+  body.appendChild(tagsResult.tagsWrap);
+
   _buildFileDropZone(body, contentArea, charCount, titleInput);
   _buildVariableReference(body);
 
-  return { body, titleInput, contentArea, catSelect: catResult.catSelect, catCustomInput: catResult.catCustomInput };
+  return { body, titleInput, contentArea, catSelect: catResult.catSelect, catCustomInput: catResult.catCustomInput, tagsInput: tagsResult.tagsInput };
 }
 
 function _buildTitleAndContent(body: HTMLElement, initialData: Record<string, unknown>): { titleInput: HTMLInputElement; contentArea: HTMLTextAreaElement; charCount: HTMLElement } {
