@@ -148,3 +148,60 @@ export async function syncTaskQueueToDb(projectId: string, projectName: string, 
     logError('MacroDb', 'syncTaskQueueToDb failed', err);
   }
 }
+
+/**
+ * Manual trigger to sync current IndexedDB queue state to SQLite.
+ */
+export async function forceSyncQueueToDb(): Promise<void> {
+  const { loadTaskQueue } = await import('../task-queue');
+  const { extractProjectIdFromUrl } = await import('../workspace-detection');
+  const { state } = await import('../shared-state');
+  
+  const projectId = extractProjectIdFromUrl();
+  if (!projectId) return;
+
+  const queueState = await loadTaskQueue();
+  const projectName = state.projectNameFromApi || state.projectNameFromDom || 'Unknown Project';
+  
+  log('[MacroDb] Force-syncing task queue to SQLite...', 'check');
+  await syncTaskQueueToDb(projectId, projectName, queueState.tasks);
+  log('[MacroDb] Queue synced to SQLite', 'success');
+}
+
+/**
+ * Purge communication history older than N days.
+ */
+export async function purgeOldCommunications(days: number = 30): Promise<void> {
+  const sql = `DELETE FROM Communications WHERE Timestamp < datetime('now', '-${days} days')`;
+  try {
+    await sendToExtension('PROJECT_API', {
+      project: DB_NAME,
+      method: 'SCHEMA',
+      endpoint: 'rawSql',
+      params: { sql }
+    });
+    log(`[MacroDb] Purged communications older than ${days} days`, 'info');
+  } catch (err) {
+    logError('MacroDb', 'purgeOldCommunications failed', err);
+  }
+}
+
+/**
+ * Get communication history for the current project.
+ */
+export async function getCommunicationHistory(projectId: string, limit: number = 50): Promise<any[]> {
+  const sql = `SELECT * FROM v_prompt_history WHERE ProjectId = '${projectId.replace(/'/g, "''")}' ORDER BY Timestamp DESC LIMIT ${limit}`;
+  try {
+    const resp = await sendToExtension('PROJECT_API', {
+      project: DB_NAME,
+      method: 'QUERY',
+      endpoint: 'rawSql',
+      params: { sql }
+    });
+    return resp?.isOk ? resp.rows || [] : [];
+  } catch (err) {
+    logError('MacroDb', 'getCommunicationHistory failed', err);
+    return [];
+  }
+}
+
