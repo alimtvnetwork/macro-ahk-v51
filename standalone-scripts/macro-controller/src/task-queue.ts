@@ -14,8 +14,10 @@ export interface MacroTask {
   projectName: string;
   prompt: string;
   timestamp: number;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
+  status: 'pending' | 'processing' | 'completed' | 'failed' | 'hold';
   error?: string;
+  retryCount?: number;
+  holdUntil?: number;
 }
 
 export interface TaskQueueState {
@@ -109,6 +111,13 @@ export async function clearCompletedTasks(): Promise<void> {
     log(`[TaskQueue] Cleared ${count - queueState.tasks.length} completed tasks`, 'info');
   }
 }
+
+/**
+ * Shared queue delay countdown state.
+ */
+let _queueDelayUntil = 0;
+export function setQueueDelayUntil(ts: number): void { _queueDelayUntil = ts; }
+export function getQueueDelayUntil(): number { return _queueDelayUntil; }
 
 /**
  * Check if the "Return to Extension" button is present and pause queue if so.

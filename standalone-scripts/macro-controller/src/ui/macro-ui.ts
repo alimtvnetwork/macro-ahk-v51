@@ -3,7 +3,7 @@
  */
 
 import { taskNextState, type TaskNextDeps } from './task-next-ui';
-import { loadTaskQueue, saveTaskQueue, updateTaskStatus, clearCompletedTasks, type MacroTask, type TaskQueueState } from '../task-queue';
+import { loadTaskQueue, saveTaskQueue, updateTaskStatus, clearCompletedTasks, getQueueDelayUntil, type MacroTask, type TaskQueueState } from '../task-queue';
 import { TaskQueueManager } from '../task-manager';
 import { cPanelBg, cPanelFg, cPrimary, cPrimaryLight, cSuccess, cError, cWarning, cPanelBgAlt, cPanelBorder } from '../shared-state';
 import { log } from '../logging';
@@ -20,10 +20,19 @@ export function buildTaskQueueSection(): HTMLElement {
   const header = document.createElement('div');
   header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;';
   
+  const titleWrap = document.createElement('div');
+  titleWrap.style.cssText = 'display:flex;align-items:center;gap:6px;';
+
   const title = document.createElement('div');
   title.style.cssText = 'font-size:11px;font-weight:700;color:' + cPrimaryLight + ';text-transform:uppercase;letter-spacing:0.5px;';
   title.textContent = '📋 Task Queue';
-  header.appendChild(title);
+  titleWrap.appendChild(title);
+
+  const countdownBadge = document.createElement('span');
+  countdownBadge.id = 'task-queue-countdown';
+  countdownBadge.style.cssText = 'font-size:9px;color:' + cWarning + ';font-weight:600;min-width:40px;text-align:right;';
+  titleWrap.appendChild(countdownBadge);
+  header.appendChild(titleWrap);
 
   const controls = document.createElement('div');
   controls.style.cssText = 'display:flex;gap:6px;';
@@ -62,15 +71,26 @@ export function buildTaskQueueSection(): HTMLElement {
   section.appendChild(listContainer);
 
   // Polling for updates
-  const refreshHandler = () => refreshTaskQueueUI(listContainer);
+  const refreshHandler = () => {
+    refreshTaskQueueUI(listContainer);
+    _updateQueueCountdown(countdownBadge);
+  };
   listContainer.addEventListener('refresh-queue', refreshHandler);
   
-  setInterval(refreshHandler, 5000);
+  setInterval(refreshHandler, 1000);
   refreshHandler();
 
-
-
   return section;
+}
+
+function _updateQueueCountdown(badge: HTMLElement): void {
+  const until = getQueueDelayUntil();
+  if (until > Date.now()) {
+    const secs = Math.ceil((until - Date.now()) / 1000);
+    badge.textContent = `⏳ ${secs}s`;
+  } else {
+    badge.textContent = '';
+  }
 }
 
 /**
@@ -99,7 +119,12 @@ async function refreshTaskQueueUI(container: HTMLElement): Promise<void> {
     
     const status = document.createElement('div');
     status.style.cssText = `font-size:9px;color:${getStatusColor(task.status)};font-weight:600;`;
-    status.textContent = task.status.toUpperCase();
+    if (task.status === 'hold' && task.holdUntil) {
+      const secs = Math.max(0, Math.ceil((task.holdUntil - Date.now()) / 1000));
+      status.textContent = `HOLD ${secs}s`;
+    } else {
+      status.textContent = task.status.toUpperCase();
+    }
     row1.appendChild(status);
     
     item.appendChild(row1);
@@ -121,6 +146,44 @@ function getStatusColor(status: MacroTask['status']): string {
     case 'processing': return cPrimary;
     case 'completed': return cSuccess;
     case 'failed': return cError;
+    case 'hold': return cWarning;
     default: return '#9ca3af';
   }
+}
+
+/** Opens a full-screen modal showing the task queue. */
+export function showTaskQueueModal(): void {
+  const existing = document.getElementById('macro-task-queue-modal');
+  if (existing) { existing.remove(); return; }
+
+  const overlay = document.createElement('div');
+  overlay.id = 'macro-task-queue-modal';
+  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+  overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+  const modal = document.createElement('div');
+  modal.style.cssText = 'background:' + cPanelBg + ';border:1px solid ' + cPanelBorder + ';border-radius:12px;width:92%;max-width:560px;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 25px 60px rgba(0,0,0,0.5);overflow:hidden;';
+  modal.onclick = (e) => e.stopPropagation();
+
+  const header = document.createElement('div');
+  header.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid ' + cPanelBorder + ';flex-shrink:0;';
+  header.innerHTML = `<span style="font-size:14px;font-weight:700;color:${cPrimaryLight};">📋 Task Queue</span>`;
+
+  const closeBtn = document.createElement('span');
+  closeBtn.textContent = '✕';
+  closeBtn.style.cssText = 'cursor:pointer;color:#64748b;font-size:18px;';
+  closeBtn.onclick = () => overlay.remove();
+  header.appendChild(closeBtn);
+  modal.appendChild(header);
+
+  const body = document.createElement('div');
+  body.style.cssText = 'padding:12px;flex:1;overflow-y:auto;';
+
+  // Reuse the section builder logic
+  const queueSection = buildTaskQueueSection();
+  body.appendChild(queueSection);
+  modal.appendChild(body);
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
 }

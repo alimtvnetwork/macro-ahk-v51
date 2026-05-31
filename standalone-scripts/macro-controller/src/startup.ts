@@ -323,6 +323,27 @@ function createUiAndObserver(): void {
     scheduleUiCreationRetry(mc, 1);
   }
   startWorkspaceObserver();
+  _checkPendingTasksOnStartup();
+}
+
+/** Check for pending tasks and auto-resume if queue is not paused. */
+function _checkPendingTasksOnStartup(): void {
+  setTimeout(async () => {
+    try {
+      const { loadTaskQueue } = await import('./task-queue');
+      const { TaskQueueManager } = await import('./task-manager');
+      const queueState = await loadTaskQueue();
+      const pending = queueState.tasks.filter(t => t.status === 'pending' || t.status === 'hold');
+      if (pending.length > 0 && !queueState.isPaused) {
+        showToast(`📋 Resuming ${pending.length} pending task${pending.length > 1 ? 's' : ''} from queue`, 'info', { noStop: true });
+        void TaskQueueManager.getInstance().startProcessing();
+      } else if (pending.length > 0 && queueState.isPaused) {
+        showToast(`📋 ${pending.length} task${pending.length > 1 ? 's' : ''} in queue (paused). Open Task Queue to resume.`, 'info', { noStop: true });
+      }
+    } catch (_e: unknown) {
+      /* Non-critical startup check — silently ignore */
+    }
+  }, 2000);
 }
 
 function tryCreateUiNow(mc: MacroController): boolean {

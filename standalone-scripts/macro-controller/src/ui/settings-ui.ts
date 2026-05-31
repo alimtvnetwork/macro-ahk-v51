@@ -43,6 +43,7 @@ import {
   buildLoggingPanel,
   buildConfigDbPanel,
   buildGeneralPanel,
+  buildHistoryPanel,
 } from './settings-tab-panels';
 import { CssFragment } from '../types';
 // ============================================
@@ -187,7 +188,7 @@ function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => Resolved
   panels.push(timingResult.panel);
   panels.push(buildTaskNextPanel(makeField).panel);
   panels.push(buildLoggingPanel(deps).panel);
-  panels.push((window as any).marco_buildHistoryPanel().panel);
+  panels.push(buildHistoryPanel().panel);
   panels.push(buildConfigDbPanel(deps, makeField).panel);
   panels.push(generalResult.panel);
 

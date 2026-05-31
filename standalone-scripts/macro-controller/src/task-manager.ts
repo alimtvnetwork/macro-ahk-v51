@@ -3,7 +3,7 @@
  * Coordinates queue processing, delays, and state synchronization.
  */
 
-import { loadTaskQueue, saveTaskQueue, updateTaskStatus, checkForReturnButton, type MacroTask, type TaskQueueState } from './task-queue';
+import { loadTaskQueue, saveTaskQueue, updateTaskStatus, checkForReturnButton, setQueueDelayUntil, type MacroTask, type TaskQueueState } from './task-queue';
 import { getSettingsOverrides } from './settings-store';
 import { log, logSub } from './logging';
 import { getByXPath, isReturnButtonVisible } from './xpath-utils';
@@ -46,15 +46,10 @@ export class TaskQueueManager {
     try {
       while (this._isProcessing) {
         const queueState = await loadTaskQueue();
-        const nextTask = queueState.tasks.find(t => t.status === 'pending');
+        const now = Date.now();
+        const nextTask = queueState.tasks.find(t => t.status === 'pending' || (t.status === 'hold' && (t.holdUntil ?? 0) <= now));
         
         // Check for return button (indicates we should pause/delay)
-        if (checkForReturnButton() || isReturnButtonVisible()) {
-          log('[TaskQueue] "Return to Extension" button detected. Pausing processing loop.', 'warn');
-          this._isProcessing = false;
-          break;
-        }
-
         if (checkForReturnButton() || isReturnButtonVisible()) {
           log('[TaskQueue] "Return to Extension" button detected. Pausing processing loop.', 'warn');
           this._isPaused = true;
@@ -71,12 +66,14 @@ export class TaskQueueManager {
         
         // Apply configured delay
         const overrides = getSettingsOverrides();
-        // Default to 22s as requested by user
         const delaySec = overrides.nextSubmissionDelaySeconds ?? 22;
         
         if (overrides.enableNextSubmissionDelay !== false) {
           log(`[TaskQueue] Waiting ${delaySec}s before next task...`, 'info');
-          await new Promise(resolve => setTimeout(resolve, delaySec * 1000));
+          const delayMs = delaySec * 1000;
+          setQueueDelayUntil(Date.now() + delayMs);
+          await new Promise(resolve => setTimeout(resolve, delayMs));
+          setQueueDelayUntil(0);
         }
       }
     } catch (err) {
@@ -100,7 +97,7 @@ export class TaskQueueManager {
     });
 
     if (outcome === 'failed') {
-      await updateTaskStatus(task.id, 'failed', 'Injection failed');
+      await this._handleTaskFailure(task, 'Injection failed');
       return;
     }
 
@@ -115,10 +112,33 @@ export class TaskQueueManager {
       
       log(`[TaskQueue] Task completed: ${task.id}`, 'success');
     } else {
-      // Fallback: Use clipboard if submit button not found but injection worked
-      log(`[TaskQueue] Submit button not found for task ${task.id}. Retrying next cycle.`, 'warn');
-      await updateTaskStatus(task.id, 'failed', 'Submit button not found');
+      await this._handleTaskFailure(task, 'Submit button not found');
       showPasteToast('⚠️ Submit button not found - task marked failed', true);
+    }
+  }
+
+  private async _handleTaskFailure(task: MacroTask, reason: string): Promise<void> {
+    const overrides = getSettingsOverrides();
+    const retries = task.retryCount ?? 0;
+    const maxRetries = 3;
+
+    if (overrides.retryOnFailure !== false && retries < maxRetries) {
+      const nextRetry = retries + 1;
+      const holdMs = 10000 * nextRetry; // 10s, 20s, 30s backoff
+      log(`[TaskQueue] Task ${task.id} failed (${reason}). Retry ${nextRetry}/${maxRetries} in ${holdMs / 1000}s.`, 'warn');
+      
+      const queueState = await loadTaskQueue();
+      const t = queueState.tasks.find(t => t.id === task.id);
+      if (t) {
+        t.status = 'hold';
+        t.error = reason;
+        t.retryCount = nextRetry;
+        t.holdUntil = Date.now() + holdMs;
+        await saveTaskQueue(queueState);
+      }
+    } else {
+      log(`[TaskQueue] Task ${task.id} failed permanently: ${reason}`, 'error');
+      await updateTaskStatus(task.id, 'failed', reason);
     }
   }
 

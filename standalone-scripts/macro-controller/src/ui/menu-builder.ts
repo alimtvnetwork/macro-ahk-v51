@@ -24,6 +24,7 @@ import { showCreditTotalsModal } from './credit-totals-modal';
 import { resolveAutoAttachConfig, runAutoAttachGroup } from './auto-attach';
 import { logError } from '../error-utils';
 import { sendToExtension } from './prompt-manager';
+import { showTaskQueueModal } from './macro-ui';
 
 import { SECTION_DIVIDER } from '../constants';
 export interface MenuBuilderDeps {
@@ -84,6 +85,7 @@ export function buildHamburgerMenu(deps: MenuBuilderDeps): MenuBuilderResult {
   menuDropdown.appendChild(createMenuItem(menuCtx, '🗄️', 'Database', 'Browse project database tables and rows', function() { showDatabaseModal(); }));
   menuDropdown.appendChild(createMenuItem(menuCtx, '📂', 'Projects', 'Show open Lovable projects grouped by workspace', function() { showProjectsModal(); }));
   menuDropdown.appendChild(createMenuItem(menuCtx, '💰', 'Credit Totals', 'Show aggregated credit usage across workspaces', function() { showCreditTotalsModal(); }));
+  menuDropdown.appendChild(createMenuItem(menuCtx, '📋', 'Task Queue', 'View pending and active prompt tasks', function() { showTaskQueueModal(); }));
 
   _addAutoAttachSection(menuCtx, menuDropdown);
 
