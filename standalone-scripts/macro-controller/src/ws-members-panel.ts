@@ -458,7 +458,7 @@ function findFooter(el: HTMLElement): HTMLElement | null {
 function swapFooter(el: HTMLElement, expanded: boolean): void {
   const footer = findFooter(el);
   if (!footer) return;
-  const _wsId = (el as unknown as { _wsId?: string })._wsId || '';
+  
   footer.innerHTML = expanded ? footerFormHtml() : footerCollapsedHtml();
   if (expanded) {
     const chipContainer = footer.querySelector('#marco-chip-input-container');

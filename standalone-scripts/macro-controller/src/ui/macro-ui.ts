@@ -181,10 +181,8 @@ export function buildTaskQueueSection(): HTMLElement {
   
   pauseOnErrorCheck.onchange = async () => {
   const s = getSettingsOverrides();
-  void (async () => {
-    s.pauseQueueOnError = (pauseOnErrorCheck as any).checked;
-    await saveSettingsOverrides(s);
-  })();
+  s.pauseQueueOnError = (pauseOnErrorCheck as any).checked;
+  void saveSettingsOverrides(s);
     s.pauseQueueOnError = pauseOnErrorCheck.checked;
     await saveSettingsOverrides(s);
   };

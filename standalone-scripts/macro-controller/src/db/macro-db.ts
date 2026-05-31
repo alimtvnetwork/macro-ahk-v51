@@ -156,7 +156,6 @@ export async function forceSyncQueueToDb(): Promise<void> {
   const { visualSyncConfirm } = await import('../ui/prompt-utils');
   const { loadTaskQueue } = await import('../task-queue');
   const { extractProjectIdFromUrl } = await import('../workspace-detection');
-  const { state } = await import('../shared-state');
   
   const projectId = extractProjectIdFromUrl();
   if (!projectId) return;
