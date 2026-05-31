@@ -198,6 +198,13 @@ export function buildTaskQueueSection(): HTMLElement {
   listContainer.addEventListener('refresh-queue', refreshHandler);
   
   setInterval(refreshHandler, 1000);
+  
+  // Update pause button state based on manager
+  setInterval(() => {
+    const mgr = TaskQueueManager.getInstance();
+    updatePauseBtnStyle(mgr.isPaused(), mgr.isStopped());
+  }, 1000);
+
   refreshHandler();
 
   return section;
