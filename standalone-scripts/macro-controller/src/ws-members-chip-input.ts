@@ -2,7 +2,7 @@
  * Multi-email chip input component.
  * Validates emails, supports paste-splitting, and keyboard removal.
  */
-export function createChipInput(options: {
+export function createChipInput(options: { // eslint-disable-line max-lines-per-function
   placeholder?: string;
   onValidEmailsChange?: (emails: string[]) => void;
 }): HTMLElement {

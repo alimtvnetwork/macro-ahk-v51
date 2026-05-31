@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /**
  * MacroLoop Controller — Settings Tab Panel Builders
  *

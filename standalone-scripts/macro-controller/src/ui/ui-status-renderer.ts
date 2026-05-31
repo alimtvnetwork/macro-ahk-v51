@@ -43,7 +43,7 @@ export const statusRenderStats = statusRenderState.stats;
  * Update the status panel with current loop state, credit bars, and workspace info.
  * Uses a dirty-flag guard to skip innerHTML rebuilds when nothing changed.
  */
-export function updateStatus(): void {
+export function updateStatus(): void { // eslint-disable-line max-lines-per-function
   const el = document.getElementById(IDS.STATUS);
   if (!el) return;
 

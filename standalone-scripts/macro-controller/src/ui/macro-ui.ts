@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /**
  * MacroLoop Controller — Task Queue UI (Modal & Section)
  */
