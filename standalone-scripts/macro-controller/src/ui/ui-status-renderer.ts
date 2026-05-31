@@ -65,7 +65,7 @@ export function updateStatus(): void {
     loopCreditState.lastCheckedAt || 0,
     loopCreditState.currentWs ? loopCreditState.currentWs.name : '',
     (loopCreditState.perWorkspace || []).length,
-    (state as any).__queue_count || 0
+    (state as { __queue_count?: number }).__queue_count || 0
   ].join('|');
 
   // Skip innerHTML rebuild if nothing changed

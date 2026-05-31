@@ -221,7 +221,7 @@ function buildIOButton(): HTMLElement {
   btn.onmouseout = function() { btn.style.background = 'rgba(124,58,237,0.55)'; };
   btn.onclick = function(e: Event) {
     e.stopPropagation();
-    void import('./prompt-io-dialog').then(function(mod) { mod.renderPromptIODialog(); });
+    void import('./prompt-io-dialog').then(function(mod) { (mod as { renderPromptIODialog: () => void }).renderPromptIODialog(); });
   };
   return btn;
 }
