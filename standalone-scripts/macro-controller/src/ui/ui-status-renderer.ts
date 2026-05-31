@@ -8,7 +8,7 @@
  */
 
 import { clearSkeletons } from './skeleton';
-import { IDS, TIMING, state, loopCreditState, cWarning, tFontTiny } from '../shared-state';
+import { IDS, TIMING, state, loopCreditState, cWarning, tFontTiny, cPrimaryLight, cLogSuccess } from '../shared-state';
 import { calcTotalCredits, calcAvailableCredits, renderCreditBar } from '../credit-api';
 
 // ============================================
@@ -63,7 +63,8 @@ export function updateStatus(): void {
     state.lastStatusCheck,
     loopCreditState.lastCheckedAt || 0,
     loopCreditState.currentWs ? loopCreditState.currentWs.name : '',
-    (loopCreditState.perWorkspace || []).length
+    (loopCreditState.perWorkspace || []).length,
+    (state as any).__queue_count || 0
   ].join('|');
 
   // Skip innerHTML rebuild if nothing changed
@@ -86,9 +87,32 @@ export function updateStatus(): void {
     progressContainer.id = 'marco-progress-container';
     creditContainer = document.createElement('div');
     creditContainer.id = 'marco-credit-container';
+    
+    const queueStatus = document.createElement('div');
+    queueStatus.id = 'marco-queue-status';
+    queueStatus.style.cssText = 'font-size:9px;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center;';
+
     el.appendChild(statusLine);
     el.appendChild(progressContainer);
     el.appendChild(creditContainer);
+    el.appendChild(queueStatus);
+  }
+
+  // Update Queue Status
+  const queueStatusEl = document.getElementById('marco-queue-status');
+  if (queueStatusEl) {
+    import('../task-queue').then(m => {
+      m.loadTaskQueue().then(queue => {
+        const pending = queue.tasks.filter(t => t.status === 'pending').length;
+        (state as any).__queue_count = pending;
+        queueStatusEl.innerHTML = `
+          <span style="color:#64748b;display:flex;align-items:center;gap:4px;">
+            <span style="color:${cLogSuccess};">●</span> Synced Queue:
+          </span>
+          <span style="${pending > 0 ? `color:${cPrimaryLight};font-weight:700;` : 'color:#64748b;'}">${pending} Tasks</span>
+        `;
+      });
+    });
   }
 
   // Credit bars (innerHTML OK — cached via MC-03, changes rarely)
