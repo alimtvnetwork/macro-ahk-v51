@@ -984,8 +984,16 @@ function renderPromptItem(
 
   if (hasText) {
     appendPromptActions(actions, p, promptsDropdown, promptsCfg, ctx, taskNextDeps);
-    item.onclick = async function(e: Event) {
+    item.onclick = async function(e: MouseEvent) {
       if (actions.contains(e.target as Node)) return;
+      
+      // Inline Editor Trigger (Alt + Click)
+      if (e.altKey) {
+        e.stopPropagation();
+        _openInlinePromptEditor(item, p, ctx, taskNextDeps);
+        return;
+      }
+
       log('Prompt clicked: "' + p.name + '" (' + p.text.length + ' chars)', 'info');
       const outcome = await pasteIntoEditor(p.text, promptsCfg, getByXPathAsElement);
       if (outcome === 'injected' || outcome === 'clipboard') {
