@@ -79,8 +79,36 @@ test.describe('E2E-23 — Multi-Tab State Synchronization', () => {
 });
 
 async function navigateToSection(page: Page, sectionName: string) {
-  // Use a more robust selector for the sidebar buttons
-  const navButton = page.locator('nav').getByRole('button', { name: sectionName, exact: true });
-  await expect(navButton).toBeVisible();
+  // 1. Wait for the app to be ready, potentially bypassing onboarding
+  const marker = page.locator('[data-testid="options-state-marker"]');
+  await expect(marker).toBeAttached({ timeout: 15000 });
+  
+  // If we're in onboarding, click "Continue/Get Started" until we reach the ready state
+  let attempts = 0;
+  while (attempts < 5) {
+    const branch = await marker.getAttribute('data-branch');
+    if (branch !== 'onboarding-flow') break;
+
+    console.log(`Bypassing onboarding step ${attempts + 1}...`);
+    const cta = page.locator('[data-onboarding-cta]');
+    if (await cta.isVisible()) {
+      await cta.click();
+      // Wait a bit for the animation/transition
+      await page.waitForTimeout(500);
+    } else {
+      break;
+    }
+    attempts++;
+  }
+
+  // 2. Ensure we are in the 'ready' branch where the sidebar exists
+  await expect(marker).toHaveAttribute('data-branch', 'ready', { timeout: 15000 });
+
+  // 3. Find the navigation button by its accessible name (robust)
+  // We use .first() to handle cases where there might be multiple (hidden/visible)
+  const navButton = page.getByRole('button', { name: sectionName }).first();
+  
+  // If not visible yet, maybe we need to wait for a bit
+  await expect(navButton).toBeVisible({ timeout: 10000 });
   await navButton.click();
 }
