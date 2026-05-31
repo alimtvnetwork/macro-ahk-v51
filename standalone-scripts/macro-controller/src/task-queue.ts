@@ -93,10 +93,20 @@ export async function addTaskToQueue(prompt: string, projectName: string): Promi
  */
 export async function updateTaskStatus(taskId: string, status: MacroTask['status'], error?: string): Promise<void> {
   const queueState = await loadTaskQueue();
-  const task = queueState.tasks.find(t => t.id === taskId);
-  if (task) {
+  const index = queueState.tasks.findIndex(t => t.id === taskId);
+  if (index !== -1) {
+    const task = queueState.tasks[index];
     task.status = status;
     if (error) task.error = error;
+    
+    // Move completed/failed to history
+    if (status === 'completed' || status === 'failed') {
+      if (!queueState.history) queueState.history = [];
+      queueState.history.unshift(task);
+      if (queueState.history.length > 50) queueState.history.pop();
+      queueState.tasks.splice(index, 1);
+    }
+    
     await saveTaskQueue(queueState);
   }
 }
