@@ -136,21 +136,11 @@ type StorageReadResult =
     | { Kind: "Bytes"; Bytes: Uint8Array }
     | { Kind: "Error"; Error: unknown };
 
-function readBytesFromStorage(): StorageReadResult {
-    let raw: string | null;
+async function readBytesFromStorage(): Promise<StorageReadResult> {
     try {
-        raw = localStorage.getItem(STORAGE_KEY);
-    } catch (err) {
-        // Access blocked entirely (e.g. SecurityError in sandboxed iframes).
-        return { Kind: "Error", Error: err };
-    }
-    if (raw === null) return { Kind: "Empty" };
-    try {
-        const arr = JSON.parse(raw) as unknown;
-        if (!Array.isArray(arr)) {
-            return { Kind: "Error", Error: new Error("stored payload is not a numeric array") };
-        }
-        return { Kind: "Bytes", Bytes: new Uint8Array(arr as number[]) };
+        const bytes = await WorkspaceStorage.get<Uint8Array>(STORAGE_KEY);
+        if (!bytes) return { Kind: "Empty" };
+        return { Kind: "Bytes", Bytes: bytes };
     } catch (err) {
         return { Kind: "Error", Error: err };
     }
@@ -158,24 +148,18 @@ function readBytesFromStorage(): StorageReadResult {
 
 /**
  * Write result mirrors the read shape so the bootstrap path can
- * distinguish "saved fine" from "stayed in memory only". Mutation
- * helpers downstream still call this and only `console.warn` on
- * failure, since by then the user has been working with the library
- * and a hard error would lose unsaved work.
+ * distinguish "saved fine" from "stayed in memory only".
  */
-function writeBytesToStorage(bytes: Uint8Array): { Ok: true } | { Ok: false; Error: unknown } {
+async function writeBytesToStorage(bytes: Uint8Array): Promise<{ Ok: true } | { Ok: false; Error: unknown }> {
     try {
-        // localStorage only takes strings — JSON-encode as a numeric
-        // array. Acceptable for a preview-tier persistence (small DBs);
-        // production wiring will flip this over to OPFS.
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(Array.from(bytes)));
+        await WorkspaceStorage.set(STORAGE_KEY, bytes);
         return { Ok: true };
     } catch (err) {
-        // Quota / private-mode failures should not crash the UI.
-        console.warn("useStepLibrary: localStorage write failed", err);
+        console.warn("useStepLibrary: WorkspaceStorage write failed", err);
         return { Ok: false, Error: err };
     }
 }
+
 
 /* ------------------------------------------------------------------ */
 /*  Public hook surface                                                */
