@@ -7,7 +7,7 @@
 
 import { log } from '../logging';
 import { logError } from '../error-utils';
-import type { PromptEntry as LoaderPromptEntry } from '../types';
+import type { PromptEntry as LoaderPromptEntry, ResolvedPromptsConfig } from '../types';
 
 import { cPanelFg, cPanelFgDim, cPrimary, cPrimaryLight, cBtnMenuHover, lDropdownRadius } from '../shared-state';
 import { getByXPath } from '../xpath-utils';
@@ -171,7 +171,7 @@ export function renderPromptsDropdown(ctx: PromptContext, taskNextDeps: TaskNext
   _hydrateMemSnapshotOnce();
 
   const promptsDropdown = ctx.promptsDropdown;
-  const promptsCfg = getPromptsConfig();
+  const promptsCfg = getPromptsConfig() as ResolvedPromptsConfig;
   const entries = promptsCfg.entries;
   const currentHash = computePromptHash(entries as CachedPromptEntry[]);
   const currentFilter = _computeFilterKey();
@@ -540,7 +540,7 @@ function _renderFolderTree(
     };
 
     folders[folderName].forEach((p, idx) => {
-      folderBody.appendChild(renderPromptItem(idx, p, container, promptsCfg, ctx, taskNextDeps));
+      folderBody.appendChild(renderPromptItem(idx, p, container, promptsCfg as ResolvedPromptsConfig, ctx, taskNextDeps));
     });
 
     folderWrap.appendChild(folderHeader);
@@ -550,7 +550,7 @@ function _renderFolderTree(
 
   // Render root items
   rootItems.forEach((p, idx) => {
-    container.appendChild(renderPromptItem(idx, p, container, promptsCfg, ctx, taskNextDeps));
+    container.appendChild(renderPromptItem(idx, p, container, promptsCfg as ResolvedPromptsConfig, ctx, taskNextDeps));
   });
 }
 
@@ -1166,8 +1166,8 @@ function appendPromptActions(
 }
 
 /** Build the favorite ⭐ toggle icon for a prompt item. */
-function _buildFavoriteIcon(p: PromptEntry, _dropdown: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
-  const isFav = !!p.isFavorite;
+function _buildFavoriteIcon(p: LoaderPromptEntry, _dropdown: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
+  const isFav = !!(p as any).isFavorite;
   const icon = _makeActionIcon(isFav ? '⭐' : '☆', isFav ? 'Remove from favorites' : 'Mark as favorite', isFav ? '1' : '0.4');
   icon.onclick = function(e: Event) {
     e.stopPropagation();

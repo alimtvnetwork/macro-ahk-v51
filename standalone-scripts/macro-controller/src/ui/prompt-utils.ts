@@ -439,11 +439,11 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
     const capturedTarget = target as HTMLElement & { __captured?: boolean };
     if (capturedTarget && !capturedTarget.__captured) {
       capturedTarget.__captured = true;
-      const isInput = target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
+      const isInput = target && (target.tagName === 'TEXTAREA' || target.tagName === 'INPUT');
       const eventType = isInput ? 'input' : 'input'; // both use input for content changes
       
-      target.addEventListener(eventType, () => {
-        const text = isInput ? (target as HTMLInputElement).value : target.textContent || '';
+      target?.addEventListener(eventType, () => {
+        const text = isInput ? (target as HTMLInputElement).value : target?.textContent || '';
         if (text.trim().length > 2) {
           throttleSave(text.trim());
         }
