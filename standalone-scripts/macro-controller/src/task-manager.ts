@@ -60,7 +60,7 @@ export class TaskQueueManager {
     this._isProcessing = true;
     this._abortController = new AbortController();
     
-    log('[TaskQueue] Starting queue processing...', 'info');
+    this._logExecution('Starting queue processing loop...', 'info');
     
     try {
       while (this._isProcessing && !this._isStopped) {
