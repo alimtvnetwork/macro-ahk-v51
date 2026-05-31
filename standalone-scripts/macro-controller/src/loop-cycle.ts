@@ -391,8 +391,8 @@ export function runCycle(): void {
 
   state.__cycleInFlight = true;
 
-  if (state.isDelegating) {
-    if (!handleDelegateTimeout()) return;
+  if (state.isDelegating && !handleDelegateTimeout()) {
+    return;
   }
 
   state.cycleCount++;

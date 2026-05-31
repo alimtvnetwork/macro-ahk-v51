@@ -123,14 +123,14 @@ function attachRowListeners(body: HTMLElement, union: AggregatedMember[]): void 
     const member = union.find(m => m.userId === userId);
     if (!member) return;
 
-    row.addEventListener('contextmenu', (e: any) => {
+    row.addEventListener('contextmenu', (e: MouseEvent) => {
         e.preventDefault();
         showMemberRowContextMenu(member, e.clientX, e.clientY);
     });
 
     const moreBtn = row.querySelector('.bulk-member-more');
     if (moreBtn) {
-        moreBtn.addEventListener('click', (e: any) => {
+        moreBtn.addEventListener('click', (e: MouseEvent) => {
             e.stopPropagation();
             showMemberRowContextMenu(member, e.clientX, e.clientY);
         });
@@ -248,7 +248,7 @@ function renderFooter(): void {
   const inviteBtn = document.getElementById('bulk-invite-btn') as HTMLButtonElement;
   inviteBtn.disabled = true;
   inviteBtn.onclick = () => {
-    const role = (document.getElementById('bulk-role-select') as HTMLSelectElement).value as any;
+    const role = (document.getElementById('bulk-role-select') as HTMLSelectElement).value as MemberRole;
     if (activeState) {
         inviteMemberMany(activeState.wsIds, validEmails, role, loopCreditState.perWorkspace || []);
     }

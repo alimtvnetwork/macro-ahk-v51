@@ -28,7 +28,7 @@ const membersCache = new Map<string, { members: WorkspaceMember[]; total: number
 const CACHE_TTL = 30000; // 30s
 
 interface MarcoSdkShape {
-  api?: { memberships?: { list: (wsId: string, options?: { limit?: number; baseUrl?: string }) => Promise<{ ok: boolean; status: number; data: any }> } };
+  api?: { memberships?: { list: (wsId: string, options?: { limit?: number; baseUrl?: string }) => Promise<{ ok: boolean; status: number; data: { members?: WorkspaceMember[]; total?: number } }> } };
 }
 
 function getMemberships() {

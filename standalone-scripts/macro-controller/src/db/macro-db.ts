@@ -190,7 +190,7 @@ export async function purgeOldCommunications(days: number = 30): Promise<void> {
 /**
  * Get communication history for the current project.
  */
-export async function getCommunicationHistory(projectId: string, limit: number = 50): Promise<any[]> {
+export async function getCommunicationHistory(projectId: string, limit: number = 50): Promise<unknown[]> {
   const sql = `SELECT * FROM v_prompt_history WHERE ProjectId = '${projectId.replace(/'/g, "''")}' ORDER BY Timestamp DESC LIMIT ${limit}`;
   try {
     const resp = await sendToExtension('PROJECT_API', {

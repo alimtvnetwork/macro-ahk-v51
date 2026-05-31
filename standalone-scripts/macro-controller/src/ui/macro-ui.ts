@@ -178,7 +178,7 @@ export function buildTaskQueueSection(): HTMLElement {
   
   const initialSettings = (function() {
     try {
-      return (window as any).RiseupAsiaMacroExt.Projects.MacroController.getSettingsOverrides();
+      return (window as unknown as { RiseupAsiaMacroExt: { Projects: { MacroController: { getSettingsOverrides: () => { pauseQueueOnError: boolean; maxTaskRetries: number } } } } }).RiseupAsiaMacroExt.Projects.MacroController.getSettingsOverrides();
     } catch {
       return { pauseQueueOnError: true, maxTaskRetries: 3 };
     }

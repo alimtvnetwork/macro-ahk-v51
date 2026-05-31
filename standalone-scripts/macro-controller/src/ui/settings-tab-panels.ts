@@ -9,7 +9,7 @@
 
 import { taskNextState } from './task-next-ui';
 import { getBackdropOpacity, setBackdropOpacity } from './panel-layout';
-import { getSettingsOverrides, saveSettingsOverrides, type PerWorkspaceLifecycleOverride } from '../settings-store';
+import { getSettingsOverrides, saveSettingsOverrides, type PerWorkspaceLifecycleOverride, type SettingsOverrides } from '../settings-store';
 import { showToast } from '../toast';
 import { logError } from '../error-utils';
 import type { ExtensionResponse, ResolvedPromptsConfig } from '../types';
@@ -141,7 +141,7 @@ export function buildTimingPanel(makeField: MakeFieldFn): TimingPanelResult {
 }
 
 /** Internal helper for automation toggles in Timing panel. */
-function _buildAutomationToggles(panel: HTMLElement, overrides: ReturnType<typeof getSettingsOverrides>): Record<string, HTMLInputElement> {
+function _buildAutomationToggles(panel: HTMLElement, overrides: SettingsOverrides): Record<string, HTMLInputElement> {
   const items = [
     { key: 'enableNextSubmissionDelay', label: 'Enable Submission Delay', value: overrides.enableNextSubmissionDelay !== false, hint: 'Wait between prompts in the queue.' },
     { key: 'autoDetectDelay', label: 'Auto-detect delay', value: overrides.autoDetectDelay !== false, hint: 'Automatically wait if Return button is detected.' },

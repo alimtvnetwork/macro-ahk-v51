@@ -300,7 +300,7 @@ function _importOverridesJson(
 
 async function _persistOverrideToggles(generalResult: GeneralPanelResult, timingResult: TimingPanelResult): Promise<void> {
   const current = getSettingsOverrides();
-  const next: any = { ...current };
+  const next: Partial<SettingsOverrides> = { ...current };
 
   if (generalResult.toggles) {
     next.enableCanceledCreditOverride = generalResult.toggles.enableCanceledCreditOverride?.checked ?? true;

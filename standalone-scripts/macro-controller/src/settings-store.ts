@@ -114,51 +114,39 @@ function sanitize(raw: unknown): SettingsOverrides {
   if (!raw || typeof raw !== 'object') return {};
   const r = raw as Record<string, unknown>;
   const out: SettingsOverrides = {};
-  if (isFiniteNonNegative(r.expiryGracePeriodDays)) {
-    out.expiryGracePeriodDays = Math.floor(r.expiryGracePeriodDays);
-  }
-  if (isFiniteNonNegative(r.refillWarningThresholdDays)) {
-    out.refillWarningThresholdDays = Math.floor(r.refillWarningThresholdDays);
-  }
-  if (isFiniteNonNegative(r.proZeroCreditBalanceCacheTtlMinutes)) {
-    out.proZeroCreditBalanceCacheTtlMinutes = Math.floor(r.proZeroCreditBalanceCacheTtlMinutes);
-  }
-  if (isFiniteNonNegative(r.projectsCacheTtlHours)) {
-    out.projectsCacheTtlHours = Math.floor(r.projectsCacheTtlHours);
-  }
-  if (typeof r.enableCanceledCreditOverride === 'boolean') {
-    out.enableCanceledCreditOverride = r.enableCanceledCreditOverride;
-  }
-  if (typeof r.enableWorkspaceStatusLabels === 'boolean') {
-    out.enableWorkspaceStatusLabels = r.enableWorkspaceStatusLabels;
-  }
-  if (typeof r.enableWorkspaceHoverDetails === 'boolean') {
-    out.enableWorkspaceHoverDetails = r.enableWorkspaceHoverDetails;
-  }
-  if (isFiniteNonNegative(r.hoverCardHideGracePeriodMs)) {
-    out.hoverCardHideGracePeriodMs = Math.floor(r.hoverCardHideGracePeriodMs);
-  }
-  if (isFiniteNonNegative(r.nextSubmissionDelaySeconds)) {
-    out.nextSubmissionDelaySeconds = Math.floor(r.nextSubmissionDelaySeconds);
-  }
-  if (typeof r.enableNextSubmissionDelay === 'boolean') {
-    out.enableNextSubmissionDelay = r.enableNextSubmissionDelay;
-  }
-  if (typeof r.autoDetectDelay === 'boolean') {
-    out.autoDetectDelay = r.autoDetectDelay;
-  }
-  if (typeof r.retryOnFailure === 'boolean') {
-    out.retryOnFailure = r.retryOnFailure;
-  }
-  if (isFiniteNonNegative(r.creditPollIntervalSeconds)) {
-    out.creditPollIntervalSeconds = Math.floor(r.creditPollIntervalSeconds);
-  }
-  if (typeof r.pauseQueueOnError === 'boolean') {
-    out.pauseQueueOnError = r.pauseQueueOnError;
-  }
-  if (isFiniteNonNegative(r.maxTaskRetries)) {
-    out.maxTaskRetries = Math.floor(r.maxTaskRetries);
-  }
+
+  const numericFields: Array<keyof SettingsOverrides> = [
+    'expiryGracePeriodDays',
+    'refillWarningThresholdDays',
+    'proZeroCreditBalanceCacheTtlMinutes',
+    'projectsCacheTtlHours',
+    'hoverCardHideGracePeriodMs',
+    'nextSubmissionDelaySeconds',
+    'creditPollIntervalSeconds',
+    'maxTaskRetries'
+  ];
+
+  numericFields.forEach(f => {
+    if (isFiniteNonNegative(r[f])) {
+      (out as any)[f] = Math.floor(r[f] as number);
+    }
+  });
+
+  const booleanFields: Array<keyof SettingsOverrides> = [
+    'enableCanceledCreditOverride',
+    'enableWorkspaceStatusLabels',
+    'enableWorkspaceHoverDetails',
+    'enableNextSubmissionDelay',
+    'autoDetectDelay',
+    'retryOnFailure',
+    'pauseQueueOnError'
+  ];
+
+  booleanFields.forEach(f => {
+    if (typeof r[f] === 'boolean') {
+      (out as any)[f] = r[f];
+    }
+  });
 
   const perWs = sanitizePerWorkspace(r.perWorkspace);
   if (perWs) {
