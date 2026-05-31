@@ -323,6 +323,29 @@ function createUiAndObserver(): void {
     scheduleUiCreationRetry(mc, 1);
   }
   startWorkspaceObserver();
+  _checkPendingTasksOnStartup();
+}
+
+/** Check for pending tasks and offer to resume via toast. */
+function _checkPendingTasksOnStartup(): void {
+  setTimeout(async () => {
+    try {
+      const { loadTaskQueue } = await import('./task-queue');
+      const { TaskQueueManager } = await import('./task-manager');
+      const queueState = await loadTaskQueue();
+      const pending = queueState.tasks.filter(t => t.status === 'pending' || t.status === 'hold');
+      if (pending.length > 0) {
+        showToast(`📋 ${pending.length} pending task${pending.length > 1 ? 's' : ''} in queue. Click to resume.`, 'info', {
+          noStop: true,
+          onClick: () => {
+            void TaskQueueManager.getInstance().startProcessing();
+          },
+        });
+      }
+    } catch (_e: unknown) {
+      // Non-critical startup check — silently ignore errors
+    }
+  }, 1500);
 }
 
 function tryCreateUiNow(mc: MacroController): boolean {
