@@ -386,34 +386,12 @@ function handleDelegateTimeout(): boolean {
 
  
 export function runCycle(): void {
-  if (!state.running) {
-    state.__cycleInFlight = false;
-    state.__cycleRetryPending = false;
-    log('SKIP: Loop not running', 'skip');
-
-    return;
-  }
-
-  if (state.__cycleRetryPending) {
-    log('SKIP: Retry already scheduled — waiting', 'skip');
-
-    return;
-  }
-
-  if (state.__cycleInFlight) {
-    log('SKIP: Previous cycle still in flight', 'skip');
-
-    return;
-  }
+  if (_checkLoopPreconditions()) return;
 
   state.__cycleInFlight = true;
 
   if (state.isDelegating) {
-    const canContinue = handleDelegateTimeout();
-
-    if (!canContinue) {
-      return;
-    }
+    if (!handleDelegateTimeout()) return;
   }
 
   state.cycleCount++;
@@ -427,6 +405,28 @@ export function runCycle(): void {
     return;
   }
 
+  _performCycleTasks();
+}
+
+function _checkLoopPreconditions(): boolean {
+  if (!state.running) {
+    state.__cycleInFlight = false;
+    state.__cycleRetryPending = false;
+    log('SKIP: Loop not running', 'skip');
+    return true;
+  }
+  if (state.__cycleRetryPending) {
+    log('SKIP: Retry already scheduled — waiting', 'skip');
+    return true;
+  }
+  if (state.__cycleInFlight) {
+    log('SKIP: Previous cycle still in flight', 'skip');
+    return true;
+  }
+  return false;
+}
+
+function _performCycleTasks(): void {
   // Task Queue Management Logic
   import('./task-manager').then(m => {
     const manager = m.TaskQueueManager.getInstance();
