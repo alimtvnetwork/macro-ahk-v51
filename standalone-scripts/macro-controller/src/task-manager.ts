@@ -3,7 +3,7 @@
  * Coordinates queue processing, delays, and state synchronization.
  */
 
-import { loadTaskQueue, saveTaskQueue, updateTaskStatus, checkForReturnButton, type MacroTask, type TaskQueueState } from './task-queue';
+import { loadTaskQueue, saveTaskQueue, updateTaskStatus, checkForReturnButton, setQueueDelayUntil, type MacroTask, type TaskQueueState } from './task-queue';
 import { getSettingsOverrides } from './settings-store';
 import { log, logSub } from './logging';
 import { getByXPath, isReturnButtonVisible } from './xpath-utils';
