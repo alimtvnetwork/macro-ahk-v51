@@ -441,11 +441,27 @@ function _appendFilteredItems(
   ctx: PromptContext,
   taskNextDeps: TaskNextDeps,
 ): void {
+  // 1. Render Favorites (pinned to top)
+  const favorites = entries.filter(p => p.isFavorite);
+  if (favorites.length > 0 && !getPromptCategoryFilter() && !_currentSearchQuery) {
+    const favHeader = document.createElement('div');
+    favHeader.style.cssText = 'padding:6px 10px;font-size:9px;font-weight:700;color:#facc15;background:rgba(250,204,21,0.05);text-transform:uppercase;letter-spacing:0.5px;';
+    favHeader.textContent = '⭐ Favorites';
+    container.appendChild(favHeader);
+    for (const [idx, p] of favorites.entries()) {
+      container.appendChild(renderPromptItem(idx, p, container, promptsCfg, ctx, taskNextDeps));
+    }
+    const sep = document.createElement('div');
+    sep.style.cssText = 'height:1px;background:rgba(124,58,237,0.2);margin:4px 0;';
+    container.appendChild(sep);
+  }
+
+  // 2. Render normal filtered items
   const filtered = filterByCategory(entries);
   if (filtered.length === 0) {
     const empty = document.createElement('div');
     empty.style.cssText = 'padding:12px 8px;text-align:center;color:' + cPanelFgDim + ';font-size:11px;';
-    empty.textContent = 'No prompts in this category';
+    empty.textContent = 'No prompts found';
     container.appendChild(empty);
     return;
   }
