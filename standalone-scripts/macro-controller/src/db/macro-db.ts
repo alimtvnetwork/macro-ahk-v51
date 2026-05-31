@@ -153,6 +153,7 @@ export async function syncTaskQueueToDb(projectId: string, projectName: string, 
  * Manual trigger to sync current IndexedDB queue state to SQLite.
  */
 export async function forceSyncQueueToDb(): Promise<void> {
+  const { visualSyncConfirm } = await import('../ui/prompt-utils');
   const { loadTaskQueue } = await import('../task-queue');
   const { extractProjectIdFromUrl } = await import('../workspace-detection');
   const { state } = await import('../shared-state');
@@ -165,6 +166,7 @@ export async function forceSyncQueueToDb(): Promise<void> {
   
   log('[MacroDb] Force-syncing task queue to SQLite...', 'check');
   await syncTaskQueueToDb(projectId, projectName, queueState.tasks);
+  visualSyncConfirm();
   log('[MacroDb] Queue synced to SQLite', 'success');
 }
 
@@ -202,6 +204,37 @@ export async function getCommunicationHistory(projectId: string, limit: number =
   } catch (err) {
     logError('MacroDb', 'getCommunicationHistory failed', err);
     return [];
+  }
+}
+
+/**
+ * Export the entire prompts.macro database as a SQL dump.
+ */
+export async function exportDatabaseDump(): Promise<void> {
+  try {
+    const resp = await sendToExtension('PROJECT_API', {
+      project: DB_NAME,
+      method: 'EXPORT',
+      endpoint: 'dump'
+    });
+    
+    if (resp && resp.isOk && resp.dump) {
+      const blob = new Blob([resp.dump as string], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+      a.href = url;
+      a.download = `prompts-macro-dump-${stamp}.sql`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+      log('Database dump exported successfully', 'success');
+    } else {
+      logError('MacroDb', 'Export failed: ' + (resp?.errorMessage || 'no dump data'));
+    }
+  } catch (err) {
+    logError('MacroDb', 'Failed to export database', err);
   }
 }
 
