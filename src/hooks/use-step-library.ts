@@ -366,8 +366,11 @@ export function useStepLibrary(): UseStepLibraryApi {
                     projectId = existing[0].ProjectId;
                 }
                 if (cancelled) return;
+                const bytes = wrapper.exportDbBytes();
+                setDbBytes(bytes);
                 setSql(sqljs);
                 setLib(wrapper);
+
                 setProject(wrapper.listProjects().find((p) => p.ProjectId === projectId) ?? null);
                 refreshFromDb(wrapper, projectId, setGroups, setStepsByGroup);
                 setGroupInputs(readAllGroupInputs());
