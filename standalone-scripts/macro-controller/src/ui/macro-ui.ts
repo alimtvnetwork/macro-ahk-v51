@@ -10,6 +10,8 @@ import { log } from '../logging';
 import { showToast } from '../toast';
 import { CssFragment } from '../types';
 
+let _activeQueueTab: 'active' | 'history' = 'active';
+
 /**
  * Build the Task Queue section for the Tools panel.
  */
