@@ -71,15 +71,26 @@ export function buildTaskQueueSection(): HTMLElement {
   section.appendChild(listContainer);
 
   // Polling for updates
-  const refreshHandler = () => refreshTaskQueueUI(listContainer);
+  const refreshHandler = () => {
+    refreshTaskQueueUI(listContainer);
+    _updateQueueCountdown(countdownBadge);
+  };
   listContainer.addEventListener('refresh-queue', refreshHandler);
   
   setInterval(refreshHandler, 1000);
   refreshHandler();
 
-
-
   return section;
+}
+
+function _updateQueueCountdown(badge: HTMLElement): void {
+  const until = getQueueDelayUntil();
+  if (until > Date.now()) {
+    const secs = Math.ceil((until - Date.now()) / 1000);
+    badge.textContent = `⏳ ${secs}s`;
+  } else {
+    badge.textContent = '';
+  }
 }
 
 /**
