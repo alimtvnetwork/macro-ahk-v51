@@ -24,7 +24,8 @@ export function aggregateMembers(perWs: PerWsMembers[]): {
     if (wsResult.error) continue;
     
     for (const m of wsResult.members) {
-      const userId = (m as any).user_id || (m as any).id || (m as any).email; // Fallback to email if no ID
+      const rm = m as WorkspaceMember & { user_id?: string; id?: string };
+      const userId = rm.user_id || rm.id || m.email; // Fallback to email if no ID
       if (!userId) continue;
 
       let agg = unionMap.get(userId);
@@ -32,7 +33,7 @@ export function aggregateMembers(perWs: PerWsMembers[]): {
         agg = {
           userId,
           email: m.email,
-          fullName: (m as any).display_name || (m as any).name || (m as any).email,
+          fullName: (m as WorkspaceMember & { display_name?: string; name?: string }).display_name || (m as WorkspaceMember & { display_name?: string; name?: string }).name || m.email,
           role: m.role || 'member',
           presenceCount: 0,
           workspaces: []

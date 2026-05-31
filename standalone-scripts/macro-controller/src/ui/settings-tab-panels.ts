@@ -488,7 +488,8 @@ function _showHistoryDetailModal(row: Record<string, unknown>): void {
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 
   const modal = document.createElement('div');
-  modal.style.cssText = 'background:' + ((state as any).cPanelBg || '#1a1625') + ';border:1px solid ' + ((state as any).cPanelBorder || '#2d2b3b') + ';border-radius:12px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.6);overflow:hidden;';
+  const s = state as Record<string, string>;
+  modal.style.cssText = 'background:' + (s.cPanelBg || '#1a1625') + ';border:1px solid ' + (s.cPanelBorder || '#2d2b3b') + ';border-radius:12px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.6);overflow:hidden;';
   
   const header = document.createElement('div');
   header.style.cssText = 'padding:16px 20px;border-bottom:1px solid ' + cPanelBorder + ';display:flex;justify-content:space-between;align-items:center;';
