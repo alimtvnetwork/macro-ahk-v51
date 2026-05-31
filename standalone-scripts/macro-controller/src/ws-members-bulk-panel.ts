@@ -123,16 +123,18 @@ function attachRowListeners(body: HTMLElement, union: AggregatedMember[]): void 
     const member = union.find(m => m.userId === userId);
     if (!member) return;
 
-    row.addEventListener('contextmenu', (e: MouseEvent) => {
+    row.addEventListener('contextmenu', (e: Event) => {
+        const mouseEvent = e as MouseEvent;
         e.preventDefault();
-        showMemberRowContextMenu(member, e.clientX, e.clientY);
+        showMemberRowContextMenu(member, mouseEvent.clientX, mouseEvent.clientY);
     });
 
     const moreBtn = row.querySelector('.bulk-member-more');
     if (moreBtn) {
-        moreBtn.addEventListener('click', (e: MouseEvent) => {
+        moreBtn.addEventListener('click', (e: Event) => {
+            const mouseEvent = e as MouseEvent;
             e.stopPropagation();
-            showMemberRowContextMenu(member, e.clientX, e.clientY);
+            showMemberRowContextMenu(member, mouseEvent.clientX, mouseEvent.clientY);
         });
     }
   });
@@ -181,10 +183,8 @@ function showMemberRowContextMenu(member: AggregatedMember, x: number, y: number
         }
     }));
     menu.appendChild(buildItem('❌ Remove from All', () => {
-        if (confirm(`Remove ${member.fullName} from ALL selected workspaces?`)) {
-            if (activeState) {
-                removeMemberMany(activeState.wsIds, member.userId, loopCreditState.perWorkspace || []);
-            }
+        if (confirm(`Remove ${member.fullName} from ALL selected workspaces?`) && activeState) {
+            removeMemberMany(activeState.wsIds, member.userId, loopCreditState.perWorkspace || []);
         }
     }));
 
@@ -248,7 +248,7 @@ function renderFooter(): void {
   const inviteBtn = document.getElementById('bulk-invite-btn') as HTMLButtonElement;
   inviteBtn.disabled = true;
   inviteBtn.onclick = () => {
-    const role = (document.getElementById('bulk-role-select') as HTMLSelectElement).value as MemberRole;
+    const role = (document.getElementById('bulk-role-select') as HTMLSelectElement).value as string;
     if (activeState) {
         inviteMemberMany(activeState.wsIds, validEmails, role, loopCreditState.perWorkspace || []);
     }

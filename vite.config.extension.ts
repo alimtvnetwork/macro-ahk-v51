@@ -293,7 +293,7 @@ function validateNoBackgroundDynamicImport(): Plugin {
             // dynamic-import scan does not false-positive on text like
             //   "Trailing comma is not allowed in import()"
             // which acorn ships as an error message constant.
-            const stripStringsAndComments = (src: string): string => {
+            const stripStringsAndComments = (src: string): string => { // eslint-disable-line sonarjs/cognitive-complexity
                 let out = "";
                 let i = 0;
                 const n = src.length;
