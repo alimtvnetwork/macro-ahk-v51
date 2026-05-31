@@ -206,10 +206,12 @@ export function buildTaskQueueSection(): HTMLElement {
   retriesInput.max = '10';
   retriesInput.value = String(initialSettings.maxTaskRetries ?? 3);
   retriesInput.style.cssText = `width:28px;background:${cPanelBgAlt};border:1px solid ${cPanelBorder};color:#fff;font-size:9px;padding:1px 2px;border-radius:2px;`;
-  retriesInput.onchange = async () => {
-    const s = getSettingsOverrides();
-    s.maxTaskRetries = parseInt(retriesInput.value) || 0;
-    await saveSettingsOverrides(s);
+  retriesInput.onchange = () => {
+    import('../settings-store').then(mod => {
+      const s = mod.getSettingsOverrides();
+      s.maxTaskRetries = parseInt(retriesInput.value) || 0;
+      void mod.saveSettingsOverrides(s);
+    });
   };
   retriesWrap.appendChild(retriesInput);
   settingsRow.appendChild(retriesWrap);
