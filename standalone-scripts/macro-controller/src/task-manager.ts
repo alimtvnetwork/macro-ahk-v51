@@ -48,7 +48,7 @@ export class TaskQueueManager {
     log('[TaskQueue] Starting queue processing...', 'info');
     
     try {
-      while (this._isProcessing) {
+      while (this._isProcessing && !this._isStopped) {
         const queueState = await loadTaskQueue();
         const now = Date.now();
         const nextTask = queueState.tasks.find(t => t.status === 'pending' || (t.status === 'hold' && (t.holdUntil ?? 0) <= now));
