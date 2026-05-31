@@ -48,8 +48,8 @@ function getAboutData() {
     description: 'Browser automation & credit management tool for workspace orchestration. Automatically monitors credits, rotates projects across workspaces, and provides real-time diagnostics.',
     authorInitials: 'AK',
     authorName: 'Md. Alim Ul Karim',
-    authorTitle: 'Chief Software Engineer — Riseup Asia',
-    authorBio: '20+ years of software engineering experience. Former Software Architect at Crossover.com (Top 1% Developer worldwide). Known for inventing an automatic unit test generation tool in 2018 — before AI — capable of writing code and unit tests automatically. Built this tool to help developers work more effectively with automated credit management and workspace orchestration.',
+    authorTitle: 'Chief Software Engineer \u2014 Riseup Asia',
+    authorBio: '20+ years of software engineering experience. Former Software Architect at Crossover.com (Top 1% Developer worldwide). Known for inventing an automatic unit test generation tool in 2018 \u2014 before AI \u2014 capable of writing code and unit tests automatically. Built this tool to help developers work more effectively with automated credit management and workspace orchestration.',
     year: new Date().getFullYear(),
     links: [
       { label: '🔗 alimkarim.com', url: 'https://alimkarim.com' },
@@ -241,27 +241,27 @@ export function showAboutModal(): void {
   }
 
   // Create overlay
-  const overlay = document.createElement('div');
-  overlay.id = 'macroloop-about-modal';
-  overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
-  overlay.onclick = function(e: Event) { if (e.target === overlay) overlay.remove(); };
+  const container = document.createElement('div');
+  container.id = 'macroloop-about-modal';
+  container.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
+  container.onclick = function(e: Event) { if (e.target === container) container.remove(); };
 
   // Inject rendered HTML
-  const container = document.createElement('div');
-  container.innerHTML = html;
-  const modal = container.firstElementChild as HTMLElement;
+  const innerContainer = document.createElement('div');
+  innerContainer.innerHTML = html;
+  const modal = innerContainer.firstElementChild as HTMLElement;
   if (modal) {
     modal.classList.add('marco-enter');
 
     // Bind close button
     const closeBtn = modal.querySelector('[data-action="close"]');
     if (closeBtn) {
-      (closeBtn as HTMLElement).onclick = function() { overlay.remove(); };
+      (closeBtn as HTMLElement).onclick = function() { container.remove(); };
     }
 
-    overlay.appendChild(modal);
+    container.appendChild(modal);
   }
 
-  document.body.appendChild(overlay);
+  document.body.appendChild(container);
   log('About modal opened (template-rendered)', 'info');
 }

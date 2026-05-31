@@ -51,6 +51,10 @@ import { MAX_SDK_ATTEMPTS, SDK_RETRY_DELAY_MS, MAX_UI_CREATE_RETRIES, STARTUP_WS
 import { Label } from './types';
 import { loadSettingsOverrides, onSettingsChange } from './settings-store';
 import { hydrateCreditBalanceFromCache } from './credit-balance/hydrate';
+import { initMacroDb, saveProjectMetadata } from './db/macro-db';
+import { setupPromptCapture } from './ui/prompt-utils';
+import { getPromptsConfig } from './ui/prompt-loader';
+import { getByXPath } from './xpath-utils';
 
 // Re-export sub-modules for backward compatibility
 export { setupPersistenceObserver as _setupPersistenceObserver } from './startup-persistence';
@@ -99,6 +103,19 @@ export function bootstrap(deps: {
   // from SQLite before any /credit-balance call so the 10s per-ws cooldown
   // survives reloads and the panel can paint last-known values immediately.
   void hydrateCreditBalanceFromCache();
+
+  // Init Macro DB and Capture
+  void initMacroDb().then(() => {
+    const pId = extractProjectIdFromUrl();
+    const pName = getProjectNameFromDom() || state.projectNameFromApi || 'Unknown';
+    if (pId) {
+      saveProjectMetadata(pId, pName, window.location.href);
+    }
+    setupPromptCapture(getPromptsConfig(), (xpath) => {
+      const node = getByXPath(xpath);
+      return node instanceof Element ? node : null;
+    });
+  });
 
   setupPersistenceObserver(function () {
     const mc = MacroController.getInstance();

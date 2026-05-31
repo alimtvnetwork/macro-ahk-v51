@@ -294,7 +294,7 @@ function doNextTask(ctx: TaskNextLoopCtx, index: number): void {
 
     tryClickAndAdvance(clickCtx);
     ctx.completed = clickCtx.completed;
-  }, taskNextState.settings.preClickDelayMs);
+  }, delay);
 }
 
 export function runTaskNextLoop(deps: TaskNextDeps, count: number) {
