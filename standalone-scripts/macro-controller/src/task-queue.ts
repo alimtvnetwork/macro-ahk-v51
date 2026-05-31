@@ -155,6 +155,26 @@ export function setQueueDelayUntil(ts: number): void { _queueDelayUntil = ts; }
 export function getQueueDelayUntil(): number { return _queueDelayUntil; }
 
 /**
+ * Reorder a task in the queue.
+ */
+export async function reorderTask(taskId: string, direction: 'up' | 'down'): Promise<void> {
+  const queueState = await loadTaskQueue();
+  const index = queueState.tasks.findIndex(t => t.id === taskId);
+  if (index === -1) return;
+
+  if (direction === 'up' && index > 0) {
+    [queueState.tasks[index - 1], queueState.tasks[index]] = [queueState.tasks[index], queueState.tasks[index - 1]];
+  } else if (direction === 'down' && index < queueState.tasks.length - 1) {
+    [queueState.tasks[index + 1], queueState.tasks[index]] = [queueState.tasks[index], queueState.tasks[index + 1]];
+  } else {
+    return;
+  }
+
+  await saveTaskQueue(queueState);
+  log(`[TaskQueue] Reordered task ${taskId} ${direction}`, 'info');
+}
+
+/**
  * Check if the "Return to Extension" button is present and pause queue if so.
  */
 export function checkForReturnButton(): boolean {
