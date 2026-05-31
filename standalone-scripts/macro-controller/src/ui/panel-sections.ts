@@ -62,6 +62,7 @@ import type { PanelBuilderDeps } from './panel-builder';
 import type { TaskNextDeps } from './task-next-ui';
 import type { SettingsDeps } from './settings-ui';
 import type { PanelLayoutCtx } from './panel-layout';
+import { buildTaskQueueSection } from './macro-ui';
 
 // ============================================
 // Return types
@@ -74,12 +75,14 @@ export interface StatusBarResult {
 
 export interface ToolsMasterResult {
   toolsSection: HTMLElement;
+  taskQueueSection: HTMLElement;
   wsDropSection: HTMLElement;
   /** @deprecated Auth Diagnostics is now mounted inside Tools & Logs (Issue 125). Kept for backwards compatibility of bodyElements wiring; consumers must NOT re-append. */
   authDiagRow: HTMLElement;
   jsBody: HTMLElement;
   settingsDeps: SettingsDeps;
 }
+
 
 
 // ============================================
