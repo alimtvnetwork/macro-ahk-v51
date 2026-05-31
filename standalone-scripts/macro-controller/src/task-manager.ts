@@ -18,6 +18,21 @@ export class TaskQueueManager {
   private _isPaused = false;
   private _isStopped = false;
   private _abortController: AbortController | null = null;
+  private _executionLogs: string[] = [];
+  private _onLogUpdate: ((logs: string[]) => void) | null = null;
+
+  private _logExecution(msg: string, level: 'info' | 'success' | 'warn' | 'error' = 'info'): void {
+    const time = new Date().toLocaleTimeString();
+    const logMsg = `[${time}] ${msg}`;
+    this._executionLogs.push(logMsg);
+    if (this._executionLogs.length > 100) this._executionLogs.shift();
+    if (this._onLogUpdate) this._onLogUpdate([...this._executionLogs]);
+    log(`[TaskExecution] ${msg}`, level);
+  }
+
+  getExecutionLogs(): string[] { return this._executionLogs; }
+  onLogUpdate(cb: (logs: string[]) => void): void { this._onLogUpdate = cb; }
+
 
   isProcessing(): boolean { return this._isProcessing; }
   isPaused(): boolean { return this._isPaused; }
