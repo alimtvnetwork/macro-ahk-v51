@@ -175,16 +175,21 @@ export function buildTaskQueueSection(): HTMLElement {
   pauseOnErrorCheck.type = 'checkbox';
   pauseOnErrorCheck.style.cssText = 'margin:0;';
   
-  const { getSettingsOverrides, saveSettingsOverrides } = await import('../settings-store');
-  const initialSettings = getSettingsOverrides();
+  const initialSettings = (function() {
+    try {
+      return (window as any).RiseupAsiaMacroExt.Projects.MacroController.getSettingsOverrides();
+    } catch {
+      return { pauseQueueOnError: true, maxTaskRetries: 3 };
+    }
+  })();
   pauseOnErrorCheck.checked = initialSettings.pauseQueueOnError !== false;
   
-  pauseOnErrorCheck.onchange = async () => {
-  const s = getSettingsOverrides();
-  s.pauseQueueOnError = (pauseOnErrorCheck as any).checked;
-  void saveSettingsOverrides(s);
-    s.pauseQueueOnError = pauseOnErrorCheck.checked;
-    await saveSettingsOverrides(s);
+  pauseOnErrorCheck.onchange = () => {
+    import('../settings-store').then(mod => {
+      const s = mod.getSettingsOverrides();
+      s.pauseQueueOnError = pauseOnErrorCheck.checked;
+      void mod.saveSettingsOverrides(s);
+    });
   };
   
   pauseOnErrorWrap.appendChild(pauseOnErrorCheck);
