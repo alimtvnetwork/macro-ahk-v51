@@ -72,7 +72,7 @@ function onEscHandler(overlay: HTMLElement): (e: KeyboardEvent) => void {
  * @param editPrompt — existing prompt object for editing (has .id)
  * @param prefillData — pre-fill data for new prompt (no .id, not edit mode)
  */
-export function openPromptCreationModal(_ctx: PromptContext, _taskNextDeps: TaskNextDeps, editPrompt: EditablePrompt | null, prefillData?: { name?: string; text?: string; category?: string }): void {
+export function openPromptCreationModal(_ctx: PromptContext, _taskNextDeps: TaskNextDeps, editPrompt: EditablePrompt | null, prefillData?: { name?: string; text?: string; category?: string; tags?: string[] }): void {
   const existing = document.getElementById('marco-prompt-modal');
   if (existing) existing.remove();
 
