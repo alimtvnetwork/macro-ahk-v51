@@ -42,6 +42,7 @@ export interface XPathPanelResult {
 export interface TimingPanelResult {
   panel: HTMLElement;
   inputs: Record<string, HTMLInputElement>;
+  automationToggles?: Record<string, HTMLInputElement>;
 }
 
 export interface TaskNextPanelResult {
@@ -98,6 +99,7 @@ export function buildXPathsPanel(makeField: MakeFieldFn): XPathPanelResult {
 
 export function buildTimingPanel(makeField: MakeFieldFn): TimingPanelResult {
   const panel = document.createElement('div');
+  const overrides = getSettingsOverrides();
   const fields = [
     { key: 'LOOP_INTERVAL', label: 'Loop Interval (ms)', hint: 'Time between each cycle' },
     { key: 'COUNTDOWN_INTERVAL', label: 'Countdown Interval (ms)' },
@@ -115,7 +117,98 @@ export function buildTimingPanel(makeField: MakeFieldFn): TimingPanelResult {
     inputs[f.key] = field.input;
     panel.appendChild(field.row);
   });
-  return { panel, inputs };
+
+  // Issue 131 Task 3: Automation Timing section
+  const autoTitle = document.createElement('div');
+  autoTitle.style.cssText = CssFragment.FontSize11pxFontWeight700Color + cSectionHeader + ';margin-top:14px;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.5px;';
+  autoTitle.textContent = 'Automation & Queue Timing';
+  panel.appendChild(autoTitle);
+
+  // Delay Slider
+  const delayField = _buildDelaySlider(overrides.nextSubmissionDelaySeconds ?? 30);
+  inputs['nextSubmissionDelaySeconds'] = delayField.input;
+  panel.appendChild(delayField.row);
+
+  // Poll Interval
+  const pollField = makeField('Credit Poll Interval (s)', String(overrides.creditPollIntervalSeconds ?? 5), { type: 'number', hint: 'Frequency of credit background checks' });
+  inputs['creditPollIntervalSeconds'] = pollField.input;
+  panel.appendChild(pollField.row);
+
+  // Toggles for Delay and Retry
+  const automationToggles = _buildAutomationToggles(panel, overrides);
+
+  return { panel, inputs, automationToggles };
+}
+
+/** Internal helper for automation toggles in Timing panel. */
+function _buildAutomationToggles(panel: HTMLElement, overrides: ReturnType<typeof getSettingsOverrides>): Record<string, HTMLInputElement> {
+  const items = [
+    { key: 'enableNextSubmissionDelay', label: 'Enable Submission Delay', value: overrides.enableNextSubmissionDelay !== false, hint: 'Wait between prompts in the queue.' },
+    { key: 'retryOnFailure', label: 'Retry on Failure', value: overrides.retryOnFailure !== false, hint: 'Hold and retry prompts if injection fails.' },
+  ];
+  const toggles: Record<string, HTMLInputElement> = {};
+
+  items.forEach(function(item) {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid ' + cPanelBorder + ';';
+    const labelWrap = document.createElement('div');
+    labelWrap.style.cssText = 'display:flex;flex-direction:column;gap:2px;flex:1;padding-right:8px;';
+    const lbl = document.createElement('span');
+    lbl.style.cssText = 'font-size:11px;color:' + cPanelText + ';';
+    lbl.textContent = item.label;
+    const hint = document.createElement('span');
+    hint.style.cssText = 'font-size:9px;color:#64748b;';
+    hint.textContent = item.hint;
+    labelWrap.appendChild(lbl);
+    labelWrap.appendChild(hint);
+    const sw = document.createElement('input');
+    sw.type = 'checkbox';
+    sw.checked = item.value;
+    sw.style.cssText = 'width:16px;height:16px;cursor:pointer;accent-color:' + cPrimary + ';';
+    row.appendChild(labelWrap);
+    row.appendChild(sw);
+    panel.appendChild(row);
+    toggles[item.key] = sw;
+  });
+  return toggles;
+}
+
+/** Builds the next submission delay slider row. */
+function _buildDelaySlider(initialValue: number): { row: HTMLDivElement; input: HTMLInputElement } {
+  const row = document.createElement('div');
+  row.style.cssText = 'margin-top:8px;margin-bottom:10px;';
+  const lbl = document.createElement('div');
+  lbl.style.cssText = 'font-size:10px;color:' + cSectionHeader + ';margin-bottom:3px;font-weight:600;';
+  lbl.textContent = 'Next Submission Delay (s)';
+  row.appendChild(lbl);
+
+  const sliderRow = document.createElement('div');
+  sliderRow.style.cssText = 'display:flex;align-items:center;gap:8px;';
+
+  const slider = document.createElement('input');
+  slider.type = 'range';
+  slider.min = '0';
+  slider.max = '120';
+  slider.step = '5';
+  slider.value = String(initialValue);
+  slider.style.cssText = 'flex:1;height:6px;accent-color:' + cPrimary + ';cursor:pointer;';
+
+  const valLabel = document.createElement('span');
+  valLabel.style.cssText = 'font-size:11px;color:' + cPanelText + ';min-width:36px;text-align:right;font-family:monospace;';
+  valLabel.textContent = slider.value + 's';
+
+  slider.oninput = function() { valLabel.textContent = slider.value + 's'; };
+
+  sliderRow.appendChild(slider);
+  sliderRow.appendChild(valLabel);
+  row.appendChild(sliderRow);
+
+  const hint = document.createElement('div');
+  hint.style.cssText = 'font-size:9px;color:#64748b;margin-top:2px;';
+  hint.textContent = 'Seconds to wait between sending prompts from the queue.';
+  row.appendChild(hint);
+
+  return { row, input: slider };
 }
 
 // ── Task Next Panel ──

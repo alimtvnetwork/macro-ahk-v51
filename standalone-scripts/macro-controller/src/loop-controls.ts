@@ -16,6 +16,8 @@ import { showToast, setStopLoopCallback } from './toast';
 import { LoopDirection } from './types';
 import { getByXPath } from './xpath-utils';
 import { fetchLoopCreditsAsync, syncCreditStateFromApi } from './credit-fetch';
+import { getSettingsOverrides } from './settings-store';
+
 import { MacroController } from './core/MacroController';
 import { resolveToken, refreshBearerTokenFromBestSource } from './auth';
 import { checkSystemBusy, closeProjectDialog, ensureProjectDialogOpen, isOnProjectPage, isUserTypingInPrompt, pollForDialogReady } from './dom-helpers';
@@ -323,7 +325,10 @@ export function refreshStatus(): void {
  * when they differ. A no-op fast-path is preserved when the period already matches.
  */
 export function startStatusRefresh(): void {
-  const intervalMs = state.running ? (TIMING.WS_CHECK_INTERVAL || 5000) : 30000;
+  const overrides = getSettingsOverrides();
+  const pollSecs = (overrides.creditPollIntervalSeconds !== undefined) ? overrides.creditPollIntervalSeconds : (TIMING.WS_CHECK_INTERVAL / 1000);
+  const intervalMs = state.running ? (pollSecs * 1000) : 30000;
+
 
   // Fast path: already running at the desired cadence.
   if (state.statusRefreshId && state.statusRefreshPeriodMs === intervalMs) {

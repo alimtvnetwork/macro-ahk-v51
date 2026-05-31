@@ -123,13 +123,13 @@ export function showSettingsDialog(deps: SettingsDeps) {
   overlay.onclick = function(e) { if (e.target === overlay) overlay.remove(); };
 
   const dialog = _buildSettingsDialogShell(tFontSystem);
-  const { tabBtns, panels, tabPanels, generalResult } = _buildSettingsTabs(deps, getPromptsConfig);
+  const { tabBtns, panels, tabPanels, generalResult, timingResult } = _buildSettingsTabs(deps, getPromptsConfig);
 
   dialog.appendChild(_buildSettingsHeader(tFontSystem, overlay));
   dialog.appendChild(tabPanels.tabBar);
   dialog.appendChild(tabPanels.panelsContainer);
 
-  const footer = _buildSettingsFooter(btnStyle, deps, panels, overlay, generalResult);
+  const footer = _buildSettingsFooter(btnStyle, deps, panels, overlay, generalResult, timingResult);
   dialog.appendChild(footer);
 
   overlay.appendChild(dialog);
@@ -163,7 +163,7 @@ function _buildSettingsHeader(_fontSystem: string, overlay: HTMLElement): HTMLEl
   return hdr;
 }
 
-function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => ResolvedPromptsConfig): { tabBtns: HTMLElement[]; panels: HTMLElement[]; tabPanels: { tabBar: HTMLElement; panelsContainer: HTMLElement }; generalResult: GeneralPanelResult } {
+function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => ResolvedPromptsConfig): { tabBtns: HTMLElement[]; panels: HTMLElement[]; tabPanels: { tabBar: HTMLElement; panelsContainer: HTMLElement }; generalResult: GeneralPanelResult; timingResult: TimingPanelResult } {
   const tabs = ['XPaths', 'Timing', 'Task Next', 'Logging', 'Config (DB)', 'General'];
   const tabBar = document.createElement('div');
   tabBar.style.cssText = 'display:flex;gap:0;border-bottom:1px solid ' + cPanelBorder + ';padding:0 20px;flex-shrink:0;';
@@ -182,18 +182,20 @@ function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => Resolved
   });
 
   const generalResult = buildGeneralPanel(makeField, getPromptsConfig);
+  const timingResult = buildTimingPanel(makeField);
   panels.push(buildXPathsPanel(makeField).panel);
-  panels.push(buildTimingPanel(makeField).panel);
+  panels.push(timingResult.panel);
   panels.push(buildTaskNextPanel(makeField).panel);
   panels.push(buildLoggingPanel(deps).panel);
   panels.push(buildConfigDbPanel(deps, makeField).panel);
   panels.push(generalResult.panel);
+
   panels.forEach(function(p) { tabPanels.appendChild(p); });
 
-  return { tabBtns, panels, tabPanels: { tabBar, panelsContainer: tabPanels }, generalResult };
+  return { tabBtns, panels, tabPanels: { tabBar, panelsContainer: tabPanels }, generalResult, timingResult };
 }
 
-function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTMLElement[], overlay: HTMLElement, generalResult: GeneralPanelResult): HTMLElement {
+function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTMLElement[], overlay: HTMLElement, generalResult: GeneralPanelResult, timingResult: TimingPanelResult): HTMLElement {
   const { showToast, log } = deps;
   const footer = document.createElement('div');
   footer.style.cssText = 'display:flex;gap:8px;justify-content:flex-end;padding:12px 20px;border-top:1px solid ' + cPanelBorder + ';flex-shrink:0;';
@@ -227,7 +229,8 @@ function _buildSettingsFooter(btnStyle: string, deps: SettingsDeps, _panels: HTM
   saveBtn2.textContent = '💾 Save';
   saveBtn2.style.cssText = btnStyle + CssFragment.Background + cSuccess + ';color:#1e1e2e;padding:6px 20px;font-size:12px;font-weight:600;';
   saveBtn2.onclick = function() {
-    _persistOverrideToggles(generalResult).then(function() {
+    _persistOverrideToggles(generalResult, timingResult).then(function() {
+
       log('Settings saved', 'info');
       showToast('✅ Settings saved', 'info');
       overlay.remove();
@@ -293,15 +296,30 @@ function _importOverridesJson(
   void generalResult;
 }
 
-async function _persistOverrideToggles(generalResult: GeneralPanelResult): Promise<void> {
-  if (!generalResult.toggles) return;
+async function _persistOverrideToggles(generalResult: GeneralPanelResult, timingResult: TimingPanelResult): Promise<void> {
   const current = getSettingsOverrides();
-  const next = {
-    ...current,
-    enableCanceledCreditOverride: generalResult.toggles.enableCanceledCreditOverride?.checked ?? true,
-    enableWorkspaceStatusLabels: generalResult.toggles.enableWorkspaceStatusLabels?.checked ?? true,
-    enableWorkspaceHoverDetails: generalResult.toggles.enableWorkspaceHoverDetails?.checked ?? true,
-  };
+  const next: any = { ...current };
+
+  if (generalResult.toggles) {
+    next.enableCanceledCreditOverride = generalResult.toggles.enableCanceledCreditOverride?.checked ?? true;
+    next.enableWorkspaceStatusLabels = generalResult.toggles.enableWorkspaceStatusLabels?.checked ?? true;
+    next.enableWorkspaceHoverDetails = generalResult.toggles.enableWorkspaceHoverDetails?.checked ?? true;
+  }
+
+  if (timingResult.automationToggles) {
+    next.enableNextSubmissionDelay = timingResult.automationToggles.enableNextSubmissionDelay?.checked ?? true;
+    next.retryOnFailure = timingResult.automationToggles.retryOnFailure?.checked ?? true;
+  }
+
+  if (timingResult.inputs) {
+    if (timingResult.inputs.nextSubmissionDelaySeconds) {
+      next.nextSubmissionDelaySeconds = parseInt(timingResult.inputs.nextSubmissionDelaySeconds.value, 10);
+    }
+    if (timingResult.inputs.creditPollIntervalSeconds) {
+      next.creditPollIntervalSeconds = parseInt(timingResult.inputs.creditPollIntervalSeconds.value, 10);
+    }
+  }
+
   await saveSettingsOverrides(next);
 }
 

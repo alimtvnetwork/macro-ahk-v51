@@ -48,8 +48,10 @@ function adapterGetByXPath(xpath: string): Element | null {
 }
 
 function injectPlanPrompt(n: number): void {
+  console.log('[PlanTask] Injecting plan prompt for ' + n + ' steps');
   const text = buildPlanTaskPrompt(n);
   const outcome = pasteIntoEditor(text, getPromptsConfig(), adapterGetByXPath);
+  console.log('[PlanTask] Injection outcome: ' + outcome);
   // Success ('injected') and clipboard-fallback ('clipboard') already toast from prompt-utils.
   // Only show a caller-side toast on hard failure.
   if (outcome === 'failed') showPasteToast('❌ Plan prompt: injection failed', true);
