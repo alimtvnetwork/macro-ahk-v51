@@ -45,15 +45,12 @@ export function buildTaskQueueSection(): HTMLElement {
   listContainer.style.cssText = 'max-height:160px;overflow-y:auto;background:rgba(0,0,0,0.2);border-radius:6px;padding:4px;display:flex;flex-direction:column;gap:4px;';
   section.appendChild(listContainer);
 
-  // Initial load
-  refreshTaskQueueUI(listContainer);
+  // Polling for updates
+  const refreshHandler = () => refreshTaskQueueUI(listContainer);
+  listContainer.addEventListener('refresh-queue', refreshHandler);
+  
+  setInterval(refreshHandler, 5000);
 
-  // Poll for updates
-  setInterval(() => {
-    if (document.getElementById('task-queue-list')) {
-      refreshTaskQueueUI(listContainer);
-    }
-  }, 5000);
 
   return section;
 }
