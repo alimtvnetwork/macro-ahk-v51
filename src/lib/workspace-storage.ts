@@ -13,7 +13,7 @@ export class WorkspaceStorage {
     private static getDB() {
         if (!this.db) {
             this.db = openDB(DB_NAME, DB_VERSION, {
-                upgrade(db) {
+                upgrade(db: IDBPDatabase) {
                     if (!db.objectStoreNames.contains(STORE_NAME)) {
                         db.createObjectStore(STORE_NAME);
                     }
@@ -22,6 +22,7 @@ export class WorkspaceStorage {
         }
         return this.db;
     }
+
 
     static async set(key: string, value: any): Promise<void> {
         const db = await this.getDB();
