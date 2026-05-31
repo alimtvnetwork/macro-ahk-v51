@@ -7,7 +7,7 @@
 2. [x] Implement Export logic (IndexedDB -> JSON Download).
 3. [x] Implement Import Parsing & Schema Validation.
 4. [x] Implement Upsert/Merge logic for prompts.
-5. Create the Import/Export Dialog shell (`prompt-io-dialog.ts`).
+5. [x] Create the Import/Export Dialog shell (`prompt-io-dialog.ts`).
 6. Add Drag & Drop support to the dialog.
 7. Add File Picker support to the dialog.
 8. Integrate the dialog trigger into the Prompts Dropdown UI.
