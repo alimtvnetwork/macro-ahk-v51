@@ -16,6 +16,7 @@ import { showToast } from './toast';
 import { resolveToken } from './auth';
 import { getLastTokenSource, invalidateSessionBridgeKey, markBearerTokenExpired, recoverAuthOnce } from './auth';
 import { parseLoopApiResponse, syncCreditStateFromApi, schedulePostParseEnrichment } from './credit-fetch';
+const LOG_SCOPE_LOOP_CYCLE = 'loop-cycle';
 import { MacroController } from './core/MacroController';
 import { isUserTypingInPrompt } from './dom-helpers';
 import { CREDIT_API_BASE, TIMING, loopCreditState, state } from './shared-state';
@@ -128,7 +129,7 @@ async function handleFallbackAuthRecovery(
   fetchWithTokenFn: () => Promise<void>,
 ): Promise<void> {
   if (freshToken) {
-    markBearerTokenExpired('loop-cycle');
+    markBearerTokenExpired(LOG_SCOPE_LOOP_CYCLE);
     invalidateSessionBridgeKey(freshToken);
   }
 
@@ -310,7 +311,7 @@ async function doCycleFetchWithToken(isRetryAttempt: boolean): Promise<void> {
     }
 
     if (isAuthFailure(resp.status) && freshToken) {
-      markBearerTokenExpired('loop-cycle');
+      markBearerTokenExpired(LOG_SCOPE_LOOP_CYCLE);
     }
 
     if (!resp.ok) {
@@ -386,34 +387,12 @@ function handleDelegateTimeout(): boolean {
 
  
 export function runCycle(): void {
-  if (!state.running) {
-    state.__cycleInFlight = false;
-    state.__cycleRetryPending = false;
-    log('SKIP: Loop not running', 'skip');
-
-    return;
-  }
-
-  if (state.__cycleRetryPending) {
-    log('SKIP: Retry already scheduled — waiting', 'skip');
-
-    return;
-  }
-
-  if (state.__cycleInFlight) {
-    log('SKIP: Previous cycle still in flight', 'skip');
-
-    return;
-  }
+  if (_checkLoopPreconditions()) return;
 
   state.__cycleInFlight = true;
 
   if (state.isDelegating) {
-    const canContinue = handleDelegateTimeout();
-
-    if (!canContinue) {
-      return;
-    }
+    if (!handleDelegateTimeout()) return;
   }
 
   state.cycleCount++;
@@ -427,6 +406,28 @@ export function runCycle(): void {
     return;
   }
 
+  _performCycleTasks();
+}
+
+function _checkLoopPreconditions(): boolean {
+  if (!state.running) {
+    state.__cycleInFlight = false;
+    state.__cycleRetryPending = false;
+    log('SKIP: Loop not running', 'skip');
+    return true;
+  }
+  if (state.__cycleRetryPending) {
+    log('SKIP: Retry already scheduled — waiting', 'skip');
+    return true;
+  }
+  if (state.__cycleInFlight) {
+    log('SKIP: Previous cycle still in flight', 'skip');
+    return true;
+  }
+  return false;
+}
+
+function _performCycleTasks(): void {
   // Task Queue Management Logic
   import('./task-manager').then(m => {
     const manager = m.TaskQueueManager.getInstance();
