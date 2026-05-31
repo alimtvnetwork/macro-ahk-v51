@@ -409,8 +409,12 @@ const OptionsPage = () => {
           <header className="h-12 flex items-center border-b border-border bg-card/80 backdrop-blur-xl px-4 gap-3 sticky top-0 z-10 shadow-[0_1px_12px_-2px_hsl(var(--primary)/0.15)]">
             <SidebarTrigger className="hover:bg-primary/15 hover:text-primary transition-all duration-200" />
             <h1 className="text-sm font-bold tracking-tight">Marco Extension</h1>
+            <div className="h-4 w-px bg-border/50 mx-1" />
+            <WorkspaceSelector />
             <RecorderControlBar />
-            <div className="ml-auto flex items-center gap-1">
+            <div className="ml-auto flex items-center gap-2">
+              <RecoveryIndicator />
+
               {extensionVersion && (
                 <Badge variant="outline" className="text-[10px] px-1.5 py-0">
                   v{extensionVersion}
