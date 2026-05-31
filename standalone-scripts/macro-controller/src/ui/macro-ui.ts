@@ -28,7 +28,23 @@ export function buildTaskQueueSection(): HTMLElement {
   const controls = document.createElement('div');
   controls.style.cssText = 'display:flex;gap:6px;';
 
+  const pauseBtn = document.createElement('button');
+  pauseBtn.textContent = '⏸ Pause';
+  pauseBtn.style.cssText = 'padding:2px 6px;font-size:9px;background:' + cPanelBgAlt + ';border:1px solid ' + cPanelBorder + ';border-radius:4px;color:#9ca3af;cursor:pointer;';
+  pauseBtn.onclick = async () => {
+    const queueState = await loadTaskQueue();
+    queueState.isPaused = !queueState.isPaused;
+    await saveTaskQueue(queueState);
+    pauseBtn.textContent = queueState.isPaused ? '▶ Resume' : '⏸ Pause';
+    if (!queueState.isPaused) {
+      void TaskQueueManager.getInstance().startProcessing();
+    }
+    refreshTaskQueueUI(listContainer);
+  };
+  controls.appendChild(pauseBtn);
+
   const clearBtn = document.createElement('button');
+
   clearBtn.textContent = 'Clear Done';
   clearBtn.style.cssText = 'padding:2px 6px;font-size:9px;background:' + cPanelBgAlt + ';border:1px solid ' + cPanelBorder + ';border-radius:4px;color:#9ca3af;cursor:pointer;';
   clearBtn.onclick = async () => {
