@@ -313,6 +313,35 @@ function handleLoadClick(btn: HTMLElement, ctx: PromptContext, taskNextDeps: Tas
   });
 }
 
+/** Build the search input for filtering prompts. */
+function buildSearchInput(ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
+  const container = document.createElement('div');
+  container.style.cssText = 'padding:6px 8px;border-bottom:1px solid rgba(124,58,237,0.2);background:rgba(124,58,237,0.05);';
+  
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = '🔍 Search prompts or #tags...';
+  input.value = _currentSearchQuery;
+  input.style.cssText = 'width:100%;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:#fff;font-size:10px;padding:4px 8px;outline:none;';
+  
+  input.oninput = function() {
+    _currentSearchQuery = input.value.trim().toLowerCase();
+    // We re-render the filtered items part without rebuilding the whole dropdown
+    // or just re-render the whole dropdown fresh
+    renderPromptsDropdown(ctx, taskNextDeps);
+  };
+  
+  // Focus on render if it was already focused? 
+  // Actually, re-rendering the whole dropdown will lose focus.
+  // Let's try to preserve it.
+  if (_currentSearchQuery) {
+    setTimeout(() => input.focus(), 0);
+  }
+
+  container.appendChild(input);
+  return container;
+}
+
 function _renderFresh(
   promptsDropdown: HTMLElement,
   entries: LoaderPromptEntry[],
