@@ -53,7 +53,12 @@ import { sortByRefillPriority, daysToRefillForWs } from './workspace-refill-prio
 import { classifyFromStatus, type WorkspaceDisplayStatus } from './workspace-display-status';
 
 import { resolveBadgeStyle, diluteBadgeBg } from './workspace-badge-styles';
-// import { publishVisibleWorkspaces } from './visible-workspaces-store';
+import { 
+  getSelectedWsIds, 
+  setSelectedWsIds, 
+  toggleWsSelection, 
+  isWsSelected 
+} from './selected-workspaces-store';
 
 const CSS_BG = ';background:';
 
