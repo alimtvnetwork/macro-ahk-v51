@@ -147,6 +147,10 @@ export function showPasteToast(message: string, isError: boolean): void {
   }, duration);
 }
 
+import { getProjectKvStore } from '../project-kv-store';
+import { extractProjectIdFromUrl } from '../workspace-detection';
+import { saveCommunication } from '../db/macro-db';
+
 // ── Find editor paste target via XPath/CSS selectors ──
 export function findPasteTarget(promptsCfg: PromptsCfg, getByXPath: (xpath: string) => Element | null): Element | null {
   let el: Element | null = null;
@@ -274,4 +278,47 @@ export function pasteIntoEditor(rawText: string, promptsCfg: PromptsCfg, getByXP
     });
     return 'failed';
   }
+}
+
+/**
+ * Setup capture for prompt text box to sync with IndexedDB and SQLite.
+ */
+export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: string) => Element | null): void {
+  log('Prompt Capture: Initializing...', 'info');
+  
+  // Throttle helper
+  let timer: number | null = null;
+  const throttleSave = (text: string) => {
+    if (timer) clearTimeout(timer);
+    timer = window.setTimeout(async () => {
+      const projectId = extractProjectIdFromUrl();
+      if (!projectId) return;
+      
+      // 1. Save to IndexedDB
+      const store = getProjectKvStore('macro-controller');
+      await store.set('last_prompt_capture', projectId, { text, timestamp: Date.now() });
+      
+      // 2. Sync to SQLite
+      await saveCommunication(projectId, text);
+      logSub('Captured prompt synced to DB', 1);
+    }, 2000);
+  };
+
+  // Poll for target periodically since it may be unmounted/remounted in SPA
+  setInterval(() => {
+    const target = findPasteTarget(promptsCfg, getByXPath) as HTMLElement | null;
+    if (target && !(target as any).__captured) {
+      (target as any).__captured = true;
+      const isInput = target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
+      const eventType = isInput ? 'input' : 'input'; // both use input for content changes
+      
+      target.addEventListener(eventType, (e) => {
+        const text = isInput ? (target as HTMLInputElement).value : target.textContent || '';
+        if (text.trim().length > 2) {
+          throttleSave(text.trim());
+        }
+      });
+      log('Prompt Capture: Attached to editor target', 'success');
+    }
+  }, 3000);
 }
