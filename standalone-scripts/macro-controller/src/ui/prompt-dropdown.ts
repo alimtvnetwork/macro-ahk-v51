@@ -968,11 +968,13 @@ function renderPromptItem(
 
   if (hasText) {
     appendPromptActions(actions, p, promptsDropdown, promptsCfg, ctx, taskNextDeps);
-    item.onclick = function(e: Event) {
+    item.onclick = async function(e: Event) {
       if (actions.contains(e.target as Node)) return;
       log('Prompt clicked: "' + p.name + '" (' + p.text.length + ' chars)', 'info');
-      pasteIntoEditor(p.text, promptsCfg, getByXPathAsElement);
-      promptsDropdown.style.display = 'none';
+      const outcome = await pasteIntoEditor(p.text, promptsCfg, getByXPathAsElement);
+      if (outcome === 'injected' || outcome === 'clipboard') {
+        promptsDropdown.style.display = 'none';
+      }
     };
   } else {
     // Prompt text not loaded — show a helpful message on click
