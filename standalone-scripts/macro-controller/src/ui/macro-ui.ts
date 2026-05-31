@@ -65,7 +65,7 @@ export function buildTaskQueueSection(): HTMLElement {
   const refreshHandler = () => refreshTaskQueueUI(listContainer);
   listContainer.addEventListener('refresh-queue', refreshHandler);
   
-  setInterval(refreshHandler, 5000);
+  setInterval(refreshHandler, 1000);
   refreshHandler();
 
 
