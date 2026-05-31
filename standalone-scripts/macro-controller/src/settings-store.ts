@@ -127,8 +127,9 @@ function sanitize(raw: unknown): SettingsOverrides {
   ];
 
   numericFields.forEach(f => {
-    if (isFiniteNonNegative(r[f])) {
-      (out as any)[f] = Math.floor(r[f] as number);
+    const val = r[f];
+    if (isFiniteNonNegative(val)) {
+      (out as Record<string, unknown>)[f] = Math.floor(val);
     }
   });
 
@@ -143,8 +144,9 @@ function sanitize(raw: unknown): SettingsOverrides {
   ];
 
   booleanFields.forEach(f => {
-    if (typeof r[f] === 'boolean') {
-      (out as any)[f] = r[f];
+    const val = r[f];
+    if (typeof val === 'boolean') {
+      (out as Record<string, unknown>)[f] = val;
     }
   });
 

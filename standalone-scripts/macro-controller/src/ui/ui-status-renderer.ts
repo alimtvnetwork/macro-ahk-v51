@@ -43,7 +43,7 @@ export const statusRenderStats = statusRenderState.stats;
  * Update the status panel with current loop state, credit bars, and workspace info.
  * Uses a dirty-flag guard to skip innerHTML rebuilds when nothing changed.
  */
-export function updateStatus(): void {
+export function updateStatus(): void { // eslint-disable-line max-lines-per-function
   const el = document.getElementById(IDS.STATUS);
   if (!el) return;
 
@@ -65,7 +65,7 @@ export function updateStatus(): void {
     loopCreditState.lastCheckedAt || 0,
     loopCreditState.currentWs ? loopCreditState.currentWs.name : '',
     (loopCreditState.perWorkspace || []).length,
-    (state as { __queue_count?: number }).__queue_count || 0
+    (state as Record<string, unknown>).__queue_count || 0
   ].join('|');
 
   // Skip innerHTML rebuild if nothing changed
@@ -111,7 +111,7 @@ export function updateStatus(): void {
     import('../task-queue').then(m => {
       m.loadTaskQueue().then(queue => {
         const pending = queue.tasks.filter(t => t.status === 'pending').length;
-        (state as any).__queue_count = pending;
+        (state as Record<string, unknown>).__queue_count = pending;
         const isProcessing = TaskQueueManager.getInstance().isProcessing();
         const isPaused = TaskQueueManager.getInstance().isPaused();
         

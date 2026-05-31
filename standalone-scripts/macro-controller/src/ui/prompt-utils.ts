@@ -436,8 +436,9 @@ export function setupPromptCapture(promptsCfg: PromptsCfg, getByXPath: (xpath: s
   // Poll for target periodically since it may be unmounted/remounted in SPA
   setInterval(() => {
     const target = findPasteTarget(promptsCfg, getByXPath) as HTMLElement | null;
-    if (target && !(target as any).__captured) {
-      (target as any).__captured = true;
+    const capturedTarget = target as HTMLElement & { __captured?: boolean };
+    if (capturedTarget && !capturedTarget.__captured) {
+      capturedTarget.__captured = true;
       const isInput = target.tagName === 'TEXTAREA' || target.tagName === 'INPUT';
       const eventType = isInput ? 'input' : 'input'; // both use input for content changes
       

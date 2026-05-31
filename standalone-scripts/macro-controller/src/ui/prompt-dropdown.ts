@@ -450,7 +450,7 @@ function _appendFilteredItems(
       sugHeader.style.cssText = 'padding:6px 10px;font-size:9px;font-weight:700;color:#3daee9;background:rgba(61,174,233,0.05);text-transform:uppercase;letter-spacing:0.5px;';
       sugHeader.textContent = '✨ Suggested';
       container.appendChild(sugHeader);
-      suggestions.forEach((p: any, idx: number) => {
+      suggestions.forEach((p: LoaderPromptEntry, idx: number) => {
         container.appendChild(renderPromptItem(idx, p, container, promptsCfg, ctx, taskNextDeps));
       });
       const sep = document.createElement('div');
@@ -499,7 +499,7 @@ function _appendFilteredItems(
 function _renderFolderTree(
   container: HTMLElement,
   entries: LoaderPromptEntry[],
-  promptsCfg: any,
+  promptsCfg: unknown,
   ctx: PromptContext,
   taskNextDeps: TaskNextDeps,
 ): void {
@@ -1167,7 +1167,7 @@ function appendPromptActions(
 
 /** Build the favorite ⭐ toggle icon for a prompt item. */
 function _buildFavoriteIcon(p: PromptEntry, _dropdown: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
-  const isFav = !!(p as any).isFavorite;
+  const isFav = !!p.isFavorite;
   const icon = _makeActionIcon(isFav ? '⭐' : '☆', isFav ? 'Remove from favorites' : 'Mark as favorite', isFav ? '1' : '0.4');
   icon.onclick = function(e: Event) {
     e.stopPropagation();

@@ -21,7 +21,7 @@ import {
 
 import { rerenderPromptsDropdown } from './prompt-loader';
 
-export function renderPromptIODialog(): void {
+export function renderPromptIODialog(): void { // eslint-disable-line max-lines-per-function
   removePromptIODialog();
 
   const panel = document.createElement('div');

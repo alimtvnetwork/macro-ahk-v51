@@ -27,6 +27,7 @@ import { ApiPath } from './types';
 
 const LOG_SCOPE_CREDIT_FETCH = 'credit-fetch';
 const CREDIT_FETCH_ASYNC_SCOPE = 'credit-fetch-async';
+const LOG_PREFIX = 'Credit API (async): ';
 
 function mc() { return MacroController.getInstance(); }
 
@@ -319,7 +320,7 @@ export function fetchLoopCreditsAsync(isRetry?: boolean): Promise<void> {
 // CQ4: Extracted — resolve token with TTL-aware getBearerToken
 async function resolveTokenWithRecovery(isRetry?: boolean): Promise<string> {
   if (isRetry) {
-    log('Credit API (async): retry — forcing token refresh', 'check');
+    log(LOG_PREFIX + 'retry — forcing token refresh', 'check');
 
     return getBearerToken({ force: true });
   }
@@ -332,7 +333,7 @@ async function handleAsyncAuthFailure(resp: SdkApiResponse, token: string): Prom
   markBearerTokenExpired(CREDIT_FETCH_ASYNC_SCOPE);
   if (token) { invalidateSessionBridgeKey(token); }
 
-  log('Credit API (async): Auth ' + resp.status + ' — forcing token refresh before retry...', 'warn');
+  log(LOG_PREFIX + 'Auth ' + resp.status + ' — forcing token refresh before retry...', 'warn');
   showToast('Auth ' + resp.status + ' — recovering session...', 'warn', { noStop: true });
 
   const newToken = await getBearerToken({ force: true });

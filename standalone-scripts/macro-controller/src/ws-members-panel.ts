@@ -440,7 +440,7 @@ function render(el: HTMLElement, wsName: string, state: PanelState): void {
       placeholder: 'Enter emails...',
       onValidEmailsChange: (emails) => {
         if (inviteBtn) inviteBtn.disabled = emails.length === 0;
-        (el as any)._marcoValidEmails = emails;
+        (el as HTMLElement & { _marcoValidEmails?: string[] })._marcoValidEmails = emails;
       }
     });
     chipContainer.appendChild(chipInput);
@@ -469,7 +469,7 @@ function swapFooter(el: HTMLElement, expanded: boolean): void {
       placeholder: 'Enter emails...',
       onValidEmailsChange: (emails) => {
         if (inviteBtn) inviteBtn.disabled = emails.length === 0;
-        (el as any)._marcoValidEmails = emails;
+        (el as HTMLElement & { _marcoValidEmails?: string[] })._marcoValidEmails = emails;
       }
     });
     if (chipContainer) chipContainer.appendChild(chipInput);
@@ -610,7 +610,7 @@ function openMemberActionMenu(
 
 // v3.4.3 (task 13) — Submit invite + optimistic insert. Reverts on failure.
 function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLFormElement): void {
-  const validEmails = (el as any)._marcoValidEmails || [];
+  const validEmails = (el as HTMLElement & { _marcoValidEmails?: string[] })._marcoValidEmails || [];
   const roleSelect = form.querySelector('[data-marco-field="invite-role"]') as HTMLSelectElement | null;
   const submitBtn = form.querySelector('[data-marco-field="invite-submit"]') as HTMLButtonElement | null;
   const roleRaw = (roleSelect?.value || 'member').toLowerCase();
@@ -632,7 +632,7 @@ function submitInvite(el: HTMLElement, wsId: string, wsName: string, form: HTMLF
       try {
         await inviteMember(wsId, email, role);
         results.success++;
-      } catch (e: any) {
+      } catch (e: unknown) {
         results.fail++;
       }
     }

@@ -465,7 +465,7 @@ export function getPromptsConfig(): ResolvedPromptsConfig {
 
 /** Get contextually suggested prompts. */
 export function getSuggestedPrompts(allEntries: PromptEntry[]): PromptEntry[] {
-  const currentTags = (window as any).RiseupAsiaMacroExt?.Projects?.MacroController?.meta?.tags || [];
+  const currentTags = (window as unknown as { RiseupAsiaMacroExt?: { Projects?: { MacroController?: { meta?: { tags?: string[] } } } } }).RiseupAsiaMacroExt?.Projects?.MacroController?.meta?.tags || [];
   
   if (currentTags.length === 0) {
     // Fallback: recently used or favorites

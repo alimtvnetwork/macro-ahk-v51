@@ -110,7 +110,7 @@ export async function inviteMemberMany(
             try {
                 await inviteMember(wsId, email, role);
                 results.success++;
-            } catch (e: any) {
+            } catch (e: unknown) {
                 results.fail++;
                 const reason = e.message || String(e);
                 const reasonDetail = e.data ? JSON.stringify(e.data) : undefined;
@@ -146,7 +146,7 @@ export async function updateMemberRoleMany(
         try {
             await updateMemberRole(wsId, userId, role);
             results.success++;
-        } catch (e: any) {
+        } catch (e: unknown) {
             results.fail++;
             const reason = e.message || String(e);
             const reasonDetail = e.data ? JSON.stringify(e.data) : undefined;
@@ -164,7 +164,7 @@ export async function updateMemberRoleMany(
  * Bulk promote/demote (Task 12) 
  * Wraps updateMemberRoleMany with toast feedback.
  */
-export async function promoteMemberMany(wsIds: string[], userId: string, workspaces: any[] = []): Promise<void> {
+export async function promoteMemberMany(wsIds: string[], userId: string, workspaces: unknown[] = []): Promise<void> {
     showToast(`Promoting member in ${wsIds.length} workspaces...`, 'info');
     const res = await updateMemberRoleMany(wsIds, userId, 'owner', workspaces);
     if (res.fail > 0) {
@@ -174,7 +174,7 @@ export async function promoteMemberMany(wsIds: string[], userId: string, workspa
     }
 }
 
-export async function demoteMemberMany(wsIds: string[], userId: string, workspaces: any[] = []): Promise<void> {
+export async function demoteMemberMany(wsIds: string[], userId: string, workspaces: unknown[] = []): Promise<void> {
     showToast(`Demoting member in ${wsIds.length} workspaces...`, 'info');
     const res = await updateMemberRoleMany(wsIds, userId, 'member', workspaces);
     if (res.fail > 0) {
@@ -198,7 +198,7 @@ export async function removeMemberMany(
         try {
             await removeMember(wsId, userId);
             results.success++;
-        } catch (e: any) {
+        } catch (e: unknown) {
             results.fail++;
             const reason = e.message || String(e);
             const reasonDetail = e.data ? JSON.stringify(e.data) : undefined;

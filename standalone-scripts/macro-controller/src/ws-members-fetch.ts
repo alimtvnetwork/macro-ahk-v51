@@ -100,7 +100,7 @@ export async function fetchMembersForMany(
       const res = { wsId: id, wsName, members };
       bulkCache.set(id, res);
       results.push(res);
-    } catch (e: any) {
+    } catch (e: unknown) {
       results.push({ wsId: id, wsName, members: [], error: String(e.message || e) });
     }
   }

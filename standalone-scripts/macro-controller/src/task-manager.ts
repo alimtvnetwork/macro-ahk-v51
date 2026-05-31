@@ -116,7 +116,7 @@ export class TaskQueueManager {
       return node instanceof Element ? node : null;
     });
 
-    if ((outcome as any) === 'failed') {
+    if (String(outcome) === 'failed') {
       this._logExecution('Injection failed', 'error');
       await this._handleTaskFailure(task, 'Injection failed');
       return;

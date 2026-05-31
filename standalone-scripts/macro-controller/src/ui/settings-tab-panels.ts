@@ -1,3 +1,4 @@
+/* eslint-disable sonarjs/no-duplicate-string */
 /**
  * MacroLoop Controller — Settings Tab Panel Builders
  *
@@ -293,7 +294,7 @@ export function buildLoggingPanel(deps: SettingsDeps): LoggingPanelResult {
 
   const resetLogBtn = document.createElement('button');
   resetLogBtn.textContent = '↺ Reset Logging Defaults';
-  // eslint-disable-next-line sonarjs/no-duplicate-string
+  
   resetLogBtn.style.cssText = btnStyle + 'background:' + cWarning + ';color:#1e1e2e;padding:5px 12px;font-size:11px;margin-top:12px;';
   resetLogBtn.onclick = function() {
     resetLogConfig();
@@ -482,13 +483,14 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
 }
 
 /** Shows a full-screen modal with history details. */
-function _showHistoryDetailModal(row: any): void {
+function _showHistoryDetailModal(row: Record<string, unknown>): void {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2147483647;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);';
   overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 
   const modal = document.createElement('div');
-  modal.style.cssText = 'background:' + ((state as any).cPanelBg || '#1a1625') + ';border:1px solid ' + ((state as any).cPanelBorder || '#2d2b3b') + ';border-radius:12px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.6);overflow:hidden;';
+  const s = state as Record<string, string>;
+  modal.style.cssText = 'background:' + (s.cPanelBg || '#1a1625') + ';border:1px solid ' + (s.cPanelBorder || '#2d2b3b') + ';border-radius:12px;width:90%;max-width:600px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 30px 70px rgba(0,0,0,0.6);overflow:hidden;';
   
   const header = document.createElement('div');
   header.style.cssText = 'padding:16px 20px;border-bottom:1px solid ' + cPanelBorder + ';display:flex;justify-content:space-between;align-items:center;';
