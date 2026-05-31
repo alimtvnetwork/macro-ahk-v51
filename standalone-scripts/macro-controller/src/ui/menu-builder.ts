@@ -24,6 +24,7 @@ import { showCreditTotalsModal } from './credit-totals-modal';
 import { resolveAutoAttachConfig, runAutoAttachGroup } from './auto-attach';
 import { logError } from '../error-utils';
 import { sendToExtension } from './prompt-manager';
+import { showTaskQueueModal } from './macro-ui';
 
 import { SECTION_DIVIDER } from '../constants';
 export interface MenuBuilderDeps {
