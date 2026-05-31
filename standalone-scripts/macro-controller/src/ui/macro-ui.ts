@@ -304,6 +304,12 @@ async function _updateQueueCountdown(badge: HTMLElement, title?: HTMLElement): P
  */
 async function refreshTaskQueueUI(container: HTMLElement): Promise<void> {
   const state = await loadTaskQueue();
+  
+  if (_activeQueueTab === 'live') {
+    renderLiveStream(container);
+    return;
+  }
+
   const tasksToShow = _activeQueueTab === 'active' ? state.tasks : (state.history || []);
   
   // Update bulk row visibility
