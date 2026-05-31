@@ -385,8 +385,11 @@ export function useStepLibrary(): UseStepLibraryApi {
 
     const persist = useCallback(() => {
         if (lib === null) return;
-        writeBytesToStorage(lib.exportDbBytes());
+        const bytes = lib.exportDbBytes();
+        setDbBytes(bytes);
+        void writeBytesToStorage(bytes);
     }, [lib]);
+
 
     const refresh = useCallback(() => {
         if (lib === null || project === null) return;
