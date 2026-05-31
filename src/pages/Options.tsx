@@ -40,7 +40,12 @@ const LibraryView = lazy(() => import("@/components/options/LibraryView"));
 const StepGroupLibraryPanel = lazy(() => import("@/components/options/StepGroupLibraryPanel"));
 const StepGroupListPanel = lazy(() => import("@/components/options/StepGroupListPanel"));
 const ErrorSwallowAuditView = lazy(() => import("@/components/options/ErrorSwallowAuditView"));
+
+import { WorkspaceSelector } from "@/components/options/WorkspaceSelector";
+import { RecoveryIndicator } from "@/components/options/RecoveryIndicator";
+
 const SECTION_STEP_GROUPS: SidebarSection = "step-groups";
+
 const HASH_STEP_GROUPS_LIST = "step-groups-list";
 
 function LazyFallback() {
