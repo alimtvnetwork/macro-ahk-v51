@@ -96,6 +96,12 @@ export function updateStatus(): void {
     el.appendChild(progressContainer);
     el.appendChild(creditContainer);
     el.appendChild(queueStatus);
+
+    // Create a global badge element for the main UI
+    const badge = document.createElement('div');
+    badge.id = 'loop-queue-badge';
+    badge.style.cssText = 'position:fixed;top:10px;right:10px;background:#ef4444;color:white;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;display:none;z-index:1000000;pointer-events:none;box-shadow:0 2px 4px rgba(0,0,0,0.3);';
+    document.body.appendChild(badge);
   }
 
   // Update Queue Status
@@ -126,6 +132,26 @@ export function updateStatus(): void {
   } else {
     renderStoppedStatus(statusLine, progressContainer);
   }
+}
+
+/**
+ * Update the global queue badge.
+ */
+export function updateQueueBadge(): void {
+  import('../task-queue').then(m => {
+    m.loadTaskQueue().then(queue => {
+      const pending = queue.tasks.filter(t => t.status === 'pending').length;
+      const badge = document.getElementById('loop-queue-badge');
+      if (badge) {
+        if (pending > 0) {
+          badge.textContent = String(pending);
+          badge.style.display = 'block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    });
+  });
 }
 
 function buildCreditBarsHtml(): string {

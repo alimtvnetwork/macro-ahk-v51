@@ -164,7 +164,7 @@ function _buildSettingsHeader(_fontSystem: string, overlay: HTMLElement): HTMLEl
 }
 
 function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => ResolvedPromptsConfig): { tabBtns: HTMLElement[]; panels: HTMLElement[]; tabPanels: { tabBar: HTMLElement; panelsContainer: HTMLElement }; generalResult: GeneralPanelResult; timingResult: TimingPanelResult } {
-  const tabs = ['XPaths', 'Timing', 'Task Next', 'Logging', 'Config (DB)', 'General'];
+  const tabs = ['XPaths', 'Timing', 'Task Next', 'Logging', 'History', 'Config (DB)', 'General'];
   const tabBar = document.createElement('div');
   tabBar.style.cssText = 'display:flex;gap:0;border-bottom:1px solid ' + cPanelBorder + ';padding:0 20px;flex-shrink:0;';
   const tabPanels = document.createElement('div');
@@ -187,6 +187,7 @@ function _buildSettingsTabs(deps: SettingsDeps, getPromptsConfig: () => Resolved
   panels.push(timingResult.panel);
   panels.push(buildTaskNextPanel(makeField).panel);
   panels.push(buildLoggingPanel(deps).panel);
+  panels.push((window as any).marco_buildHistoryPanel().panel);
   panels.push(buildConfigDbPanel(deps, makeField).panel);
   panels.push(generalResult.panel);
 

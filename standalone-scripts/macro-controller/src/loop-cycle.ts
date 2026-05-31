@@ -30,6 +30,8 @@ import { checkAndActOnCreditBalance, BALANCE_CONFIG } from './credit-balance';
 import { delay } from './async-utils';
 import { logError } from './error-utils';
 
+import { checkAutoResume } from './queue-control/auto-resume';
+
 /** Shorthand for MacroController singleton */
 function mc() { return MacroController.getInstance(); }
 
@@ -432,6 +434,9 @@ export function runCycle(): void {
       logError('runCycle', 'TaskQueueManager failed', err);
     });
   });
+
+  // Run auto-resume check to see if "Return" button is gone
+  checkAutoResume();
 
   log('Step 1: Checking credit balance via API...', 'check');
 
