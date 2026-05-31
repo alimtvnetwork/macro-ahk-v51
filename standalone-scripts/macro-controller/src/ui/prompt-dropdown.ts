@@ -921,7 +921,7 @@ function _appendTaskNextSettings(taskNextSub: HTMLElement, promptsDropdown: HTML
   taskNextSub.appendChild(settingsItem);
 }
 
-interface PromptEntry { id?: string; slug?: string; name: string; text: string; category?: string; isDefault?: boolean }
+interface PromptEntry { id?: string; slug?: string; name: string; text: string; category?: string; isDefault?: boolean; tags?: string[] }
 
 function renderPromptItem(
   idx: number, p: PromptEntry, promptsDropdown: HTMLElement,
