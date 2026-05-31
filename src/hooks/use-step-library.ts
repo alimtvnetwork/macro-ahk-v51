@@ -19,6 +19,10 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { logError } from "./hook-logger";
+import { useCrossTabSync } from "./use-cross-tab-sync";
+import { WorkspaceStorage } from "@/lib/workspace-storage";
+import { StateReconciler } from "@/lib/state-reconciler";
+
 import initSqlJs, { type Database, type SqlJsStatic } from "sql.js";
 
 import {
