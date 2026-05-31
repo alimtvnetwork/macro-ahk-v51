@@ -134,6 +134,26 @@ export function updateStatus(): void {
   }
 }
 
+/**
+ * Update the global queue badge.
+ */
+export function updateQueueBadge(): void {
+  import('../task-queue').then(m => {
+    m.loadTaskQueue().then(queue => {
+      const pending = queue.tasks.filter(t => t.status === 'pending').length;
+      const badge = document.getElementById('loop-queue-badge');
+      if (badge) {
+        if (pending > 0) {
+          badge.textContent = String(pending);
+          badge.style.display = 'block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+    });
+  });
+}
+
 function buildCreditBarsHtml(): string {
   if (!loopCreditState.lastCheckedAt) return '';
 
