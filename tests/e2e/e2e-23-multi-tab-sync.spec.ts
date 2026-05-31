@@ -30,7 +30,9 @@ test.describe('E2E-23 — Multi-Tab State Synchronization', () => {
     // 4. Add prompt in Tab 1
     console.log('Adding prompt in Tab 1...');
     // Click the "Add" (plus) button in the header
-    await tab1.getByRole('button', { name: /plus|add/i }).last().click();
+    const addBtn = tab1.getByRole('button', { name: /plus|add/i }).last();
+    await addBtn.click();
+    
     await tab1.getByPlaceholder(/prompt name/i).fill(testPromptName);
     
     // Interact with Monaco editor (fallback to filling the hidden textarea)
@@ -61,7 +63,8 @@ test.describe('E2E-23 — Multi-Tab State Synchronization', () => {
     if (await firstGroupBtn.isVisible()) {
       await firstGroupBtn.click();
     } else {
-      await tab1.getByRole('button', { name: /new group|plus/i }).first().click();
+      // Find the "New group" button in the toolbar
+      await tab1.getByRole('button', { name: /new/i }).first().click();
     }
     
     await tab1.locator('input[placeholder="Group name..."]').fill(testGroupName);
@@ -76,8 +79,8 @@ test.describe('E2E-23 — Multi-Tab State Synchronization', () => {
 });
 
 async function navigateToSection(page: Page, sectionName: string) {
-  // Try finding by button name, then fallback to finding by data-testid or custom logic if needed
-  const navButton = page.getByRole('button', { name: sectionName, exact: true });
+  // Use a more robust selector for the sidebar buttons
+  const navButton = page.locator('nav').getByRole('button', { name: sectionName, exact: true });
   await expect(navButton).toBeVisible();
   await navButton.click();
 }
