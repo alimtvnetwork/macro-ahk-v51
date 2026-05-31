@@ -540,7 +540,7 @@ function _renderFolderTree(
     };
 
     folders[folderName].forEach((p, idx) => {
-      folderBody.appendChild(renderPromptItem(idx, p, container, promptsCfg, ctx, taskNextDeps));
+      folderBody.appendChild(renderPromptItem(idx, p, container, promptsCfg as ResolvedPromptsConfig, ctx, taskNextDeps));
     });
 
     folderWrap.appendChild(folderHeader);
@@ -550,7 +550,7 @@ function _renderFolderTree(
 
   // Render root items
   rootItems.forEach((p, idx) => {
-    container.appendChild(renderPromptItem(idx, p, container, promptsCfg, ctx, taskNextDeps));
+    container.appendChild(renderPromptItem(idx, p, container, promptsCfg as ResolvedPromptsConfig, ctx, taskNextDeps));
   });
 }
 
@@ -1166,8 +1166,8 @@ function appendPromptActions(
 }
 
 /** Build the favorite ⭐ toggle icon for a prompt item. */
-function _buildFavoriteIcon(p: PromptEntry, _dropdown: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
-  const isFav = !!p.isFavorite;
+function _buildFavoriteIcon(p: LoaderPromptEntry, _dropdown: HTMLElement, ctx: PromptContext, taskNextDeps: TaskNextDeps): HTMLElement {
+  const isFav = !!(p as any).isFavorite;
   const icon = _makeActionIcon(isFav ? '⭐' : '☆', isFav ? 'Remove from favorites' : 'Mark as favorite', isFav ? '1' : '0.4');
   icon.onclick = function(e: Event) {
     e.stopPropagation();

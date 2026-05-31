@@ -336,8 +336,9 @@ export function buildConfigDbPanel(
 
     const sections: Record<string, Array<{ key: string; value: string; valueType: string }>> = {};
     for (const row of (rows || [])) {
-      if (!sections[row.section]) sections[row.section] = [];
-      sections[row.section].push({ key: row.key, value: row.value, valueType: row.valueType });
+      const r = row as any;
+      if (!sections[r.section]) sections[r.section] = [];
+      sections[r.section].push({ key: r.key, value: r.value, valueType: r.valueType });
     }
 
     for (const [sectionName, entries] of Object.entries(sections)) {
@@ -455,15 +456,16 @@ export function buildHistoryPanel(): { panel: HTMLElement } {
       item.onmouseenter = () => { item.style.background = 'rgba(255,255,255,0.03)'; };
       item.onmouseleave = () => { item.style.background = 'transparent'; };
       
-      const time = new Date(row.Timestamp).toLocaleString();
+      const r = row as any;
+      const time = new Date(r.Timestamp).toLocaleString();
       item.innerHTML = `
         <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
           <span style="font-size:9px;color:${cPrimaryLight};font-weight:700;">${time}</span>
         </div>
-        <div style="font-size:11px;color:${cPanelText};word-break:break-word;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${row.Prompt}</div>
+        <div style="font-size:11px;color:${cPanelText};word-break:break-word;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${r.Prompt}</div>
       `;
       item.onclick = () => {
-        _showHistoryDetailModal(row);
+        _showHistoryDetailModal(r);
       };
       listContainer.appendChild(item);
     });
@@ -504,7 +506,7 @@ function _showHistoryDetailModal(row: Record<string, unknown>): void {
 
   const content = document.createElement('div');
   content.style.cssText = 'flex:1;overflow-y:auto;padding:20px;font-family:monospace;font-size:12px;color:' + cPanelText + ';white-space:pre-wrap;line-height:1.5;background:' + cPanelBgAlt + ';';
-  content.textContent = row.Prompt;
+  content.textContent = (row as any).Prompt;
 
   const footer = document.createElement('div');
   footer.style.cssText = 'padding:12px 20px;border-top:1px solid ' + cPanelBorder + ';display:flex;justify-content:flex-end;gap:10px;';
@@ -513,7 +515,7 @@ function _showHistoryDetailModal(row: Record<string, unknown>): void {
   copyBtn.textContent = '📋 Copy Prompt';
   copyBtn.style.cssText = 'padding:8px 16px;background:' + cPrimary + ';color:#fff;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-weight:600;';
   copyBtn.onclick = () => {
-    navigator.clipboard.writeText(row.Prompt);
+    navigator.clipboard.writeText((row as any).Prompt);
     showToast('✅ Prompt copied to clipboard', 'info');
   };
 
