@@ -239,6 +239,8 @@ function NavItem({ item, index, isActive, isExpanded, onSelect }: NavItemProps) 
       <div className={`anim-fade-in-left hover-shift-right ${delayClass}`}>
         <SidebarMenuButton
           onClick={onSelect}
+          aria-label={item.label}
+          tooltip={item.label}
           className={`
             transition-all duration-200 
             hover:bg-primary/10 hover:text-primary
