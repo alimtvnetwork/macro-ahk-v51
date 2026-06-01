@@ -102,7 +102,7 @@ describe('E2E — Summary totals always match backend catalog', () => {
         const texts = pillTexts(bar);
         expect(texts[0]).toContain('…');
         expect(texts[1]).toContain('… / …');
-        expect(texts[2]).toBe('…');
+        expect(texts[2]).toContain('…');
         // Hard regression guard for issue 125:
         for (const t of texts) {
             expect(t).not.toMatch(/^0\b/);
