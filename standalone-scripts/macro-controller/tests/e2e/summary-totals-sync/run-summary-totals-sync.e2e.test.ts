@@ -180,6 +180,7 @@ describe('E2E — Summary totals always match backend catalog', () => {
  * mirrors the renderer contract: filters narrow the VISIBLE rows but
  * `publishVisibleWorkspaces()` is always invoked with the FULL catalog.
  */
+// eslint-disable-next-line max-lines-per-function -- describe() block aggregates multiple it() cases; splitting would fragment the suite.
 describe('E2E — filter combinations keep totals synced with backend', () => {
     type SortKey = 'name' | 'available' | 'totalCredits' | 'numProjects';
     type WsTypeFilter = 'all' | 'pro' | 'free' | 'expiring';
