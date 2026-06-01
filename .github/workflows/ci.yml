@@ -2457,6 +2457,78 @@ jobs:
           retention-days: 7
 
   # ════════════════════════════════════════════════════════════
+  # Job 6c: E2E-23 (Multi-Tab State Synchronization)
+  #
+  # Runs only `tests/e2e/e2e-23-multi-tab-sync.spec.ts` with an
+  # explicit `npx playwright install` step before execution so the
+  # Chromium binary is present even if the cache layer or the prior
+  # `--with-deps` install was skipped. Test uses its own
+  # test.setTimeout(180_000) for the cross-tab Monaco/onboarding
+  # overhead.
+  # ════════════════════════════════════════════════════════════
+  e2e-23-multi-tab-sync:
+    name: E2E-23 · Multi-Tab State Synchronization
+    needs: [build-extension, verify-built-manifest-csp]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pnpm/store
+          key: pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --no-frozen-lockfile
+
+      - name: Download built Chrome extension
+        uses: actions/download-artifact@v4
+        with:
+          name: chrome-extension-dist
+          path: dist/
+
+      - name: Install Playwright browsers (explicit, pre-test)
+        run: npx playwright install --with-deps chromium
+
+      - name: Install xvfb
+        run: sudo apt-get update && sudo apt-get install -y xvfb
+
+      - name: Run E2E-23 multi-tab sync spec
+        env:
+          CI: 'true'
+        run: |
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x800x24" \
+            pnpm exec playwright test tests/e2e/e2e-23-multi-tab-sync.spec.ts \
+              --project=chrome-extension \
+              --reporter=list
+
+      - name: Upload Playwright artifacts (E2E-23)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts-e2e-23
+          path: test-results/artifacts
+          retention-days: 7
+
+
+
+  # ════════════════════════════════════════════════════════════
   # Registry-required build stubs.
   #
   # These jobs satisfy the strict standalone registry checker
