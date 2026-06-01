@@ -97,6 +97,7 @@ afterEach(() => {
     __resetVisibleWorkspacesStore();
 });
 
+// eslint-disable-next-line max-lines-per-function -- describe() block aggregates multiple it() cases; splitting would fragment the suite.
 describe('E2E — Summary totals always match backend catalog', () => {
     it('Step 1 — cold start (no publish yet) renders loading placeholder, never "0 Pro / 0 / 0"', () => {
         const texts = pillTexts(bar);
