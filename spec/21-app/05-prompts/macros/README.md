@@ -1,7 +1,7 @@
 # Prompt Macros — Spec Index
 
-**Created:** 2026-06-02 (Asia/Kuala_Lumpur)
-**Status:** Authoring in progress (Block 1 of 10 — see `.lovable/plans/prompt-macros-50-step.md`).
+**Updated:** 2026-06-02 (Asia/Kuala_Lumpur)
+**Status:** ✅ v2.0 complete. Audited readiness **100 / 100** (`READINESS-SCORE-v2.md`). See `../README.md` (root index) and `../IMPLEMENTATION-CHECKLIST.md` for the blind-AI runbook.
 
 A **Macro** is an ordered, declarative chain of typed prompt steps that the
 extension auto-executes: it injects prompts, drives the `next` loop, runs
