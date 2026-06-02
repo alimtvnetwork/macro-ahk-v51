@@ -53,7 +53,7 @@ template and a separate count.
 ## 4. Spec layout
 
 ```
-spec/2026-prompts-generic/
+spec/2026-spec/
   00-overview.md                ← (this file)
   01-plan-tasks-1-20.md         ← the 20-step plan for tasks 21–120
   10-glossary/                  ← created in Task 21–25

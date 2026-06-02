@@ -1,46 +1,50 @@
-# `spec/2026-spec/` — pointer
+# 2026 Prompts (generic) — Spec
 
 **Date:** 2026-06-02 (Asia/Kuala_Lumpur)
+**Status:** 120/120 tasks complete; hardening pass in `02-hardening-backlog.md`.
 
-This folder is a **pointer**, not a separate spec. The generic
-prompt-runner spec lives at:
+A host-agnostic specification for shipping a **Prompts feature** (prompt
+library + Next/Plan automation loop) into any chat-style web app.
+The spec deliberately contains no references to this project's
+internals — every host integration point is an answered `???` question
+(see `00-overview.md`, Q1–Q8).
 
-> **[`../2026-prompts-generic/`](../2026-prompts-generic/README.md)**
+## Read order (for humans and AIs)
 
-## Why two names?
+Mirrors the T120 handoff. If you only have 30 minutes, stop at step 8.
 
-The original brief (2026-06-02) was first executed under the name
-`2026-prompts-generic/` and is complete:
+1. `00-overview.md` — purpose, Q1–Q8 placeholders, non-goals.
+2. `01-plan-tasks-1-20.md` — 120-task index + completion ledger.
+3. `02-hardening-backlog.md` — post-T120 punch list (H1–H10).
+4. `10-glossary/` — vocabulary + banlist (enforced by `check:spec-banlist`).
+5. `20-data-model/` + `30-prompt-source-format/` — what a Prompt **is**.
+6. `40-loader-contract/` → `50-ui-contract/` → `60-injection-contract/` + `70-editor-adapters/` — the read/paste happy path.
+7. `80-save-create-edit/` — author flows.
+8. `90-next-overview/` → `100-queue-model/` → `110-queue-lifecycle/` → `120-delay-engine/` — automation core.
+9. `130-failure-handling/` — failure taxonomy + mandatory log shape.
+10. `140-plan-mode/` — plan profile delta.
+11. `150-settings/` + `160-observability/` — configuration & diagnostics.
+12. `170-onboarding/` + `180-test-plan/` — bring-up + QA gates.
+13. `190-reference-snippets/` — copy-pastable TS pseudo-code (~40–80 LOC each).
+14. `200-adoption-checklist/` — pre-flight, wire-up order, go-live, worked example, handoff.
 
-- **T1–T120** — 120 sequenced spec tasks across 20 sub-folders
-  (`10-glossary` … `200-adoption-checklist`).
-- **H1–H10** — post-spec hardening backlog (banlist linter, Mermaid lint,
-  JSON-schema validator for `info.json`, cross-link audit, acceptance
-  extractor, PDF bundler, snippet typecheck harness, vanilla-HTML
-  host-wiring PoC at `poc/2026-prompts-generic/`).
+## Invariants (must not regress)
 
-When the brief was re-issued asking for `spec/2026-spec/`, the existing
-workstream already satisfied every acceptance criterion. To avoid
-duplicating ~35 files, this pointer was created instead of a rename or a
-copy. See ambiguity log
-[`.lovable/question-and-ambiguity/59-2026-spec-folder-name.md`](../../.lovable/question-and-ambiguity/59-2026-spec-folder-name.md).
+- No `chrome.*`, `MacroController`, `RiseupAsia*`, `Marco SDK`, or `Supabase` references inside the spec (other than the banlist itself and meta-docs that quote it).
+- **No-Retry policy**: fail-fast everywhere; no exponential backoff.
+- Failure logs always carry `Reason` + `ReasonDetail` + `SelectorAttempts[]` + `VariableContext[]`.
+- `readme.txt` is never auto-stamped with time/clock/git values.
+- Verbose logging defaults OFF; full prompt bodies only persisted when ON.
 
-## Quick map
+## Tooling
 
-| What you want | Where to read |
+| Command | Purpose |
 |---|---|
-| Read order + overview | [`../2026-prompts-generic/README.md`](../2026-prompts-generic/README.md) |
-| 20-step plan + T1–T20 | [`../2026-prompts-generic/01-plan-tasks-1-20.md`](../2026-prompts-generic/01-plan-tasks-1-20.md) |
-| Open selectors (chat box, Next, Plan) marked `?` | `../2026-prompts-generic/50-ui-contract/`, `60-injection-contract/`, `140-plan-mode/` |
-| Queue + delay (5–10 s configurable) | `../2026-prompts-generic/100-queue-model/`, `110-queue-lifecycle/`, `120-delay-engine/` |
-| Plan mode | `../2026-prompts-generic/140-plan-mode/` |
-| Reference snippets (zero-dep TS) | `../2026-prompts-generic/190-reference-snippets/` |
-| Runnable PoC | `../../poc/2026-prompts-generic/index.html` |
-| Hardening backlog status | `../2026-prompts-generic/02-hardening-backlog.md` |
+| `npm run check:spec-banlist` | Enforce vocabulary banlist (H1). |
+| `npm run check:spec-prompts-xrefs` | Verify every `T###` reference resolves (H7). |
+| `npm run spec:prompts:acceptance` | Extract all `- [ ]` bullets into one master checklist (H8). |
+| `npm run spec:prompts:pdf` | Concatenate the spec into a single printable markdown bundle in `/mnt/documents/` (H6). |
 
-## If you really want this folder to hold the spec
+## Extending the spec
 
-Run: `git mv spec/2026-prompts-generic spec/2026-spec` and update the
-`check:spec-banlist`, `check:spec-prompts-xrefs`, `spec:prompts:acceptance`,
-`spec:prompts:pdf`, `check:prompts-info-json`, `check:spec-mermaid`,
-`check:spec-snippets` script paths in `package.json` + `scripts/*.mjs`.
+Add a new top-level folder with a `NNN-` prefix continuing the numbering, then append a row to `01-plan-tasks-1-20.md`'s tracking table. Re-run the four commands above.

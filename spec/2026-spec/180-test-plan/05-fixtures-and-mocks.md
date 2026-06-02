@@ -15,7 +15,7 @@
 
 ## Fixture corpus
 
-`spec/2026-prompts-generic/fixtures/` (created later alongside implementation):
+`spec/2026-spec/fixtures/` (created later alongside implementation):
 
 ```
 fixtures/

@@ -1,10 +1,10 @@
-# H10 — Host-wiring PoC (2026-prompts-generic)
+# H10 — Host-wiring PoC (2026-spec)
 
 **Date:** 2026-06-02 (Asia/Kuala_Lumpur)
 **Task:** H10 (spec-hardening backlog)
 
 A single self-contained `index.html` wires together the five reference
-snippets from `spec/2026-prompts-generic/190-reference-snippets/`:
+snippets from `spec/2026-spec/190-reference-snippets/`:
 
 1. `01-prompt-store-in-memory` → `createInMemoryPromptStore`
 2. `02-queue-engine`           → `createQueueEngine`
@@ -19,9 +19,9 @@ host; the PoC keeps it in a `Map`).
 
 ```
 # any static server works
-npx serve poc/2026-prompts-generic
+npx serve poc/2026-spec
 # or
-python3 -m http.server -d poc/2026-prompts-generic 8080
+python3 -m http.server -d poc/2026-spec 8080
 ```
 
 Open `http://localhost:8080` and:
