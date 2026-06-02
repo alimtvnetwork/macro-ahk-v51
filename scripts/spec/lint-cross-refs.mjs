@@ -21,26 +21,28 @@ function walk(dir) {
 const SPEC_RE = /\b(spec\/[\w./-]+\.(?:md|json))\b/g;
 const MEM_RE = /\bmem:\/\/([\w./-]+)/g;
 
-const broken = [];
+const hardFail = []; // spec/... paths must exist (hard fail)
+const warn = [];     // mem://... refs — memory store is opaque, warn only
+
 for (const file of walk(ROOT)) {
   const txt = readFileSync(file, 'utf8');
   for (const m of txt.matchAll(SPEC_RE)) {
-    if (!existsSync(m[1])) broken.push({ file, ref: m[1], kind: 'spec-path' });
+    if (!existsSync(m[1])) hardFail.push({ file, ref: m[1] });
   }
   for (const m of txt.matchAll(MEM_RE)) {
-    const candidates = [
-      join(MEM_ROOT, m[1] + '.md'),
-      join(MEM_ROOT, m[1]),
-    ];
-    if (!candidates.some(existsSync)) {
-      broken.push({ file, ref: `mem://${m[1]}`, kind: 'mem-ref' });
-    }
+    const candidates = [join(MEM_ROOT, m[1] + '.md'), join(MEM_ROOT, m[1])];
+    if (!candidates.some(existsSync)) warn.push({ file, ref: `mem://${m[1]}` });
   }
 }
 
-if (broken.length) {
-  console.error('[lint-cross-refs] Broken references:');
-  for (const b of broken) console.error(`  ${b.file} -> ${b.ref} (${b.kind})`);
+if (warn.length) {
+  console.warn(`[lint-cross-refs] ${warn.length} mem:// refs not in local mirror (memory store is opaque — informational):`);
+  warn.slice(0, 5).forEach(w => console.warn(`  ${w.file} -> ${w.ref}`));
+  if (warn.length > 5) console.warn(`  ... +${warn.length - 5} more`);
+}
+if (hardFail.length) {
+  console.error('[lint-cross-refs] Broken spec/ references (must fix):');
+  for (const b of hardFail) console.error(`  ${b.file} -> ${b.ref}`);
   process.exit(1);
 }
-console.log('[lint-cross-refs] OK — all references resolve');
+console.log('[lint-cross-refs] OK — all spec/ paths resolve');
