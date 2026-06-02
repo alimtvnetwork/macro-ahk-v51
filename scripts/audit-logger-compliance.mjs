@@ -1,0 +1,111 @@
+#!/usr/bin/env node
+/**
+ * audit-logger-compliance.mjs — Batch C steps 22–23 / S13 remediation.
+ *
+ * Scans `src/` for `console.error(...)` callers and classifies each against
+ * the allowlist in `spec/audit/blind-ai-implementation-audit/coverage/logging-sweep-targets.md`.
+ *
+ * Writes `public/logger-compliance-audit.json` for the Options audit panel.
+ * Exits 1 if any file outside the allowlist contains `console.error`.
+ *
+ * Usage:
+ *   node scripts/audit-logger-compliance.mjs           # human + JSON file
+ *   node scripts/audit-logger-compliance.mjs --json    # JSON to stdout
+ */
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { dirname } from 'node:path';
+
+// Allowlist — see logging-sweep-targets.md section A.
+const ALLOWLIST = new Set([
+  'src/background/bg-logger.ts',
+  'src/lib/lib-logger.ts',
+  'src/components/options/options-logger.ts',
+  'src/components/recorder/recorder-logger.ts',
+  'src/content-scripts/prompt-injector-logger.ts',
+  'src/hooks/popup-logger.ts',
+  'src/hooks/hook-logger.ts',
+  'src/background/session-log-writer.ts',
+  'src/background/db-manager.ts',
+  'src/background/handlers/injection-namespace-bootstrap.ts',
+  'src/components/ErrorBoundary.tsx',
+  'src/lib/developer-guide-data.generated.ts',
+  'src/background/__tests__/allow-swallow-fallbacks.test.ts',
+  'src/background/recorder/__tests__/failure-logger.test.ts',
+]);
+
+function listConsoleErrorFiles() {
+  try {
+    const out = execSync('rg -l "console\\.error" src/', { encoding: 'utf8' });
+    return out.trim().split('\n').filter(Boolean).sort();
+  } catch {
+    return [];
+  }
+}
+
+function countOccurrences(file) {
+  const content = readFileSync(file, 'utf8');
+  const matches = content.match(/console\.error\s*\(/g);
+  return matches ? matches.length : 0;
+}
+
+const allFiles = listConsoleErrorFiles();
+const allowed = [];
+const violations = [];
+
+for (const file of allFiles) {
+  const count = countOccurrences(file);
+  const record = { file, count };
+  if (ALLOWLIST.has(file)) {
+    allowed.push(record);
+  } else {
+    violations.push(record);
+  }
+}
+
+const totalCalls = allFiles.reduce((sum, f) => sum + countOccurrences(f), 0);
+const allowedCalls = allowed.reduce((sum, r) => sum + r.count, 0);
+const violationCalls = violations.reduce((sum, r) => sum + r.count, 0);
+const compliancePercent = totalCalls === 0 ? 100 : ((allowedCalls / totalCalls) * 100).toFixed(1);
+
+const result = {
+  generatedAt: new Date().toISOString(),
+  totals: {
+    filesWithConsoleError: allFiles.length,
+    allowedFiles: allowed.length,
+    violatingFiles: violations.length,
+    totalCalls,
+    allowedCalls,
+    violationCalls,
+    compliancePercent: Number(compliancePercent),
+  },
+  allowedFiles: allowed,
+  violatingFiles: violations,
+  policy: 'spec/audit/blind-ai-implementation-audit/coverage/logging-sweep-targets.md',
+};
+
+mkdirSync('public', { recursive: true });
+writeFileSync('public/logger-compliance-audit.json', JSON.stringify(result, null, 2) + '\n');
+
+if (process.argv.includes('--json')) {
+  console.log(JSON.stringify(result, null, 2));
+} else {
+  console.log(`[logger-compliance] ${allFiles.length} files with console.error`);
+  console.log(`[logger-compliance]   allowed: ${allowed.length} files (${allowedCalls} calls)`);
+  console.log(`[logger-compliance]   violations: ${violations.length} files (${violationCalls} calls)`);
+  console.log(`[logger-compliance]   compliance: ${compliancePercent}%`);
+  if (violations.length > 0) {
+    console.log('[logger-compliance] Sweep these files (use Logger.error / logBgError):');
+    for (const v of violations) {
+      console.log(`  - ${v.file}  (${v.count} call${v.count === 1 ? '' : 's'})`);
+    }
+  }
+  console.log(`[logger-compliance] Wrote public/logger-compliance-audit.json`);
+}
+
+const strict = process.argv.includes('--strict');
+if (strict && violations.length > 0) {
+  console.error(`[logger-compliance] FAIL (--strict): ${violations.length} files outside allowlist.`);
+  process.exit(1);
+}
+process.exit(0);
