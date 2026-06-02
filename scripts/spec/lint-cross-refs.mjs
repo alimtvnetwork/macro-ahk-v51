@@ -27,11 +27,15 @@ const warn = [];     // mem://... refs — memory store is opaque, warn only
 
 for (const file of walk(ROOT)) {
   const txt = readFileSync(file, 'utf8');
+  // Issue tracker docs legitimately discuss missing files — skip hard-fail there
+  const inIssueTracker = file.includes('/99-spec-issues/');
   for (const m of txt.matchAll(SPEC_RE)) {
     const ref = m[1];
-    // Skip illustrative/example paths (ellipsis, audit timestamps, generic placeholders)
     if (ref.includes('...') || ref.startsWith('spec/audit/') || /CONVENTIONS\.md$/.test(ref)) continue;
-    if (!existsSync(ref)) hardFail.push({ file, ref });
+    if (!existsSync(ref)) {
+      if (inIssueTracker) continue; // warn-only via existence is fine
+      hardFail.push({ file, ref });
+    }
   }
   for (const m of txt.matchAll(MEM_RE)) {
     const candidates = [join(MEM_ROOT, m[1] + '.md'), join(MEM_ROOT, m[1])];
