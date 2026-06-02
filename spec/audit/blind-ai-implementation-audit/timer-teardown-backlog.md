@@ -34,10 +34,11 @@
 | 15 | 3 | `src/lib/developer-guide-data.generated.ts` | P2 |
 
 ## Recommended attack order
-1. **P0 batch A** (5 files, ~22 installs): `injection-toast.ts`, `csp-fallback.ts`, `network-reporter.ts`, `first-attach-toast.ts`, `hotkey-executor.ts`. Add paired teardown + `pagehide` listener; bound reinstall loops with finite backoff.
-2. **P0 batch B**: `click-trail.ts` + remaining `src/background/` / `src/content-scripts/` / `src/lib/` non-test hits.
-3. **P1 batch**: `monaco-js-intellisense.ts` (largest single offender), `BootFailureBanner.tsx`, `PopupFooter.tsx`, plus the remaining `src/components/**` files.
-4. **P2**: regenerate `developer-guide-data.generated.ts` via its source script.
-5. **Audit polish (T)**: extend `scripts/audit-timer-teardown.mjs` to skip `__tests__/**` and re-baseline `--strict` to 0 P0+P1 findings.
+1. **P0 batch A — done 2026-06-02** (5 files, ~22 installs): `injection-toast.ts`, `csp-fallback.ts`, `network-reporter.ts`, `first-attach-toast.ts`, `hotkey-executor.ts`. Added paired teardown, `pagehide` cleanup, listener removal, and timer clearing. Locked by `scripts/__tests__/audit-timer-teardown.test.mjs`.
+2. **P0 batch B — partial 2026-06-02**: remediated delay/flush helpers in `condition-evaluator.ts`, recorder `condition-evaluator.ts`, `live-dom-replay.ts`, `step-wait.ts`, and `session-log-writer.ts`.
+3. **P0 batch C**: `spa-reinject.ts`, `message-relay.ts`, `prompt-injector.ts`, `click-trail.ts`, plus remaining `src/background/` / `src/content-scripts/` / `src/lib/` non-test hits.
+4. **P1 batch**: `monaco-js-intellisense.ts` (largest single offender), `BootFailureBanner.tsx`, `PopupFooter.tsx`, plus the remaining `src/components/**` files.
+5. **P2**: regenerate `developer-guide-data.generated.ts` via its source script.
+6. **Audit polish (T)**: extend `scripts/audit-timer-teardown.mjs` to skip `__tests__/**` and re-baseline `--strict` to 0 P0+P1 findings.
 
 Each fix MUST land with a paired test (`mem://preferences/test-with-features`).
