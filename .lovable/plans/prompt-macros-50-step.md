@@ -206,18 +206,18 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 53. [x] Write `spec/21-app/05-prompts/json/02-export-all.md` — full-bundle export including MacroPrompts + Macros + Categories, ordering, redaction.
 54. [x] Write `spec/21-app/05-prompts/json/03-import-merge.md` — merge-by-Slug algorithm, conflict UI (Keep / Use theirs / Rename), dry-run preview.
 55. [x] Write `spec/21-app/05-prompts/json/04-replace-atomic.md` — confirm dialog, auto-backup to chrome.storage.local, rollback path.
-56. [ ] Write `spec/21-app/05-prompts/json/05-validation-and-errors.md` — Ajv usage, error-surface copy, mandatory failure-log shape.
-57. [ ] Write `spec/21-app/05-prompts/json/06-versioning-and-migration.md` — `Version` semantics, forward/backward compat, migrators registry.
-58. [ ] Write `spec/21-app/05-prompts/json/07-clipboard-format.md` — single-prompt copy uses same schema as save; round-trip safe.
-59. [ ] Write `spec/21-app/05-prompts/json/08-drag-drop-import.md` — drop `.json` file onto Prompts panel triggers import-merge flow.
-60. [ ] Write `spec/21-app/05-prompts/json/09-cli-equivalents.md` — `scripts/prompts-export.mjs`, `scripts/prompts-import.mjs`, `scripts/prompts-validate.mjs` contracts.
+56. [x] Write `spec/21-app/05-prompts/json/05-validation-and-errors.md` — Ajv usage, error-surface copy, mandatory failure-log shape.
+57. [x] Write `spec/21-app/05-prompts/json/06-versioning-and-migration.md` — `Version` semantics, forward/backward compat, migrators registry.
+58. [x] Write `spec/21-app/05-prompts/json/07-clipboard-format.md` — single-prompt copy uses same schema as save; round-trip safe.
+59. [x] Write `spec/21-app/05-prompts/json/08-drag-drop-import.md` — drop `.json` file onto Prompts panel triggers import-merge flow.
+60. [x] Write `spec/21-app/05-prompts/json/09-cli-equivalents.md` — `scripts/prompts-export.mjs`, `scripts/prompts-import.mjs`, `scripts/prompts-validate.mjs` contracts.
 
 ### Block 7 — Engine Architecture & Persistence (Tasks 61–70)
-61. [ ] Write `spec/21-app/05-prompts/macros/engine/00-architecture.md` — modules + Mermaid sequence diagram (panel → background → injector).
-62. [ ] Write `spec/21-app/05-prompts/macros/engine/01-state-machine.md` — Idle → Running → Paused → Looping → Done / Failed transitions table.
-63. [ ] Write `spec/21-app/05-prompts/macros/engine/02-resume-after-sw-restart.md` — persisted keys, rehydration, max-stale window.
-64. [ ] Write `spec/21-app/05-prompts/macros/engine/03-score-extraction.md` — regex(es) for `score: NN/100`, fail-fast fallback.
-65. [ ] Write `spec/21-app/05-prompts/macros/engine/04-audit-folder-writer.md` — exact paths, naming, idempotency, collision handling.
+61. [x] Write `spec/21-app/05-prompts/macros/engine/00-architecture.md` — modules + Mermaid sequence diagram (panel → background → injector).
+62. [x] Write `spec/21-app/05-prompts/macros/engine/01-state-machine.md` — Idle → Running → Paused → Looping → Done / Failed transitions table.
+63. [x] Write `spec/21-app/05-prompts/macros/engine/02-resume-after-sw-restart.md` — persisted keys, rehydration, max-stale window.
+64. [x] Write `spec/21-app/05-prompts/macros/engine/03-score-extraction.md` — regex(es) for `score: NN/100`, fail-fast fallback.
+65. [x] Write `spec/21-app/05-prompts/macros/engine/04-audit-folder-writer.md` — exact paths, naming, idempotency, collision handling.
 66. [ ] Write `spec/21-app/05-prompts/macros/engine/05-variable-interpolator.md` — template engine spec, escaping, error surface.
 67. [ ] Write `spec/21-app/05-prompts/macros/engine/06-message-contract.md` — panel ↔ background ↔ injector message shapes (typed, no `unknown`).
 68. [ ] Write `spec/21-app/05-prompts/macros/engine/07-concurrency.md` — single-run-per-tab rule, queueing policy, abort semantics.
