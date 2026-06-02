@@ -12,11 +12,11 @@
 
 ---
 
-## 🆕 Release Page CI/CD Hardening Plan — 8 Steps (queued)
+## ✅ Release Page CI/CD Hardening Plan — 8 Steps (CLOSED 2026-06-02)
 
 **Trigger**: User reported that a release tag was created, but the GitHub Release page has no Chrome extension ZIP or other built ZIP assets, and the release-page changelog/notes did not update correctly.
 
-**Status**: Plan written only. Awaiting `next` to implement Step 1.
+**Status**: **Fully closed as of v3.21.0** — all 8 steps shipped (see "Remaining items" checklist at the end of this section). Verified 2026-06-02 against `.github/workflows/release.yml` (lines 95–198 = Step 1, 590–608 = Step 2, 764–820 = Step 3, 672–760 = Step 4) and `.github/workflows/audit-releases.yml` (Step 5). Kept below for RCA history only.
 
 **Root cause found from repo evidence**:
 - A tag/source archive alone is not a real Marco release. The expected ZIPs/installers are uploaded only by `.github/workflows/release.yml` via `softprops/action-gh-release@v2` and `files: release-assets/*`.
