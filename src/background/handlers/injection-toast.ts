@@ -43,7 +43,12 @@ export async function showInjectionToastInTab(
 
                 const loader = document.getElementById("__marco-inject-toast-loading");
                 // eslint-disable-next-line sonarjs/no-duplicate-string
-                if (loader) { loader.style.opacity = "0"; loader.style.transform = "translateY(8px) scale(0.96)"; setTimeout(() => loader.remove(), 300); }
+                let loaderTimer: ReturnType<typeof setTimeout> | null = null;
+                if (loader) {
+                    loader.style.opacity = "0";
+                    loader.style.transform = "translateY(8px) scale(0.96)";
+                    loaderTimer = setTimeout(() => { loaderTimer = null; loader.remove(); }, 300);
+                }
 
                 const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
                 if (m?.notify?.success) {
@@ -94,6 +99,26 @@ export async function showInjectionToastInTab(
                 close.onmouseleave = () => { close.style.opacity = "0.6"; };
                 close.onclick = () => dismiss();
 
+                let dismissTimer: ReturnType<typeof setTimeout> | null = null;
+                let removeTimer: ReturnType<typeof setTimeout> | null = null;
+                const cleanup = () => {
+                    if (loaderTimer !== null) { clearTimeout(loaderTimer); loaderTimer = null; }
+                    if (dismissTimer !== null) { clearTimeout(dismissTimer); dismissTimer = null; }
+                    if (removeTimer !== null) { clearTimeout(removeTimer); removeTimer = null; }
+                    window.removeEventListener("pagehide", cleanup);
+                    close.onclick = null;
+                    close.onmouseenter = null;
+                    close.onmouseleave = null;
+                    toast.remove();
+                };
+
+                const dismiss = () => {
+                    if (dismissTimer !== null) { clearTimeout(dismissTimer); dismissTimer = null; }
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translateY(8px) scale(0.96)";
+                    removeTimer = setTimeout(cleanup, 350);
+                };
+
                 toast.appendChild(icon);
                 toast.appendChild(body);
                 toast.appendChild(close);
@@ -104,13 +129,8 @@ export async function showInjectionToastInTab(
                     toast.style.transform = "translateY(0) scale(1)";
                 });
 
-                const dismiss = () => {
-                    toast.style.opacity = "0";
-                    toast.style.transform = "translateY(8px) scale(0.96)";
-                    setTimeout(() => toast.remove(), 350);
-                };
-
-                setTimeout(dismiss, 4000);
+                window.addEventListener("pagehide", cleanup, { once: true });
+                dismissTimer = setTimeout(dismiss, 4000);
             },
             args: [successCount, totalCount, Math.round(durationMs), EXTENSION_VERSION],
         });
@@ -140,7 +160,12 @@ export async function showInjectionFailureToastInTab(
                 const msg = `❌ Marco v${version} — ${failed}/${total} scripts failed (${ms}ms)\n${nameList}`;
 
                 const loader = document.getElementById("__marco-inject-toast-loading");
-                if (loader) { loader.style.opacity = "0"; loader.style.transform = "translateY(8px) scale(0.96)"; setTimeout(() => loader.remove(), 300); }
+                let loaderTimer: ReturnType<typeof setTimeout> | null = null;
+                if (loader) {
+                    loader.style.opacity = "0";
+                    loader.style.transform = "translateY(8px) scale(0.96)";
+                    loaderTimer = setTimeout(() => { loaderTimer = null; loader.remove(); }, 300);
+                }
 
                 const m = (window as unknown as Record<string, Record<string, ((...args: unknown[]) => void)>>).marco;
                 if (m?.notify?.error) {
@@ -202,6 +227,27 @@ export async function showInjectionFailureToastInTab(
                 close.onmouseleave = () => { close.style.opacity = "0.6"; };
                 close.onclick = () => dismiss();
 
+                let dismissTimer: ReturnType<typeof setTimeout> | null = null;
+                let removeTimer: ReturnType<typeof setTimeout> | null = null;
+                const cleanup = () => {
+                    if (loaderTimer !== null) { clearTimeout(loaderTimer); loaderTimer = null; }
+                    if (dismissTimer !== null) { clearTimeout(dismissTimer); dismissTimer = null; }
+                    if (removeTimer !== null) { clearTimeout(removeTimer); removeTimer = null; }
+                    window.removeEventListener("pagehide", cleanup);
+                    close.onclick = null;
+                    close.onmouseenter = null;
+                    close.onmouseleave = null;
+                    toast.remove();
+                };
+
+                // eslint-disable-next-line sonarjs/no-identical-functions
+                const dismiss = () => {
+                    if (dismissTimer !== null) { clearTimeout(dismissTimer); dismissTimer = null; }
+                    toast.style.opacity = "0";
+                    toast.style.transform = "translateY(8px) scale(0.96)";
+                    removeTimer = setTimeout(cleanup, 350);
+                };
+
                 toast.appendChild(icon);
                 toast.appendChild(body);
                 toast.appendChild(close);
@@ -212,14 +258,8 @@ export async function showInjectionFailureToastInTab(
                     toast.style.transform = "translateY(0) scale(1)";
                 });
 
-                // eslint-disable-next-line sonarjs/no-identical-functions
-                const dismiss = () => {
-                    toast.style.opacity = "0";
-                    toast.style.transform = "translateY(8px) scale(0.96)";
-                    setTimeout(() => toast.remove(), 350);
-                };
-
-                setTimeout(dismiss, 6000);
+                window.addEventListener("pagehide", cleanup, { once: true });
+                dismissTimer = setTimeout(dismiss, 6000);
             },
             args: [failedNames, failCount, totalCount, Math.round(durationMs), EXTENSION_VERSION],
         });
