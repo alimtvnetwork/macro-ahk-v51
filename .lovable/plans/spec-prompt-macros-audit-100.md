@@ -57,13 +57,12 @@
 
 ## Phase 5 — JSON / UI / Variables — Tasks 56–75
 
-56–65. [ ] One per `json/` doc (`56`–`65`).
-66–75. [ ] One per `ui/` doc (`66`–`75`).
+56. [x] C29 batch finding: planned `json/`, `ui/`, `macro-prompts/`, `variables/` folders DO NOT EXIST → `56-missing-planned-subfolders.md`. Original tasks 66–85 SUBSUMED by C29 (skip per-doc audit of non-existent files).
+57–64. [x] One per top-level macros doc (`00-concept` … `07-permissions-and-scope`) → `57`–`64`.
+65. [x] `folder-layout/` batch audit (5 docs) → `65-folder-layout-batch.md`. Note: `folder-layout/02-schema-reference.md` likely replaces the missing `json/` folder.
 
-## Phase 6 — Macro-prompts folder + variables — Tasks 76–85
-
-76–83. [ ] One per `macro-prompts/00`–`07`.
-84–85. [ ] `variables/` deep audit (2 tasks).
+## Phase 6 — SUBSUMED by C29 — Tasks 66–85
+66–85. [x] Marked complete-by-shortcut; rationale in `56-missing-planned-subfolders.md`. No per-doc audits possible for non-existent docs.
 
 ## Phase 7 — Cross-cutting & memory — Tasks 86–92
 
