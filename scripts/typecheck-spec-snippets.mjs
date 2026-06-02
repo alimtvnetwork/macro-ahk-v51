@@ -65,6 +65,13 @@ for (const [name, body] of Object.entries(shims)) writeFileSync(join(OUT, name),
 
 // --- extract snippets ----------------------------------------------
 const TS_RE = /```ts\s*\n([\s\S]*?)```/g;
+function rewriteImports(src) {
+  return src
+    .replaceAll('from "../20-data-model"',      'from "./20-data-model"')
+    .replaceAll('from "../70-editor-adapters"', 'from "./70-editor-adapters"')
+    .replaceAll('from "../100-queue-model"',    'from "./100-queue-model"')
+    .replaceAll('from "./02-queue-engine"',     'from "./02-queue-engine.snippet-1"');
+}
 let extracted = 0;
 for (const file of readdirSync(SRC).sort()) {
   if (!/\.md$/.test(file)) continue;
@@ -73,7 +80,7 @@ for (const file of readdirSync(SRC).sort()) {
   for (const m of text.matchAll(TS_RE)) {
     idx++;
     const stem = file.replace(/\.md$/, "");
-    writeFileSync(join(OUT, `${stem}.snippet-${idx}.ts`), m[1]);
+    writeFileSync(join(OUT, `${stem}.snippet-${idx}.ts`), rewriteImports(m[1]));
     extracted++;
   }
 }
