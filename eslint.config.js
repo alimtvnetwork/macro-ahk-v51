@@ -27,6 +27,20 @@ export default tseslint.config(
       "no-var": "error",
       "@typescript-eslint/no-restricted-types": "off",
 
+      // ── Namespace Logger mandate (Batch C step 24 / audit S13) ──────
+      // Ban bare `console.error(...)` in production source. Use the
+      // appropriate Logger module instead (bg-logger, hook-logger,
+      // popup-logger, etc.). Allowlist of legitimate consumers lives in
+      // scripts/audit-logger-compliance.mjs and is overridden per-file
+      // below. See mem://standards/error-logging-via-namespace-logger.md
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.object.name='console'][callee.property.name='error']",
+          message: "Use Logger.error / logError / logBgError instead of console.error (see scripts/audit-logger-compliance.mjs allowlist).",
+        },
+      ],
+
       // --- SonarJS: Code smells & complexity ---
       "sonarjs/cognitive-complexity": ["warn", 15],
       "sonarjs/no-duplicate-string": ["warn", { threshold: 4 }],
