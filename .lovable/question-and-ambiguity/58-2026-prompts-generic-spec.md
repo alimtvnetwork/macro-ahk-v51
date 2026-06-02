@@ -11,7 +11,7 @@ total 120 tasks; user will drive execution with `next ten steps`.
 
 | # | Ambiguity | Options | Chosen | Why |
 |---|---|---|---|---|
-| A1 | Spec folder name | `spec/2026-…` / `spec/27-prompts-generic` / `spec/2026-prompts-generic` | **`spec/2026-prompts-generic`** | Matches user's literal "2026 spec" phrasing; avoids colliding with numeric series (26 is taken by `26-chrome-extension-generic`). Reversible via `git mv`. |
+| A1 | Spec folder name | `spec/2026-…` / `spec/27-prompts-generic` / `spec/2026-spec` | **`spec/2026-spec`** | Matches user's literal "2026 spec" phrasing; avoids colliding with numeric series (26 is taken by `26-chrome-extension-generic`). Reversible via `git mv`. |
 | A2 | Where the "first 20 steps" live | Single file vs 20 separate files | **Single `01-plan-tasks-1-20.md`** | User said "write what you do in the next 100 tasks" — that is a plan document, not 20 deliverables. |
 | A3 | Mapping `next ten steps` → tasks | 10 spec tasks per turn vs 10 planning steps per turn | **10 spec tasks per turn (= 2 planning steps)** | "Next ten steps" reads naturally as 10 actual tasks; 100 remaining / 10 = 10 turns to finish, clean cadence. |
 | A4 | XPath placeholders | Invent generic selectors vs leave blank vs `???` with HOST comment | **`???` + `<!-- HOST: … -->` comment** | User explicitly said "put those XPaths as question marks". |
