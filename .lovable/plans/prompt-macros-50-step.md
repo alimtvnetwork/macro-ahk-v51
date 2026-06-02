@@ -194,11 +194,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 43. [x] Write `spec/21-app/05-prompts/ui/02-filter-and-search.md` — substring + slug + category match, deterministic (no fuzzy), empty-state copy.
 44. [x] Write `spec/21-app/05-prompts/ui/03-categories.md` — category CRUD, ordering, HSL color tokens (dark-only).
 45. [x] Write `spec/21-app/05-prompts/ui/04-favorites.md` — pin-to-top, persistence, cross-tab sync via `marco-prompts-sync` channel.
-46. [ ] Write `spec/21-app/05-prompts/ui/05-macros-tab.md` — rows + Run/Pause/Stop/Edit/Duplicate/Export/Delete buttons + running banner anatomy.
-47. [ ] Write `spec/21-app/05-prompts/ui/06-macro-builder.md` — step-card editor (add/remove/reorder), per-kind form fields, validation.
-48. [ ] Write `spec/21-app/05-prompts/ui/07-run-banner.md` — sticky banner spec: runId, step X/N, loop M/MaxLoops, last score, ⏸/⏹, error pill.
-49. [ ] Write `spec/21-app/05-prompts/ui/08-keyboard-shortcuts.md` — keymap (Run macro, Pause, Stop, Open builder); no conflicts with recorder shortcuts.
-50. [ ] Write `spec/21-app/05-prompts/ui/09-variable-input-dialog.md` — inline form rendered when step has unfilled required vars; per-Type widgets; submit/cancel; ESC behavior.
+46. [x] Write `spec/21-app/05-prompts/ui/05-macros-tab.md` — rows + Run/Pause/Stop/Edit/Duplicate/Export/Delete buttons + running banner anatomy.
+47. [x] Write `spec/21-app/05-prompts/ui/06-macro-builder.md` — step-card editor (add/remove/reorder), per-kind form fields, validation.
+48. [x] Write `spec/21-app/05-prompts/ui/07-run-banner.md` — sticky banner spec: runId, step X/N, loop M/MaxLoops, last score, ⏸/⏹, error pill.
+49. [x] Write `spec/21-app/05-prompts/ui/08-keyboard-shortcuts.md` — keymap (Run macro, Pause, Stop, Open builder); no conflicts with recorder shortcuts.
+50. [x] Write `spec/21-app/05-prompts/ui/09-variable-input-dialog.md` — inline form rendered when step has unfilled required vars; per-Type widgets; submit/cancel; ESC behavior.
 
 ### Block 6 — JSON Save/Export/Import/Replace (Tasks 51–60)
 51. [ ] Write `spec/21-app/05-prompts/json/00-overview.md` — when to use each op, file-naming conventions.
