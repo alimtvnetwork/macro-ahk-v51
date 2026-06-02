@@ -52,8 +52,8 @@
 
 ## Phase 4 — Deep dive: testing & observability — Tasks 46–55
 
-46–50. [ ] One per `testing/` doc.
-51–55. [ ] One per `observability/` doc.
+46–50. [x] One per `testing/` doc.
+51–55. [x] One per `observability/` doc.
 
 ## Phase 5 — JSON / UI / Variables — Tasks 56–75
 
