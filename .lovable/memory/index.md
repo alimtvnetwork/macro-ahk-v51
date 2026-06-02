@@ -29,6 +29,7 @@ Updated: 2026-06-02 (Asia/Kuala_Lumpur)
 - **New-tab guard**: Auto-injector + project-matcher MUST refuse to run on new-tab / blank / no-URL navigations (`about:blank`, `chrome://newtab/`, `chrome://new-tab-page/`, `chrome-search://local-ntp*`, `edge://newtab/`, `brave://newtab/`, `opera://startpage/`, empty string). Use single helper `isNewTabOrBlankUrl()` from `src/shared/url-utils.ts`. See `mem://features/new-tab-no-url-guard`.
 - **`next` command**: Always DO the next task in the same turn (never just announce/stage). End every `next` reply with a flat numbered remaining-tasks list using simple sequential integers (`1. 2. 3. 4.`) — no `Step 7`, no decimals, no sub-bullets in the primary sequence. Keep numbering stable across turns. If all done, recall prior chat/memory for leftovers. See `mem://preferences/next-command-convention`.
 - **CI push trigger unfiltered**: `.github/workflows/ci.yml` MUST use bare `on: push:` (no `branches`/`paths` filters). Filters silently skip Lovable branch commits — regression has recurred 3x. Canary: `.github/workflows/ping.yml`. Test: `scripts/__tests__/ci-workflow-trigger-policy.test.mjs`. See `mem://constraints/ci-push-trigger-unfiltered`.
+- **Prompt Macros audit-root**: Prompt Macros write audits ONLY under `spec/audit/<RunId>/`; never to `skipped/` or `.release/`. Variables resolve Step → Macro → RunContext → Default → fail-fast. See `mem://features/prompt-macros`.
 
 ## Memories
 - [Timezone](mem://localization/timezone) — Asia/Kuala_Lumpur for local timezone formatting
@@ -122,3 +123,6 @@ Updated: 2026-06-02 (Asia/Kuala_Lumpur)
 - [`next` command convention](mem://preferences/next-command-convention) — Always execute a task per `next`; end with flat `1. 2. 3. 4.` remaining-tasks list; stable numbering across turns
 - [Credit Totals — exclude FREE tier](mem://features/macro-controller/credit-totals-exclude-free) — v3.31.0: aggregateCreditTotals() skips tier='FREE'/plan='free' from Used/Remaining/Total grant; FREE credits only via Free Daily panel
 - [Post-move credit sync (v3.40.0)](mem://features/macro-controller/post-move-credit-sync) — moveToWorkspace MUST await fetchAndPersist(target,force) THEN fetchAsync() — never fire-and-forget; Copy JSON wraps pro_0 AND pro_1 with /credit-balance; `🛈 Show Tooltip` pins hover card open
+- [Prompt Macros engine](mem://features/prompt-macros) — State machine, persistence, score parsing, 5-tier vars, audit folder, loop safety
+- [Prompt Variables](mem://features/prompt-variables) — `{{ VarName }}` syntax + shared declaration shape + 5-tier resolution waterfall
+- [Macro-Prompts folder](mem://architecture/macro-prompts-folder) — `standalone-scripts/macro-prompts/` source-of-truth + 13-stage aggregator
