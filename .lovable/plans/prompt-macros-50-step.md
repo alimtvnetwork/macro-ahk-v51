@@ -182,11 +182,11 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 33. [x] Create `schemas/prompt.schema.json` — JSON-Schema draft-07 for a single prompt with `Variables[]`.
 34. [x] Create `schemas/macro.schema.json` — JSON-Schema for a macro: top-level fields + `Steps[]` discriminated union by `Kind`.
 35. [x] Create `schemas/prompts-bundle.schema.json` — wrapper `{ Version, Prompts, MacroPrompts, Macros, Categories }`.
-36. [ ] Create `schemas/variable.schema.json` — variable declaration shape (reused by prompt + macro schemas).
-37. [ ] Write `spec/21-app/05-prompts/macros/folder-layout/02-schema-reference.md` — link the 4 schemas with worked examples.
-38. [ ] Write `spec/21-app/05-prompts/macros/folder-layout/03-aggregation.md` — extend aggregator to emit `chrome-extension/macros/macros.json`.
-39. [ ] Write `spec/21-app/05-prompts/macros/folder-layout/04-starter-macros.md` — 3 starter macros: spec-tighten-cycle, review-and-fix-loop, weekly-spec-audit.
-40. [ ] Author `standalone-scripts/macros/001-spec-tighten-cycle.macro.json` as the reference example matching Part A.5.
+36. [x] Create `schemas/variable.schema.json` — variable declaration shape (reused by prompt + macro schemas).
+37. [x] Write `spec/21-app/05-prompts/macros/folder-layout/02-schema-reference.md` — link the 4 schemas with worked examples.
+38. [x] Write `spec/21-app/05-prompts/macros/folder-layout/03-aggregation.md` — extend aggregator to emit `chrome-extension/macros/macros.json`.
+39. [x] Write `spec/21-app/05-prompts/macros/folder-layout/04-starter-macros.md` — 3 starter macros: spec-tighten-cycle, review-and-fix-loop, weekly-spec-audit.
+40. [x] Author `standalone-scripts/macros/001-spec-tighten-cycle.macro.json` as the reference example matching Part A.5.
 
 ### Block 5 — Prompts Button UX & Panel Detail (Tasks 41–50)
 41. [ ] Write `spec/21-app/05-prompts/ui/00-prompts-button.md` — trigger, anchor, hover/focus states, ARIA combobox, dark-theme tokens (HSL).
