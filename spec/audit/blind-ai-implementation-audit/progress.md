@@ -109,3 +109,23 @@ Remaining: Batches B (steps 11–20), C (21–30), D (31–40), E (41–50).
 - **S84** `.lovable/templates/next-response.md` codifies the `next` reply skeleton.
 
 **Verification:** all 4 audit scripts execute clean; tests added under `scripts/__tests__/`.
+
+---
+
+## Batch E (Steps 41–50) — Genericization & Final Hardening — 2026-06-02
+
+- **S41** `genericization-targets.md` — 220 `RiseupAsiaMacroExt` hits surveyed; policy = spec uses placeholders, src keeps real names.
+- **S42/S48** `spec/00-glossary.md` — placeholder ↔ real mapping (`<NAMESPACE>`, `<VENDOR>`, `<ID_PREFIX>`, `<LOGGER>`, `<BEARER>`).
+- **S43** `spec/00-what-to-read-first.md` already generic from Batch A.
+- **S44** `spec/01-quickstart-for-blind-ai.md` — 10-bullet quickstart.
+- **S45** `spec/02-non-negotiables.md` — 15-row hard-ban table with memory anchors.
+- **S46** `spec/03-decision-tree.md` — request → file → rule flow.
+- **S47** `spec/04-failure-modes.md` — 16-row catalog of recurring LLM drifts (F-S5..F-readme).
+- **S49** `dry-run-report.md` — 6 scenarios simulated → all PASS.
+- **S50** `final-readiness-report.md` — overall ceiling **60% → 95%**, target met.
+
+**Verification:** 9 new files; all entry docs cross-link via memory anchors.
+
+---
+
+## Plan complete (steps 1–50 across Batches A–E).
