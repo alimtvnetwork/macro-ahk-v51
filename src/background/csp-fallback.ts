@@ -243,22 +243,32 @@ async function executeInMainWorld(code: string): Promise<string> {
 
     // eslint-disable-next-line max-lines-per-function
     await new Promise<void>((resolve, reject) => {
-        const timeoutId = window.setTimeout(() => {
+        let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
+        const cleanup = (): void => {
+            if (timeoutId !== null) {
+                window.clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+            script.removeEventListener("load", onLoad);
+            script.removeEventListener("error", onError);
             URL.revokeObjectURL(url);
+        };
+        const onTimeout = (): void => {
+            cleanup();
             reject(new Error("MAIN blob script load timeout"));
-        }, 4000);
-
-        script.addEventListener("load", () => {
-            window.clearTimeout(timeoutId);
-            URL.revokeObjectURL(url);
+        };
+        const onLoad = (): void => {
+            cleanup();
             resolve();
-        }, { once: true });
-
-        script.addEventListener("error", () => {
-            window.clearTimeout(timeoutId);
-            URL.revokeObjectURL(url);
+        };
+        const onError = (): void => {
+            cleanup();
             reject(new Error("MAIN blob script failed to parse/execute"));
-        }, { once: true });
+        };
+
+        timeoutId = window.setTimeout(onTimeout, 4000);
+        script.addEventListener("load", onLoad, { once: true });
+        script.addEventListener("error", onError, { once: true });
 
         // CRITICAL: appendNodeToTarget must be inlined here because this function
         // is serialized by chrome.scripting.executeScript — outer-scope references
@@ -289,8 +299,7 @@ async function executeInMainWorld(code: string): Promise<string> {
         const scriptOk = appendNode(script);
 
         if (!commentOk || !scriptOk) {
-            window.clearTimeout(timeoutId);
-            URL.revokeObjectURL(url);
+            cleanup();
             reject(new Error("Failed to inject MAIN blob script tag at HTML bottom"));
         }
     });
@@ -534,22 +543,32 @@ async function executeBlobInjection(code: string): Promise<string> {
 
     // eslint-disable-next-line max-lines-per-function
     await new Promise<void>((resolve, reject) => {
-        const timeoutId = window.setTimeout(() => {
+        let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
+        const cleanup = (): void => {
+            if (timeoutId !== null) {
+                window.clearTimeout(timeoutId);
+                timeoutId = null;
+            }
+            script.removeEventListener("load", onLoad);
+            script.removeEventListener("error", onError);
             URL.revokeObjectURL(url);
+        };
+        const onTimeout = (): void => {
+            cleanup();
             reject(new Error("ISOLATED blob script load timeout"));
-        }, 4000);
-
-        script.addEventListener("load", () => {
-            window.clearTimeout(timeoutId);
-            URL.revokeObjectURL(url);
+        };
+        const onLoad = (): void => {
+            cleanup();
             resolve();
-        }, { once: true });
-
-        script.addEventListener("error", () => {
-            window.clearTimeout(timeoutId);
-            URL.revokeObjectURL(url);
+        };
+        const onError = (): void => {
+            cleanup();
             reject(new Error("ISOLATED blob script failed to parse/execute"));
-        }, { once: true });
+        };
+
+        timeoutId = window.setTimeout(onTimeout, 4000);
+        script.addEventListener("load", onLoad, { once: true });
+        script.addEventListener("error", onError, { once: true });
 
         // CRITICAL: Inlined — this function is serialized by chrome.scripting.executeScript.
         // Outer-scope references are NOT available. See spec/22-app-issues/92-*.md
@@ -580,8 +599,7 @@ async function executeBlobInjection(code: string): Promise<string> {
         const scriptOk = appendNode(script);
 
         if (!commentOk || !scriptOk) {
-            window.clearTimeout(timeoutId);
-            URL.revokeObjectURL(url);
+            cleanup();
             reject(new Error("Failed to inject ISOLATED blob script tag at HTML bottom"));
         }
     });
