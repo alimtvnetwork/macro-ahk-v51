@@ -1,12 +1,19 @@
-# What To Read — AI Onboarding Map
+# What To Read — AI Onboarding Map (top-level pointer)
 
 > **Purpose:** Tell the next AI exactly which files to open to understand the
 > project's folder structure, the canonical JSON shapes, and how to add a new
-> prompt / instruction / config entry without guessing.
+> prompt / instruction / config entry / unit test / spec / feature without guessing.
 >
 > Read this file first on every fresh session, then the targeted files below.
+>
+> **Note:** This is the top-level discovery copy. The authoritative canonical
+> version lives at [`.lovable/memory/what-to-read.md`](./memory/what-to-read.md)
+> and is mirrored here so a fresh AI session that lists `.lovable/` finds it
+> immediately. Keep the two in sync when editing.
 
 ---
+
+
 
 ## 1. Project Orientation (read in order)
 
@@ -168,7 +175,7 @@ Per `mem://preferences/test-with-features`, **every feature or fix ships with a 
 
 ### 6.2 How to add a new feature end-to-end
 
-1. **Spec first** — draft / update the relevant spec under `spec/21-app/` or `spec/26-macro-controller/` (see §7 for spec folder slots).
+1. **Spec first** — draft / update the relevant spec under `spec/21-app/` or `spec/26-macro-controller/`. See §7 below for spec folder slots.
 2. **Plan entry** — add a row in `.lovable/plan.md` (status `⏳ Pending`).
 3. **Code** — follow `.lovable/coding-guidelines.md` (function size ≤ 25 lines, no `any`/`unknown`, named constants, defensive `?.`/`??`).
 4. **Test** — per §6.1 above. No PR without a matching test.
