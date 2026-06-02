@@ -229,6 +229,11 @@ export function WasmStatusBanner() {
     const [cspProbe, setCspProbe] = useState<CspProbeResult | null>(null);
     const [probing, setProbing] = useState(false);
     const [copied, setCopied] = useState(false);
+    const copyTimerRef = useRef<number | null>(null);
+
+    useEffect(() => () => {
+        if (copyTimerRef.current !== null) clearTimeout(copyTimerRef.current);
+    }, []);
 
     const declaredCsp = useMemo(readDeclaredCsp, []);
 
