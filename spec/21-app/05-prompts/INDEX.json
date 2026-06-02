@@ -1,7 +1,7 @@
 {
-  "generatedAt": "2026-06-02T20:45:15.768Z",
+  "generatedAt": "2026-06-02T20:45:22.018Z",
   "root": "spec/21-app/05-prompts",
-  "fileCount": 247,
+  "fileCount": 248,
   "files": [
     {
       "path": "spec/21-app/05-prompts/00-all-prompts.md",
@@ -219,6 +219,13 @@
       "status": "Closed",
       "version": null,
       "bytes": 2647
+    },
+    {
+      "path": "spec/21-app/05-prompts/99-spec-issues/111-hardening-wave-v6.md",
+      "title": "Hardening Wave v6 — Close-out",
+      "status": "Closed",
+      "version": null,
+      "bytes": 3033
     },
     {
       "path": "spec/21-app/05-prompts/99-spec-issues/12-orphan-files.md",
