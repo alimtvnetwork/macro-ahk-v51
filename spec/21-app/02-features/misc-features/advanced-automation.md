@@ -154,3 +154,20 @@ CREATE TABLE AutomationChain (
 - [ ] Pause/resume/cancel work mid-chain
 - [ ] Progress indicator shows current step
 - [ ] Export/import chains as JSON
+
+---
+
+## 6. Related Subsystems
+
+**Prompt Macros** — the prompt-layer counterpart to AutomationChain. Where AutomationChain orchestrates **DOM/UI** actions, [Prompt Macros](../../05-prompts/macros/) orchestrate **prompt** sequences with score-gated loops and Variable interpolation.
+
+| Concern | AutomationChain | Prompt Macros |
+|---------|-----------------|---------------|
+| Primary unit | DOM step | Prompt / JsInline step |
+| Looping | manual (`condition` → re-enter) | declarative `LoopIf` + `MaxLoops` (cap 25) |
+| Loop signal | KV / DOM state | `score: NN/100` regex (`engine/03-score-extraction.md`) |
+| Variables | KV reads | 5-tier waterfall + brace-injection guard |
+| Audit | session log | per-run `spec/audit/<RunId>/` tree |
+| Persistence | SQLite (`AutomationChains`) | SQLite + `chrome.storage.local` run state |
+
+A `run_script` step in AutomationChain MAY launch a Prompt Macro by RunId; cross-references in `spec/21-app/05-prompts/macros/engine/00-architecture.md`.
