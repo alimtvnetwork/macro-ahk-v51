@@ -462,15 +462,12 @@ Memory: `.lovable/memory/features/release-installer.md`
 | # | Task | Effort | Impact | Blocker |
 |---|------|--------|--------|---------|
 | 1 | **Priority 0.1** — Review Q1–Q5 | Medium | High — unblocks standalone-script type migration | Awaiting reviewer |
-| 2 | **Priority 0.7** — Logger `unknown` cleanup | Low | Medium — improves type-safety compliance | None |
-| 3 | **Priority 0.8** — ESLint `id-denylist` rule | Medium | Medium — prevents naming regressions | None |
-| 4 | **Priority 0.9** — Scoped `consistent-type-definitions` | Low | Medium — enforces type alias convention | None |
-| 5 | **Priority 0.10** — `.d.ts` `unknown` lint coverage | Low | Medium — closes declaration-file gap | None |
-| 6 | **Task 1.2** — E2E Chrome verification | Low | High — validates real-world usage | Manual Chrome required |
-| 7 | **Cross-Project Sync** — Shared asset library | High | High — new feature | Spec ready |
-| 8 | **P Store** — Project marketplace | High | High — new feature | Owner spec pending |
+| 2 | **Priority 0.8** — id-denylist expansion | High | Medium — ~1700 callsites; needs staged migration | Effort budget |
+| 3 | **Task 1.2** — E2E Chrome verification | Low | High — validates real-world usage | Manual Chrome required |
+| 4 | **Cross-Project Sync** — Shared asset library | High | High — new feature | Spec ready |
+| 5 | **P Store** — Project marketplace | High | High — new feature (deferred per memory) | Owner spec pending |
 
-**Recommended next**: Priority 0.7 (Logger `unknown` cleanup) — no blocker, small surface, supports the active type-safety contract.
+**Recommended next**: Priority 0.1 — answer Q1–Q5 in `.lovable/question-and-ambiguity/` to unblock the standalone-script type migration chain (0.2–0.6, 0.11–0.16). Priorities 0.7, 0.9, 0.10 are verified closed; 0.8 expansion is a multi-day refactor needing user go-ahead.
 
 ---
 
