@@ -111,7 +111,7 @@ function interceptXhr(): void {
                 const entry = buildXhrEntry(this, startTime!);
                 bufferEntry(entry);
             }
-        });
+        }, { once: true });
 
         return originalSend.apply(this, args as any);
     };
@@ -256,15 +256,23 @@ function reportNetworkStatus(isOnline: boolean): void {
 
 /** Registers online/offline event listeners on the window. */
 function registerNetworkListeners(): void {
-    window.addEventListener("online", () => {
-        reportNetworkStatus(true);
-    });
-
-    window.addEventListener("offline", () => {
-        reportNetworkStatus(false);
-    });
+    window.addEventListener("online", onOnline);
+    window.addEventListener("offline", onOffline);
 
     reportNetworkStatus(navigator.onLine);
+}
+
+function unregisterNetworkListeners(): void {
+    window.removeEventListener("online", onOnline);
+    window.removeEventListener("offline", onOffline);
+}
+
+function onOnline(): void {
+    reportNetworkStatus(true);
+}
+
+function onOffline(): void {
+    reportNetworkStatus(false);
 }
 
 /* ------------------------------------------------------------------ */
@@ -293,12 +301,20 @@ function extractInitiator(): string {
 
 let flushTimerId: ReturnType<typeof setInterval> | null = null;
 
+function onPageHide(): void {
+    // Final best-effort flush before tearing down.
+    try { flushBuffer(); } catch { /* ignore */ } // allow-swallow: pagehide flush is best-effort
+    stopNetworkReporter();
+}
+
 /** Stops the flush interval and clears any pending state. Idempotent. */
 function stopNetworkReporter(): void {
     if (flushTimerId !== null) {
         clearInterval(flushTimerId);
         flushTimerId = null;
     }
+    unregisterNetworkListeners();
+    window.removeEventListener("pagehide", onPageHide);
 }
 
 /** Initializes all network interception and status reporting. */
@@ -318,11 +334,6 @@ function initNetworkReporter(): void {
     // PERF-5: stop the flush interval when the tab is being unloaded or
     // bfcache-frozen. Without this, long-lived tabs the user opened and
     // forgot keep the timer running indefinitely.
-    const onPageHide = (): void => {
-        // Final best-effort flush before tearing down.
-        try { flushBuffer(); } catch { /* ignore */ } // allow-swallow: pagehide flush is best-effort
-        stopNetworkReporter();
-    };
     window.addEventListener("pagehide", onPageHide, { once: true });
 
     console.log("[Marco] Network reporter initialized");
