@@ -199,8 +199,8 @@ Each completed follow-up task increments a checkbox here:
 - [x] T26–T30  Data model  *(2026-06-02)*
 - [x] T31–T35  On-disk format  *(2026-06-02)*
 - [x] T36–T40  Loader  *(2026-06-02)*
-- [ ] T41–T45  UI
-- [ ] T46–T50  Injection
+- [x] T41–T45  UI  *(2026-06-02)*
+- [x] T46–T50  Injection  *(2026-06-02)*
 - [ ] T51–T55  Editor adapters
 - [ ] T56–T60  Save/create/edit
 - [ ] T61–T65  Next overview
