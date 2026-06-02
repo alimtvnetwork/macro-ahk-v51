@@ -230,18 +230,18 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 73. [x] Write `spec/21-app/05-prompts/macros/examples/02-export-import-roundtrip.md` — export bundle → import on fresh profile → assertion checklist.
 74. [x] Write `spec/21-app/05-prompts/macros/examples/03-variable-driven-audit.md` — same macro reused for `spec/21-app` and `spec/30-import-export` via Variables.
 75. [x] Write `spec/21-app/05-prompts/macros/examples/04-macro-prompt-authoring.md` — step-by-step: author new macro-prompt with 3 variables, wire into macro.
-76. [ ] Write `spec/21-app/05-prompts/macros/testing/00-unit-tests.md` — engine state-machine, score parser, variable interpolator, schema validators.
-77. [ ] Write `spec/21-app/05-prompts/macros/testing/01-component-tests.md` — React component tests for builder, run banner, variable dialog (bans lifted 2026-05-25).
-78. [ ] Write `spec/21-app/05-prompts/macros/testing/02-e2e-tests.md` — Playwright: run macro, pause/resume, SW-restart resume, loop-if branch, replace-via-JSON, variable dialog.
-79. [ ] Write `spec/21-app/05-prompts/macros/testing/03-coverage-targets.md` — minimum coverage thresholds per module.
-80. [ ] Write `spec/21-app/05-prompts/macros/testing/04-fixtures.md` — canonical fixture macros + prompts under `tests/fixtures/macros/`.
+76. [x] Write `spec/21-app/05-prompts/macros/testing/00-unit-tests.md` — engine state-machine, score parser, variable interpolator, schema validators.
+77. [x] Write `spec/21-app/05-prompts/macros/testing/01-component-tests.md` — React component tests for builder, run banner, variable dialog (bans lifted 2026-05-25).
+78. [x] Write `spec/21-app/05-prompts/macros/testing/02-e2e-tests.md` — Playwright: run macro, pause/resume, SW-restart resume, loop-if branch, replace-via-JSON, variable dialog.
+79. [x] Write `spec/21-app/05-prompts/macros/testing/03-coverage-targets.md` — minimum coverage thresholds per module.
+80. [x] Write `spec/21-app/05-prompts/macros/testing/04-fixtures.md` — canonical fixture macros + prompts under `tests/fixtures/macros/`.
 
 ### Block 9 — Guards, Observability & Failure Diagnostics (Tasks 81–90)
-81. [ ] Write `spec/21-app/05-prompts/macros/guards/00-forbidden-writes.md` — never write to `skipped/`, `.release/`, `node_modules/`, `dist/`.
-82. [ ] Write `spec/21-app/05-prompts/macros/guards/01-loop-safety.md` — `MaxLoops` enforcement, watchdog, sequential fail-fast.
-83. [ ] Write `spec/21-app/05-prompts/macros/guards/02-no-supabase.md` — restate ban; persistence via chrome.storage.local + SQLite only.
-84. [ ] Write `spec/21-app/05-prompts/macros/guards/03-new-tab-guard.md` — macros refuse to run when active tab is `isNewTabOrBlankUrl()`.
-85. [ ] Write `spec/21-app/05-prompts/macros/guards/04-variable-injection-safety.md` — escape rules to prevent prompt-injection via user-supplied vars.
+81. [x] Write `spec/21-app/05-prompts/macros/guards/00-forbidden-writes.md` — never write to `skipped/`, `.release/`, `node_modules/`, `dist/`.
+82. [x] Write `spec/21-app/05-prompts/macros/guards/01-loop-safety.md` — `MaxLoops` enforcement, watchdog, sequential fail-fast.
+83. [x] Write `spec/21-app/05-prompts/macros/guards/02-no-supabase.md` — restate ban; persistence via chrome.storage.local + SQLite only.
+84. [x] Write `spec/21-app/05-prompts/macros/guards/03-new-tab-guard.md` — macros refuse to run when active tab is `isNewTabOrBlankUrl()`.
+85. [x] Write `spec/21-app/05-prompts/macros/guards/04-variable-injection-safety.md` — escape rules to prevent prompt-injection via user-supplied vars.
 86. [ ] Write `spec/21-app/05-prompts/macros/observability/00-logging.md` — `RiseupAsiaMacroExt.Logger.error()` usage, run-scoped log file `spec/audit/<runId>/_log.jsonl`.
 87. [ ] Write `spec/21-app/05-prompts/macros/observability/01-metrics.md` — counters: macros_run_total, macro_loops_total, macro_failed_total, last_score histogram.
 88. [ ] Write `spec/21-app/05-prompts/macros/observability/02-failure-log-schema.md` — full PascalCase shape: Reason, ReasonDetail, StepIndex, MacroSlug, RunId, VariableContext[], SelectorAttempts[].
