@@ -45,6 +45,12 @@ const ALLOWLIST = new Set([
   'src/background/schema-migration.ts',
   // Failure-formatter — itself the surfacing layer for failure reports:
   'src/background/recorder/failure-logger.ts',
+  // Injection visibility renderer — per mem://architecture/injection-visibility-system,
+  // this module IS the console.groupCollapsed presentation surface; it must call
+  // console.error directly to render in DevTools with the correct color/level.
+  'src/background/injection-diagnostics.ts',
+  // Runs inside chrome.scripting.executeScript MAIN-world func — bg Logger unreachable from page context:
+  'src/background/context-menu-handler.ts',
 ]);
 
 function listConsoleErrorFiles() {
