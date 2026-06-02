@@ -116,21 +116,36 @@ function toastPagePayload(origin: string): void {
     root.append(title, body, row);
     document.documentElement.appendChild(root);
 
+    let timeoutId: ReturnType<typeof window.setTimeout> | null = null;
+
+    function cleanup(): void {
+        if (timeoutId !== null) {
+            window.clearTimeout(timeoutId);
+            timeoutId = null;
+        }
+        root.removeEventListener("click", onClick);
+        window.removeEventListener("pagehide", cleanup);
+        if (root.isConnected) root.remove();
+    }
+
     function send(action: string): void {
         window.postMessage(
             { type: "MARCO_FIRST_ATTACH_ACTION", action, url: window.location.href },
             window.location.origin,
         );
-        root.remove();
+        cleanup();
     }
 
-    root.addEventListener("click", (e) => {
+    function onClick(e: Event): void {
         const t = e.target as HTMLElement;
         const a = t?.dataset?.action;
         if (typeof a === "string" && a.length > 0) send(a);
-    });
+    }
 
-    window.setTimeout(() => { if (root.isConnected) root.remove(); }, 30_000);
+    root.addEventListener("click", onClick);
+    window.addEventListener("pagehide", cleanup, { once: true });
+
+    timeoutId = window.setTimeout(cleanup, 30_000);
 }
 
 /**
@@ -141,7 +156,14 @@ function toastPagePayload(origin: string): void {
 function bridgePagePayload(): void {
     if ((window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge) return;
     (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = true;
-    window.addEventListener("message", (e: MessageEvent) => {
+
+    const cleanup = (): void => {
+        window.removeEventListener("message", onMessage);
+        window.removeEventListener("pagehide", cleanup);
+        (window as unknown as { __marcoToastBridge?: boolean }).__marcoToastBridge = false;
+    };
+
+    const onMessage = (e: MessageEvent): void => {
         if (e.source !== window) return;
         const d = e.data;
         if (d === null || typeof d !== "object") return;
@@ -152,7 +174,10 @@ function bridgePagePayload(): void {
         } catch { // allow-swallow: SW asleep / port closed — single-attempt fail-fast per no-retry policy; user can retry from the toast
             /* intentionally empty */
         }
-    });
+    };
+
+    window.addEventListener("message", onMessage);
+    window.addEventListener("pagehide", cleanup, { once: true });
 }
 
 /**
