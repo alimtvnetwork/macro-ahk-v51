@@ -33,7 +33,7 @@
  * state explaining how to generate it — never silently shows zero.
  */
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AlertOctagon, AlertTriangle, FileWarning, RefreshCw, Info, ExternalLink, Play, Terminal, Copy, Check } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
