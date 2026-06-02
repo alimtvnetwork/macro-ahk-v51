@@ -37,7 +37,7 @@ const REQUIRED = [
   ['Test-with-features', 'MED', 'Test-with-features mandate'],
   ['Dark-only theme', 'MED', 'Dark-only theme'],
   ['framer-motion', 'MED', 'Animation lib ban'],
-  ['readme.txt SP-1', 'HIGH', 'readme.txt prohibitions'],
+  ['SP-1..SP-7', 'HIGH', 'readme.txt prohibitions SP-1..SP-7'],
   ['isNewTabOrBlankUrl()', 'MED', 'New-tab guard'],
   ['Timer/observer teardown', 'HIGH', 'Timer/observer teardown'],
 ];
