@@ -1,16 +1,17 @@
 ---
 name: spec-prompt-macros-audit
-description: COMPLETE self-audit of spec/21-app/05-prompts/ — 33 categories, 14 critical defects, honest readiness 37/100; awaiting fix-pass approval
+description: RETRACTED + RE-SCORED — v1 audit hallucinated missing files; v2 honest readiness 86/100 with only 2 confirmed Criticals (C66, C67)
 type: feature
 ---
 
 # Audit — `spec/21-app/05-prompts/` (Prompt-Macros subsystem)
 
 **Started:** 2026-06-02 (Asia/Kuala_Lumpur)
-**Closed:** 2026-06-02 (Asia/Kuala_Lumpur)
-**Status:** ✅ COMPLETE — DISCOVERY phase finished. Awaiting user approval for fix-pass.
-**Plan:** `.lovable/plans/spec-prompt-macros-audit-100.md` (all 100 tasks executed; 66–85 collapsed by C29 shortcut)
-**Issue folder:** `spec/21-app/05-prompts/99-spec-issues/` (72 per-doc + 5 consolidation files)
+**v1 closed:** 2026-06-02 — 14 Criticals reported, 37/100 honest score.
+**v2 retraction:** 2026-06-02 — direct `ls` proved C29/C68/C70 + most C41–C65 cited files that exist on disk. See `99-spec-issues/96`–`103`.
+**Status:** ✅ COMPLETE (v2). 2 confirmed Criticals (C66, C67 — missing memory files). Honest score **86/100**.
+**Plan:** `.lovable/plans/spec-prompt-macros-audit-100.md`
+**Issue folder:** `spec/21-app/05-prompts/99-spec-issues/` (72 per-doc + 5 v1 consolidation + 8 v2 retraction files)
 
 ## Final category list
 
