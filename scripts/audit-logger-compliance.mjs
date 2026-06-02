@@ -17,6 +17,8 @@ import { execSync } from 'node:child_process';
 import { dirname } from 'node:path';
 
 // Allowlist — see logging-sweep-targets.md section A.
+// Files where `console.error` is legitimate (logger impls, recursion-guard, generated, tests,
+// runtime-emitted stub code, Monaco user-snippets, React error boundary).
 const ALLOWLIST = new Set([
   'src/background/bg-logger.ts',
   'src/lib/lib-logger.ts',
@@ -32,6 +34,17 @@ const ALLOWLIST = new Set([
   'src/lib/developer-guide-data.generated.ts',
   'src/background/__tests__/allow-swallow-fallbacks.test.ts',
   'src/background/recorder/__tests__/failure-logger.test.ts',
+  // Runtime-emitted stub code in template literals (the call runs in injected page context, not bg):
+  'src/background/builtin-script-guard.ts',
+  'src/background/manifest-seeder.ts',
+  'src/background/project-namespace-builder.ts',
+  'src/background/handlers/injection-wrapper.ts',
+  // Monaco editor snippets shown to USERS as code-completion templates:
+  'src/components/options/monaco-js-intellisense.ts',
+  // Documented bare console.error (DB mid-migration; rollback path):
+  'src/background/schema-migration.ts',
+  // Failure-formatter — itself the surfacing layer for failure reports:
+  'src/background/recorder/failure-logger.ts',
 ]);
 
 function listConsoleErrorFiles() {
