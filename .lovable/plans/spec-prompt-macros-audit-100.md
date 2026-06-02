@@ -80,22 +80,17 @@
 94. [x] `91-severity-matrix.md` (14 Critical, 17 High, 8 Medium).
 95. [x] `92-fix-effort-estimate.md` (≈14 batches to 85/100, ≈20 to 100/100).
 
-## Phase 8 — Consolidation — Tasks 93–98
-
-93. [ ] Build `99-spec-issues/90-master-issue-list.md` — flat dedup of all findings.
-94. [ ] Build `99-spec-issues/91-severity-matrix.md` — Critical/High/Medium/Low counts.
-95. [ ] Build `99-spec-issues/92-fix-effort-estimate.md` — task-count per category.
-96. [ ] Build `99-spec-issues/93-blind-ai-failure-modes.md` — what exactly breaks.
-97. [ ] Build `99-spec-issues/94-revised-readiness-score.md` — replace the bogus 100/100.
-98. [ ] Update `00-overview.md` with final tallies.
+96. [x] `93-blind-ai-failure-modes.md` — 7 concrete blind-AI failure scenarios.
+97. [x] `94-revised-readiness-score.md` — honest 37/100 (vs falsified 100).
+98. [x] Updated `00-overview.md` with final tallies + index.
 
 ## Phase 9 — Close-out — Tasks 99–100
 
-99. [ ] Update `mem://audits/spec-prompt-macros` with full finding list + status=COMPLETE.
-100. [ ] Append "Audit complete — ready for fix-pass approval" entry + ask user whether to start the fix pass (separate plan).
+99. [x] Updated `mem://audits/spec-prompt-macros` → status=COMPLETE with full finding list.
+100. [x] `95-close-out.md` — fix-pass offer (Options A/B/C); awaiting user choice.
 
 ---
 
-## Execution rule
+## AUDIT COMPLETE — 2026-06-02 (Asia/Kuala_Lumpur)
 
-Say **`next`** (singular) or **`next N`**. Each task is small enough that `next` reliably succeeds. I will never fix a file during this audit — I only enumerate.
+All 100 tasks executed (66–85 collapsed by C29 shortcut). Honest readiness: **37/100**. Awaiting user choice on fix-pass scope.
