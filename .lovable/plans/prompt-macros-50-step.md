@@ -242,18 +242,18 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done
 83. [x] Write `spec/21-app/05-prompts/macros/guards/02-no-supabase.md` — restate ban; persistence via chrome.storage.local + SQLite only.
 84. [x] Write `spec/21-app/05-prompts/macros/guards/03-new-tab-guard.md` — macros refuse to run when active tab is `isNewTabOrBlankUrl()`.
 85. [x] Write `spec/21-app/05-prompts/macros/guards/04-variable-injection-safety.md` — escape rules to prevent prompt-injection via user-supplied vars.
-86. [ ] Write `spec/21-app/05-prompts/macros/observability/00-logging.md` — `RiseupAsiaMacroExt.Logger.error()` usage, run-scoped log file `spec/audit/<runId>/_log.jsonl`.
-87. [ ] Write `spec/21-app/05-prompts/macros/observability/01-metrics.md` — counters: macros_run_total, macro_loops_total, macro_failed_total, last_score histogram.
-88. [ ] Write `spec/21-app/05-prompts/macros/observability/02-failure-log-schema.md` — full PascalCase shape: Reason, ReasonDetail, StepIndex, MacroSlug, RunId, VariableContext[], SelectorAttempts[].
-89. [ ] Write `spec/21-app/05-prompts/macros/observability/03-export-bundle.md` — include macro-run logs in the existing diagnostics ZIP export.
-90. [ ] Write `spec/21-app/05-prompts/macros/observability/04-ui-error-surface.md` — banner + toast + inline copy for every failure mode (no swallow).
+86. [x] Write `spec/21-app/05-prompts/macros/observability/00-logging.md` — `RiseupAsiaMacroExt.Logger.error()` usage, run-scoped log file `spec/audit/<runId>/_log.jsonl`.
+87. [x] Write `spec/21-app/05-prompts/macros/observability/01-metrics.md` — counters: macros_run_total, macro_loops_total, macro_failed_total, last_score histogram.
+88. [x] Write `spec/21-app/05-prompts/macros/observability/02-failure-log-schema.md` — full PascalCase shape: Reason, ReasonDetail, StepIndex, MacroSlug, RunId, VariableContext[], SelectorAttempts[].
+89. [x] Write `spec/21-app/05-prompts/macros/observability/03-export-bundle.md` — include macro-run logs in the existing diagnostics ZIP export.
+90. [x] Write `spec/21-app/05-prompts/macros/observability/04-ui-error-surface.md` — banner + toast + inline copy for every failure mode (no swallow).
 
 ### Block 10 — Integration, Memory & Final Wiring (Tasks 91–100)
-91. [ ] Update `spec/21-app/02-features/misc-features/advanced-automation.md` — cross-link Prompt-Macros as the prompt-layer counterpart to AutomationChain.
-92. [ ] Update `spec/21-app/README.md` — add Macros + Variables + MacroPrompts bullets under "Prompts subsystem".
-93. [ ] Update `.lovable/memory/index.md` — add Core line: "Prompt Macros write audits ONLY under `spec/audit/<runId>/`; never to `skipped/` or `.release/`. Variables resolve Step → Macro → RunContext → Default → fail-fast." (preserve all existing content).
-94. [ ] Create `mem://features/prompt-macros` documenting engine contract + variable resolution order.
-95. [ ] Create `mem://features/prompt-variables` documenting `{{ VarName }}` syntax + 5-tier resolution.
+91. [x] Update `spec/21-app/02-features/misc-features/advanced-automation.md` — cross-link Prompt-Macros as the prompt-layer counterpart to AutomationChain.
+92. [x] Update `spec/21-app/README.md` — add Macros + Variables + MacroPrompts bullets under "Prompts subsystem".
+93. [x] Update `.lovable/memory/index.md` — add Core line: "Prompt Macros write audits ONLY under `spec/audit/<runId>/`; never to `skipped/` or `.release/`. Variables resolve Step → Macro → RunContext → Default → fail-fast." (preserve all existing content).
+94. [x] Create `mem://features/prompt-macros` documenting engine contract + variable resolution order.
+95. [x] Create `mem://features/prompt-variables` documenting `{{ VarName }}` syntax + 5-tier resolution.
 96. [ ] Create `mem://architecture/macro-prompts-folder` documenting `standalone-scripts/macro-prompts/` + aggregation.
 97. [ ] Write `spec/21-app/05-prompts/macros/CHANGELOG.md` — append "v1.0.0 — initial Prompt Macros + Variables + Macro-Prompts folder spec".
 98. [ ] Write `spec/21-app/05-prompts/macros/MIGRATION.md` — how existing prompts opt-in to becoming macro-prompts (add `Variables[]`, move file, rebuild aggregator).
