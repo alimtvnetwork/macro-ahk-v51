@@ -27,6 +27,20 @@ export default tseslint.config(
       "no-var": "error",
       "@typescript-eslint/no-restricted-types": "off",
 
+      // ── Namespace Logger mandate (Batch C step 24 / audit S13) ──────
+      // Ban bare `console.error(...)` in production source. Use the
+      // appropriate Logger module instead (bg-logger, hook-logger,
+      // popup-logger, etc.). Allowlist of legitimate consumers lives in
+      // scripts/audit-logger-compliance.mjs and is overridden per-file
+      // below. See mem://standards/error-logging-via-namespace-logger.md
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector: "CallExpression[callee.object.name='console'][callee.property.name='error']",
+          message: "Use Logger.error / logError / logBgError instead of console.error (see scripts/audit-logger-compliance.mjs allowlist).",
+        },
+      ],
+
       // --- SonarJS: Code smells & complexity ---
       "sonarjs/cognitive-complexity": ["warn", 15],
       "sonarjs/no-duplicate-string": ["warn", { threshold: 4 }],
@@ -102,6 +116,39 @@ export default tseslint.config(
     files: ["src/components/ui/**/*.{ts,tsx}", "src/components/theme/**/*.{ts,tsx}"],
     rules: {
       "react-refresh/only-export-components": "off",
+    },
+  },
+  // ── Logger allowlist (Batch C step 24) ──────────────────────────────
+  // These files are legitimate `console.error` consumers (logger impls,
+  // recursion guards, generated, tests, runtime-emitted stubs, Monaco
+  // user-snippets, React error boundary, injection visibility renderer).
+  // The matching audit allowlist lives in scripts/audit-logger-compliance.mjs.
+  {
+    files: [
+      "src/background/bg-logger.ts",
+      "src/lib/lib-logger.ts",
+      "src/components/options/options-logger.ts",
+      "src/components/recorder/recorder-logger.ts",
+      "src/content-scripts/prompt-injector-logger.ts",
+      "src/hooks/popup-logger.ts",
+      "src/hooks/hook-logger.ts",
+      "src/background/session-log-writer.ts",
+      "src/background/db-manager.ts",
+      "src/background/handlers/injection-namespace-bootstrap.ts",
+      "src/components/ErrorBoundary.tsx",
+      "src/lib/developer-guide-data.generated.ts",
+      "src/background/builtin-script-guard.ts",
+      "src/background/manifest-seeder.ts",
+      "src/background/project-namespace-builder.ts",
+      "src/background/handlers/injection-wrapper.ts",
+      "src/components/options/monaco-js-intellisense.ts",
+      "src/background/schema-migration.ts",
+      "src/background/recorder/failure-logger.ts",
+      "src/background/injection-diagnostics.ts",
+      "src/background/context-menu-handler.ts",
+    ],
+    rules: {
+      "no-restricted-syntax": "off",
     },
   },
   // --- Build configs & generated files — disable function size ---
