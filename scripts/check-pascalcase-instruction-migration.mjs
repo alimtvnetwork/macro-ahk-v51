@@ -463,6 +463,56 @@ function runCheckC(sourceFiles) {
 }
 
 /* ----------------------------------------------------------------- */
+/*  CHECK D — instruction.ts closed string sets use shared enums.     */
+/* ----------------------------------------------------------------- */
+function runCheckD() {
+    const violations = [];
+    const CLOSED_STRING_KEY_RE = /\b(World|RunAt|MatchType|Inject)\s*:\s*["'](MAIN|ISOLATED|document_start|document_end|document_idle|glob|regex|exact|head)["']/g;
+    const projects = readdirSync(STANDALONE_DIR).filter((name) => {
+        const full = join(STANDALONE_DIR, name);
+        try {
+            return statSync(full).isDirectory();
+        } catch {
+            return false;
+        }
+    });
+
+    for (const proj of projects) {
+        const tsPath = join(STANDALONE_DIR, proj, "src", "instruction.ts");
+        if (!existsSync(tsPath)) continue;
+        const raw = readFileSync(tsPath, "utf-8");
+        const srcLines = stripComments(raw).split("\n");
+        const rawLines = raw.split("\n");
+        for (let lineIndex = 0; lineIndex < srcLines.length; lineIndex++) {
+            CLOSED_STRING_KEY_RE.lastIndex = 0;
+            let match;
+            while ((match = CLOSED_STRING_KEY_RE.exec(srcLines[lineIndex])) !== null) {
+                violations.push({
+                    file: rel(tsPath),
+                    line: lineIndex + 1,
+                    key: match[1],
+                    value: match[2],
+                    snippet: rawLines[lineIndex].trim(),
+                });
+            }
+        }
+    }
+
+    if (violations.length === 0) {
+        console.log(`✓ CHECK D — instruction.ts closed string sets use shared enum members`);
+        return 0;
+    }
+
+    process.stderr.write(`\n✗ CHECK D — ${violations.length} raw closed-string instruction value(s) found:\n\n`);
+    for (const v of violations) {
+        process.stderr.write(`  ${v.file}:${v.line}  →  ${v.key}: "${v.value}"\n    ${v.snippet}\n`);
+        annotate(v.file, v.line, `Instruction ${v.key} must use the shared enum member, not raw string "${v.value}".`);
+    }
+    process.stderr.write(`\n  Fix: import InjectionWorld, InjectionRunAt, MatchType, or AssetInjectTarget and assign the matching enum member.\n\n`);
+    return 1;
+}
+
+/* ----------------------------------------------------------------- */
 /*  Main                                                              */
 /* ----------------------------------------------------------------- */
 function main() {
