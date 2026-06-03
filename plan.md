@@ -463,13 +463,13 @@ Memory: `.lovable/memory/features/release-installer.md`
 
 | # | Task | Effort | Impact | Blocker |
 |---|------|--------|--------|---------|
-| 1 | **Priority 0.1** — Review Q1–Q5 | Medium | High — unblocks standalone-script type migration | Awaiting reviewer |
-| 2 | **Priority 0.8** — id-denylist expansion | High | Medium — ~1700 callsites; needs staged migration | Effort budget |
-| 3 | **Task 1.2** — E2E Chrome verification | Low | High — validates real-world usage | Manual Chrome required |
-| 4 | **Cross-Project Sync** — Shared asset library | High | High — new feature | Spec ready |
-| 5 | **P Store** — Project marketplace | High | High — new feature (deferred per memory) | Owner spec pending |
+| 1 | **Priority 0.11** — PaymentBannerHider class refactor | Medium | High — unlocks 0.14 runtime enums | 0.3 now closed |
+| 2 | **Priority 0.12** — Standalone-script scaffolder CLI | Medium | High — prevents future manifest drift | 0.1 now closed |
+| 3 | **Priority 0.15** — Typed DOM helpers in SDK | Medium | High — removes standalone DOM casts | 0.7 closed |
+| 4 | **Priority 0.8** — id-denylist expansion | High | Medium — ~1700 callsites; needs staged migration | Effort budget |
+| 5 | **Task 1.2** — E2E Chrome verification | Low | High — validates real-world usage | Manual Chrome required |
 
-**Recommended next**: Priority 0.1 — answer Q1–Q5 in `.lovable/question-and-ambiguity/` to unblock the standalone-script type migration chain (0.2–0.6, 0.11–0.16). Priorities 0.7, 0.9, 0.10 are verified closed; 0.8 expansion is a multi-day refactor needing user go-ahead.
+**Recommended next**: Priority 0.11 — refactor `payment-banner-hider` into the standardized class shape, because 0.1–0.6 are now closed and 0.11 directly unlocks 0.14 runtime enums. Priority 0.12 is next-best if the goal is scaffolding prevention rather than runtime cleanup.
 
 ---
 
