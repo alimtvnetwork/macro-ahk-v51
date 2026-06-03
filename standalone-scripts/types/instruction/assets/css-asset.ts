@@ -1,4 +1,4 @@
-import { AssetInjectTarget } from "../enums/asset-inject-target";
+import type { AssetInjectTarget } from "../enums/asset-inject-target";
 
 /**
  * A CSS file shipped with a standalone script and injected into the
