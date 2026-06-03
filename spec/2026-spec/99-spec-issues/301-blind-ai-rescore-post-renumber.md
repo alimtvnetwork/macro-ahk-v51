@@ -1,4 +1,4 @@
-# Blind-AI Implementation Scorecard — `spec/01-prompt-spec-2026/` (POST-renumber, 2026-06-03)
+# Blind-AI Implementation Scorecard — `spec/2026-spec/` (POST-renumber, 2026-06-03)
 
 **Question:** *"After the 100-step renumber plan executes, what is the new Blind-AI success score out of 100 — confirmed?"*
 
@@ -22,7 +22,7 @@
 | 95 | Snippet typecheck | `node scripts/typecheck-spec-snippets.mjs` | ⚠️ pre-existing TS errors in `19-reference-snippets/04` and `/05` (relative-module imports for illustrative snippets; not caused by renumber) |
 | 96 | Cross-ref linter | `node scripts/spec/lint-cross-refs.mjs` | ✅ exit 0 — all `spec/...` paths resolve |
 | 97 | Repo-wide stale-ref baseline | `rg -l 'spec/2026-spec' --excl historical+rewriter` | ✅ **0 hits** |
-| 98 | Inventory stability | `find spec/01-prompt-spec-2026 -type f \| wc -l` | ✅ **106 files** (unchanged since Phase B) |
+| 98 | Inventory stability | `find spec/2026-spec -type f \| wc -l` | ✅ **106 files** (unchanged since Phase B) |
 
 ## Score reconciliation (100-pt rubric)
 
@@ -30,7 +30,7 @@
 |---|---:|---:|---|
 | Content correctness | 96 | 96 | Unchanged — renumber is structural-only |
 | **Structural clarity** | -8 | **0** | ✅ Dense `01..20` numbering; blind-AI `for n in 01..20` now resolves every folder |
-| **Root naming** | -2 | **0** | ✅ Root now `01-prompt-spec-2026/` — matches NN- convention used everywhere in `spec/` |
+| **Root naming** | -2 | **0** | ✅ Root now `2026-spec/` — matches NN- convention used everywhere in `spec/` |
 | Cross-ref integrity | ✅ | ✅ | Linter green pre and post |
 | Schemas & fixtures | ✅ | ✅ | Unchanged |
 | Acceptance criteria | ✅ | ✅ | Unchanged |
