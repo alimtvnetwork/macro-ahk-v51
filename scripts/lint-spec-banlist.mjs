@@ -21,10 +21,10 @@ const ALLOW_FILES = new Set([
   "README.md",
   "00-overview.md",
   "01-plan-tasks-1-20.md",
-  "10-glossary/04-vocabulary-banlist.md",
-  "200-adoption-checklist/03-go-live-checklist.md",
-  "200-adoption-checklist/04-worked-example.md",
-  "200-adoption-checklist/05-handoff.md",
+  "01-glossary/04-vocabulary-banlist.md",
+  "20-adoption-checklist/03-go-live-checklist.md",
+  "20-adoption-checklist/04-worked-example.md",
+  "20-adoption-checklist/05-handoff.md",
 ]);
 
 function walk(dir) {
