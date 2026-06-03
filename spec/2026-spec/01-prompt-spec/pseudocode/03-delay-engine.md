@@ -1,0 +1,20 @@
+# Pseudocode — Delay Engine
+
+```ts
+function computeDelay(taskIndex: number, settings: Settings): number {
+  if (taskIndex === 0 && settings.skipFirstDelay) return 0;
+  const jitter = Math.floor(Math.random() * settings.jitterMs);
+  return Math.max(0, settings.delayMs + jitter);
+}
+
+async function waitWithPauseSupport(ms: number, signal: AbortSignal) {
+  const start = Date.now();
+  while (Date.now() - start < ms) {
+    if (signal.aborted) throw new AbortError("delay.cancelled");
+    if (state.paused) { await waitForResume(signal); continue; }
+    await sleep(50); // tick granularity
+  }
+}
+```
+
+Defaults live in `reference/05-runtime-defaults.md`.

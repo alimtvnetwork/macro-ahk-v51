@@ -1,58 +1,57 @@
-# 01 — Prompt Spec 2026 (generic, host-agnostic)
+# 2026 Prompt Spec — Master Index
 
-> **Canonical root:** `spec/2026-spec/01-prompt-spec/` (renamed 2026-06-03 from `spec/01-prompt-spec-2026/`; moved 2026-06-03 from repo root into `spec/2026-spec/01-prompt-spec/` to fit the 2026 grouping).
-> Inner folders renumbered `10..200` → `01..20` (dense). Mapping: `.lovable/audits/2026-06-03-renumber/path-map.json`.
+**Updated:** 2026-06-03 (Asia/Kuala_Lumpur)
+**Canonical path:** `spec/2026-spec/01-prompt-spec/`
+**Score:** 100 / 100 (blind-AI rescore, post 30-step content uplift — see `99-spec-issues/303-30-step-content-uplift.md`)
 
-## Overview
+## How to read
 
-**Date:** 2026-06-02 (Asia/Kuala_Lumpur)
-**Status:** 120/120 tasks complete; hardening pass in `02-hardening-backlog.md`.
+1. New implementer? Start with `IMPLEMENTATION-CHECKLIST.md`, then run `BLIND-AI-SMOKE-TEST.md` at the end.
+2. Vocabulary? `GLOSSARY.md` + `01-glossary/`.
+3. Want to verify acceptance? `ACCEPTANCE-MATRIX.md`.
 
-A host-agnostic specification for shipping a **Prompts feature** (prompt
-library + Next/Plan automation loop) into any chat-style web app.
-The spec deliberately contains no references to this project's
-internals — every host integration point is an answered `???` question
-(see `00-overview.md`, Q1–Q8).
+## Top-level files
 
-## Read order (for humans and AIs)
+- `00-overview.md` — narrative overview
+- `01-plan-tasks-1-20.md` — task list
+- `02-hardening-backlog.md` — known follow-ups
+- `GLOSSARY.md` — terms
+- `IMPLEMENTATION-CHECKLIST.md` — phase-by-phase runbook
+- `BLIND-AI-SMOKE-TEST.md` — 20-question gate
+- `ACCEPTANCE-MATRIX.md` — folder ↔ test-id binding
 
-Mirrors the T120 handoff. If you only have 30 minutes, stop at step 8.
+## Spec folders (dense 01–20)
 
-1. `00-overview.md` — purpose, Q1–Q8 placeholders, non-goals.
-2. `01-plan-tasks-1-20.md` — 120-task index + completion ledger.
-3. `02-hardening-backlog.md` — post-T120 punch list (H1–H10).
-4. `01-glossary/` — vocabulary + banlist (enforced by `check:spec-banlist`).
-5. `02-data-model/` + `03-prompt-source-format/` — what a Prompt **is**.
-6. `04-loader-contract/` → `05-ui-contract/` → `06-injection-contract/` + `07-editor-adapters/` — the read/paste happy path.
-7. `08-save-create-edit/` — author flows.
-8. `09-next-overview/` → `10-queue-model/` → `11-queue-lifecycle/` → `12-delay-engine/` — automation core.
-9. `13-failure-handling/` — failure taxonomy + mandatory log shape.
-10. `14-plan-mode/` — plan profile delta.
-11. `15-settings/` + `16-observability/` — configuration & diagnostics.
-12. `17-onboarding/` + `18-test-plan/` — bring-up + QA gates.
-13. `19-reference-snippets/` — copy-pastable TS pseudo-code (~40–80 LOC each).
-14. `20-adoption-checklist/` — pre-flight, wire-up order, go-live, worked example, handoff.
+| # | Folder | Theme |
+|---:|---|---|
+| 01 | `01-glossary/` | Terms, actors, non-goals |
+| 02 | `02-data-model/` | Prompt, Category, Store |
+| 03 | `03-prompt-source-format/` | Folder + info.json + prompt.md |
+| 04 | `04-loader-contract/` | Loader, cache, variable resolution |
+| 05 | `05-ui-contract/` | Trigger, dropdown, search, keyboard, a11y |
+| 06 | `06-injection-contract/` | Target, paste, verify, toast |
+| 07 | `07-editor-adapters/` | textarea, contenteditable, rich, fallback |
+| 08 | `08-save-create-edit/` | CRUD |
+| 09 | `09-next-overview/` | Submit button + next loop |
+| 10 | `10-queue-model/` | Task shape, statuses, capacity, ordering |
+| 11 | `11-queue-lifecycle/` | enqueue → tick → completion |
+| 12 | `12-delay-engine/` | Default, jitter, skip-first, pause |
+| 13 | `13-failure-handling/` | Categories, hooks, recovery, mandatory log |
+| 14 | `14-plan-mode/` | Plan-mode UX |
+| 15 | `15-settings/` | Surface, schema, defaults, overrides |
+| 16 | `16-observability/` | Events, metrics, debug panel |
+| 17 | `17-onboarding/` | First-run, tour, empty, telemetry |
+| 18 | `18-test-plan/` | Test plan overview |
+| 19 | `19-reference-snippets/` | TS snippets (typecheck-gated) |
+| 20 | `20-adoption-checklist/` | Pre-flight + go-live + handoff |
 
-## Invariants (must not regress)
+## Reference subtrees (added 2026-06-03)
 
-- No `chrome.*`, `MacroController`, `RiseupAsia*`, `Marco SDK`, or `Supabase` references inside the spec (other than the banlist itself and meta-docs that quote it).
-- **No-Retry policy**: fail-fast everywhere; no exponential backoff.
-- Failure logs always carry `Reason` + `ReasonDetail` + `SelectorAttempts[]` + `VariableContext[]`.
-- `readme.txt` is never auto-stamped with time/clock/git values.
-- Verbose logging defaults OFF; full prompt bodies only persisted when ON.
-
-## Tooling
-
-| Command | Purpose |
+| Folder | Contains |
 |---|---|
-| `npm run check:spec-banlist` | Enforce vocabulary banlist (H1). |
-| `npm run check:spec-prompts-xrefs` | Verify every `T###` reference resolves (H7). |
-| `npm run spec:prompts:acceptance` | Extract all `- [ ]` bullets into one master checklist (H8). |
-| `npm run spec:prompts:pdf` | Concatenate the spec into a single printable markdown bundle in `/mnt/documents/` (H6). |
-
-## Extending the spec
-
-Add a new top-level folder with a `NNN-` prefix continuing the numbering, then append a row to `01-plan-tasks-1-20.md`'s tracking table. Re-run the four commands above.
-
-## Files
-- See [`00-overview.md`](./00-overview.md) and the numbered subdirectories listed in **Read order** above.
+| `schemas/` | JSON Schemas: prompt, category, queue-task, settings, info.json |
+| `pseudocode/` | Loader runner, queue engine, delay engine, paste strategies, failure router |
+| `ui-reference/` | Keyboard map, a11y matrix, CSS tokens, error catalog, empty states |
+| `test-inventory/` | Unit / component / e2e / fixtures / CI gates |
+| `reference/` | Edge cases, failure reason codes, metrics, log format, runtime defaults |
+| `99-spec-issues/` | Audit trail (rescores, gap-closure proofs, content uplift manifest) |
