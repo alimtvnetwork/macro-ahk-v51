@@ -134,3 +134,20 @@ Phase C (steps 21–40): rename 20 child folders from `10..200` to `01..20`.
 | 70 | Smoke-run 4 touched scripts against new tree | 10 s | ✅ `lint-spec-mermaid` clean (2 diagrams), `check-spec-prompts-xrefs` clean (100 tasks, 102 refs), `check-prompts-info-json` clean (1 example), `lint-spec-banlist` runs (pre-existing banlist hits in handoff.md unrelated to renumber) |
 
 **Phase E part 1 summary:** 8 scripts repaired with 2 layers of fix (ROOT + escaped-regex + 2 deep subpaths), 4 smoke tests green against the renamed tree, scripts now fully operational.
+
+## Phase E part 2 (steps 71–80) — 2026-06-03
+
+| # | Action | Time | Result |
+|---|--------|------|--------|
+| 71 | Identify active `.lovable/` files referencing old path | 3 s | plan (10 lines), Q&A readme (2 lines), task-counter (1 line) |
+| 72 | Prepend STATUS banner to renumber plan | 3 s | ✅ banner notes ✅ EXECUTED + new live path |
+| 73 | Add historical note to Q&A readme entries 58 + 59 | 3 s | ✅ point to new path; clarify PoC dir N/A |
+| 74 | Add historical note to task-counter row 18 | 2 s | ✅ |
+| 75 | CI workflow scan (`spec-governance-quarterly`, `spec-gates`) | 3 s | ✅ both reference `scripts/spec/*` only — path-agnostic, no fix needed |
+| 76 | Root README spec links | 2 s | ✅ no `2026-spec` refs at root |
+| 77 | `package.json` script paths | 2 s | ✅ no spec path refs |
+| 78 | Final repo-wide stale-ref baseline (excl. historical audits/plans/Q&A) | 3 s | ✅ **0 hits — fully clean** |
+| 79 | `lint-cross-refs.mjs` | 8 s | ✅ exit 0 |
+| 80 | Snapshot count | 2 s | ✅ 106 files stable |
+
+**Phase E COMPLETE.** Repo is fully consistent with the new path. Historical artifacts (plan, Q&A logs, audit snapshots) preserve pre-rename text with explicit STATUS banners pointing to the new location.
