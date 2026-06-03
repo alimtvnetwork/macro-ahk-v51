@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// H6 — Concatenate every spec/2026-spec/*.md into a single
+// H6 — Concatenate every spec/2026-spec/01-prompt-spec/*.md into a single
 // printable markdown bundle. Avoids extra deps; markdown is browser-printable
 // and the user can convert to PDF via any tool.
 //

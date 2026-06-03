@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// H7 — Cross-reference audit for spec/2026-spec/.
+// H7 — Cross-reference audit for spec/2026-spec/01-prompt-spec/.
 // Verifies every "T###" mentioned in the spec falls in T21..T120 and that
 // the planning ledger lists T21..T120 exactly once each.
 

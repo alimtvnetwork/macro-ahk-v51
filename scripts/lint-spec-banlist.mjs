@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Spec banlist linter — enforces vocabulary banlist (T24) across
-// spec/2026-spec/. Fails fast (No-Retry policy).
+// spec/2026-spec/01-prompt-spec/. Fails fast (No-Retry policy).
 //
 // Usage: node scripts/lint-spec-banlist.mjs
 // Exit 0 = clean, 1 = violations found.

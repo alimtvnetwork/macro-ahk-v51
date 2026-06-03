@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// H8 — Extract every "- [ ]" / "- [x]" bullet from spec/2026-spec/
+// H8 — Extract every "- [ ]" / "- [x]" bullet from spec/2026-spec/01-prompt-spec/
 // into one master acceptance checklist.
 //
 // Writes: /mnt/documents/2026-prompts-acceptance.md
