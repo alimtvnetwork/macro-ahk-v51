@@ -4,7 +4,7 @@
 **Task:** T114
 
 ```ts
-import type { EditorAdapter } from "../70-editor-adapters";
+import type { EditorAdapter } from "../07-editor-adapters";
 
 export const contentEditableAdapter: EditorAdapter = {
   kind: "contenteditable",

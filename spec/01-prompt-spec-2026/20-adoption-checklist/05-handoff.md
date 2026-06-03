@@ -7,17 +7,17 @@
 
 1. `00-overview.md` — purpose, Q1–Q8 placeholders, non-goals.
 2. `01-plan-tasks-1-20.md` — 120-task index and completion ledger.
-3. `10-glossary/` — vocabulary + banlist.
-4. `20-data-model/` + `30-prompt-source-format/` — what a Prompt **is** on disk and in memory.
-5. `40-loader-contract/` → `50-ui-contract/` → `60-injection-contract/` + `70-editor-adapters/` — the read/paste happy path.
-6. `80-save-create-edit/` — author flows.
-7. `90-next-overview/` → `100-queue-model/` → `110-queue-lifecycle/` → `120-delay-engine/` — automation core.
-8. `130-failure-handling/` — failure taxonomy + mandatory log shape.
-9. `140-plan-mode/` — plan profile delta.
-10. `150-settings/` + `160-observability/` — configuration & diagnostics.
-11. `170-onboarding/` + `180-test-plan/` — bring-up + QA gates.
-12. `190-reference-snippets/` — copy-pastable TS pseudo-code.
-13. `200-adoption-checklist/` — pre-flight, wire-up order, go-live, worked example, this handoff.
+3. `01-glossary/` — vocabulary + banlist.
+4. `02-data-model/` + `03-prompt-source-format/` — what a Prompt **is** on disk and in memory.
+5. `04-loader-contract/` → `05-ui-contract/` → `06-injection-contract/` + `07-editor-adapters/` — the read/paste happy path.
+6. `08-save-create-edit/` — author flows.
+7. `09-next-overview/` → `10-queue-model/` → `11-queue-lifecycle/` → `12-delay-engine/` — automation core.
+8. `13-failure-handling/` — failure taxonomy + mandatory log shape.
+9. `14-plan-mode/` — plan profile delta.
+10. `15-settings/` + `16-observability/` — configuration & diagnostics.
+11. `17-onboarding/` + `18-test-plan/` — bring-up + QA gates.
+12. `19-reference-snippets/` — copy-pastable TS pseudo-code.
+13. `20-adoption-checklist/` — pre-flight, wire-up order, go-live, worked example, this handoff.
 
 **Invariants the next model must not break**
 - No `chrome.*`, `MacroController`, `RiseupAsia*`, or `Supabase` references.

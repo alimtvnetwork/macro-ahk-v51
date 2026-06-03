@@ -54,7 +54,7 @@ All thrown `PromptError`s MUST be logged with:
 - `Reason` = the reason code
 - `ReasonDetail` = the human one-liner
 - `SelectorAttempts: []` (empty for loader/store errors; populated by
-  injection layer in `60-injection-contract/`)
+  injection layer in `06-injection-contract/`)
 - `VariableContext: []` (populated by `render` for `UnresolvedVariable`
   with `{ name, source: "prompt-body", row, column, resolvedValue: null,
   type: "string", reason: "no-match-in-ctx" }`).

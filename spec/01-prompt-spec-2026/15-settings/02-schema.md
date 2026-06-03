@@ -5,8 +5,8 @@
 
 ```ts
 interface PromptsSettings {
-  delay: DelaySettings;        // see 120-delay-engine/02-settings.md
-  plan: PlanSettings;          // see 140-plan-mode/03-settings.md
+  delay: DelaySettings;        // see 12-delay-engine/02-settings.md
+  plan: PlanSettings;          // see 14-plan-mode/03-settings.md
   editor: EditorSettings;
   debug: DebugSettings;
 }

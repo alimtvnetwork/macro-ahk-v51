@@ -26,7 +26,7 @@ distribution format and the shape used by the reference corpus at
    - `\d{2,3}` is a 2- or 3-digit ordering prefix used **only** for
      human readability when browsing the directory. It MUST equal
      `info.json → order` zero-padded to at least 2 digits.
-   - `<slug>` matches the slug regex from `20-data-model/04-id-and-slug-rules.md`.
+   - `<slug>` matches the slug regex from `02-data-model/04-id-and-slug-rules.md`.
 3. **Required files** inside each folder: `info.json` (see T32) and
    `prompt.md` (see T33). Any other file is allowed for the integrator's
    use and MUST be ignored by the loader.

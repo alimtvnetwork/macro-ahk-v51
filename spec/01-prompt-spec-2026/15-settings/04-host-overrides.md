@@ -27,7 +27,7 @@ PromptsFeature.bootstrap({ host: myHostOverrides });
 - `settingsDefaults` shallow-merged onto spec defaults; user settings still win.
 - `defaultPrompts` register as read-only entries in the prompt store.
 - Resolvers, observers, detectors **replace** the spec defaults entirely — no chain-of-responsibility.
-- `editorAdapters` are appended; per `70-editor-adapters/01-adapter-interface.md`, last-registered wins on `canHandle`.
+- `editorAdapters` are appended; per `07-editor-adapters/01-adapter-interface.md`, last-registered wins on `canHandle`.
 
 ## Forbidden
 

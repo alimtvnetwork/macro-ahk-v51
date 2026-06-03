@@ -13,7 +13,7 @@
 
 1. Mark the currently-processing task `failed { reason: "CancelledByUser" }` if it was mid-flight.
 2. Drop all `pending` and `hold` tasks (status → `failed { reason: "CancelledByUser" }`).
-3. Abort the in-flight delay timer (see `100-queue-model/...` and Step 12 delay engine).
+3. Abort the in-flight delay timer (see `10-queue-model/...` and Step 12 delay engine).
 4. Do **not** undo already-submitted prompts; the host owns those.
 5. Emit `QueueEvent { kind: "cancelled", count }`.
 

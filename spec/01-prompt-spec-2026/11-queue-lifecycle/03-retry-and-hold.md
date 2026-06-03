@@ -5,7 +5,7 @@
 
 ## No-Retry Policy (project-wide hard rule)
 
-The queue **does not retry failed tasks**. There is no exponential backoff, no scheduled redelivery, no automatic re-enqueue. `attemptCount` is bounded to `{0, 1}` where the single bump models the readiness-grace re-check defined in `90-next-overview/03-disabled-button-handling.md`.
+The queue **does not retry failed tasks**. There is no exponential backoff, no scheduled redelivery, no automatic re-enqueue. `attemptCount` is bounded to `{0, 1}` where the single bump models the readiness-grace re-check defined in `09-next-overview/03-disabled-button-handling.md`.
 
 ## Hold vs Fail
 

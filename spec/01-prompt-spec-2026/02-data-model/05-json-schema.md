@@ -56,7 +56,7 @@ on-disk / over-the-wire records. Schema dialect: **JSON Schema 2020-12**.
 ## Validation expectations
 
 - `PromptStore.save` MUST reject any record that fails the schema with
-  the typed error `SchemaInvalid` (`40-loader-contract/04-error-modes.md`).
+  the typed error `SchemaInvalid` (`04-loader-contract/04-error-modes.md`).
 - `importMany` MUST validate every incoming record before any write;
   the entire batch is rejected on the first violation when
   `mode = "replace"` or `"rename"`; `mode = "skip"` drops only the

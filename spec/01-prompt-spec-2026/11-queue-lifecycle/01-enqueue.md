@@ -14,7 +14,7 @@ QueueEngine.enqueue({
 ```
 
 Pipeline:
-1. Render via `PromptLoader.render(slug, context)` — **synchronous body capture** at enqueue time (see `100-queue-model/01-task-shape.md` invariants).
+1. Render via `PromptLoader.render(slug, context)` — **synchronous body capture** at enqueue time (see `10-queue-model/01-task-shape.md` invariants).
 2. Build `QueuedTask` with `id = ulid()`, `status = "pending"`, `attemptCount = 0`.
 3. `QueueStore.add(task)` → emits `{ kind: "added", ids: [id] }`.
 4. If the engine loop is idle, schedule it on next microtask.
@@ -28,7 +28,7 @@ QueueEngine.enqueueBulk({ kind, promptSlug, context, count });
 - Render once, reuse the same `renderedBody` for every clone (identical context).
 - Generate `count` ULIDs (time-ordered, no collisions).
 - Single `QueueStore.addMany(tasks)` call → single `{ kind: "added", ids }` event.
-- Capacity check (see `100-queue-model/04-capacity.md`) is applied to the **whole batch**: if it would overflow, the entire enqueue rejects — no partial insert.
+- Capacity check (see `10-queue-model/04-capacity.md`) is applied to the **whole batch**: if it would overflow, the entire enqueue rejects — no partial insert.
 
 ## Forbidden
 

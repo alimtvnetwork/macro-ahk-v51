@@ -5,7 +5,7 @@
 **~80 LOC TypeScript pseudo-code.**
 
 ```ts
-import type { QueuedTask, QueueStore } from "../100-queue-model";
+import type { QueuedTask, QueueStore } from "../10-queue-model";
 
 export interface QueueEngineOptions {
   store: QueueStore;

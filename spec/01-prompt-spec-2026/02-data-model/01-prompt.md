@@ -16,7 +16,7 @@ re-case them for their storage backend.
 | `version` | string | yes | SemVer `MAJOR.MINOR.PATCH`. Bumped by Integrator/User on edits. |
 | `author` | string | no | Free text. |
 | `categories` | string[] | yes | Zero or more category slugs (see `02-category.md`). Empty array = uncategorised. |
-| `body` | string | yes | The prompt text itself. May contain `{{variable}}` placeholders (see `40-loader-contract/03-variable-resolution.md`). |
+| `body` | string | yes | The prompt text itself. May contain `{{variable}}` placeholders (see `04-loader-contract/03-variable-resolution.md`). |
 | `isDefault` | boolean | yes | `true` for shipped defaults; `false` for user-created. Defaults cannot be deleted, only hidden. |
 | `order` | number | yes | Integer sort key inside its category; lower = earlier. Ties broken by `title`. |
 | `createdAt` | ISO-8601 string | yes | UTC. |

@@ -5,7 +5,7 @@
 
 ## Onboarding-specific events
 
-Extends `ObservabilityEvent` (see `160-observability/02-event-schema.md`):
+Extends `ObservabilityEvent` (see `16-observability/02-event-schema.md`):
 
 ```ts
 type OnboardingEvent =

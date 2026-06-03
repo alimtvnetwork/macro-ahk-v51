@@ -18,7 +18,7 @@
 
 ## Content authoring
 
-Help strings live in a single `help.json` file colocated with the feature, keyed by stable ids. The host MAY override by registering a `HelpStringsProvider` at bootstrap (mirrors the host-overrides pattern in `150-settings/04-host-overrides.md`).
+Help strings live in a single `help.json` file colocated with the feature, keyed by stable ids. The host MAY override by registering a `HelpStringsProvider` at bootstrap (mirrors the host-overrides pattern in `15-settings/04-host-overrides.md`).
 
 ## i18n
 

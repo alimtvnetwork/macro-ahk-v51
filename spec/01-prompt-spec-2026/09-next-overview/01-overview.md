@@ -35,7 +35,7 @@ sequenceDiagram
 
 | Host concern | Spec reference |
 |--------------|----------------|
-| ChatBox target | `60-injection-contract/01-target-resolution.md` |
+| ChatBox target | `06-injection-contract/01-target-resolution.md` |
 | Submit button | `02-host-submit-button.md` (this folder) |
 | Busy/idle signal | `04-interruption-detection.md` |
 | Cancel surface | `05-cancel.md` |

@@ -4,9 +4,9 @@
 **Task:** T115
 
 ```ts
-import type { Prompt } from "../20-data-model";
-import type { EditorAdapter } from "../70-editor-adapters";
-import type { QueuedTask } from "../100-queue-model";
+import type { Prompt } from "../02-data-model";
+import type { EditorAdapter } from "../07-editor-adapters";
+import type { QueuedTask } from "../10-queue-model";
 import { createQueueEngine } from "./02-queue-engine";
 
 export interface NextLoopHost {

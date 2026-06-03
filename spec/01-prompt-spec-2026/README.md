@@ -1,6 +1,6 @@
 # 01 — Prompt Spec 2026 (generic, host-agnostic)
 
-> **Canonical root:** `spec/01-prompt-spec-2026/` (renamed 2026-06-03 from `spec/2026-spec/`).
+> **Canonical root:** `spec/01-prompt-spec-2026/` (renamed 2026-06-03 from `spec/01-prompt-spec-2026/`).
 > Inner folders renumbered `10..200` → `01..20` (dense). Mapping: `.lovable/audits/2026-06-03-renumber/path-map.json`.
 
 ## Overview
@@ -21,17 +21,17 @@ Mirrors the T120 handoff. If you only have 30 minutes, stop at step 8.
 1. `00-overview.md` — purpose, Q1–Q8 placeholders, non-goals.
 2. `01-plan-tasks-1-20.md` — 120-task index + completion ledger.
 3. `02-hardening-backlog.md` — post-T120 punch list (H1–H10).
-4. `10-glossary/` — vocabulary + banlist (enforced by `check:spec-banlist`).
-5. `20-data-model/` + `30-prompt-source-format/` — what a Prompt **is**.
-6. `40-loader-contract/` → `50-ui-contract/` → `60-injection-contract/` + `70-editor-adapters/` — the read/paste happy path.
-7. `80-save-create-edit/` — author flows.
-8. `90-next-overview/` → `100-queue-model/` → `110-queue-lifecycle/` → `120-delay-engine/` — automation core.
-9. `130-failure-handling/` — failure taxonomy + mandatory log shape.
-10. `140-plan-mode/` — plan profile delta.
-11. `150-settings/` + `160-observability/` — configuration & diagnostics.
-12. `170-onboarding/` + `180-test-plan/` — bring-up + QA gates.
-13. `190-reference-snippets/` — copy-pastable TS pseudo-code (~40–80 LOC each).
-14. `200-adoption-checklist/` — pre-flight, wire-up order, go-live, worked example, handoff.
+4. `01-glossary/` — vocabulary + banlist (enforced by `check:spec-banlist`).
+5. `02-data-model/` + `03-prompt-source-format/` — what a Prompt **is**.
+6. `04-loader-contract/` → `05-ui-contract/` → `06-injection-contract/` + `07-editor-adapters/` — the read/paste happy path.
+7. `08-save-create-edit/` — author flows.
+8. `09-next-overview/` → `10-queue-model/` → `11-queue-lifecycle/` → `12-delay-engine/` — automation core.
+9. `13-failure-handling/` — failure taxonomy + mandatory log shape.
+10. `14-plan-mode/` — plan profile delta.
+11. `15-settings/` + `16-observability/` — configuration & diagnostics.
+12. `17-onboarding/` + `18-test-plan/` — bring-up + QA gates.
+13. `19-reference-snippets/` — copy-pastable TS pseudo-code (~40–80 LOC each).
+14. `20-adoption-checklist/` — pre-flight, wire-up order, go-live, worked example, handoff.
 
 ## Invariants (must not regress)
 

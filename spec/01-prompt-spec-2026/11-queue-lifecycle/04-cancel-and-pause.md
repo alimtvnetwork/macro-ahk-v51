@@ -25,7 +25,7 @@ QueueEngine.cancelCurrent();
 
 ## Cancel all
 
-Defined in `90-next-overview/05-cancel.md`. Recap:
+Defined in `09-next-overview/05-cancel.md`. Recap:
 - Current → `failed { CancelledByUser }`.
 - All `pending` + `hold` → `failed { CancelledByUser }`.
 - Delay timer aborted; `paused` state cleared.
