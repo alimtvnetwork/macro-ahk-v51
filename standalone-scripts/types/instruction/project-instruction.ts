@@ -3,7 +3,7 @@ import type { VersionString } from "./primitives/version-string";
 import type { AssetBundle } from "./assets/asset-bundle";
 import type { SeedBlock } from "./seed/seed-block";
 import type { XPathRegistry } from "./xpath/xpath-registry";
-import { InjectionWorld } from "./enums/injection-world";
+import type { InjectionWorld } from "./enums/injection-world";
 
 /**
  * Top-level instruction manifest for one standalone script.

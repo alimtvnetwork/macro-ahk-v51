@@ -2,7 +2,7 @@ import type { Identifier } from "../primitives/identifier";
 import type { CookieBinding } from "./cookie-binding";
 import type { CookieSpec } from "./cookie-spec";
 import type { TargetUrl } from "./target-url";
-import { InjectionRunAt } from "../enums/injection-run-at";
+import type { InjectionRunAt } from "../enums/injection-run-at";
 
 /**
  * Declarative seed metadata that controls how the runtime registers,

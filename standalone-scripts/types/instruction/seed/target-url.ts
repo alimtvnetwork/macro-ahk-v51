@@ -1,5 +1,5 @@
 import type { UrlPattern } from "../primitives/url-pattern";
-import { MatchType } from "../enums/match-type";
+import type { MatchType } from "../enums/match-type";
 
 /**
  * One URL pattern used by the injection scheduler. `MatchType`
