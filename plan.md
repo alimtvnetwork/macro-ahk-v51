@@ -481,6 +481,8 @@ Memory: `.lovable/memory/features/release-installer.md`
 
 ### 🔴 CRITICAL — fix first
 
+> **RCA files written 2026-06-03** (per `mem://workflow/task-execution-pattern`): PERF-1 → `spec/22-app-issues/10-perf-1-hot-reload-prod-poll.md`, PERF-2 → `…/11-…`, PERF-3 → `…/12-…`, PERF-4 → `…/13-…`, PERF-5 → `…/14-…`, PERF-7 → `…/15-…`, PERF-8 → `…/16-…`. Awaiting user greenlight to land code fixes.
+
 | # | File | Issue | Why it harms perf | Root cause |
 |---|---|---|---|---|
 | **PERF-1** | `src/background/hot-reload.ts:34` + `vite.config.extension.ts:516` | **Hot-reload polls `build-meta.json` every 1 second forever — in PRODUCTION builds too.** Wakes the MV3 service worker every second, defeats Chrome's SW idle suspension, runs a `fetch()` + `JSON.parse()` per tick, fights the keepalive heuristics, and on shared/laptop machines visibly drains battery. | SW never sleeps → constant CPU/IO + extra "Marco extension was reloaded" logs. Also disables the very SW lifecycle the rest of the code (e.g. `keepalive`) tiptoes around. | `generateBuildMeta()` is wired unconditionally inside `defineConfig(({ mode }) => …)` — `isDev` is computed but never gates the plugin. So `dist/build-meta.json` ships in release ZIPs, and `startHotReload()` (called from `service-worker-main.ts:131`) sees the file present and starts the 1 s loop. The polling is also unkillable — no `clearInterval` and no stop API. |
