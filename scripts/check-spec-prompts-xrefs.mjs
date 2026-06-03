@@ -6,7 +6,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const ROOT = "spec/2026-spec";
+const ROOT = "spec/2026-spec/01-prompt-spec";
 const PLAN = `${ROOT}/01-plan-tasks-1-20.md`;
 const TASK_RE = /\bT(\d{1,3})\b/g;
 

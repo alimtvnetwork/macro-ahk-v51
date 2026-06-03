@@ -7,7 +7,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-const ROOT = "spec/2026-spec";
+const ROOT = "spec/2026-spec/01-prompt-spec";
 const DIRECTIVES = [
   "graph", "flowchart", "sequenceDiagram", "classDiagram", "stateDiagram",
   "stateDiagram-v2", "erDiagram", "journey", "gantt", "pie", "mindmap",

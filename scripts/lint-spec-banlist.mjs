@@ -8,7 +8,7 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const ROOT = "spec/2026-spec";
+const ROOT = "spec/2026-spec/01-prompt-spec";
 const BANNED = [
   /\bMacroController\b/,
   /\bRiseupAsia[A-Za-z]*/,

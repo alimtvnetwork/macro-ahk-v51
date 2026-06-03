@@ -8,7 +8,7 @@
 import { readdirSync, readFileSync, statSync, mkdirSync, writeFileSync } from "node:fs";
 import { join, relative } from "node:path";
 
-const ROOT = "spec/2026-spec";
+const ROOT = "spec/2026-spec/01-prompt-spec";
 const OUT  = "/mnt/documents/2026-prompts-spec.md";
 
 function walk(dir) {
