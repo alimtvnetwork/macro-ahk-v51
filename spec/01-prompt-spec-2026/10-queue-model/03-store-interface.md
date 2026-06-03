@@ -33,4 +33,4 @@ type QueueStoreEvent =
 ## Forbidden
 
 - `localStorage` — synchronous and 5MB-bounded; out of contract.
-- Cross-tab sync — explicit non-goal (see `10-glossary/03-non-goals.md`).
+- Cross-tab sync — explicit non-goal (see `01-glossary/03-non-goals.md`).

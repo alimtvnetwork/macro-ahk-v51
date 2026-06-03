@@ -20,5 +20,5 @@ words MUST use the meaning given here.
 | **HostApp** | The third-party web/desktop app whose ChatBox we paste into. This spec assumes nothing about its stack. |
 | **Integrator** | The engineer wiring the Prompts feature into a HostApp; the audience for `140-integration-onboarding/`. |
 | **InterruptionSignal** | Any DOM/state cue the HostApp shows when a previous turn must be acknowledged (e.g. "return to chat" banner). Located via Q3; pauses the queue when detected. |
-| **EditorKind** | One of `textarea`, `contenteditable`, `prosemirror`, `lexical`, `monaco`, `other`. Determines which paste adapter is used (see `60-injection-contract/adapters/`). |
+| **EditorKind** | One of `textarea`, `contenteditable`, `prosemirror`, `lexical`, `monaco`, `other`. Determines which paste adapter is used (see `06-injection-contract/adapters/`). |
 | **VerboseMode** | Off by default; when on, full prompt body + full DOM snapshot are recorded in logs. |

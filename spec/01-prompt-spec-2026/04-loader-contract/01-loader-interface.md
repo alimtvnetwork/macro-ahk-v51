@@ -12,7 +12,7 @@ classification — never persistence.
 export interface PromptLoader {
   /**
    * Return all prompts ready for display, with defaults+user merged
-   * per `30-prompt-source-format/04-default-vs-user-prompts.md`.
+   * per `03-prompt-source-format/04-default-vs-user-prompts.md`.
    * Cached; see T37 for invalidation rules.
    */
   loadAll(): Promise<Prompt[]>;

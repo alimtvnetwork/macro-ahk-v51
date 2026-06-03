@@ -20,7 +20,7 @@ The plain-text payload that ends up in `Prompt.body` after loading.
 
 The body MAY contain placeholders of the form `{{name}}` where `name`
 matches `^[a-zA-Z_][a-zA-Z0-9_.-]*$`. Resolution rules and the built-in
-variable set are specified in `40-loader-contract/03-variable-resolution.md`.
+variable set are specified in `04-loader-contract/03-variable-resolution.md`.
 
 Authoring conventions:
 

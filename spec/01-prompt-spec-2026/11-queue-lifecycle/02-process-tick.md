@@ -29,7 +29,7 @@ async function tick(): Promise<void> {
 1. `store.update(id, { status: "processing", startedAt: nowIso() })`.
 2. Resolve ChatBox target → `adapter.insertText(target, task.renderedBody)`.
 3. On insert failure → mark `failed` with mandatory failure record.
-4. Click submit (`90-next-overview/02-host-submit-button.md`).
+4. Click submit (`09-next-overview/02-host-submit-button.md`).
 5. `observer.whenIdle({ timeoutMs })`:
    - `Idle` → `completed`.
    - `Interrupted` → `hold` (timer stops; user resumes manually).

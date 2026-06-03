@@ -21,7 +21,7 @@ Conventions used in every follow-up section that will be written later:
 ---
 
 ## Step 1 — Tasks 21–25 · Glossary & scope guard
-**Folder:** `10-glossary/`
+**Folder:** `01-glossary/`
 - T21 `01-terms.md` — Prompt, PromptCategory, PromptStore, ChatBox, NextLoop, PlanLoop, Queue, HostApp, Integrator definitions.
 - T22 `02-actors.md` — End user, Integrator, AI model consuming the spec.
 - T23 `03-non-goals.md` — Explicitly out of scope: auth, billing, telemetry transport, prompt versioning UI.
@@ -29,7 +29,7 @@ Conventions used in every follow-up section that will be written later:
 - T25 `05-scope-diagram.mmd` — Mermaid diagram of HostApp ⇄ PromptsFeature ⇄ ChatBox boundary.
 
 ## Step 2 — Tasks 26–30 · Generic data model
-**Folder:** `20-data-model/`
+**Folder:** `02-data-model/`
 - T26 `01-prompt.md` — `Prompt { id, title, slug, version, author, categories[], body, isDefault, order, createdAt, updatedAt }`.
 - T27 `02-category.md` — `PromptCategory { slug, label, order }` + free-tag fallback.
 - T28 `03-store-interface.md` — `PromptStore` interface (list / get / save / delete / import / export).
@@ -37,7 +37,7 @@ Conventions used in every follow-up section that will be written later:
 - T30 `05-json-schema.md` — JSON Schema for `Prompt` + `PromptCategory` (pure JSON, no PascalCase mandate — leave to integrator).
 
 ## Step 3 — Tasks 31–35 · On-disk prompt source format
-**Folder:** `30-prompt-source-format/`
+**Folder:** `03-prompt-source-format/`
 - T31 `01-folder-layout.md` — `prompts/<NN>-<slug>/{info.json, prompt.md}` (mirrors the read-only `standalone-scripts/prompts/` reference corpus).
 - T32 `02-info-json.md` — Required and optional fields; example file.
 - T33 `03-prompt-md.md` — Markdown body conventions, variable placeholders `{{var}}`.
@@ -45,7 +45,7 @@ Conventions used in every follow-up section that will be written later:
 - T35 `05-import-export-zip.md` — Round-trip zip format.
 
 ## Step 4 — Tasks 36–40 · Loader contract
-**Folder:** `40-loader-contract/`
+**Folder:** `04-loader-contract/`
 - T36 `01-loader-interface.md` — `loadPrompts(): Promise<Prompt[]>` contract.
 - T37 `02-cache-rules.md` — Cache key, invalidation triggers, manual reload.
 - T38 `03-variable-resolution.md` — `{{date}}`, `{{selection}}`, `{{cursor}}`, custom vars; resolution order.
@@ -53,7 +53,7 @@ Conventions used in every follow-up section that will be written later:
 - T40 `05-lifecycle-diagram.mmd` — Load → cache → render → invalidate flow.
 
 ## Step 5 — Tasks 41–45 · UI surface contract
-**Folder:** `50-ui-contract/`
+**Folder:** `05-ui-contract/`
 - T41 `01-trigger.md` — Where the dropdown opens from (host decides: floating button, keyboard shortcut, slash-command).
 - T42 `02-dropdown-shape.md` — Required sections (Task-Next entry first, category chips, search box, prompt list, footer actions).
 - T43 `03-search-filter.md` — Match against title + slug + body.
@@ -61,7 +61,7 @@ Conventions used in every follow-up section that will be written later:
 - T45 `05-accessibility.md` — ARIA roles, focus management, reduced-motion.
 
 ## Step 6 — Tasks 46–50 · Injection contract (paste into chat-box)
-**Folder:** `60-injection-contract/`
+**Folder:** `06-injection-contract/`
 - T46 `01-target-resolution.md` — Host supplies **Q1** chat-box XPath `???` (`<!-- HOST: paste target -->`).
 - T47 `02-paste-strategies.md` — `execCommand('insertText')`, `InputEvent`, framework dispatch; pick by editor kind (**Q4**).
 - T48 `03-cursor-and-selection.md` — Append vs replace vs at-cursor.
@@ -69,7 +69,7 @@ Conventions used in every follow-up section that will be written later:
 - T50 `05-paste-toast.md` — Optional user feedback contract.
 
 ## Step 7 — Tasks 51–55 · Editor adapter abstraction
-**Folder:** `60-injection-contract/adapters/`
+**Folder:** `06-injection-contract/adapters/`
 - T51 `01-textarea-adapter.md`
 - T52 `02-contenteditable-adapter.md`
 - T53 `03-prosemirror-adapter.md`

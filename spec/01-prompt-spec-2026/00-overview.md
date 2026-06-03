@@ -2,7 +2,7 @@
 
 **Status:** DRAFT (Step 0 of 120)
 **Created:** 2026-06-02 (Asia/Kuala_Lumpur)
-**Renamed:** 2026-06-03 (root was `spec/2026-spec/`, now `spec/01-prompt-spec-2026/`)
+**Renamed:** 2026-06-03 (root was `spec/01-prompt-spec-2026/`, now `spec/01-prompt-spec-2026/`)
 **Owner:** Riseup Asia LLC
 **Source feature:** `standalone-scripts/macro-controller/src/ui/prompt-*.ts` + `standalone-scripts/prompts/**`
 
@@ -54,15 +54,15 @@ template and a separate count.
 ## 4. Spec layout
 
 ```
-spec/2026-spec/
+spec/01-prompt-spec-2026/
   00-overview.md                ← (this file)
   01-plan-tasks-1-20.md         ← the 20-step plan for tasks 21–120
-  10-glossary/                  ← created in Task 21–25
-  20-data-model/                ← Task 26–30
-  30-prompt-source-format/      ← Task 31–35
-  40-loader-contract/           ← Task 36–40
-  50-ui-contract/               ← Task 41–45
-  60-injection-contract/        ← Task 46–55
+  01-glossary/                  ← created in Task 21–25
+  02-data-model/                ← Task 26–30
+  03-prompt-source-format/      ← Task 31–35
+  04-loader-contract/           ← Task 36–40
+  05-ui-contract/               ← Task 41–45
+  06-injection-contract/        ← Task 46–55
   70-save-create-edit/          ← Task 56–60
   80-next-automation/           ← Task 61–65
   90-queue-engine/              ← Task 66–80
@@ -96,4 +96,4 @@ master list lives in `140-integration-onboarding/` (created in Tasks 101–105).
 
 1. `00-overview.md` (this file)
 2. `01-plan-tasks-1-20.md` — what gets written in tasks 21–120
-3. Sections under `10-glossary/` … `170-adoption-checklist/` as they land
+3. Sections under `01-glossary/` … `170-adoption-checklist/` as they land

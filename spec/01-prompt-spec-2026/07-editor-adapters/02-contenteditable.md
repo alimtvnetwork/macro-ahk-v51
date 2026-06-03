@@ -31,4 +31,4 @@ After insertion: collapse selection to end of inserted text, scrollIntoView if o
 ## Notes
 
 - Never use `el.innerText = ...` or `el.textContent = ...` — destroys undo stack and breaks rich-editor wrappers.
-- Never use `clipboard.writeText` + synthetic paste — out of scope here; see `60-injection-contract/02-paste-strategies.md`.
+- Never use `clipboard.writeText` + synthetic paste — out of scope here; see `06-injection-contract/02-paste-strategies.md`.

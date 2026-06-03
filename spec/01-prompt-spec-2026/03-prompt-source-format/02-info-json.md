@@ -3,7 +3,7 @@
 **Created:** 2026-06-02 (Asia/Kuala_Lumpur)
 
 The metadata sidecar for an on-disk prompt. Validated by
-`prompt.schema.json` from `20-data-model/05-json-schema.md` after the
+`prompt.schema.json` from `02-data-model/05-json-schema.md` after the
 loader fills in `body` from `prompt.md`.
 
 ## Required fields in `info.json`

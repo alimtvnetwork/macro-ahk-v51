@@ -29,5 +29,5 @@ pending ─► processing ─► completed
 
 - `completed` and `failed` are **terminal**; no further transitions.
 - Only one task may be `processing` at a time per queue.
-- `hold` is only entered from `processing` and only via the interruption observer (see `90-next-overview/04-interruption-detection.md`).
+- `hold` is only entered from `processing` and only via the interruption observer (see `09-next-overview/04-interruption-detection.md`).
 - Resume from `hold` re-enters `processing` **without** incrementing `attemptCount` (the original submit may already have landed; the engine waits for idle again rather than re-injecting).

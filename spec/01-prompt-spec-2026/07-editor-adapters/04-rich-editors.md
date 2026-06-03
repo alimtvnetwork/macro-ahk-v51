@@ -41,4 +41,4 @@ These adapters are **opt-in**. Hosts that do not bundle the editor MUST NOT load
 
 ## Failure mode
 
-If the editor instance cannot be located: return `{ ok:false, reason:"TargetDetached" }`. The injection layer then falls back to the next strategy in `60-injection-contract/02-paste-strategies.md`.
+If the editor instance cannot be located: return `{ ok:false, reason:"TargetDetached" }`. The injection layer then falls back to the next strategy in `06-injection-contract/02-paste-strategies.md`.

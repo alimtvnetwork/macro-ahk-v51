@@ -5,7 +5,7 @@
 **~40 LOC TypeScript pseudo-code, no repo imports.**
 
 ```ts
-import type { Prompt, PromptStore } from "../20-data-model";
+import type { Prompt, PromptStore } from "../02-data-model";
 
 export function createInMemoryPromptStore(seed: Prompt[] = []): PromptStore {
   const byId = new Map<string, Prompt>(seed.map((p) => [p.id, p]));

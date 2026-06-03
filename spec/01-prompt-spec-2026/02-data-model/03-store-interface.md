@@ -52,7 +52,7 @@ export type Unsubscribe = () => void;
 ## Behaviour contract
 
 1. **Atomicity**: `save` and `delete` are atomic per-record; partial writes are not allowed to surface via `list`.
-2. **No silent loss**: a failed write MUST reject the returned promise with a typed error (see `40-loader-contract/04-error-modes.md`).
+2. **No silent loss**: a failed write MUST reject the returned promise with a typed error (see `04-loader-contract/04-error-modes.md`).
 3. **Defaults are read-only**: any `save` call that mutates a record with `isDefault === true` must succeed only when `Prompt.slug` is preserved; any `delete` on a default record MUST reject with `DefaultPromptImmutable`.
 4. **Slug uniqueness**: implementations MUST reject a `save` whose slug collides with an existing record of a different `id`, with `SlugCollision`.
 5. **Change events**: emitted **after** the write is durable, never before.
@@ -62,7 +62,7 @@ export type Unsubscribe = () => void;
 - In-memory `Map` (tests, ephemeral mode).
 - Browser `localStorage` (single JSON blob keyed `prompts.v1`).
 - Browser `IndexedDB` (one object store keyed by `id`).
-- File system (`prompts/<NN>-<slug>/{info.json,prompt.md}` per `30-prompt-source-format/`).
+- File system (`prompts/<NN>-<slug>/{info.json,prompt.md}` per `03-prompt-source-format/`).
 - Remote HTTP (`GET /prompts`, `PUT /prompts/{id}`, …).
 
 The Prompts feature MUST NOT know which one is in use.

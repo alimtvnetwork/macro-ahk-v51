@@ -5,7 +5,7 @@
 
 ## Default slug
 
-`plan-default` lives in the host's shipped defaults bundle (see `30-prompt-source-format/04-default-vs-user-prompts.md`). Hosts may override the designated slug via settings.
+`plan-default` lives in the host's shipped defaults bundle (see `03-prompt-source-format/04-default-vs-user-prompts.md`). Hosts may override the designated slug via settings.
 
 ## Template requirements
 
@@ -33,4 +33,4 @@ Plan mode resolves variables via the standard `PromptContext` plus:
 - `count` — from `PlanSettings.stepCount`, default 10.
 - `selection` — host-provided current selection text, may be empty.
 
-Resolution order matches `40-loader-contract/03-variable-resolution.md`: Caller > Editor > Clock > Empty.
+Resolution order matches `04-loader-contract/03-variable-resolution.md`: Caller > Editor > Clock > Empty.

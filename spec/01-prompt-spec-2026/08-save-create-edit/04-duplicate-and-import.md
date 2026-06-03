@@ -25,7 +25,7 @@ Pipeline:
 
 ## Import (bundle .zip)
 
-Per `30-prompt-source-format/05-import-export-zip.md`:
+Per `03-prompt-source-format/05-import-export-zip.md`:
 
 - Read manifest, iterate entries.
 - Apply collision policy chosen once for the whole bundle (default: **Rename**).
