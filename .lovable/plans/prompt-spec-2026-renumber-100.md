@@ -1,10 +1,10 @@
-> **STATUS (2026-06-03):** ✅ EXECUTED ✅ EXECUTED CONFIRMED 100/100. Old `spec/2026-spec/` path references below describe the pre-rename state. Live path is `spec/01-prompt-spec-2026/`. See changelog at `spec/01-prompt-spec-2026/99-spec-issues/200-renumber-baseline.md`.
+> **STATUS (2026-06-03):** ✅ EXECUTED ✅ EXECUTED CONFIRMED 100/100. Old `spec/2026-spec/` path references below describe the pre-rename state. Live path is `spec/2026-spec/`. See changelog at `spec/2026-spec/99-spec-issues/200-renumber-baseline.md`.
 
-# Plan — Rename `spec/2026-spec/` → `spec/01-prompt-spec-2026/` and renumber children to dense `01..NN`
+# Plan — Rename `spec/2026-spec/` → `spec/2026-spec/` and renumber children to dense `01..NN`
 
 **Created:** 2026-06-03 (Asia/Kuala_Lumpur)
 **Owner:** Lovable agent
-**Trigger:** User request — "keep nice folder structure inside the 2026 spec; rename root to `01-prompt-spec-2026`; renumber children as 01, 02, 03 sequential; audit & fix every cross-reference; 100-step plan; final blind-AI audit score."
+**Trigger:** User request — "keep nice folder structure inside the 2026 spec; rename root to `2026-spec`; renumber children as 01, 02, 03 sequential; audit & fix every cross-reference; 100-step plan; final blind-AI audit score."
 **Memory anchors:** `mem://architecture/spec-organization`, `mem://workflow/file-naming-convention`, `mem://constraints/skipped-folders`.
 
 ---
@@ -12,7 +12,7 @@
 ## Target structure
 
 ```
-spec/01-prompt-spec-2026/
+spec/2026-spec/
 ├── 00-overview.md
 ├── 01-plan-tasks-1-20.md
 ├── 02-hardening-backlog.md
@@ -58,9 +58,9 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 10. Open `99-spec-issues/200-renumber-baseline.md` under target folder for changelog.
 
 ### Phase B — Root rename (11–20)
-11. `git mv spec/2026-spec spec/01-prompt-spec-2026` (single atomic move).
+11. `git mv spec/2026-spec spec/2026-spec` (single atomic move).
 12. Verify no orphaned siblings (`ls spec/2026-spec` returns ENOENT).
-13. Update `spec/01-prompt-spec-2026/README.md` heading + intro paragraph to new path.
+13. Update `spec/2026-spec/README.md` heading + intro paragraph to new path.
 14. Update `00-overview.md` self-references.
 15. Update `02-hardening-backlog.md` self-references.
 16. Update `01-plan-tasks-1-20.md` task IDs that embed the path.
@@ -97,7 +97,7 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 43. Apply rewrite for `*.md` files.
 44. Apply rewrite for `*.json` schema/index files.
 45. Apply rewrite for HTML reference snippets (`19-reference-snippets/`).
-46. Rebuild `spec/01-prompt-spec-2026/INDEX.json` (if present) via `scripts/spec/build-index.mjs --root spec/01-prompt-spec-2026`.
+46. Rebuild `spec/2026-spec/INDEX.json` (if present) via `scripts/spec/build-index.mjs --root spec/2026-spec`.
 47. Rerun `lint-cross-refs.mjs` against new root — must reach 0 hard-fails.
 48. Re-run `runbook-smoke.mjs` (unaffected sanity).
 49. Update `BLIND-AI-SMOKE-TEST.md` paths.
@@ -123,7 +123,7 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 67. Update `spec/audit/blind-ai-implementation-audit/steps/step-097.md`.
 68. Update `poc/2026-spec/README.md` paths (PoC folder name itself stays — it's code, not spec).
 69. Update `poc/2026-spec/index.html` comment headers.
-70. Optional: rename `poc/2026-spec` → `poc/01-prompt-spec-2026` only if user confirms (defer; log decision).
+70. Optional: rename `poc/2026-spec` → `poc/2026-spec` only if user confirms (defer; log decision).
 71. Update CI workflows `.github/workflows/spec-gates.yml` paths.
 72. Update CI workflows `.github/workflows/spec-governance-quarterly.yml`.
 73. Update `scripts/spec/build-index.mjs` ROOT constant.
@@ -136,7 +136,7 @@ Inner-file numbering inside each child folder stays as-authored (already `00`–
 80. Update `scripts/spec/tooltip-dict-gate.mjs` paths.
 
 ### Phase F — Memory, indexes, and tracker hygiene (81–90)
-81. Update `mem://architecture/spec-organization` to mention the renumber convention (dense `01..NN`, no gap-10s in `spec/01-prompt-spec-2026/`).
+81. Update `mem://architecture/spec-organization` to mention the renumber convention (dense `01..NN`, no gap-10s in `spec/2026-spec/`).
 82. Update `mem://workflow/file-naming-convention` with worked example.
 83. Append a new memory `mem://workflow/prompt-spec-2026-layout` describing canonical layout.
 84. Update `mem://index.md` Core line referencing the new root.

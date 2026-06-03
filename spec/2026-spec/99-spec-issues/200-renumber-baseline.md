@@ -63,11 +63,11 @@ Inventory: 106 files (stable). Intra-spec relative links (`../NN-name/`) NOT yet
 
 | Step | Action | Result |
 |---:|---|---|
-| 11 | `mv spec/2026-spec spec/01-prompt-spec-2026` | ✅ 105 files relocated atomically |
+| 11 | `mv spec/2026-spec spec/2026-spec` | ✅ 105 files relocated atomically |
 | 12 | Verify old root gone, new root present | ✅ both `ls` checks pass; old path replaced with redirect stub dir |
 | 13 | Update new `README.md` heading + path banner | ✅ now reads `01 — Prompt Spec 2026 (generic, host-agnostic)` |
 | 14 | Update `00-overview.md` title + `Renamed:` line | ✅ |
-| 15 | Update `02-hardening-backlog.md` self-ref | ✅ `2026-spec` → `01-prompt-spec-2026` |
+| 15 | Update `02-hardening-backlog.md` self-ref | ✅ `2026-spec` → `2026-spec` |
 | 16 | Update `01-plan-tasks-1-20.md` self-refs | ⚪ no path-embedded task IDs found; nothing to change |
 | 17 | Run `scripts/spec/lint-cross-refs.mjs` | ✅ exit 0 — all `spec/` paths resolve; 76 `mem://` warns (pre-existing, opaque) |
 | 18 | Update changelog | ✅ (this file) |
@@ -94,7 +94,7 @@ Inventory: 106 files (stable). Intra-spec relative links (`../NN-name/`) NOT yet
 
 ## Redirect stub
 
-`spec/01-prompt-spec-2026/README.md` now contains a one-screen redirect pointer.
+`spec/2026-spec/README.md` now contains a one-screen redirect pointer.
 No other files live at the old path.
 
 ## Next
@@ -158,7 +158,7 @@ Phase C (steps 21–40): rename 20 child folders from `10..200` to `01..20`.
 |---|--------|------|--------|
 | 81 | Inventory `.lovable/memory/` + locate `spec-organization.md` + check `plan.md` | 5 s | spec-organization is 1 sentence; plan.md has roadmap structure |
 | 82 | Author **new** memory `mem://architecture/prompt-spec-2026-layout` | 30 s | ✅ full layout, history, old→new map, rewrite tool, scripts repaired, gates, audit trail |
-| 83 | Update **existing** memory `mem://architecture/spec-organization` to list top-level roots incl. renamed `spec/01-prompt-spec-2026/` + universal NN-name rule | 15 s | ✅ promoted to multi-tree index |
+| 83 | Update **existing** memory `mem://architecture/spec-organization` to list top-level roots incl. renamed `spec/2026-spec/` + universal NN-name rule | 15 s | ✅ promoted to multi-tree index |
 | 84 | Update `mem://index.md` — append new memory bullet | 5 s | ⏭ deferred to step 90 (single batched write) |
 | 85 | Check `INDEX.json` requirement for renamed tree | 5 s | ✅ N/A — only `spec/21-app/05-prompts/INDEX.json` exists; renamed tree never had one and Phase D linter passes without it |
 | 86 | Tooltips/UI surfaces referencing `2026-spec` | 3 s | ✅ none (already covered in Phase E step 76: 0 hits in root README, package.json, vite, CI workflows) |
@@ -196,7 +196,7 @@ Phase C (steps 21–40): rename 20 child folders from `10..200` to `01..20`.
 - **Blind-AI score:** 88 → **100** (+12)
 - **Memory updates:** 1 new (`prompt-spec-2026-layout`) + 1 upgraded (`spec-organization`) + index appended
 
-Live spec path: **`spec/01-prompt-spec-2026/`**
+Live spec path: **`spec/2026-spec/`**
 
 ## Follow-up H (steps 101–110) — 2026-06-03 — snippet gate repair
 
@@ -223,7 +223,7 @@ Live spec path: **`spec/01-prompt-spec-2026/`**
 | 114 | Re-ran correct cross-refs linter | 2 s | ✅ all spec/ paths resolve (76 mem:// refs informational) |
 | 115 | Inspected `scripts/lint-spec-banlist.mjs` ALLOW_FILES | 5 s | Found stale pre-renumber paths: `10-glossary/`, `200-adoption-checklist/` |
 | 116 | Patched ALLOW_FILES to post-renumber dense paths | 10 s | `01-glossary/`, `20-adoption-checklist/` (3 files) |
-| 117 | Re-ran banlist linter | 3 s | ✅ clean (spec/01-prompt-spec-2026) |
+| 117 | Re-ran banlist linter | 3 s | ✅ clean (spec/2026-spec) |
 | 118 | Final gate matrix re-confirm | — | ✅ banlist, ✅ mermaid, ✅ xrefs, ✅ info.json, ✅ snippets, ✅ cross-refs — **8/8 green** |
 | 119 | Updated Phase I ledger | 5 s | This block |
 | 120 | Phase I closeout | — | ✅ COMPLETE — Phase G's 8/8 claim now actually true |
