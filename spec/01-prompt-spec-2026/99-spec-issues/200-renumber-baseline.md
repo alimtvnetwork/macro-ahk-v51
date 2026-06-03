@@ -100,3 +100,20 @@ No other files live at the old path.
 ## Next
 
 Phase C (steps 21–40): rename 20 child folders from `10..200` to `01..20`.
+
+## Phase D part 2 (steps 51–60) — 2026-06-03
+
+| # | Action | Result |
+|---|--------|--------|
+| 51 | Repo-wide scan OUTSIDE renamed tree for `2026-spec` / old `1NN-` / `200-` refs | ✅ **0 hits** — all external refs already clean |
+| 52 | Mermaid `.mmd` stale-ref scan | ✅ 0 hits across 2 `.mmd` files |
+| 53 | RELEASE-CHECKLIST / OWNERSHIP / CONTRIBUTING / GLOSSARY / ACRONYMS scan inside tree | ✅ N/A — these files don't live in this spec |
+| 54 | Repo-root variants of same | ✅ N/A — none exist at repo root |
+| 55 | Sub-tree audit (`macros/`, `variables/`, `ui/`) | ✅ N/A — only `99-spec-issues/` exists; 2 files (changelog + rescore) verified |
+| 56 | Final inventory snapshot → `inventory-after-phase-d.txt` | ✅ **106 files** (stable since Phase B) |
+| 57 | `lint-cross-refs.mjs` | ✅ exit 0 — all `spec/...` paths resolve |
+| 58 | Residual stale-ref grep (excluding changelog itself) | ✅ 1 hit, all inside changelog table describing the `mv` command (legitimate historical record) |
+| 59 | Changelog update | ✅ this entry |
+| 60 | Phase D closeout declaration | ✅ **Phase D COMPLETE** — intra-spec relative links fully rewritten, inventory stable, linter green, no stale refs |
+
+**Phase D summary:** rewriter authored + applied, 139 edits across 43 files, 1 banlist-literal fix, 0 external stale refs, 106 files preserved, linter green.
