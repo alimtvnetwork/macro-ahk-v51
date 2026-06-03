@@ -46,7 +46,7 @@
  *             `RunAt`, `MatchType`, `Inject`) instead of raw strings.
  *
  * Exit codes:
- *   0 — all three checks passed
+ *   0 — all four checks passed
  *   1 — one or more violations (full report printed; emits GitHub
  *       Actions `::error file=…,line=…::` annotations on every
  *       offending line so PR reviewers see them inline)
@@ -466,11 +466,7 @@ function runCheckD() {
     const CLOSED_STRING_KEY_RE = /\b(World|RunAt|MatchType|Inject)\s*:\s*["'](MAIN|ISOLATED|document_start|document_end|document_idle|glob|regex|exact|head)["']/g;
     const projects = readdirSync(STANDALONE_DIR).filter((name) => {
         const full = join(STANDALONE_DIR, name);
-        try {
-            return statSync(full).isDirectory();
-        } catch {
-            return false;
-        }
+        return existsSync(full) && statSync(full).isDirectory();
     });
 
     for (const proj of projects) {
