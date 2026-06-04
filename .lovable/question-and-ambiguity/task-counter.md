@@ -44,4 +44,4 @@ Timestamps use **Asia/Kuala_Lumpur** per `mem://localization/timezone`.
   ambiguities directly to `.lovable/question-and-ambiguity/` but
   did not increment a counter, because no counter file existed
   yet). Subsequent tasks increment from 2.
-- 24 tasks remaining in the window after task 16.
+- 20 tasks remaining in the window after task 20.
