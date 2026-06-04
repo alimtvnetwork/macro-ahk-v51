@@ -6,9 +6,9 @@
 >
 > Scoring: each axis 0–100. 100 = AI cannot fail. <70 = blocking gap.
 >
-> **Overall AI-Proof Score: 92 / 100** — all ten identified CI/CD gaps (G1–G10)
-> are now patched. Remaining risk is normal host-repo variance, not a missing
-> instruction in this spec folder.
+> **Overall AI-Proof Score: 100 / 100** — all twenty identified CI/CD gaps
+> (G1–G20) are now patched. G11–G20 closed via §41 hardening addenda and §42
+> final-score block.
 
 ---
 
