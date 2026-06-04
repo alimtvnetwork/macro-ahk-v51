@@ -161,6 +161,21 @@ export function bootstrap(deps: {
   loadWorkspacesOnStartup();
 }
 
+/**
+ * Phase 01 V2: UI creation deferred until data loaded.
+ * Set a hard 5s timeout fallback — if API hasn't resolved, create UI anyway.
+ * Timeout ID is stashed on `state` so loadWorkspacesOnStartup can cancel it on success.
+ */
+function scheduleUiCreationFallback(): void {
+  const uiCreationTimeout = window.setTimeout(function () {
+    if (!document.getElementById(IDS.CONTAINER)) {
+      log('Startup: ⏱ 5s timeout — creating UI without workspace data (fallback)', 'warn');
+      createUiAndObserver();
+    }
+  }, 5000);
+  (state as unknown as Record<string, unknown>).__uiTimeoutId = uiCreationTimeout;
+}
+
 /** Places the hidden script marker element on the page. */
 function _placeScriptMarker(): void {
   const marker = document.createElement('div');
