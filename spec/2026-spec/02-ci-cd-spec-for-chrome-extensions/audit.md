@@ -43,7 +43,7 @@ never tells the AI **where they come from**.
 
 ---
 
-## Step 3 — G2 (BLOCKER, severity 85/100): SHA-256 verification is asserted but not wired
+## Step 3 — G2 ✅ PATCHED 2026-06-04 — SHA-256 verification wired into §17a + §18 + §19
 
 §2 step 5 says "Verify SHA-256 against `checksums.txt`". §18's example
 download script **does not implement this**. §17 ships `checksums.txt` but
