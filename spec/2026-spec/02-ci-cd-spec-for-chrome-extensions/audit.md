@@ -68,18 +68,23 @@ fragile `grep`.
 
 ---
 
-## Step 5 — G4 (BLOCKER, severity 80/100): `PREV_TAG` resolution is under-specified
+## Step 5 — G4 ✅ PATCHED 2026-06-04 — `PREV_TAG` resolution is deterministic
 
 §16 says "Exclude the current tag when picking PREV_TAG" — true, but the
 common AI mistake is using `git describe --tags --abbrev=0` which **includes**
 the current tag when run after tagging.
 
-- **Failure mode**: empty release notes on every release.
-- **Fix**: pin the exact command:
+- **Failure mode**: empty release notes on every release because the computed
+  range becomes `vX.Y.Z..vX.Y.Z`.
+- **Root cause**: the original spec stated the principle but did not provide a
+  copy-paste command, so generic implementations default to `git describe`.
+- **Fix applied**: §16 now pins the exact current-tag exclusion command and the
+  first-release fallback:
   ```bash
   PREV_TAG=$(git tag --list 'v*' --sort=-v:refname | grep -vFx "$VER" | head -1)
   ```
-  and require a fallback to the repo's first commit when no prior tag exists.
+  If no prior `v*` tag exists, the range starts at the repository's first commit.
+- **Time**: ~10 min.
 
 ---
 
@@ -194,7 +199,7 @@ After G1, G2, G4, G6, G7, G9 are patched: **~18%**.
 3. **G6** — Token/PAT guidance in §25 (10 min).
 4. **G9** — SHA-pinning rule in §22a (15 min).
 5. **G7** — Full PowerShell installer in §19a (45 min).
-6. **G4** — `PREV_TAG` exact command in §16 (10 min).
+6. **G4** — `PREV_TAG` exact command in §16 (10 min). ✅ PATCHED 2026-06-04
 7. **G3**, **G5**, **G8**, **G10** — sweep in one follow-up pass.
 
 After this patch pass, re-score: target **≥ 90/100 AI-proof**.
