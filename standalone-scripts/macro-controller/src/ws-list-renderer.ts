@@ -19,6 +19,7 @@ import {
   cPrimaryLight,
   cPrimaryHL,
   cPrimaryBgAL,
+  cWarning,
 } from './shared-state';
 import { log } from './logging';
 import { publishVisibleWorkspaces } from './visible-workspaces-store';
@@ -54,6 +55,7 @@ import { sortByRefillPriority, daysToRefillForWs } from './workspace-refill-prio
 import { classifyFromStatus, type WorkspaceDisplayStatus } from './workspace-display-status';
 
 import { resolveBadgeStyle, diluteBadgeBg } from './workspace-badge-styles';
+import { resolveCreditSummary } from './credit-balance-update/credit-summary-resolver';
 
 
 const CSS_BG = ';background:';
@@ -667,8 +669,9 @@ function buildWsRow(
   ws: WorkspaceCredit, wsIndex: number, isCurrent: boolean,
   count: number, maxTotalCredits: number,
 ): HTMLDivElement {
-  const available = Math.round(ws.available || 0);
-  const limitInt = Math.round(ws.limit || 0);
+  const creditSummary = resolveCreditSummary(ws);
+  const available = creditSummary.available;
+  const limitInt = creditSummary.billingLimit;
   const emoji = wsStatusEmoji(isCurrent, available, limitInt);
   const wsId = String(ws.id || (ws.raw && ws.raw.id) || '');
   const selEl = document.getElementById(DomId.LoopWsSelected);
@@ -693,18 +696,16 @@ function buildWsRow(
   // badge room to breathe without crowding adjacent rows.
   row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 8px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background 0.15s;font-size:11px;' + wsRowBgStyle(isCurrent, isSel);
 
-  const dailyFree = Math.round(ws.dailyFree || 0);
-  const rollover = Math.round(ws.rollover || 0);
-  const billingAvail = Math.round(ws.billingAvailable || 0);
-  const totalCap = Math.round(ws.totalCredits ?? calcTotalCredits(ws.freeGranted, ws.dailyLimit, ws.limit, ws.topupLimit, ws.rolloverLimit, ws.plan));
-  const creditBarHtml = renderCreditBar({
-    totalCredits: totalCap, available: Math.round(ws.available || 0), totalUsed: ws.totalCreditsUsed || 0,
-    freeRemaining: Math.round(ws.freeRemaining || 0), freeGranted: Math.round(ws.freeGranted || 0),
-    billingAvail, billingLimit: limitInt,
-    rollover, rolloverLimit: Math.round(ws.rolloverLimit || 0),
-    dailyFree, dailyLimit: Math.round(ws.dailyLimit || 0),
-    compact: viewState().getCompactMode(), maxTotalCredits,
-  });
+  const creditBarHtml = creditSummary.renderDash
+    ? '<span title="Credit-balance request timed out" style="font-size:11px;color:' + cWarning + ';min-width:160px;display:inline-block;">—</span>'
+    : renderCreditBar({
+      totalCredits: creditSummary.total, available: creditSummary.available, totalUsed: creditSummary.totalUsed,
+      freeRemaining: Math.round(ws.freeRemaining || 0), freeGranted: Math.round(ws.freeGranted || 0),
+      billingAvail: creditSummary.billingAvailable, billingLimit: creditSummary.billingLimit,
+      rollover: creditSummary.rollover, rolloverLimit: creditSummary.rolloverLimit,
+      dailyFree: creditSummary.daily, dailyLimit: creditSummary.dailyLimit,
+      compact: viewState().getCompactMode(), maxTotalCredits,
+    });
 
 
   row.innerHTML = buildWsRowInnerHtml(ws, isCurrent, isChecked, emoji, creditBarHtml);
