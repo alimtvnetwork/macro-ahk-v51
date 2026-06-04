@@ -31,7 +31,7 @@ import { CssFragment } from '../types';
 export interface InputRowResult {
   row: HTMLElement;
   input: HTMLInputElement;
-  cb: HTMLInputElement | null;
+  checkbox: HTMLInputElement | null;
 }
 
 export interface PresetRowResult {
@@ -146,13 +146,13 @@ export function buildInputRow(
 ): InputRowResult {
   const row = document.createElement('div');
   row.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;';
-  let cb: HTMLInputElement | null = null;
+  let checkbox: HTMLInputElement | null = null;
   if (withCheckbox) {
-    cb = document.createElement('input');
-    cb.type = 'checkbox';
-    cb.id = inputId + '-cb';
-    cb.style.cssText = 'width:12px;height:12px;accent-color:' + cPrimaryLight + ';';
-    row.appendChild(cb);
+    checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.id = inputId + '-cb';
+    checkbox.style.cssText = 'width:12px;height:12px;accent-color:' + cPrimaryLight + ';';
+    row.appendChild(checkbox);
   }
   const lbl = document.createElement('span');
   lbl.style.cssText = 'font-size:9px;color:#94a3b8;min-width:40px;';
@@ -164,7 +164,7 @@ export function buildInputRow(
   input.placeholder = placeholder;
   input.style.cssText = 'flex:1;padding:3px 5px;border:1px solid ' + cInputBorder + CssFragment.BorderRadius3pxBackground + cInputBg + ';color:' + cInputFg + ';font-size:10px;outline:none;font-family:monospace;';
   row.appendChild(input);
-  return { row, input, cb };
+  return { row, input, checkbox };
 }
 
 // ── Template Row ──
