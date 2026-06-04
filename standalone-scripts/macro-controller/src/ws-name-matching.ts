@@ -172,8 +172,8 @@ function collectFromElement(
 ): void {
   expandWorkspaceNameCandidates((el.textContent || '').trim(), selected, candidates);
   for (const key of attrKeys) {
-    const val = el.getAttribute(key);
-    if (val) expandWorkspaceNameCandidates(val, selected, candidates);
+    const attributeValue = el.getAttribute(key);
+    if (attributeValue) expandWorkspaceNameCandidates(attributeValue, selected, candidates);
   }
 }
 

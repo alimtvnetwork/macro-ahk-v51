@@ -80,9 +80,9 @@ export function PromptVariablesCard() {
     setCustomVars((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const updateVariable = (index: number, field: "key" | "value", val: string) => {
+  const updateVariable = (index: number, field: "key" | "value", nextValue: string) => {
     setCustomVars((prev) =>
-      prev.map((v, i) => (i === index ? { ...v, [field]: val } : v))
+      prev.map((v, i) => (i === index ? { ...v, [field]: nextValue } : v))
     );
   };
 

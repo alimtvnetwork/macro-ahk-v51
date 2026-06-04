@@ -16,13 +16,13 @@ export async function evaluateCondition(check: ConditionCheck): Promise<boolean>
       return !document.querySelector(check.selector ?? "");
 
     case "kv_equals": {
-      const val = await getKvValue(check.key ?? "");
-      return val === (check.value ?? "");
+      const storedValue = await getKvValue(check.key ?? "");
+      return storedValue === (check.value ?? "");
     }
 
     case "kv_exists": {
-      const val = await getKvValue(check.key ?? "");
-      return val !== null && val !== undefined;
+      const storedValue = await getKvValue(check.key ?? "");
+      return storedValue !== null && storedValue !== undefined;
     }
 
     default:

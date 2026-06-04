@@ -129,26 +129,26 @@ class WsListViewState {
   }
 
   getCompactMode(): boolean { return this.isCompactMode; }
-  setCompactMode(val: boolean): void { this.isCompactMode = val; }
+  setCompactMode(enabled: boolean): void { this.isCompactMode = enabled; }
 
   getFreeOnly(): boolean { return this.isFreeOnly; }
-  setFreeOnly(val: boolean): void { this.isFreeOnly = val; }
+  setFreeOnly(enabled: boolean): void { this.isFreeOnly = enabled; }
 
   getExpiredWithCredits(): boolean { return this.isExpiredWithCredits; }
-  setExpiredWithCredits(val: boolean): void { this.isExpiredWithCredits = val; }
+  setExpiredWithCredits(enabled: boolean): void { this.isExpiredWithCredits = enabled; }
 
   getExpiring(): boolean { return this.isExpiring; }
-  setExpiring(val: boolean): void { this.isExpiring = val; }
+  setExpiring(enabled: boolean): void { this.isExpiring = enabled; }
 
   getRefillSoon(): boolean { return this.isRefillSoon; }
-  setRefillSoon(val: boolean): void { this.isRefillSoon = val; }
+  setRefillSoon(enabled: boolean): void { this.isRefillSoon = enabled; }
 
   getRefillPriority(): boolean { return this.isRefillPriority; }
 
-  setRefillPriority(val: boolean): void {
-    this.isRefillPriority = val;
+  setRefillPriority(enabled: boolean): void {
+    this.isRefillPriority = enabled;
     try {
-      localStorage.setItem('ml_refill_priority', val ? 'true' : 'false');
+      localStorage.setItem('ml_refill_priority', enabled ? 'true' : 'false');
     } catch (e: unknown) {
       logError('viewState.setRefillPriority', 'Failed to persist refill priority flag', e);
     }
@@ -156,10 +156,10 @@ class WsListViewState {
 
   getCreditSortMode(): CreditSortMode { return this.creditSortMode; }
 
-  setCreditSortMode(val: CreditSortMode): void {
-    this.creditSortMode = val;
+  setCreditSortMode(mode: CreditSortMode): void {
+    this.creditSortMode = mode;
     try {
-      localStorage.setItem('ml_credit_sort_mode', val);
+      localStorage.setItem('ml_credit_sort_mode', mode);
     } catch (e: unknown) {
       logError('viewState.setCreditSortMode',
         'Failed to persist credit sort mode', e);
@@ -178,13 +178,13 @@ function viewState(): WsListViewState {
 export function getLoopWsCompactMode(): boolean { return viewState().getCompactMode(); }
 
 /** Set compact mode state. */
-export function setLoopWsCompactMode(val: boolean): void { viewState().setCompactMode(val); }
+export function setLoopWsCompactMode(enabled: boolean): void { viewState().setCompactMode(enabled); }
 
 /** Get free-only filter state. */
 export function getLoopWsFreeOnly(): boolean { return viewState().getFreeOnly(); }
 
 /** Set free-only filter state. */
-export function setLoopWsFreeOnly(val: boolean): void { viewState().setFreeOnly(val); }
+export function setLoopWsFreeOnly(enabled: boolean): void { viewState().setFreeOnly(enabled); }
 
 /**
  * Minimum `available` credit threshold for a workspace to surface in the
@@ -204,8 +204,8 @@ export function getLoopWsExpiring(): boolean {
 }
 
 /** Set expiring filter state. */
-export function setLoopWsExpiring(val: boolean): void {
-  viewState().setExpiring(val);
+export function setLoopWsExpiring(enabled: boolean): void {
+  viewState().setExpiring(enabled);
 }
 
 /** Get refill-soon filter state (only show workspaces with display kind = refill-soon). */
@@ -214,14 +214,14 @@ export function getLoopWsRefillSoon(): boolean {
 }
 
 /** Set refill-soon filter state. */
-export function setLoopWsRefillSoon(val: boolean): void {
-  viewState().setRefillSoon(val);
+export function setLoopWsRefillSoon(enabled: boolean): void {
+  viewState().setRefillSoon(enabled);
 }
 
 
 /** Set expired-with-credits filter state. */
-export function setLoopWsExpiredWithCredits(val: boolean): void {
-  viewState().setExpiredWithCredits(val);
+export function setLoopWsExpiredWithCredits(enabled: boolean): void {
+  viewState().setExpiredWithCredits(enabled);
 }
 
 /** Get refill-priority sort state. */
@@ -230,8 +230,8 @@ export function getLoopWsRefillPriority(): boolean {
 }
 
 /** Set refill-priority sort state. */
-export function setLoopWsRefillPriority(val: boolean): void {
-  viewState().setRefillPriority(val);
+export function setLoopWsRefillPriority(enabled: boolean): void {
+  viewState().setRefillPriority(enabled);
 }
 
 /** Get the active credit-sort mode (v3.30.0 — credit-sort hamburger row). */
@@ -240,8 +240,8 @@ export function getLoopWsCreditSortMode(): CreditSortMode {
 }
 
 /** Set the active credit-sort mode (persists to localStorage). */
-export function setLoopWsCreditSortMode(val: CreditSortMode): void {
-  viewState().setCreditSortMode(val);
+export function setLoopWsCreditSortMode(mode: CreditSortMode): void {
+  viewState().setCreditSortMode(mode);
 }
 
 // ============================================
@@ -979,8 +979,8 @@ class WsDropdownState {
     return this.hash;
   }
 
-  setHash(val: string): void {
-    this.hash = val;
+  setHash(nextHash: string): void {
+    this.hash = nextHash;
   }
 
   invalidate(): void {

@@ -591,13 +591,13 @@ async function readSupabaseJwtFromPlatformTabs(tabUrlHint?: string): Promise<str
                         // Priority 2: Lovable-specific auth keys
                         const lovableKeys = ["lovable-auth-token", "lovable:token", "auth-token", "supabase.auth.token"];
                         for (let j = 0; j < lovableKeys.length; j++) {
-                            const val = localStorage.getItem(lovableKeys[j]);
-                            if (!val) continue;
+                            const storedToken = localStorage.getItem(lovableKeys[j]);
+                            if (!storedToken) continue;
                             try {
-                                const p2 = JSON.parse(val);
+                                const p2 = JSON.parse(storedToken);
                                 const t2 = p2?.access_token ?? p2?.currentSession?.access_token ?? p2?.token;
                                 if (typeof t2 === "string" && t2.startsWith("eyJ") && t2.split(".").length === 3) return t2;
-                            } catch { if (val.startsWith("eyJ") && val.split(".").length === 3) return val; }
+                            } catch { if (storedToken.startsWith("eyJ") && storedToken.split(".").length === 3) return storedToken; }
                         }
                     } catch (lsErr) { console.debug("[config-auth] localStorage scan unavailable:", lsErr); }
                     return null;

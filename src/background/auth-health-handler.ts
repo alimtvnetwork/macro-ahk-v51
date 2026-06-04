@@ -130,9 +130,9 @@ export async function buildAuthHealthResponse(): Promise<AuthHealthResponse> {
                         return null;
                     },
                 });
-                const val = result?.[0]?.result;
-                if (typeof val === "string" && val.startsWith("found:")) {
-                    return { success: true, detail: `JWT in ${val.slice(6)} (tabId=${tab.id})` };
+                const scanResult = result?.[0]?.result;
+                if (typeof scanResult === "string" && scanResult.startsWith("found:")) {
+                    return { success: true, detail: `JWT in ${scanResult.slice(6)} (tabId=${tab.id})` };
                 }
             } catch (tabErr) {
                 logBgWarnError(BgLogTag.AUTH_HEALTH, `chrome.scripting.executeScript JWT scan failed for tabId=${tab.id} (url=${tab.url ?? "?"}) — tab may be discarded, restricted (chrome://, devtools), or closed mid-scan`, tabErr instanceof Error ? tabErr : new Error(String(tabErr)));

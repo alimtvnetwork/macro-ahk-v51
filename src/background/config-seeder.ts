@@ -75,27 +75,27 @@ interface ConfigRow {
 function flattenConfig(obj: Record<string, unknown>, parentSection = ""): ConfigRow[] {
     const rows: ConfigRow[] = [];
 
-    for (const [key, val] of Object.entries(obj)) {
-        if (val !== null && typeof val === "object" && !Array.isArray(val)) {
+    for (const [key, configValue] of Object.entries(obj)) {
+        if (configValue !== null && typeof configValue === "object" && !Array.isArray(configValue)) {
             // Nested section — recurse with section prefix
             const section = parentSection ? `${parentSection}.${key}` : key;
-            rows.push(...flattenConfig(val as Record<string, unknown>, section));
+            rows.push(...flattenConfig(configValue as Record<string, unknown>, section));
         } else {
             const section = parentSection || "_root";
-            let valueType = typeof val;
+            let valueType = typeof configValue;
             let serialized: string;
 
-            if (val === null || val === undefined) {
+            if (configValue === null || configValue === undefined) {
                 serialized = "";
                 valueType = "null";
-            } else if (Array.isArray(val)) {
-                serialized = JSON.stringify(val);
+            } else if (Array.isArray(configValue)) {
+                serialized = JSON.stringify(configValue);
                 valueType = "array";
-            } else if (typeof val === "object") {
-                serialized = JSON.stringify(val);
+            } else if (typeof configValue === "object") {
+                serialized = JSON.stringify(configValue);
                 valueType = "object";
             } else {
-                serialized = String(val);
+                serialized = String(configValue);
             }
 
             rows.push({ section, key, value: serialized, valueType });

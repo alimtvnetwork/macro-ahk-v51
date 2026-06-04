@@ -295,7 +295,7 @@ export function PopupFooter({
         <ToggleGroup
           type="single"
           value={importMode}
-          onValueChange={(val) => { if (val) setImportMode(val as "merge" | "replace"); }}
+          onValueChange={(mode) => { if (mode) setImportMode(mode as "merge" | "replace"); }}
           className="bg-muted/50 rounded-md p-0.5 shrink-0 mx-0.5"
         >
           <ToggleGroupItem value="merge" className="text-[9px] h-5 px-2 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground rounded-sm">

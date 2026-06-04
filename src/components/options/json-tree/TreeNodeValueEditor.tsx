@@ -12,7 +12,7 @@ interface TreeNodeValueEditorProps {
   value: JsonValue;
   isEditing: boolean;
   editValue: string;
-  onEditValueChange: (val: string) => void;
+  onEditValueChange: (nextValue: string) => void;
   onCommitEdit: () => void;
   onCancelEdit: () => void;
   onStartEdit: () => void;
@@ -67,7 +67,7 @@ export function TreeNodeValueEditor({
 
 interface PrimitiveEditInputProps {
   editValue: string;
-  onEditValueChange: (val: string) => void;
+  onEditValueChange: (nextValue: string) => void;
   onCommitEdit: () => void;
   onCancelEdit: () => void;
   onKeyDown: (e: React.KeyboardEvent) => void;

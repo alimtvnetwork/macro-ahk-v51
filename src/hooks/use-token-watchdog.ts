@@ -64,8 +64,8 @@ function decodeJwtPayload(token: string): Record<string, unknown> | null {
 function extractToken(result: Record<string, unknown> | null): string | null {
   if (!result) return null;
   for (const key of ["token", "authToken", "sessionId"]) {
-    const val = result[key];
-    if (typeof val === "string" && val.length > 0) return val;
+    const tokenValue = result[key];
+    if (typeof tokenValue === "string" && tokenValue.length > 0) return tokenValue;
   }
   return null;
 }
