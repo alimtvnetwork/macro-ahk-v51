@@ -121,11 +121,6 @@ export default tseslint.config(
   // graduate off this list as their authored-source debt is cleaned.
   {
     files: [
-      "src/background/__tests__/allow-swallow-fallbacks.test.ts",
-      "src/background/__tests__/lovable-dashboard-autoinject.test.ts",
-      "src/background/__tests__/manifest-seeder-migration.test.ts",
-      "src/background/__tests__/manifest-seeder-projects.test.ts",
-      "src/background/__tests__/shortcut-command-handler.test.ts",
       "src/background/config-seeder.ts",
       "src/background/context-menu-handler.ts",
       "src/background/csp-fallback.ts",
