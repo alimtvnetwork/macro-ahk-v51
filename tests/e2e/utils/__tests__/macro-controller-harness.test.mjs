@@ -17,7 +17,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = resolve(__dirname, '..', '..');
+const REPO_ROOT = resolve(__dirname, '..', '..', '..', '..');
 const HARNESS = resolve(REPO_ROOT, 'tests/e2e/utils/macro-controller-harness.ts');
 const SHELL = resolve(REPO_ROOT, 'tests/e2e/fixtures/lovable-shell.html');
 
