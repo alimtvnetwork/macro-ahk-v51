@@ -10,5 +10,5 @@ numbered subfolder.
 - [`02-ci-cd-spec-for-chrome-extensions/`](./02-ci-cd-spec-for-chrome-extensions/) — Generic Manifest V3 CI/CD,
   release artifact, installer, probing, and no-committed-ZIP standard.
 
-Add future 2026 specs as `NN-name/` siblings (`02-`, `03-`, …) and link
+Add future 2026 specs as `NN-name/` siblings (`03-`, `04-`, …) and link
 them here.
