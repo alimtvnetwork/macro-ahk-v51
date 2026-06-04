@@ -142,6 +142,7 @@ function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDi
               onChange={e => setName(e.target.value)}
               placeholder="e.g. Production Sites"
               className="h-8 text-sm"
+              data-testid="project-group-name-input"
               autoFocus
             />
           </div>
@@ -153,13 +154,14 @@ function GroupFormDialog({ open, onOpenChange, onSaved, editGroup }: GroupFormDi
               onChange={e => setSettings(e.target.value)}
               placeholder='{"logLevel": "warn", "retryOnNavigate": true}'
               className="min-h-[80px] font-mono text-xs"
+              data-testid="project-group-settings-input"
             />
           </div>
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleSave} disabled={saving || !name.trim()}>
+          <Button onClick={handleSave} disabled={saving || !name.trim()} data-testid="project-group-save-button">
             {saving ? <Loader2 className="h-3.5 w-3.5 animate-spin mr-1" /> : null}
             {isEdit ? "Update" : "Create"}
           </Button>
