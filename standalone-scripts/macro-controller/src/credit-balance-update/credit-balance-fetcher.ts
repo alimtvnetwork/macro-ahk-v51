@@ -9,10 +9,11 @@ import type { CreditBalance, CreditFailureLogPayload, CreditFetchResult } from '
 const CREDIT_BALANCE_PATH_SUFFIX = '/credit-balance';
 const DEFAULT_FETCH_TIMEOUT_MS = 3000;
 
-interface FetchCreditBalanceOptions {
+export interface FetchCreditBalanceOptions {
     readonly workspaceId: string;
     readonly plan: Plan;
     readonly timeoutMs?: number;
+    readonly forceTokenRefresh?: boolean;
 }
 
 function buildCreditBalanceUrl(workspaceId: string): string {
@@ -102,7 +103,7 @@ export async function fetchWorkspaceCreditBalance(
     const timeoutMs = options.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
     const url = buildCreditBalanceUrl(options.workspaceId);
     const startMs = Date.now();
-    const token = await getBearerToken();
+    const token = await getBearerToken(options.forceTokenRefresh ? { force: true } : undefined);
 
     if (!token) {
         const detail = 'No bearer token returned by unified getBearerToken() contract';
