@@ -61,11 +61,11 @@ function JsonTreeNode({ label, value, depth = 0 }: { label: string; value: JsonV
             </button>
             {expanded && (
                 <>
-                    {entries.map(([key, val]) => (
+                    {entries.map(([key, variableValue]) => (
                         <JsonTreeNode
                             key={key}
                             label={isArray ? `[${key}]` : key}
-                            value={val as JsonValue}
+                            value={variableValue as JsonValue}
                             depth={depth + 1}
                         />
                     ))}
