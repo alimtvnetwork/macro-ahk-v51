@@ -56,15 +56,23 @@ download script **does not implement this**. §17 ships `checksums.txt` but
 
 ---
 
-## Step 4 — G3 (HIGH, severity 70/100): Version-agreement check is hand-wavy
+## Step 4 — G3 ✅ PATCHED 2026-06-04 — Version-agreement check has a reference script
 
-§14 says "all four sources must agree before publishing — fail the build
-otherwise" but provides **no script**. An AI will either skip it or invent a
-fragile `grep`.
+§14 said "all four sources must agree before publishing — fail the build
+otherwise" but provided **no script**, so a copy-paste AI would either skip the
+check or invent a fragile `grep` that silently passes mismatched majors.
 
-- **Fix**: add a `scripts/check-version-agreement.sh` reference implementation
-  that compares `inputs.version`, the tag ref, the branch ref, and every
-  discovered `manifest.version`, exiting non-zero with a diff on mismatch.
+- **Root cause**: principle stated, implementation omitted.
+- **Failure mode**: published a release where `manifest.version` ≠ tag, breaking
+  Chrome auto-update because the CRX version did not match the listing.
+- **Fix applied**: added §14a "Reference implementation:
+  `scripts/check-version-agreement.sh`" — a copy-paste bash script that
+  compares the `workflow_dispatch` input, the tag ref, the branch ref, and
+  every discovered `manifest.json` `version`, exiting `1` on disagreement and
+  `2` on insufficient sources. Includes the exact `yaml` step to wire it into
+  the publish job before any artifact upload.
+- **Time**: ~8 min.
+
 
 ---
 
