@@ -51,8 +51,14 @@ function ws(id: string): WorkspaceCredit {
     } as unknown as WorkspaceCredit;
 }
 
-beforeEach(() => {
-    vi.resetModules();
+beforeEach(async () => {
+    fetchSpy.mockClear();
+    const ctrl = await import('../credit-balance-update/credit-fetch-controller');
+    ctrl.__resetCreditFetchControllerForTests();
+    const cache = await import('../credit-balance-update/credit-balance-cache');
+    if (typeof (cache as { __resetCreditBalanceUpdateCacheForTests?: () => void }).__resetCreditBalanceUpdateCacheForTests === 'function') {
+        (cache as unknown as { __resetCreditBalanceUpdateCacheForTests: () => void }).__resetCreditBalanceUpdateCacheForTests();
+    }
 });
 
 describe('credit-balance network-count contract', () => {
