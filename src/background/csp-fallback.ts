@@ -545,6 +545,7 @@ async function executeBlobInjection(code: string): Promise<string> {
     await new Promise<void>((resolve, reject) => {
         let timeoutId: number | null = null;
         // Duplicated intentionally: this function is serialized by chrome.scripting.executeScript.
+        // eslint-disable-next-line sonarjs/no-identical-functions
         const cleanup = (): void => {
             if (timeoutId !== null) {
                 window.clearTimeout(timeoutId);
