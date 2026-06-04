@@ -178,9 +178,9 @@ export function KeyValueBrowser({ projectSlug }: KeyValueBrowserProps) {
     }
   };
 
-  const truncateValue = (val: string | null, max = 60): string => {
-    if (!val) return "—";
-    return val.length > max ? val.slice(0, max) + "…" : val;
+  const truncateValue = (displayValue: string | null, max = 60): string => {
+    if (!displayValue) return "—";
+    return displayValue.length > max ? displayValue.slice(0, max) + "…" : displayValue;
   };
 
   return (
