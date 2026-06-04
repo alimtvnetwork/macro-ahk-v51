@@ -344,8 +344,8 @@ function _applyXPathSettings(xpResult: XPathPanelResult): void {
 
 function _applyTimingSettings(tmResult: TimingPanelResult): void {
   for (const k in tmResult.inputs) {
-    const val = parseInt(tmResult.inputs[k].value, 10);
-    if (!isNaN(val) && val >= 0) TIMING[k] = val;
+    const numericValue = parseInt(tmResult.inputs[k].value, 10);
+    if (!isNaN(numericValue) && numericValue >= 0) TIMING[k] = numericValue;
   }
 }
 
