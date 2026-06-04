@@ -24,9 +24,9 @@ import { CONFIG, IDS, VERSION, cInputBg, cInputBorder, cInputFg, cPanelBgAlt, cP
 import { CssFragment, DomId } from '../types';
 export interface ToolsSectionsDeps {
   btnStyle: string;
-  updateProjectButtonXPath: (val: string) => void;
-  updateProgressXPath: (val: string) => void;
-  updateWorkspaceXPath: (val: string) => void;
+  updateProjectButtonXPath: (nextXPath: string) => void;
+  updateProgressXPath: (nextXPath: string) => void;
+  updateWorkspaceXPath: (nextXPath: string) => void;
   executeJs: () => void;
   navigateLoopJsHistory: (dir: string) => void;
 }
@@ -67,7 +67,7 @@ function _buildXPathSection(deps: ToolsSectionsDeps): HTMLElement {
   const xpathBody = xpathCol.body;
   const inputStyle = CssFragment.Width100Padding3px5pxBorder1pxSol + cInputBorder + CssFragment.BorderRadius3pxBackground + cInputBg + ';color:' + cInputFg + ';font-family:monospace;font-size:9px;box-sizing:border-box;';
 
-  const fields: Array<{ label: string; id: string; value: string; onChange: (val: string) => void; extraStyle?: string }> = [
+  const fields: Array<{ label: string; id: string; value: string; onChange: (nextXPath: string) => void; extraStyle?: string }> = [
     { label: 'Project Button XPath:', id: 'xpath-project-btn', value: CONFIG.PROJECT_BUTTON_XPATH, onChange: updateProjectButtonXPath, extraStyle: 'margin-bottom:4px;' },
     { label: 'Progress Bar XPath:', id: 'xpath-progress-bar', value: CONFIG.PROGRESS_XPATH, onChange: updateProgressXPath },
     { label: 'Workspace Name XPath:', id: 'xpath-workspace-name', value: CONFIG.WORKSPACE_XPATH, onChange: updateWorkspaceXPath, extraStyle: 'margin-top:4px;' },
