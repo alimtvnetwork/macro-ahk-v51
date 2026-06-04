@@ -43,12 +43,25 @@ export interface HarnessOptions {
     projectId?: string;
     /** Override the bundle path. Defaults to the production IIFE output. */
     bundlePath?: string;
+    /**
+     * Skip the IIFE injection step. Useful for tests that only need the
+     * simulated lovable.dev page + chrome.* stubs (e.g. asserting the
+     * harness contract itself before the macro bundle boots).
+     */
+    skipBundle?: boolean;
 }
 
 export interface HarnessHandle {
     page: Page;
-    /** Resolved bundle path actually injected (useful for failure messages). */
-    bundlePath: string;
+    /** Resolved bundle path actually injected, or null when skipBundle=true. */
+    bundlePath: string | null;
+    /**
+     * Page-script error captured during bundle injection, if any. Tests can
+     * assert this is null when the bundle is expected to boot cleanly, or
+     * inspect it during regression triage. The harness never throws on
+     * bundle exceptions itself — that would mask the real failure.
+     */
+    bundleError: Error | null;
 }
 
 /**
