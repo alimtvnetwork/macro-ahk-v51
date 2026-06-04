@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-06-02T16:09:08.711Z",
+  "generatedAt": "2026-06-04T12:26:47.826Z",
   "totals": {
-    "filesWithConsoleError": 23,
-    "allowedFiles": 23,
+    "filesWithConsoleError": 33,
+    "allowedFiles": 33,
     "violatingFiles": 0,
-    "totalCalls": 43,
-    "allowedCalls": 43,
+    "totalCalls": 60,
+    "allowedCalls": 60,
     "violationCalls": 0,
     "compliancePercent": 100
   },
@@ -100,6 +100,46 @@
     },
     {
       "file": "src/lib/lib-logger.ts",
+      "count": 2
+    },
+    {
+      "file": "standalone-scripts/lovable-common/src/logger.ts",
+      "count": 2
+    },
+    {
+      "file": "standalone-scripts/lovable-dashboard/src/logger.ts",
+      "count": 1
+    },
+    {
+      "file": "standalone-scripts/macro-controller/src/core/MacroController.ts",
+      "count": 1
+    },
+    {
+      "file": "standalone-scripts/macro-controller/src/credit-api.ts",
+      "count": 1
+    },
+    {
+      "file": "standalone-scripts/macro-controller/src/error-utils.ts",
+      "count": 3
+    },
+    {
+      "file": "standalone-scripts/macro-controller/src/logging.ts",
+      "count": 2
+    },
+    {
+      "file": "standalone-scripts/macro-controller/src/queue-control/auto-resume.ts",
+      "count": 1
+    },
+    {
+      "file": "standalone-scripts/macro-controller/src/user-gesture-guard.ts",
+      "count": 1
+    },
+    {
+      "file": "standalone-scripts/marco-sdk/src/logger.ts",
+      "count": 3
+    },
+    {
+      "file": "standalone-scripts/payment-banner-hider/src/logger.ts",
       "count": 2
     }
   ],

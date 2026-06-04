@@ -17,6 +17,7 @@
 import "./globals.d";
 import { BannerLocator } from "./banner-locator";
 import { BannerLogFn } from "../../types/runtime/enums/banner";
+import { logPaymentBannerHiderError } from "./logger";
 import {
     BannerState,
     OBSERVER_DEBOUNCE_MS,
@@ -139,17 +140,9 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
         }, OBSERVER_DEBOUNCE_MS);
     }
 
-    /** Logger.error if available, console.error fallback — never swallow. */
-    private logError(fn: string, message: string, error: unknown): void {
-        const logger = window.RiseupAsiaMacroExt?.Logger;
-
-        if (logger !== undefined) {
-            logger.error(fn, message, error);
-
-            return;
-        }
-
-        console.error(`[${fn}] ${message}`, error);
+    /** Logger.error if available, isolated fallback otherwise — never swallow. */
+    private logError(fn: string, message: string, error: CaughtError): void {
+        logPaymentBannerHiderError(fn, message, error);
     }
 }
 

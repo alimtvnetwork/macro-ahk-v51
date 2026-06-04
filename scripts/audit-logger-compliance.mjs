@@ -2,7 +2,7 @@
 /**
  * audit-logger-compliance.mjs — Batch C steps 22–23 / S13 remediation.
  *
- * Scans `src/` for `console.error(...)` callers and classifies each against
+ * Scans authored app/standalone source for `console.error(...)` callers and classifies each against
  * the allowlist in `spec/audit/blind-ai-implementation-audit/coverage/logging-sweep-targets.md`.
  *
  * Writes `public/logger-compliance-audit.json` for the Options audit panel.
@@ -51,11 +51,26 @@ const ALLOWLIST = new Set([
   'src/background/injection-diagnostics.ts',
   // Runs inside chrome.scripting.executeScript MAIN-world func — bg Logger unreachable from page context:
   'src/background/context-menu-handler.ts',
+  'standalone-scripts/lovable-common/src/logger.ts',
+  'standalone-scripts/lovable-dashboard/src/logger.ts',
+  'standalone-scripts/macro-controller/src/core/MacroController.ts',
+  'standalone-scripts/macro-controller/src/credit-api.ts',
+  'standalone-scripts/macro-controller/src/error-utils.ts',
+  'standalone-scripts/macro-controller/src/logging.ts',
+  'standalone-scripts/macro-controller/src/queue-control/auto-resume.ts',
+  'standalone-scripts/macro-controller/src/user-gesture-guard.ts',
+  'standalone-scripts/marco-sdk/src/logger.ts',
+  'standalone-scripts/payment-banner-hider/src/logger.ts',
 ]);
+
+const SCAN_GLOBS = [
+  'src/',
+  'standalone-scripts/*/src/',
+];
 
 function listConsoleErrorFiles() {
   try {
-    const out = execSync('rg -l "console\\.error" src/', { encoding: 'utf8' });
+    const out = execSync(`rg -l "console\\.error" ${SCAN_GLOBS.join(' ')}`, { encoding: 'utf8' });
     return out.trim().split('\n').filter(Boolean).sort();
   } catch {
     return [];
