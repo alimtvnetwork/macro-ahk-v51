@@ -573,6 +573,32 @@ workflow edits needed.
   - `MINISIGN_SECRET_KEY` if signing installers.
 - Names must be generic — do **not** hard-code repo-specific secret names.
 
+## §25a. GitHub token vs. PAT trigger rule (MANDATORY)
+
+Use the built-in `GITHUB_TOKEN` only for the default safe flow where the release
+workflow is triggered directly by one of §5's supported events (`push` to
+`release/**`, `v*` tag push, `release`, or `workflow_dispatch`) and then uploads
+assets in the same workflow run.
+
+If any workflow creates a GitHub Release through REST, `gh release create`, or a
+third-party action and expects a **separate downstream workflow** to run from the
+resulting `release` event, `GITHUB_TOKEN` is forbidden for that creation step.
+GitHub suppresses workflow-triggering events created by `GITHUB_TOKEN`; the
+downstream `release.yml` will not run.
+
+For REST-created releases, use exactly one of these deterministic designs:
+
+1. **Recommended:** do not split creation and publishing. Keep release creation,
+   artifact upload, checksums, and installer upload inside the same `release.yml`
+   run using `GITHUB_TOKEN` plus `permissions: { contents: write }`.
+2. **Allowed only when split workflows are required:** create the release with a
+   fine-grained PAT stored as `RELEASE_PAT`, scoped to the single repository with
+   **Contents: Read and write**. Use `RELEASE_PAT` only for the REST release
+   creation step; all other steps should continue using `GITHUB_TOKEN`.
+
+Never name this secret after a repository, user, or organization. Never use a
+classic broad PAT unless fine-grained tokens are unavailable.
+
 ## §26. ⛔ Strict rule — never commit asset ZIPs
 
 > **No `.zip`, `.crx`, `.xpi`, or built `dist/` artifact may ever be committed
