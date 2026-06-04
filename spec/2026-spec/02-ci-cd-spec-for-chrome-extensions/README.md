@@ -832,10 +832,10 @@ workflow edits needed.
 
 ## §24. Caching & dependency steps
 
-- `actions/setup-node@v4` with `cache: npm` (or `pnpm`).
+- `actions/setup-node@<40-char-sha> # vX.Y.Z` with `cache: npm` (or `pnpm`).
 - Cache the package-manager store keyed on the lockfile hash.
-- Use `actions/cache@v4` for any heavyweight per-extension build dirs.
-- Use `actions/upload-artifact@v4` / `download-artifact@v4` (1-day retention)
+- Use `actions/cache@<40-char-sha> # vX.Y.Z` for any heavyweight per-extension build dirs.
+- Use `actions/upload-artifact@<40-char-sha> # vX.Y.Z` / `download-artifact@<40-char-sha> # vX.Y.Z` (1-day retention)
   to pass ZIPs between `build` and `publish` jobs.
 
 ## §24a. Concurrency and cancellation rule (publish is never cancel-in-progress)
@@ -864,7 +864,9 @@ been resolved, but keep `cancel-in-progress: false`.
 
 ## §25. Permissions & secrets
 
-- `permissions: { contents: write }` is required on the publish job.
+- Top-level workflow permissions MUST be `contents: read`; only the publish job
+  elevates to `contents: write` (plus `id-token: write` / `attestations: write`
+  only when provenance or keyless signing is enabled).
 - No third-party secrets are required for the default flow. Only add:
   - `CWS_*` (Chrome Web Store) if auto-publishing.
   - `MINISIGN_SECRET_KEY` if signing installers.
