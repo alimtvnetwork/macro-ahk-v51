@@ -143,7 +143,7 @@ export function registerSdkSelfNamespace(marco: MarcoOpaque, version: string): v
         log: Object.freeze({
             info: (msg: string) => console.log(LOG_PREFIX, msg),
             warn: (msg: string) => console.warn(LOG_PREFIX, msg),
-            error: (msg: string) => console.error(LOG_PREFIX, msg),
+            error: (msg: string) => NamespaceLogger.error("selfNamespace", msg),
         }),
         scripts: Object.freeze([]),
         db: Object.freeze({
