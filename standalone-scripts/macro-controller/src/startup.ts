@@ -91,7 +91,21 @@ export function bootstrap(deps: {
   // Preload user settings overrides (chrome.storage.local) before any UI render
   // so the first paint of the workspace list reflects edited grace/refill values.
   // Fire-and-forget — non-blocking; resolver falls back to JSON until loaded.
-  void loadSettingsOverrides().then(function () {
+  void loadSettingsOverrides().then(function (overrides) {
+    // Hydrate the credit-balance-update controller timeout (Step 47) so the
+    // user-configured slider value takes effect on first paint. Subscribe so
+    // SAVE_SETTINGS updates hot-reload into the controller too.
+    try {
+      const cbu = require('./credit-balance-update/credit-fetch-controller') as {
+        setTimeoutMs: (n: number) => void;
+        subscribeCreditFetchSettings: () => void;
+      };
+      if (typeof overrides.creditFetchDelayMs === 'number') {
+        cbu.setTimeoutMs(overrides.creditFetchDelayMs);
+      }
+      cbu.subscribeCreditFetchSettings();
+    } catch (_e: unknown) { /* allow-swallow: non-critical, controller may be tree-shaken in some builds. */ }
+
     // Re-render the UI when the user saves new overrides so the workspace
     // status pills pick up the new thresholds without a page reload.
     onSettingsChange(function () {
