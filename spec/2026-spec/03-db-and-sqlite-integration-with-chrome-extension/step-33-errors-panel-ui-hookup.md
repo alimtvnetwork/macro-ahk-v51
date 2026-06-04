@@ -1,22 +1,128 @@
-# Step 33 — Errors Panel Ui Hookup
-
-> **Status:** stub. Expanded in the next `next 2` pass.
+# Step 33 — Errors Panel UI Hookup
 
 Part of [`spec/2026-spec/03-db-and-sqlite-integration-with-chrome-extension/`](./README.md) — see [`01-forty-planning-steps.md`](./01-forty-planning-steps.md) for the full ordered outline.
 
+## Root cause this step prevents
+
+Errors that only appear in DevTools are invisible to normal operators, while errors that appear as generic red toasts are not actionable. The project already has a strict diagnostic shape; the UI must show that shape without truncating away the fields needed to fix the issue. The fix is an Errors panel that reads the Errors DB, updates on `ERROR_COUNT_CHANGED`, and exposes Code Red details directly.
+
 ## Goal
 
-_To be written._ This step covers: **Errors Panel Ui Hookup**.
+Wire routed background errors into the popup/options Errors panel with durable rows, unread counts, reason filters, and copyable diagnostics.
 
-## Scope checklist (what the expanded version must contain)
+## Required files
 
-- [ ] Goal — one-sentence summary.
-- [ ] Required packages and exact file paths.
-- [ ] Copy-pasteable TypeScript / config sample.
-- [ ] Error model — error type, logger tag, user-visible surface.
-- [ ] Acceptance — testable conditions.
-- [ ] Cross-references to neighbouring steps.
+- `src/background/handlers/error-handler.ts` — `GET_ERRORS`, `ACK_ERROR`, `CLEAR_DISPOSABLE_ERRORS` handlers.
+- `src/popup/components/DebugPanel.tsx` — renders recent error count/summary.
+- `src/popup/hooks/useDebugPanel.ts` — subscribes to `ERROR_COUNT_CHANGED`.
+- `src/options/options-entry.tsx` or existing options diagnostics surface — full Errors panel if popup only shows summary.
+- `src/shared/message-types.ts` — error query and broadcast message types.
+- `src/types/error-model.ts` — row shape and diagnostic fields.
+- `src/pages/__tests__/Popup.test.tsx` or options component test — verifies display.
 
-## Open questions for the implementer AI
+No new runtime package is required.
 
-_None recorded yet._
+## User-facing row shape
+
+```ts
+type ErrorPanelRow = {
+    id: string;
+    createdAt: string;
+    level: "warning" | "error" | "code-red";
+    source: string;
+    messageType: string;
+    reason: string;
+    reasonDetail: string;
+    path: string;
+    missing: string;
+    selectorAttemptsJson: string | null;
+    variableContextJson: string | null;
+    isAcked: boolean;
+};
+```
+
+The panel must display these columns or equivalent labels:
+
+| Field | Why it matters |
+|---|---|
+| `createdAt` | locate the failing action |
+| `level` | distinguish degraded vs Code Red |
+| `source` + `messageType` | find the caller path |
+| `reason` | filter stable failure classes |
+| `reasonDetail` | explain exact failure |
+| `path` | exact file/storage/API path |
+| `missing` | exact item that was expected |
+
+## Query contract
+
+```ts
+type GetErrorsPayload = {
+    limit: number;
+    includeAcked: boolean;
+    level?: "warning" | "error" | "code-red";
+    reason?: string;
+};
+
+type GetErrorsResult = {
+    rows: readonly ErrorPanelRow[];
+    unreadCount: number;
+    codeRedCount: number;
+};
+```
+
+Rules:
+
+1. Default `limit` is 50; maximum is 500.
+2. The UI must request unacked rows first.
+3. Acknowledging an error only flips `isAcked`; it does not delete the row.
+4. Clearing is allowed only for disposable/generated test errors, not Code Red history.
+5. Copy Report includes raw `SelectorAttempts` and `VariableContext` JSON.
+
+## Broadcast hookup
+
+```ts
+chrome.runtime.onMessage.addListener((message) => {
+    if (message?.type !== "ERROR_COUNT_CHANGED") {
+        return;
+    }
+    void refreshErrors();
+});
+```
+
+Use optional property access and guard clauses; do not assume arbitrary runtime messages have a complete shape.
+
+## Visual rules
+
+- Dark-only theme.
+- Code Red rows use the established danger tone, not a new one-off palette.
+- Long `reasonDetail`, `path`, and SQL preview text wrap; they must not overflow the panel.
+- Do not nest cards inside cards. The panel can be a table/list inside the existing debug surface.
+- Copy buttons use icon+tooltip where the existing UI has icons.
+
+## Error model
+
+| Failure | Reason | Logger tag | User-visible surface |
+|---|---|---|---|
+| Error query fails | `ErrorPanelQueryFailed` | `ERROR_PANEL` | inline panel failure row |
+| Acknowledge fails | `ErrorAckFailed` | `ERROR_PANEL` | toast/panel error |
+| Broadcast missed | no error; next poll/query refreshes | none | stale until next open/refresh |
+| Malformed row JSON | `ErrorDiagnosticParseFailed` | `ERROR_PANEL` | show raw string fallback |
+
+UI failures must not create infinite error-routing loops. If the panel itself cannot render a diagnostic, show the raw row fields and log once.
+
+## Acceptance
+
+- [ ] Errors panel lists newest unacked errors with reason, detail, path, and missing item visible.
+- [ ] `ERROR_COUNT_CHANGED` refreshes counts without page reload.
+- [ ] Code Red rows remain visible until acknowledged; acknowledgement does not delete them.
+- [ ] Copy Report includes `SelectorAttempts` and `VariableContext` exactly as stored.
+- [ ] Malformed diagnostic JSON renders a safe fallback instead of crashing the panel.
+- [ ] Component tests cover empty, warning, error, Code Red, long path, and malformed JSON states.
+
+## Cross-references
+
+- [step-31](./step-31-error-model.md) — row fields come from the canonical diagnostic.
+- [step-32](./step-32-error-routing.md) — source of persisted rows and broadcasts.
+- [step-34](./step-34-boot-failure-banner.md) — boot-critical errors also appear here.
+- [step-35](./step-35-logging-tables-and-retention.md) — table schema and retention.
+- Core memory: Dark-only theme; failure logs mandatory shape; namespace logging.
