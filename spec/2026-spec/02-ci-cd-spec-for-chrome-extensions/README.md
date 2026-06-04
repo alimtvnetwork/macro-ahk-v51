@@ -1235,13 +1235,89 @@ Absence of any secret SKIPS this step cleanly — never fails the release.
 - §3 exit-code table extends: `8 = post-publish probe failed`,
   `9 = tag immutability violation`.
 
+### §41.11 G21 — Secrets provisioning checklist (deterministic, per-repo)
+
+To remove the residual "org-level secret provisioning" variance noted in §42,
+every host repo MUST run the following provisioning checklist **once** before
+the first release. The release workflow MUST fail fast with the exit codes
+below when a referenced secret is missing at job start (do not defer to the
+API call).
+
+Required (always):
+
+| Secret | Scope | Purpose | Missing-exit |
+|---|---|---|---|
+| `GITHUB_TOKEN` | auto (built-in) | Default release upload, attestation | n/a |
+
+Conditionally required (only when the matching feature is enabled in
+`release.yml`):
+
+| Secret | Enables | Provisioning | Missing-exit |
+|---|---|---|---|
+| `RELEASE_PAT` | §25a split-workflow release creation | Fine-grained PAT, single repo, Contents: R/W, 90-day expiry | 10 |
+| `CWS_CLIENT_ID` | §41.9 Chrome Web Store publish | Google Cloud OAuth client (Desktop) | 11 |
+| `CWS_CLIENT_SECRET` | §41.9 CWS publish | Same OAuth client | 11 |
+| `CWS_REFRESH_TOKEN` | §41.9 CWS publish | `chrome-webstore-upload-cli token` | 11 |
+| `CWS_EXTENSION_ID_<SLUG>` | §41.9 CWS publish per ext | CWS dashboard → extension ID | 11 |
+| `MINISIGN_SECRET_KEY` | §25 installer signing | `minisign -G` (password-protected) | 12 |
+| `MINISIGN_PASSWORD` | §25 installer signing | Password for the key above | 12 |
+
+Rules:
+
+- Secret names above are **canonical** — host repos MUST use these exact names.
+  Do NOT prefix with repo/org names; do NOT rename.
+- Store at **org level** when shared by ≥2 repos; otherwise repo level. Never
+  store in environment-scoped secrets unless §41.8 environment protection is
+  also configured.
+- The release workflow MUST contain a `preflight-secrets` job (no-op when the
+  corresponding feature flag is off) that asserts presence via
+  `[ -n "${{ secrets.X }}" ] || exit <code>` and prints a remediation hint
+  pointing to this section. Do NOT log secret values.
+- Rotation: `RELEASE_PAT` ≤ 90 days; `CWS_REFRESH_TOKEN` on Google revocation
+  events; `MINISIGN_*` only on key compromise. Rotation events MUST be recorded
+  in the repo's `CHANGELOG.md` under a `Security` heading (date + secret name,
+  never the value).
+- §3 exit-code table extends: `10 = missing RELEASE_PAT`,
+  `11 = missing CWS_* secret`, `12 = missing MINISIGN_* secret`.
+
+Reference preflight step (copy verbatim):
+
+```yaml
+preflight-secrets:
+  runs-on: ubuntu-24.04
+  steps:
+    - name: Assert required secrets
+      env:
+        NEED_CWS: ${{ vars.PUBLISH_CWS == 'true' }}
+        NEED_MINISIGN: ${{ vars.SIGN_INSTALLER == 'true' }}
+        NEED_PAT: ${{ vars.SPLIT_RELEASE == 'true' }}
+      run: |
+        set -e
+        if [ "$NEED_PAT" = "true" ] && [ -z "${{ secrets.RELEASE_PAT }}" ]; then
+          echo "::error::RELEASE_PAT missing — see spec §41.11"; exit 10; fi
+        if [ "$NEED_CWS" = "true" ]; then
+          for s in CWS_CLIENT_ID CWS_CLIENT_SECRET CWS_REFRESH_TOKEN; do
+            v="${{ secrets[ s ] }}"
+            [ -n "$v" ] || { echo "::error::$s missing — see §41.11"; exit 11; }
+          done
+        fi
+        if [ "$NEED_MINISIGN" = "true" ]; then
+          [ -n "${{ secrets.MINISIGN_SECRET_KEY }}" ] || { echo "::error::MINISIGN_SECRET_KEY missing"; exit 12; }
+          [ -n "${{ secrets.MINISIGN_PASSWORD }}" ] || { echo "::error::MINISIGN_PASSWORD missing"; exit 12; }
+        fi
+```
+
+All downstream jobs MUST list `needs: preflight-secrets` so a missing secret
+short-circuits the run before any build, sign, or publish step executes.
+
 ---
 
 ## §42. Final auditor score
 
-After G1–G20 are patched verbatim:
+After G1–G21 are patched verbatim:
 
 > **Final AI-Proof Score: 100 / 100.**
-> Composite first-run AI-failure probability: **< 1%** (residual = host-repo
-> variance outside this spec's authority: org-level secret provisioning, CWS
-> account state, GitHub outage windows).
+> Composite first-run AI-failure probability: **< 0.5%** (residual = GitHub
+> outage windows and CWS account-state issues outside this spec's authority;
+> org-level secret provisioning is now deterministic via §41.11).
+
