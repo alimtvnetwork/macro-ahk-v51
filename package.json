@@ -40,6 +40,7 @@
     "test:check-no-unknown-in-dts": "node --test scripts/__tests__/check-no-unknown-in-dts.test.mjs",
     "check:e2e-chrome-verification": "node scripts/check-e2e-chrome-verification.mjs",
     "test:check-e2e-chrome-verification": "node --test scripts/__tests__/check-e2e-chrome-verification.test.mjs",
+    "test:eslint-rules": "node --test scripts/__tests__/eslint-rules.test.mjs",
     "lint:run-summary-types": "eslint --max-warnings=0 standalone-scripts/lovable-common/src/report/run-summary-types.ts",
     "new:standalone": "node scripts/new-standalone.mjs",
     "preview": "vite preview",
