@@ -138,15 +138,20 @@ What happens when a bad release ships? No section covers:
 
 ## Step 10 — G9, G10 (BLOCKER + MEDIUM): Last two gaps
 
-**G9 (BLOCKER, severity 80/100) — Action-version pinning**: §15, §22 pin
-`@v4` / `@v2` major tags. Supply-chain best practice (and the only
+**G9 (BLOCKER, severity 80/100) — Action-version pinning** ✅ PATCHED 2026-06-04:
+§15, §22 pin `@v4` / `@v2` major tags. Supply-chain best practice (and the only
 AI-deterministic approach) is to pin to a **commit SHA**, e.g.
 `softprops/action-gh-release@9d7c94cfd0a1f3ed45544c887983e9fa900f0564 # v2.2.1`.
 Without this rule, an AI implementing this spec in 2027 may silently consume
-`@v2` = `v2.99.0` with breaking changes.
+`@v2` = `v2.99.0` with breaking changes, or worse, a retagged malicious commit.
 
-- **Fix**: add §22a "All third-party actions MUST be pinned to a 40-char
-  commit SHA with a `# vX.Y.Z` trailing comment. Dependabot may bump them."
+- **Fix applied**: new **§22a "SHA-pin all third-party actions"** — every
+  `uses:` entry MUST pin to a full 40-char commit SHA with a `# vX.Y.Z`
+  trailing comment (including first-party `actions/*`). Ships with example
+  pins for checkout/setup-node/upload-artifact/download-artifact/action-gh-release,
+  a CI grep gate that fails on any floating ref, and a Dependabot
+  (`github-actions` ecosystem) upgrade recipe.
+
 
 **G10 (MEDIUM, severity 55/100) — No node/runner version policy**: §22 uses
 `node-version: 20` inline. If the AI implementing this spec in 18 months
