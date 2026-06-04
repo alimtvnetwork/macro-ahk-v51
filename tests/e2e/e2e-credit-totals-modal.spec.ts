@@ -50,7 +50,7 @@ test.describe('Credit Totals modal — sort → drag → filter → CSV export r
             await page.getByText('💰 Credits').click();
             await expect.poll(() => creditStub.counts.userWorkspaces, { timeout: 20_000 }).toBeGreaterThan(0);
 
-            await page.getByText('☰').click();
+            await page.getByTitle('More actions').click();
             await page.getByText('Credit Totals').click();
             const modal = page.locator('#marco-credit-totals-modal');
             await expect(modal).toBeVisible();
@@ -64,9 +64,12 @@ test.describe('Credit Totals modal — sort → drag → filter → CSV export r
             await rows.nth(2).dragTo(rows.nth(0));
             await expect(rows.nth(0).locator('[data-cell="name"]')).toContainText('Cancelled Pro Workspace');
 
-            await modal.locator('[data-chip="free"]').click();
+            // FREE plan rows are excluded from aggregateCreditTotals (v3.31.0),
+            // so the table contains KTLO + CANCELLED only. CANCELLED has 0 remaining
+            // → the Empty chip narrows to exactly that single row.
+            await modal.locator('[data-chip="empty"]').click();
             await expect(rows).toHaveCount(1);
-            await expect(rows.nth(0).locator('[data-cell="name"]')).toContainText('Free Workspace');
+            await expect(rows.nth(0).locator('[data-cell="name"]')).toContainText('Cancelled Pro Workspace');
 
             const downloadPromise = page.waitForEvent('download');
             await modal.locator('[data-credit-totals-csv]').click();
@@ -80,7 +83,7 @@ test.describe('Credit Totals modal — sort → drag → filter → CSV export r
             });
             const csv = Buffer.concat(chunks).toString('utf8');
             expect(csv).toContain('Workspace,Plan,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
-            expect(csv).toContain('Free Workspace');
+            expect(csv).toContain('Cancelled Pro Workspace');
         } finally {
             await context.close();
         }
