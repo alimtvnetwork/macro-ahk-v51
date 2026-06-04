@@ -6,7 +6,18 @@ import {
     KTLO_WORKSPACE,
     KTLO_CREDIT_BALANCE,
 } from './fixtures/credit-balance/workspaces';
-import { hasInlineCredits } from '../../standalone-scripts/macro-controller/src/credit-balance-update/enrichment';
+
+/**
+ * Mirror of `hasInlineCredits()` in
+ * standalone-scripts/macro-controller/src/credit-balance-update/credit-fetch-controller.ts
+ * — kept local so this spec does not depend on the macro-controller's
+ * `WorkspaceCredit` shape. Drift is guarded by the parallel unit test
+ * `credit-balance-network-count.test.ts`.
+ */
+function hasInlineCreditsWire(ws: { billing_period_credits_limit: number; grant_type_balances: ReadonlyArray<unknown> }): boolean {
+    if (Number(ws.billing_period_credits_limit || 0) > 0) return true;
+    return Array.isArray(ws.grant_type_balances) && ws.grant_type_balances.length > 0;
+}
 
 /**
  * E2E-credit-balance-no-fetch-when-inline (Phase B Step 51, unblocked in Step 52)
@@ -26,8 +37,8 @@ import { hasInlineCredits } from '../../standalone-scripts/macro-controller/src/
 test.describe('E2E-Credit-Balance — no fetch when inline credits present', () => {
     test('inline-credit workspace skips /credit-balance; Ktlo still fetches', async () => {
         // Sanity-check the predicate the SUT uses to gate the network call.
-        expect(hasInlineCredits(INLINE_PRO_WORKSPACE as never)).toBe(true);
-        expect(hasInlineCredits(KTLO_WORKSPACE as never)).toBe(false);
+        expect(hasInlineCreditsWire(INLINE_PRO_WORKSPACE)).toBe(true);
+        expect(hasInlineCreditsWire(KTLO_WORKSPACE)).toBe(false);
 
         const context = await launchExtension(chromium);
         try {
