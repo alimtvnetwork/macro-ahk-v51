@@ -83,7 +83,7 @@ test.describe('Credit Totals modal — sort → drag → filter → CSV export r
             });
             const csv = Buffer.concat(chunks).toString('utf8');
             expect(csv).toContain('Workspace,Plan,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
-            expect(csv).toContain('Free Workspace');
+            expect(csv).toContain('Cancelled Pro Workspace');
         } finally {
             await context.close();
         }
