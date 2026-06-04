@@ -47,6 +47,7 @@ Trigger phrases the user may type to query this file:
 - [x] **Task 1.2 — Chrome E2E verification gate** — 2026-06-04, added `scripts/check-e2e-chrome-verification.mjs` + unit guard; CI enforces headed-Chromium/xvfb Playwright evidence instead of relying on a manual-only note.
 - [x] **Priority 4 — Cross-Project Sync Chrome E2E pass** — 2026-06-04, added executable `tests/e2e/e2e-24-cross-project-sync.spec.ts` and wired it into CI + the Chrome verification gate.
 - [x] **Priority 0.8 — `val` id-denylist pass** — 2026-06-04, cleaned authored-source `val` identifier debt and pinned the ESLint rule with `scripts/__tests__/eslint-rules.test.mjs`.
+- [x] **Priority 0.8 — `cb`/`obj` id-denylist enforcement pass** — 2026-06-04, renamed cleaned-file shorthand in recorder sync, SQLite bundle import, and bulk rename inputs; globally banned `cb`/`obj` for new/cleaned files while explicitly quarantining remaining legacy debt.
 
 ## P2 — Spec / Owner Pending
 
