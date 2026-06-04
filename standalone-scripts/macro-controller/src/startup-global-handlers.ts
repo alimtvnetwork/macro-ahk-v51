@@ -100,8 +100,8 @@ function buildDiagnosticDump(): DiagnosticDump {
 
   log('=== DIAGNOSTIC DUMP ===', 'warn');
   for (const k in diag) {
-    const val = Array.isArray(diag[k]) ? '[' + diag[k].join(', ') + ']' : String(diag[k]);
-    log('  ' + k + ': ' + val, 'check');
+    const diagnosticValue = Array.isArray(diag[k]) ? '[' + diag[k].join(', ') + ']' : String(diag[k]);
+    log('  ' + k + ': ' + diagnosticValue, 'check');
   }
 
   const perWs = loopCreditState.perWorkspace || [];
