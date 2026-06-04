@@ -12,6 +12,22 @@
 
 ---
 
+## 🆕 2026-06-04 — CI/CD Spec For Chrome Extensions (40-step, generic)
+
+**Spec**: `spec/2026/02 - CI-CD Spec For Chrome Extensions/README.md` — written
+in full. Generic, repo-agnostic, supports N extensions via matrix discovery.
+
+**Phases (implement on each `next`):**
+1. Add `.gitignore` enforcement entries (`release-assets/`, `*.zip`, `*.crx`, `*.xpi`).
+2. Add CI gate script `scripts/check-no-committed-zips.mjs` + wire into `ci.yml`.
+3. Extract generic `scripts/download-extension.sh` (mirror of `.ps1`).
+4. Extract generic `scripts/probe-siblings.sh`.
+5. Add `scripts/enumerate-extensions.mjs` (Manifest V3 auto-discovery).
+6. Reference spec from `.lovable/cicd-index.md`.
+7. Add acceptance test `scripts/__tests__/ci-cd-spec-2026-02.test.mjs`
+   verifying §40 criteria 1, 5, 6.
+8. Memory: add `mem://architecture/cicd-spec-2026-02` pointer.
+
 ## ✅ Release Page CI/CD Hardening Plan — 8 Steps (CLOSED 2026-06-02)
 
 **Trigger**: User reported that a release tag was created, but the GitHub Release page has no Chrome extension ZIP or other built ZIP assets, and the release-page changelog/notes did not update correctly.
