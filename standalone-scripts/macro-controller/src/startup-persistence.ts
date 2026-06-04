@@ -44,7 +44,7 @@ function tryReinjectUI(createUI: () => void): void {
 
 // PERF-13: Idle-callback handle type (window.requestIdleCallback may be absent).
 interface IdleCallbackWindow {
-  requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+  requestIdleCallback?: (callback: () => void, opts?: { timeout: number }) => number;
   cancelIdleCallback?: (handle: number) => void;
 }
 

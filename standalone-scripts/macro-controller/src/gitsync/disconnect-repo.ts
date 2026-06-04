@@ -108,7 +108,7 @@ export async function disconnectGithubRepo(
 export async function confirmAndDisconnectGithubRepo(
   wsId: string,
   pid: string,
-  confirmFn?: (msg: string) => boolean,
+  confirmFn?: (confirmMessage: string) => boolean,
   message: string = DEFAULT_CONFIRM_MESSAGE,
 ): Promise<GitsyncDisconnectOutcome> {
   const askFn = confirmFn
