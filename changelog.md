@@ -7,7 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.51.0] — 2026-06-04
+
+### Added
+- **Credit Totals — Playwright E2E skeleton** covering sort → drag-reorder → filter → CSV download against a seeded `loopCreditState`. Skeleton is marked `fixme` pending fixture wiring (tracked in `.lovable/question-and-ambiguity/`).
+- **Plan Task UX 20-step rollout closed** — every fix (Plan Task RCA, no-autorun guard, Credit Totals modal sort/drag/filter/CSV/projects-column, Prompts Task-Next right-anchor) shipped with matching Vitest + JSDOM coverage (`plan-task-ui`, `task-next-right-anchor`, `credit-totals-{sort,filter,dnd,projects-column,component,csv}`).
+
+### Changed
+- Re-audited new code paths against no-retry / no-autorun / error-swallow / timer-teardown memories — zero new violations recorded in `public/error-swallow-audit.json`.
+- Version bump: 3.50.0 → 3.51.0 (manifest, version.json, constants, all 8 instruction.ts, shared-state.ts).
+
+---
+
 ## [v3.50.0] — 2026-06-04
+
 
 ### Added
 - **Credit Balance Update** — Ktlo (Lite) / Free / Cancelled workspaces now fetch `/workspaces/{id}/credit-balance` on demand when inline credits are absent, with PascalCase `Plan` + `GrantType` + `CreditFetchOutcome` enums, AbortController-backed timeout, dual-layer cache (in-memory + IndexedDB, 10-min TTL), single-flight join, single auth-retry, and full failure-log schema (Reason + ReasonDetail). Spec: `spec/21-app/01-chrome-extension/credit-balance-update/`.
