@@ -19,6 +19,7 @@ import {
   cPrimaryLight,
   cPrimaryHL,
   cPrimaryBgAL,
+  cWarning,
 } from './shared-state';
 import { log } from './logging';
 import { publishVisibleWorkspaces } from './visible-workspaces-store';
@@ -696,7 +697,7 @@ function buildWsRow(
   row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 8px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);transition:background 0.15s;font-size:11px;' + wsRowBgStyle(isCurrent, isSel);
 
   const creditBarHtml = creditSummary.renderDash
-    ? '<span title="Credit-balance request timed out" style="font-size:11px;color:#dcdcaa;min-width:160px;display:inline-block;">—</span>'
+    ? '<span title="Credit-balance request timed out" style="font-size:11px;color:' + cWarning + ';min-width:160px;display:inline-block;">—</span>'
     : renderCreditBar({
       totalCredits: creditSummary.total, available: creditSummary.available, totalUsed: creditSummary.totalUsed,
       freeRemaining: Math.round(ws.freeRemaining || 0), freeGranted: Math.round(ws.freeGranted || 0),
