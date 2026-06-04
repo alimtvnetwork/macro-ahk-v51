@@ -44,15 +44,18 @@ export function formatMytReset(iso: string): string {
 /** Generate a RFC-4180-ish CSV string from workspace credits. */
 export function generateCsv(workspaces: ReadonlyArray<WorkspaceCredit>): string {
   const rows: string[] = [];
-  rows.push('Workspace,Plan,Projects,Used,Remaining,Total');
+  rows.push('Workspace,Plan,Projects,Used,Remaining,Total,Daily,DailyLimit,Source');
   for (const ws of workspaces) {
+    const summary = resolveCreditSummary(ws);
     const name = (ws.fullName || ws.name || ws.id).replace(/"/g, '""');
     const plan = (ws.plan || '').replace(/"/g, '""');
     const projects = String(Number(ws.numProjects) || 0);
-    const used = String(Number(ws.totalCreditsUsed) || 0);
-    const rem = String(Number(ws.available) || 0);
-    const total = String(Number(ws.totalCredits) || 0);
-    rows.push('"' + name + '","' + plan + '",' + projects + ',' + used + ',' + rem + ',' + total);
+    const used = String(summary.totalUsed);
+    const rem = String(summary.available);
+    const total = String(summary.total);
+    const daily = String(summary.daily);
+    const dailyLimit = String(summary.dailyLimit);
+    rows.push('"' + name + '","' + plan + '",' + projects + ',' + used + ',' + rem + ',' + total + ',' + daily + ',' + dailyLimit + ',' + summary.source);
   }
   return rows.join('\r\n');
 }
