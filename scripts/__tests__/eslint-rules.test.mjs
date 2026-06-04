@@ -13,6 +13,14 @@ export function broken() {
 }
 `;
 
+const GLOBAL_CONSOLE_ERROR_VIOLATING = `
+export function broken() {
+    try { /* noop */ } catch (err) {
+        globalThis.console.error("bad", err);
+    }
+}
+`;
+
 const CONSOLE_ERROR_COMPLIANT = `
 import { logError } from "./hook-logger";
 export function ok() {
@@ -70,6 +78,16 @@ test('no-restricted-syntax reports console.error outside the logger allowlist', 
     const messages = await lintMessages(
         CONSOLE_ERROR_VIOLATING,
         'src/hooks/__fixture-violating.ts',
+        'no-restricted-syntax',
+    );
+    assert.ok(messages.length >= 1);
+    assert.match(messages[0].message, /Logger\.error/);
+});
+
+test('no-restricted-syntax reports globalThis.console.error outside the logger allowlist', async () => {
+    const messages = await lintMessages(
+        GLOBAL_CONSOLE_ERROR_VIOLATING,
+        'standalone-scripts/lovable-user-add/src/__fixture-violating.ts',
         'no-restricted-syntax',
     );
     assert.ok(messages.length >= 1);
