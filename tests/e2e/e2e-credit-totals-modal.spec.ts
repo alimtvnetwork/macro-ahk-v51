@@ -49,7 +49,16 @@ test.describe('Credit Totals modal — sort → drag → filter → CSV export r
 
             await page.getByText('💰 Credits').click();
             await page.waitForFunction(() => {
-                return window.RiseupAsiaMacroExt?.Projects?.MacroController?.api?.credits?.getState?.()?.perWorkspace?.length === 3;
+                const w = window as Window & {
+                    RiseupAsiaMacroExt?: {
+                        Projects?: {
+                            MacroController?: {
+                                api?: { credits?: { getState?: () => { perWorkspace?: readonly object[] } | null } };
+                            };
+                        };
+                    };
+                };
+                return w.RiseupAsiaMacroExt?.Projects?.MacroController?.api?.credits?.getState?.()?.perWorkspace?.length === 3;
             }, null, { timeout: 20_000 });
 
             await page.getByText('☰').click();
