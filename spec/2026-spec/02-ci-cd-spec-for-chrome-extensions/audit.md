@@ -257,6 +257,22 @@ probability drops from **~6%** (post-G10) to **<1%** (post-G20).
 
 ## Final auditor score
 
+### Step 12 — Copy-paste conflict re-audit ✅ PATCHED 2026-06-04
+
+**Root cause:** G11–G20 were correctly added in §41, but older copy-pasteable
+examples still showed `softprops/action-gh-release@v2`, `actions/*@v4`, a
+top-level `permissions: { contents: write }`, and an exit-code table that did
+not include G17/G20 codes. A future AI could copy the older examples and bypass
+the final hardening addenda.
+
+**Fix applied:** normalized the main workflow and supporting sections so the
+copy-paste path now matches the audit: SHA-pinned actions, top-level
+`contents: read`, publish-job-only write elevation, web-ext lint before zip,
+deterministic ZIP packaging, cosign checksum signing, post-publish exit `8`,
+and exit-code `9` for tag immutability.
+
+**Time:** ~12 min.
+
 > **AI-Proof Score: 100 / 100.**
 > All twenty gaps (G1–G20) patched. Residual risk is host-repo variance
 > (org-level secret provisioning, CWS account state, GitHub outage windows)
