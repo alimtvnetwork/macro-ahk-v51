@@ -2,7 +2,7 @@
 
 **Version:** 3.2.0  
 **Status:** Active  
-**Updated:** 2026-04-22  
+**Updated:** 2026-06-04  
 **AI Confidence:** High  
 **Ambiguity:** None
 
@@ -58,7 +58,7 @@ The numbering convention is:
 | 09 | [`09-code-block-system/`](./09-code-block-system/00-overview.md) | Code-block rendering & syntax highlighting | 🟡 Planned (stub) |
 | 10 | [`10-research/`](./10-research/00-overview.md) | Research notes, prototypes, references | 🟡 Planned (stub) |
 | 11 | [`11-powershell-integration/`](./11-powershell-integration/00-overview.md) | PowerShell deploy & integration scripts | ✅ Active |
-| 12 | [`12-cicd-pipeline-workflows/`](./12-cicd-pipeline-workflows/00-overview.md) | CI/CD pipeline definitions & release procedure | 🟡 Planned (stub) |
+| 12 | [`12-cicd-pipeline-workflows/`](./12-cicd-pipeline-workflows/00-overview.md) | CI/CD pipeline definitions, release procedure, and Chrome-extension CI/CD hardening | ✅ Active |
 | 14 | [`14-update/`](./14-update/00-overview.md) | Extension auto-update mechanics | 🟡 Planned (stub) |
 | 17 | [`17-consolidated-guidelines/`](./17-consolidated-guidelines/00-overview.md) | Consolidated quick-reference guide | 🟡 Planned (stub) |
 
