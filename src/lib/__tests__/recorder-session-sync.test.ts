@@ -57,11 +57,11 @@ describe("subscribeRecorderSession (localStorage transport)", () => {
 
     it("delivers the current state immediately on subscribe", async () => {
         await writeSession(makeSession({ ProjectSlug: "alpha" }));
-        const cb = vi.fn();
-        subscribeRecorderSession(cb);
+        const callback = vi.fn();
+        subscribeRecorderSession(callback);
         await new Promise((r) => setTimeout(r, 0));
-        expect(cb).toHaveBeenCalled();
-        const last = cb.mock.calls.at(-1)?.[0] as RecordingSession | null;
+        expect(callback).toHaveBeenCalled();
+        const last = callback.mock.calls.at(-1)?.[0] as RecordingSession | null;
         expect(last?.ProjectSlug).toBe("alpha");
     });
 
@@ -80,50 +80,50 @@ describe("subscribeRecorderSession (localStorage transport)", () => {
 
     it("dispatches null when phase becomes Idle", async () => {
         await writeSession(makeSession());
-        const cb = vi.fn();
-        subscribeRecorderSession(cb);
+        const callback = vi.fn();
+        subscribeRecorderSession(callback);
         await new Promise((r) => setTimeout(r, 0));
-        cb.mockClear();
+        callback.mockClear();
 
         await writeSession(makeSession({ Phase: "Idle" }));
-        expect(cb).toHaveBeenLastCalledWith(null);
+        expect(callback).toHaveBeenLastCalledWith(null);
     });
 
     it("stops delivering after unsubscribe", async () => {
-        const cb = vi.fn();
-        const off = subscribeRecorderSession(cb);
+        const callback = vi.fn();
+        const off = subscribeRecorderSession(callback);
         await new Promise((r) => setTimeout(r, 0));
-        cb.mockClear();
+        callback.mockClear();
         off();
 
         await writeSession(makeSession());
         await new Promise((r) => setTimeout(r, 0));
-        expect(cb).not.toHaveBeenCalled();
+        expect(callback).not.toHaveBeenCalled();
     });
 
     it("reacts to cross-tab DOM storage events", async () => {
-        const cb = vi.fn();
-        subscribeRecorderSession(cb);
+        const callback = vi.fn();
+        subscribeRecorderSession(callback);
         await new Promise((r) => setTimeout(r, 0));
-        cb.mockClear();
+        callback.mockClear();
 
         const session = makeSession({ ProjectSlug: "from-other-tab" });
         window.dispatchEvent(new StorageEvent("storage", {
             key: RECORDER_SESSION_STORAGE_KEY,
             newValue: JSON.stringify(session),
         }));
-        expect(cb).toHaveBeenCalledTimes(1);
-        expect((cb.mock.calls[0][0] as RecordingSession).ProjectSlug).toBe("from-other-tab");
+        expect(callback).toHaveBeenCalledTimes(1);
+        expect((callback.mock.calls[0][0] as RecordingSession).ProjectSlug).toBe("from-other-tab");
     });
 
     it("ignores unrelated storage keys", async () => {
-        const cb = vi.fn();
-        subscribeRecorderSession(cb);
+        const callback = vi.fn();
+        subscribeRecorderSession(callback);
         await new Promise((r) => setTimeout(r, 0));
-        cb.mockClear();
+        callback.mockClear();
 
         window.dispatchEvent(new StorageEvent("storage", { key: "something-else", newValue: "x" }));
-        expect(cb).not.toHaveBeenCalled();
+        expect(callback).not.toHaveBeenCalled();
     });
 });
 
