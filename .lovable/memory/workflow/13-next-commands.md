@@ -37,13 +37,14 @@ Trigger phrases the user may type to query this file:
 ## P1 — Ready to Implement
 
 - [x] **Issue 114 — pro_0 Credit Balance Calculation** — completed v3.11.1 (5 steps, 12 unit tests + UI wiring + E2E fixtures).
-- [ ] **Release installer hardening v0.2** — SLSA provenance attestation via GitHub Attestations added to release workflow; minisign signing conditional on MINISIGN_SECRET_KEY secret — needs operator to add secret for full v0.2 completion
+- [x] **Release installer hardening v0.2** — checksum verification complete in both installers; minisign signing remains optional/operator-secret-gated via MINISIGN_SECRET_KEY.
 - [x] **Cross-Project Sync Phase 3** — ProjectGroup UI, drag-assign, sync notifications — completed 2026-05-22 (v9 migration, picker UI, handler wiring, drag-to-assign, cross-tab broadcast)
 - [x] **TS Migration V2 Phase 02** — class architecture (S-046) — verified complete 2026-04-23 (v2.225.0)
 - [x] **TS Migration V2 Phase 04** — performance & logging (S-047) — verified complete 2026-04-23 (v2.225.0)
 - [x] **TS Migration V2 Phase 05** — JSON config pipeline (S-048) — verified + activity-log routing + 7 unit tests, 2026-04-23 (v2.225.0)
 - [x] **Injection pipeline split — Step 9** — 2026-05-25, E2E `tests/e2e/e2e-21-injection-pipeline-split.spec.ts` shell (4 cases: stage ordering, preflight short-circuit, envelope shape, delegation spy). See `mem://workflow/14-injection-pipeline-split-session`.
 - [x] **Recorder xpath batch — Step 10** — 2026-05-25, E2E `tests/e2e/e2e-22-recorder-xpath-batch.spec.ts` shell (4 cases: 8-rapid-coalesce, debounce single, flushNow serialization, single session resolve). See `mem://workflow/14-injection-pipeline-split-session`.
+- [x] **Task 1.2 — Chrome E2E verification gate** — 2026-06-04, added `scripts/check-e2e-chrome-verification.mjs` + unit guard; CI enforces headed-Chromium/xvfb Playwright evidence instead of relying on a manual-only note.
 
 ## P2 — Spec / Owner Pending
 
