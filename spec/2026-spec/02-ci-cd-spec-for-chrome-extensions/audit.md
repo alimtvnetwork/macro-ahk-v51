@@ -319,6 +319,7 @@ drift** added to §3.
 
 ## Final auditor score
 
+<a id="g23-exit-code-table-drift"></a>
 ### Step 15 — G23 ✅ PATCHED 2026-06-04 — Canonical exit-code table drift
 
 **Root cause:** §41.11 and §41.8 introduced deterministic failure codes
