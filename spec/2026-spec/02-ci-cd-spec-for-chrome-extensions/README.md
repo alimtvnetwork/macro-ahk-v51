@@ -776,8 +776,8 @@ MUST be SHA-pinned** per this section.
 ## §22b. Node and runner version policy (active LTS only)
 
 The workflow MUST declare Node once at top level and every `setup-node` step
-MUST read that value. Inline literals such as `node-version: 20` are forbidden
-because they become stale silently when copied into future repositories.
+MUST read that value. Inline `node-version` literals with hard-coded majors are
+forbidden because they become stale silently when copied into future repositories.
 
 Required workflow shape:
 
