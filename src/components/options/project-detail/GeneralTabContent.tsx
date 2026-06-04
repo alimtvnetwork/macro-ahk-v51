@@ -366,9 +366,9 @@ export function GeneralTabContent({ project, allProjects, onSave }: GeneralTabCo
             <select
               value={settings?.logLevel ?? "info"}
               onChange={(e) => {
-                const val = e.target.value as "debug" | "info" | "warn" | "error";
-                void onSave({ id: project.id, settings: { ...(settings ?? {}), logLevel: val } as StoredProject["settings"] });
-                toast.success(`Log level set to ${val}`);
+                const logLevel = e.target.value as "debug" | "info" | "warn" | "error";
+                void onSave({ id: project.id, settings: { ...(settings ?? {}), logLevel } as StoredProject["settings"] });
+                toast.success(`Log level set to ${logLevel}`);
               }}
               className="h-8 w-full rounded-md border border-input bg-background px-2 text-xs font-mono focus:outline-none focus:ring-2 focus:ring-ring"
             >
