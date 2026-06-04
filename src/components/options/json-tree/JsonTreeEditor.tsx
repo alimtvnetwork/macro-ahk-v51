@@ -36,8 +36,8 @@ export function JsonTreeEditor({ value, onChange }: Props) {
 
   const rootObj = parsed as JsonObject;
 
-  const handleValueUpdate = (path: string[], val: JsonValue) => {
-    handleUpdate(setNestedValue(rootObj, path, val));
+  const handleValueUpdate = (path: string[], nextValue: JsonValue) => {
+    handleUpdate(setNestedValue(rootObj, path, nextValue));
   };
 
   const handleDelete = (path: string[]) => {
@@ -48,8 +48,8 @@ export function JsonTreeEditor({ value, onChange }: Props) {
     handleUpdate(renameNestedKey(rootObj, path, newKey));
   };
 
-  const handleAddProperty = (key: string, val: JsonValue) => {
-    handleUpdate({ ...rootObj, [key]: val });
+  const handleAddProperty = (key: string, nextValue: JsonValue) => {
+    handleUpdate({ ...rootObj, [key]: nextValue });
   };
 
   const hasEntries = Object.keys(rootObj).length > 0;
@@ -97,7 +97,7 @@ function InvalidRootMessage({ onReset }: InvalidRootMessageProps) {
 }
 
 interface TreeEditorHeaderProps {
-  onAdd: (key: string, val: JsonValue) => void;
+  onAdd: (key: string, nextValue: JsonValue) => void;
 }
 
 /** Header bar with title and add-property button. */
