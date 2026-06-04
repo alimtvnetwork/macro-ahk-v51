@@ -51,8 +51,7 @@ describe('credit-balance-update cache', () => {
     });
 
     it('hydrates from IndexedDB after memory cache is cleared', async () => {
-        writeCreditBalanceUpdateCache('ws_1', result(), 10_000, 20_000);
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await writeCreditBalanceUpdateCache('ws_1', result(), 10_000, 20_000);
         clearCreditBalanceUpdateMemoryCache();
 
         const cached = await readCreditBalanceUpdateCache('ws_1', 20_500);
@@ -62,8 +61,7 @@ describe('credit-balance-update cache', () => {
     });
 
     it('invalidates memory and IndexedDB rows', async () => {
-        writeCreditBalanceUpdateCache('ws_1', result(), 10_000, 20_000);
-        await new Promise(resolve => setTimeout(resolve, 0));
+        await writeCreditBalanceUpdateCache('ws_1', result(), 10_000, 20_000);
 
         await invalidateCreditBalanceUpdateCache('ws_1');
 
