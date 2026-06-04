@@ -610,21 +610,21 @@ See that folder's `README.md` for the index.
 29. ✅ Wire `getBearerToken()` (no direct localStorage).
 30. ✅ Mandatory failure logging via `Logger.error('CreditBalanceUpdate.fetch', …)` with full Reason/ReasonDetail schema (file 11).
 
-#### Cache + single-flight (31–34)
-31. `credit-balance-cache.ts` — Map<WorkspaceId, CreditFetchResult> + IDB store `entries_v2_ktlo_free_cancelled`, 10-min TTL.
-32. Invalidation hooks: settings change, manual Refresh, auth recovery.
-33. Single-flight Map<WorkspaceId, Promise<…>> in controller.
-34. `__tests__/credit-balance-cache.test.ts` — TTL boundary, invalidation, single-flight join.
+#### Cache + single-flight (31–34) ✅ COMPLETED 2026-06-04
+31. ✅ `credit-balance-cache.ts` — Map<WorkspaceId, CreditFetchResult> + IDB store `entries_v2_ktlo_free_cancelled`, 10-min TTL.
+32. ✅ Invalidation hooks: settings change, manual Refresh/auth path via controller invalidation + forced-token retry.
+33. ✅ Single-flight Map<WorkspaceId, Promise<…>> in controller.
+34. ✅ `__tests__/credit-balance-cache.test.ts` — TTL boundary, invalidation, single-flight join.
 
-#### Controller (35–38)
-35. `credit-fetch-controller.ts` — trigger logic from spec file 02 (hasInlineCredits, plan branch, single auth retry).
-36. Expose `requestCredits(workspace)` and `setTimeoutMs(ms)` (hot reload).
-37. Subscribe to settings bus updates to refresh `timeoutMs`.
-38. `__tests__/credit-fetch-controller.test.ts` — InlineHit, Skipped, ApiHit, ApiCacheHit, Timeout, AuthError, single-flight.
+#### Controller (35–38) ✅ COMPLETED 2026-06-04
+35. ✅ `credit-fetch-controller.ts` — trigger logic from spec file 02 (hasInlineCredits, plan branch, single auth retry).
+36. ✅ Expose `requestCredits(workspace)` and `setTimeoutMs(ms)` (hot reload).
+37. ✅ Subscribe to settings bus updates to refresh `timeoutMs`.
+38. ✅ `__tests__/credit-fetch-controller.test.ts` — InlineHit, Skipped, ApiHit, ApiCacheHit, Timeout, AuthError, single-flight.
 
 #### UI integration (39–44)
-39. `credit-summary-resolver.ts` — produce `{available,total,daily,source}` for UI consumers.
-40. Update workspace row cell to call resolver; render `—` when source=Timeout & no cached value.
+39. ✅ `credit-summary-resolver.ts` — produce `{available,total,daily,source}` for UI consumers.
+40. ✅ Update workspace row cell to call resolver; render `—` when source=Timeout & no cached value.
 41. Update singleton tooltip with new Credits section (file 07).
 42. Update Credit Totals modal columns + CSV export to include new fields and `source`.
 43. Update `workspace-refill-priority.ts` to read from resolver (no duplicate math).
@@ -653,7 +653,7 @@ See that folder's `README.md` for the index.
 60. Mark Phase B complete in plan.md; update README.md/Phase-B box; close out.
 
 ### Remaining items
-1. Phase B step 31 (next).
+1. Phase B step 41 (next).
 2. Pending — Plan Task UX (`.lovable/plans/credit-totals-and-macro-ux-20-step.md`).
 3. Pending — Release installer hardening v0.2 (blocked on `MINISIGN_SECRET_KEY`).
 
