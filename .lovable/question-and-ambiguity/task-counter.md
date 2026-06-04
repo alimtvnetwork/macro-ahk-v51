@@ -37,6 +37,7 @@ Timestamps use **Asia/Kuala_Lumpur** per `mem://localization/timezone`.
 | 20 | 2026-06-04 | Task 0.8 quarantine retirement — graduate 5 files from the id-denylist legacy quarantine: `schema-meta-handler.ts` (`msg`→`message`), `xpath-validation-handler.ts` (`msg`→`request`, inner `msg`→`errorMessage`), `script-info-handler.ts` (`msg`→`request` ×2), `wasm-integrity.ts` (`obj`→`record`), `url-trigger.ts` (`el`→`element`). Removed entries from `eslint.config.js` quarantine list. 9/9 pinned `eslint-rules.test.mjs` still green; id-denylist clean on all 5 files. Cumulative graduations: 14 → 19. | none — direct mechanical rename, no design ambiguity |
 | 21 | 2026-06-04 | Task 0.8 quarantine retirement — graduate next 5 files from the id-denylist legacy quarantine: `allow-swallow-fallbacks.test.ts` (`ReturnType<typeof vi.fn>`→`Mock`), `lovable-dashboard-autoinject.test.ts` (`obj`→`record`), `manifest-seeder-migration.test.ts` (`ReturnType<typeof vi.fn>`→`Mock`, `obj`→`record`), `manifest-seeder-projects.test.ts` (`obj`→`record`), `shortcut-command-handler.test.ts` (`ReturnType<typeof vi.fn>`→`Mock`). Removed entries from `eslint.config.js` quarantine list. Cumulative graduations: 19 → 24. | none — direct mechanical rename, no design ambiguity |
 | 22 | 2026-06-04 | Task 0.8 quarantine retirement — graduate next 5 files from the id-denylist legacy quarantine: `config-seeder.ts` (`obj`→`record`), `context-menu-handler.ts` (`el`→`element` plus submenu helpers to keep max-lines clean), `csp-fallback.ts` (`el`→`element`), `token-seeder.test.ts` (`ReturnType<typeof vi.fn>`→`Mock`), `automation-chain-handler.ts` (`msg`→`request`). Removed entries from `eslint.config.js` quarantine list. Cumulative graduations: 24 → 29. | none — direct mechanical rename, no design ambiguity |
+| 23 | 2026-06-04 | Task 0.8 quarantine retirement — graduate next 5 files from the id-denylist legacy quarantine: `config-auth-handler.ts` (`obj`→`record`), `data-bridge-handler.ts` (`msg`→`request`), `dynamic-require-handler.ts` (`msg`→`request`), `error-handler.ts` (`msg`→`request`), `file-storage-handler.ts` (`cb`→`callback`, `msg`→`request`). Removed entries from `eslint.config.js` quarantine list and moved the quarantine guard fixture to `grouped-kv-handler.ts`. Cumulative graduations: 29 → 34. | none — direct mechanical rename, no design ambiguity |
 
 ## Notes
 
@@ -46,4 +47,4 @@ Timestamps use **Asia/Kuala_Lumpur** per `mem://localization/timezone`.
   ambiguities directly to `.lovable/question-and-ambiguity/` but
   did not increment a counter, because no counter file existed
   yet). Subsequent tasks increment from 2.
-- 18 tasks remaining in the window after task 22.
+- 17 tasks remaining in the window after task 23.

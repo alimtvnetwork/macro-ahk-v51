@@ -122,21 +122,21 @@ function countKeysWithPrefix(data: StoreData, prefix: string): number {
 export async function handleDataSet(
     message: MessageRequest,
 ): Promise<{ isOk: boolean; errorMessage?: string }> {
-    const msg = message as MessageRequest & {
+    const request = message as MessageRequest & {
         key: string;
         value: JsonValue;
         projectId: string;
         scriptId: string;
     };
 
-    const keyError = validateKey(msg.key);
+    const keyError = validateKey(request.key);
     const hasKeyError = keyError !== null;
 
     if (hasKeyError) {
         return { isOk: false, errorMessage: keyError! };
     }
 
-    const valueError = validateValue(msg.value);
+    const valueError = validateValue(request.value);
     const hasValueError = valueError !== null;
 
     if (hasValueError) {
@@ -144,22 +144,22 @@ export async function handleDataSet(
     }
 
     const data = await readStore();
-    const prefix = extractPrefix(msg.key);
+    const prefix = extractPrefix(request.key);
     const existingCount = countKeysWithPrefix(data, prefix);
-    const isNewKey = data[msg.key] === undefined;
+    const isNewKey = data[request.key] === undefined;
     const isOverKeyLimit = isNewKey && existingCount >= MAX_KEYS_PER_PREFIX;
 
     if (isOverKeyLimit) {
         return { isOk: false, errorMessage: `Exceeded ${MAX_KEYS_PER_PREFIX} keys per project` };
     }
 
-    const sanitizedValue = JSON.parse(JSON.stringify(msg.value));
+    const sanitizedValue = JSON.parse(JSON.stringify(request.value));
 
-    data[msg.key] = {
+    data[request.key] = {
         value: sanitizedValue,
         updatedAt: new Date().toISOString(),
-        projectId: msg.projectId,
-        scriptId: msg.scriptId,
+        projectId: request.projectId,
+        scriptId: request.scriptId,
     };
 
     await writeStore(data);
@@ -174,9 +174,9 @@ export async function handleDataSet(
 export async function handleDataGet(
     message: MessageRequest,
 ): Promise<{ value: JsonValue }> {
-    const msg = message as MessageRequest & { key: string };
+    const request = message as MessageRequest & { key: string };
     const data = await readStore();
-    const entry = data[msg.key];
+    const entry = data[request.key];
     const hasEntry = entry !== undefined;
 
     return { value: hasEntry ? entry.value : undefined };
@@ -190,10 +190,10 @@ export async function handleDataGet(
 export async function handleDataDelete(
     message: MessageRequest,
 ): Promise<{ isOk: boolean }> {
-    const msg = message as MessageRequest & { key: string };
+    const request = message as MessageRequest & { key: string };
     const data = await readStore();
 
-    delete data[msg.key];
+    delete data[request.key];
     await writeStore(data);
 
     return { isOk: true };
@@ -207,15 +207,15 @@ export async function handleDataDelete(
 export async function handleDataKeys(
     message: MessageRequest,
 ): Promise<{ keys: string[] }> {
-    const msg = message as MessageRequest & { prefix: string };
+    const request = message as MessageRequest & { prefix: string };
     const data = await readStore();
     const matchingKeys: string[] = [];
 
     for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(msg.prefix);
+        const hasPrefix = key.startsWith(request.prefix);
 
         if (hasPrefix) {
-            const strippedKey = key.slice(msg.prefix.length);
+            const strippedKey = key.slice(request.prefix.length);
 
             matchingKeys.push(strippedKey);
         }
@@ -232,15 +232,15 @@ export async function handleDataKeys(
 export async function handleDataGetAll(
     message: MessageRequest,
 ): Promise<{ entries: Record<string, unknown> }> {
-    const msg = message as MessageRequest & { prefix: string };
+    const request = message as MessageRequest & { prefix: string };
     const data = await readStore();
     const entries: Record<string, unknown> = {};
 
     for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(msg.prefix);
+        const hasPrefix = key.startsWith(request.prefix);
 
         if (hasPrefix) {
-            const strippedKey = key.slice(msg.prefix.length);
+            const strippedKey = key.slice(request.prefix.length);
 
             entries[strippedKey] = data[key].value;
         }
@@ -257,12 +257,12 @@ export async function handleDataGetAll(
 export async function handleDataClear(
     message: MessageRequest,
 ): Promise<{ isOk: boolean; cleared: number }> {
-    const msg = message as MessageRequest & { prefix: string };
+    const request = message as MessageRequest & { prefix: string };
     const data = await readStore();
     let cleared = 0;
 
     for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(msg.prefix);
+        const hasPrefix = key.startsWith(request.prefix);
 
         if (hasPrefix) {
             delete data[key];

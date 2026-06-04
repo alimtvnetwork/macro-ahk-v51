@@ -121,11 +121,6 @@ export default tseslint.config(
   // graduate off this list as their authored-source debt is cleaned.
   {
     files: [
-      "src/background/handlers/config-auth-handler.ts",
-      "src/background/handlers/data-bridge-handler.ts",
-      "src/background/handlers/dynamic-require-handler.ts",
-      "src/background/handlers/error-handler.ts",
-      "src/background/handlers/file-storage-handler.ts",
       "src/background/handlers/grouped-kv-handler.ts",
       "src/background/handlers/injection-handler.ts",
       "src/background/handlers/injection-namespace-bootstrap.ts",
