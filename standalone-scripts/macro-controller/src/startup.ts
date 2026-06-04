@@ -96,16 +96,17 @@ export function bootstrap(deps: {
     // Hydrate the credit-balance-update controller timeout (Step 47) so the
     // user-configured slider value takes effect on first paint. Subscribe so
     // SAVE_SETTINGS updates hot-reload into the controller too.
-    try {
-      const cbu = require('./credit-balance-update/credit-fetch-controller') as {
-        setTimeoutMs: (n: number) => void;
-        subscribeCreditFetchSettings: () => void;
-      };
-      if (typeof overrides.creditFetchDelayMs === 'number') {
-        cbu.setTimeoutMs(overrides.creditFetchDelayMs);
-      }
-      cbu.subscribeCreditFetchSettings();
-    } catch (_e: unknown) { /* allow-swallow: non-critical, controller may be tree-shaken in some builds. */ }
+    if (typeof overrides.creditFetchDelayMs === 'number') {
+      setCreditFetchTimeoutMs(overrides.creditFetchDelayMs);
+    }
+    subscribeCreditFetchSettings();
+
+    // Re-render the UI when the user saves new overrides so the workspace
+    // status pills pick up the new thresholds without a page reload.
+    onSettingsChange(function () {
+      try { updateUI(); } catch (_e: unknown) { /* UI may not be mounted yet */ } // allow-swallow: UI may not be mounted at settings-change time; non-critical cosmetic update.
+    });
+  });
 
     // Re-render the UI when the user saves new overrides so the workspace
     // status pills pick up the new thresholds without a page reload.
