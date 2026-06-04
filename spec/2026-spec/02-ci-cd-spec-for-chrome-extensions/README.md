@@ -1358,7 +1358,7 @@ preflight-secrets:
         HAS_CWS_CLIENT_ID: ${{ secrets.CWS_CLIENT_ID != '' }}
         HAS_CWS_CLIENT_SECRET: ${{ secrets.CWS_CLIENT_SECRET != '' }}
         HAS_CWS_REFRESH_TOKEN: ${{ secrets.CWS_REFRESH_TOKEN != '' }}
-        HAS_CWS_EXTENSION_ID_<SLUG>: ${{ secrets.CWS_EXTENSION_ID_<SLUG> != '' }}
+        HAS_CWS_EXTENSION_ID_MY_EXTENSION: ${{ secrets.CWS_EXTENSION_ID_MY_EXTENSION != '' }}
         HAS_MINISIGN_SECRET_KEY: ${{ secrets.MINISIGN_SECRET_KEY != '' }}
         HAS_MINISIGN_PASSWORD: ${{ secrets.MINISIGN_PASSWORD != '' }}
       run: |
@@ -1374,7 +1374,7 @@ preflight-secrets:
           require_secret CWS_CLIENT_ID "$HAS_CWS_CLIENT_ID" 11
           require_secret CWS_CLIENT_SECRET "$HAS_CWS_CLIENT_SECRET" 11
           require_secret CWS_REFRESH_TOKEN "$HAS_CWS_REFRESH_TOKEN" 11
-          require_secret CWS_EXTENSION_ID_<SLUG> "$HAS_CWS_EXTENSION_ID_<SLUG>" 11
+          require_secret CWS_EXTENSION_ID_MY_EXTENSION "$HAS_CWS_EXTENSION_ID_MY_EXTENSION" 11
         fi
         if [ "$NEED_MINISIGN" = "true" ]; then
           require_secret MINISIGN_SECRET_KEY "$HAS_MINISIGN_SECRET_KEY" 12
@@ -1382,10 +1382,10 @@ preflight-secrets:
         fi
 ```
 
-For multiple extensions, generate one `HAS_CWS_EXTENSION_ID_<SLUG>` env line and
-one `require_secret CWS_EXTENSION_ID_<SLUG> ... 11` line per canonical slug.
-`<SLUG>` MUST be uppercased and normalized to `[A-Z0-9_]` before use in the
-secret name.
+Replace `MY_EXTENSION` with the canonical extension slug. For multiple
+extensions, generate one `HAS_CWS_EXTENSION_ID_<SLUG>` env line and one
+`require_secret CWS_EXTENSION_ID_<SLUG> ... 11` line per canonical slug. `<SLUG>`
+MUST be uppercased and normalized to `[A-Z0-9_]` before use in the secret name.
 
 All downstream jobs MUST list `needs: preflight-secrets` so a missing secret
 short-circuits the run before any build, sign, or publish step executes.
