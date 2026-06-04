@@ -67,12 +67,14 @@ test('§40.5 — example workflow YAML supports N extensions via strategy.matrix
 
 test('§40.6 — no-committed-ZIP rule enforced in .gitignore', () => {
     const ignored = readFileSync(GITIGNORE, 'utf8');
-    for (const pat of ['*.zip', '*.crx', '*.xpi', 'release-assets/']) {
-        assert.ok(
-            ignored.split(/\r?\n/).some(line => line.trim() === pat),
-            `.gitignore must include "${pat}" to enforce §26/§27`,
-        );
+    const lines = ignored.split(/\r?\n/).map(l => l.trim());
+    for (const pat of ['*.zip', '*.crx', '*.xpi']) {
+        assert.ok(lines.includes(pat), `.gitignore must include "${pat}" to enforce §26/§27`);
     }
+    assert.ok(
+        lines.includes('release-assets') || lines.includes('release-assets/'),
+        '.gitignore must ignore release-assets build output (§27)',
+    );
 });
 
 test('generic helper scripts referenced by the spec exist', () => {
