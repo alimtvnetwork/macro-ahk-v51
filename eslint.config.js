@@ -86,6 +86,7 @@ export default tseslint.config(
         "arr",
         "str",
         "num",
+        "val",
       ],
 
       // --- Function size (matches 25-line standard) ---
