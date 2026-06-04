@@ -207,15 +207,15 @@ export async function handleDataDelete(
 export async function handleDataKeys(
     message: MessageRequest,
 ): Promise<{ keys: string[] }> {
-    const msg = message as MessageRequest & { prefix: string };
+    const request = message as MessageRequest & { prefix: string };
     const data = await readStore();
     const matchingKeys: string[] = [];
 
     for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(msg.prefix);
+        const hasPrefix = key.startsWith(request.prefix);
 
         if (hasPrefix) {
-            const strippedKey = key.slice(msg.prefix.length);
+            const strippedKey = key.slice(request.prefix.length);
 
             matchingKeys.push(strippedKey);
         }
@@ -232,15 +232,15 @@ export async function handleDataKeys(
 export async function handleDataGetAll(
     message: MessageRequest,
 ): Promise<{ entries: Record<string, unknown> }> {
-    const msg = message as MessageRequest & { prefix: string };
+    const request = message as MessageRequest & { prefix: string };
     const data = await readStore();
     const entries: Record<string, unknown> = {};
 
     for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(msg.prefix);
+        const hasPrefix = key.startsWith(request.prefix);
 
         if (hasPrefix) {
-            const strippedKey = key.slice(msg.prefix.length);
+            const strippedKey = key.slice(request.prefix.length);
 
             entries[strippedKey] = data[key].value;
         }
@@ -257,12 +257,12 @@ export async function handleDataGetAll(
 export async function handleDataClear(
     message: MessageRequest,
 ): Promise<{ isOk: boolean; cleared: number }> {
-    const msg = message as MessageRequest & { prefix: string };
+    const request = message as MessageRequest & { prefix: string };
     const data = await readStore();
     let cleared = 0;
 
     for (const key of Object.keys(data)) {
-        const hasPrefix = key.startsWith(msg.prefix);
+        const hasPrefix = key.startsWith(request.prefix);
 
         if (hasPrefix) {
             delete data[key];
