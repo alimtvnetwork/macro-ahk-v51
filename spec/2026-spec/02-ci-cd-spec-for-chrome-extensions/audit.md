@@ -275,6 +275,7 @@ and exit-code `9` for tag immutability.
 
 ---
 
+<a id="g21-secrets-provisioning"></a>
 ## Step 13 — G21 ✅ PATCHED 2026-06-04 — Secrets provisioning checklist
 
 **Root cause:** §42 acknowledged "org-level secret provisioning" as residual
