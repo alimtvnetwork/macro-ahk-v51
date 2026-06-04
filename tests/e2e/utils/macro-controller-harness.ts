@@ -131,6 +131,24 @@ function buildChromeStubSource(extensionId: string): string {
     })();`;
 }
 
+function buildPageStubSource(projectId: string): string {
+    return `(() => {
+        const token = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJlMmUtaGFybmVzcyJ9.signature';
+        localStorage.setItem('marco_bearer_token', token);
+        localStorage.setItem('lovable-session-id', token);
+        localStorage.setItem('marco_token_saved_at', String(Date.now()));
+        const normalize = (raw) => String(raw || '').trim().replace(/^Bearer\\s+/i, '');
+        const isUsable = (raw) => { const t = normalize(raw); return t.startsWith('eyJ') && t.split('.').length === 3; };
+        window.marco = window.marco || {};
+        window.marco.authUtils = { normalizeBearerToken: normalize, isJwtToken: isUsable, isUsableToken: isUsable, extractBearerTokenFromUnknown: (raw) => isUsable(raw) ? normalize(raw) : '', scanSupabaseLocalStorage: () => '', extractSupabaseTokenFromRaw: () => '' };
+        window.marco.auth = { getLastAuthDiag: () => ({ source: 'harness-localStorage', bridgeOutcome: 'skipped', durationMs: 0 }) };
+        window.marco.prompts = { preWarm: () => Promise.resolve([]) };
+        window.marco.api = window.marco.api || {};
+        window.marco.api.credits = { fetchWorkspaces: async ({ baseUrl }) => { const resp = await fetch(String(baseUrl || 'https://api.lovable.dev') + '/user/workspaces'); return { ok: resp.ok, status: resp.status, data: await resp.json(), headers: {} }; } };
+        window.marco.api.workspace = { markViewed: () => Promise.resolve({ ok: true, status: 200, data: { workspace_id: 'ws-ktlo-001', project: { workspace_id: 'ws-ktlo-001', name: ${JSON.stringify(projectId)} } } }) };
+    })();`;
+}
+
 /**
  * Mount the macro-controller IIFE on a fake lovable.dev page.
  *
@@ -170,8 +188,9 @@ export async function mountMacroControllerHarness(
     // stable fake id so chrome.runtime.getURL stays deterministic in logs.
     const extensionId = context.serviceWorkers()[0]?.url().split('/')[2] ?? 'e2eharnessextensionid000000000000';
 
-    // 1. Inject chrome.* stubs before *any* document scripts run.
+    // 1. Inject chrome.*, auth, and minimal marco-sdk stubs before *any* document scripts run.
     await context.addInitScript(buildChromeStubSource(extensionId));
+    await context.addInitScript(buildPageStubSource(projectId));
 
     // 2. Route the simulated lovable.dev URL to our local shell.
     await context.route(targetUrl, async (route) => {
@@ -191,8 +210,7 @@ export async function mountMacroControllerHarness(
         const errorPromise = new Promise<Error | null>((resolve) => {
             const onPageError = (err: Error): void => { resolve(err); };
             page.once('pageerror', onPageError);
-            // Resolve to null on next tick if no error fires.
-            setTimeout(() => { page.off('pageerror', onPageError); resolve(null); }, 0);
+            setTimeout(() => { page.off('pageerror', onPageError); resolve(null); }, 250);
         });
         await page.addScriptTag({ content: bundleSource });
         bundleError = await errorPromise;

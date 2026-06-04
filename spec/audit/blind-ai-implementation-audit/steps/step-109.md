@@ -11,4 +11,4 @@ Smallest change with most-immediate clarity gain. Converts `.lovable/plan.md` (2
 ## Next action if approved
 1. Read `.lovable/plan.md` to preserve any unique content
 2. Append unique content to `plan.md`
-3. Replace `.lovable/plan.md` with: `# Plan SOT moved\nSee [../plan.md](../plan.md). Canonical roadmap lives there per mem://workflow/planning-roadmap.`
+3. Replace `.lovable/plan.md` with: `# Plan SOT moved\nSee [../../../../plan.md](../../../../plan.md). Canonical roadmap lives there per mem://workflow/planning-roadmap.`
