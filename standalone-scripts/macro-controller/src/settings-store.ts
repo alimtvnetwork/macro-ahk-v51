@@ -95,19 +95,19 @@ function sanitizePerWorkspace(
 ): Record<string, PerWorkspaceLifecycleOverride> | undefined {
   if (!raw || typeof raw !== 'object') return undefined;
   const out: Record<string, PerWorkspaceLifecycleOverride> = {};
-  for (const [wsId, val] of Object.entries(raw as Record<string, unknown>)) {
+  for (const [wsId, overrideValue] of Object.entries(raw as Record<string, unknown>)) {
     if (!wsId || typeof wsId !== 'string') continue;
-    if (!val || typeof val !== 'object') continue;
-    const v = val as Record<string, unknown>;
+    if (!overrideValue || typeof overrideValue !== 'object') continue;
+    const overrideRecord = overrideValue as Record<string, unknown>;
     const entry: PerWorkspaceLifecycleOverride = {};
-    if (isFiniteNonNegative(v.expiryGracePeriodDays)) {
-      entry.expiryGracePeriodDays = Math.floor(v.expiryGracePeriodDays);
+    if (isFiniteNonNegative(overrideRecord.expiryGracePeriodDays)) {
+      entry.expiryGracePeriodDays = Math.floor(overrideRecord.expiryGracePeriodDays);
     }
-    if (isFiniteNonNegative(v.refillWarningThresholdDays)) {
-      entry.refillWarningThresholdDays = Math.floor(v.refillWarningThresholdDays);
+    if (isFiniteNonNegative(overrideRecord.refillWarningThresholdDays)) {
+      entry.refillWarningThresholdDays = Math.floor(overrideRecord.refillWarningThresholdDays);
     }
-    if (isFiniteNonNegative(v.hoverCardHideGracePeriodMs)) {
-      entry.hoverCardHideGracePeriodMs = Math.floor(v.hoverCardHideGracePeriodMs);
+    if (isFiniteNonNegative(overrideRecord.hoverCardHideGracePeriodMs)) {
+      entry.hoverCardHideGracePeriodMs = Math.floor(overrideRecord.hoverCardHideGracePeriodMs);
     }
     if (entry.expiryGracePeriodDays !== undefined || entry.refillWarningThresholdDays !== undefined || entry.hoverCardHideGracePeriodMs !== undefined) {
       out[wsId] = entry;
@@ -133,9 +133,9 @@ function sanitize(raw: unknown): SettingsOverrides {
   ];
 
   numericFields.forEach(f => {
-    const val = r[f];
-    if (isFiniteNonNegative(val)) {
-      (out as Record<string, unknown>)[f] = Math.floor(val);
+    const fieldValue = r[f];
+    if (isFiniteNonNegative(fieldValue)) {
+      (out as Record<string, unknown>)[f] = Math.floor(fieldValue);
     }
   });
 
@@ -157,9 +157,9 @@ function sanitize(raw: unknown): SettingsOverrides {
   ];
 
   booleanFields.forEach(f => {
-    const val = r[f];
-    if (typeof val === 'boolean') {
-      (out as Record<string, unknown>)[f] = val;
+    const fieldValue = r[f];
+    if (typeof fieldValue === 'boolean') {
+      (out as Record<string, unknown>)[f] = fieldValue;
     }
   });
 
