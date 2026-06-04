@@ -169,6 +169,8 @@ deployments, a policy folder).
   | 4 | Targeted asset missing (404) in strict mode |
   | 5 | Network/tool error |
   | 6 | Integrity failed — SHA-256 mismatch, missing checksum entry, or archive invalid / extraction failed (see §17a) |
+  | 8 | Post-publish probe failed — at least one uploaded release asset is missing, zero-byte, or unreachable |
+  | 9 | Tag immutability violation — an existing version tag points at a different commit or the channel rule is violated |
 
 - **Discovery vs strict:** explicit `--version` or release-URL invocation = strict
   (no fallback). Bare invocation = discovery (latest → main as last resort).
@@ -668,7 +670,8 @@ on:
   workflow_dispatch:
     inputs:
       version: { description: "vX.Y.Z", required: true }
-permissions: { contents: write }
+permissions:
+  contents: read
 concurrency: { group: release-${{ github.ref }}, cancel-in-progress: false }
 env:
   NODE_VERSION: "24" # Active LTS as of 2026-06; refresh when Node active LTS changes.
@@ -678,7 +681,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs: { version: ${{ steps.v.outputs.version }}, exts: ${{ steps.d.outputs.exts }} }
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
         with: { fetch-depth: 0 }
       - id: v
         run: |
@@ -696,38 +699,53 @@ jobs:
     runs-on: ubuntu-latest
     strategy: { matrix: { ext: ${{ fromJSON(needs.setup.outputs.exts) }} } }
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
         with: { node-version: ${{ env.NODE_VERSION }}, cache: npm }
       - run: '[ -f package.json ] && npm ci || true'
       - run: '[ -f "${{ matrix.ext }}/package.json" ] && (cd "${{ matrix.ext }}" && npm ci && npm run build --if-present) || true'
+      - run: npx --yes web-ext@8 lint --source-dir "${{ matrix.ext }}" --warnings-as-errors
       - name: Package
         run: |
           mkdir -p release-assets
           name=$(jq -r .name "${{ matrix.ext }}/manifest.json" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
           ver="${{ needs.setup.outputs.version }}"
           src="${{ matrix.ext }}"; [ -d "$src/dist" ] && src="$src/dist"
-          (cd "$src" && zip -r "$GITHUB_WORKSPACE/release-assets/${name}-${ver}.zip" . -x '*.map')
-      - uses: actions/upload-artifact@v4
+          (cd "$src" && find . -exec touch -h -d '2020-01-01T00:00:00Z' {} + && TZ=UTC zip -X -r -9 "$GITHUB_WORKSPACE/release-assets/${name}-${ver}.zip" . -x '*.git*' '*.DS_Store' 'node_modules/*' '*.map')
+      - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
         with: { name: zip-${{ matrix.ext }}, path: release-assets/*.zip }
 
   publish:
     needs: [setup, build]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      - uses: actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e # v4.1.7
         with: { path: release-assets, merge-multiple: true }
       - run: |
           cp scripts/install.{sh,ps1} release-assets/
           echo "${{ needs.setup.outputs.version }}" >release-assets/VERSION.txt
           ( cd release-assets && sha256sum * >checksums.txt )
-      - uses: softprops/action-gh-release@v2
+      - uses: sigstore/cosign-installer@e1523de7571e31dbe865fd2e80c3e0197d95dc41 # v3.5.0
+      - run: |
+          cd release-assets
+          cosign sign-blob --yes --output-signature checksums.txt.sig --output-certificate checksums.txt.pem checksums.txt
+      - uses: softprops/action-gh-release@69320dbe05506a9a39fc8ae11030b214ec2d1f87 # v2.0.5
         with:
           tag_name: v${{ needs.setup.outputs.version }}
           files: release-assets/*
           draft: false
           prerelease: ${{ contains(needs.setup.outputs.version, '-') }}
+      - run: |
+          base="https://github.com/${GITHUB_REPOSITORY}/releases/download/v${{ needs.setup.outputs.version }}"
+          for asset in release-assets/*; do
+            size=$(curl -fsSLI "$base/$(basename "$asset")" | awk 'tolower($1)=="content-length:" {print $2}' | tr -d '\r')
+            [ "${size:-0}" -gt 0 ] || { echo "missing or empty asset: $(basename "$asset")" >&2; exit 8; }
+          done
 ```
 
 ## §22a. SHA-pin all third-party actions (supply-chain hard rule)
