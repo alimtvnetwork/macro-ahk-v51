@@ -83,14 +83,14 @@ export function writeCreditBalanceUpdateCache(
     result: CreditFetchResult,
     ttlMs: number = DEFAULT_TTL_MS,
     nowMs: number = Date.now(),
-): void {
+): Promise<void> {
     if (!workspaceId) {
-        return;
+        return Promise.resolve();
     }
     const entry = buildEntry(workspaceId, result, ttlMs, nowMs);
     memoryCache.set(workspaceId, entry);
-    openDb()
-        .then(function (db): Promise<void> { return writeStoreEntry(db, entry); })
+    return openDb()
+        .then(function (db): Promise<void> { return writeStoreEntry(db, entry).finally(function (): void { db.close(); }); })
         .catch(function (caught: CaughtError): void {
             logError(
                 'CreditBalanceUpdate.cache.write',
@@ -122,6 +122,7 @@ export async function readCreditBalanceUpdateCache(
     try {
         const db = await openDb();
         const entry = await readStoreEntry(db, workspaceId);
+        db.close();
         if (!entry || !isFresh(entry, nowMs)) {
             return null;
         }
@@ -142,6 +143,7 @@ export async function invalidateCreditBalanceUpdateCache(workspaceId: string): P
     try {
         const db = await openDb();
         await deleteStoreEntry(db, workspaceId);
+        db.close();
     } catch (caught: CaughtError) {
         logError(
             'CreditBalanceUpdate.cache.invalidate',
