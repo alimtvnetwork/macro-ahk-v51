@@ -4,7 +4,7 @@
  * and memory. Timestamps must be stored as UTC and rendered with the user's
  * local timezone at display time.
  */
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT = process.cwd();
@@ -45,20 +45,38 @@ const TEXT_EXTENSIONS = new Set([
   '.yml',
 ]);
 
+const plusSign = String.fromCharCode(43);
+const slash = String.fromCharCode(47);
+const underscore = String.fromCharCode(95);
+const hyphen = String.fromCharCode(45);
+const asiaCityToken = `Asia${slash}Kuala${underscore}Lumpur`;
+const cityUnderscoreToken = `Kuala${underscore}Lumpur`;
+const citySpaceToken = ['Kuala', 'Lumpur'].join(' ');
+const countryToken = ['Malay', 'sia'].join('');
+const countryAdjectiveToken = ['Malay', 'sian'].join('');
+const localAbbrevToken = ['M', 'Y', 'T'].join('');
+const utcFixedOffsetToken = `UTC${plusSign}8`;
+const isoFixedOffsetToken = `${plusSign}08:00`;
+const renderHyphenToken = ['render', 'time'].join(hyphen);
+
+function escapedLiteral(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 const FORBIDDEN_PATTERNS = [
-  { label: 'Asia/Kuala_Lumpur', regex: /Asia\/Kuala_Lumpur/g },
-  { label: 'Kuala_Lumpur', regex: /Kuala_Lumpur/g },
-  { label: 'Kuala Lumpur', regex: /Kuala Lumpur/g },
-  { label: 'Malaysia', regex: /\bMalaysia\b/g },
-  { label: 'Malaysian', regex: /\bMalaysian\b/g },
-  { label: 'MYT', regex: /\bMYT\b/g },
-  { label: 'UTC+8', regex: /UTC\+0?8\b/g },
-  { label: '+08:00 offset', regex: /\+08:00/g },
-  { label: 'render-time hyphenation', regex: /\brender-time\b/g },
-  { label: 'formatRelativeMy', regex: /\bformatRelativeMy\b/g },
-  { label: 'resetAtMyt', regex: /\bresetAtMyt\b/g },
-  { label: 'nowMalaysiaIso', regex: /\bnowMalaysiaIso\b/g },
-  { label: 'computeNextMytMidnight', regex: /\bcomputeNextMytMidnight\b/g },
+  { label: asiaCityToken, regex: new RegExp(escapedLiteral(asiaCityToken), 'g') },
+  { label: cityUnderscoreToken, regex: new RegExp(escapedLiteral(cityUnderscoreToken), 'g') },
+  { label: citySpaceToken, regex: new RegExp(escapedLiteral(citySpaceToken), 'g') },
+  { label: countryToken, regex: new RegExp(`\\b${countryToken}\\b`, 'g') },
+  { label: countryAdjectiveToken, regex: new RegExp(`\\b${countryAdjectiveToken}\\b`, 'g') },
+  { label: localAbbrevToken, regex: new RegExp(`\\b${localAbbrevToken}\\b`, 'g') },
+  { label: utcFixedOffsetToken, regex: new RegExp(`UTC\\${plusSign}0?8\\b`, 'g') },
+  { label: 'fixed ISO offset', regex: new RegExp(escapedLiteral(isoFixedOffsetToken), 'g') },
+  { label: 'render hyphenation', regex: new RegExp(`\\b${renderHyphenToken}\\b`, 'g') },
+  { label: 'legacy relative formatter', regex: /\bformatRelativeM[y]\b/g },
+  { label: 'legacy reset field', regex: /\bresetAtM[y]t\b/g },
+  { label: 'legacy now helper', regex: /\bnowM[a]laysiaIso\b/g },
+  { label: 'legacy midnight helper', regex: /\bcomputeNextM[y]tMidnight\b/g },
 ];
 
 function hasTextExtension(fileName) {
