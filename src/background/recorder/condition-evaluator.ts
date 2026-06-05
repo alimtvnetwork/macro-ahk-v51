@@ -87,6 +87,8 @@ type PollResult = {
     readonly Trace: PredicateEvaluation[];
 };
 
+type CaughtError = unknown;
+
 /* ------------------------------------------------------------------ */
 /*  Validation                                                         */
 /* ------------------------------------------------------------------ */
@@ -381,7 +383,7 @@ function createTimeoutOutcome(
 }
 
 function createInvalidSelectorOutcome(
-    error: unknown,
+    error: CaughtError,
     durationMs: number,
     polls: number,
     trace: PredicateEvaluation[],
