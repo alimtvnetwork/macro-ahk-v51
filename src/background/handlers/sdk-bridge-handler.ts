@@ -74,27 +74,27 @@ export async function handleSdkAuthGetJwt(): Promise<string | null> {
 
 /** COOKIES_GET — get a single cookie value by name. */
 export async function handleSdkCookiesGet(
-    msg: MessageRequest,
+    payload: MessageRequest,
 ): Promise<{ value: string | null }> {
-    const { name, url } = msg as MessageRequest & { name: string; url?: string };
+    const { name, url } = payload as MessageRequest & { name: string; url?: string };
     const value = await readCookieValueFromCandidates(name, url);
     return { value };
 }
 
 /** COOKIES_GET_DETAIL — get full cookie object. */
 export async function handleSdkCookiesGetDetail(
-    msg: MessageRequest,
+    payload: MessageRequest,
 ): Promise<{ cookie: chrome.cookies.Cookie | null }> {
-    const { name, url } = msg as MessageRequest & { name: string; url?: string };
+    const { name, url } = payload as MessageRequest & { name: string; url?: string };
     const cookie = await readCookieFromCandidates(name, url);
     return { cookie };
 }
 
 /** COOKIES_GET_ALL — get all cookies for a URL. */
 export async function handleSdkCookiesGetAll(
-    msg: MessageRequest,
+    payload: MessageRequest,
 ): Promise<{ cookies: chrome.cookies.Cookie[] }> {
-    const { url, domain } = msg as MessageRequest & { url?: string; domain?: string };
+    const { url, domain } = payload as MessageRequest & { url?: string; domain?: string };
     try {
         const details: chrome.cookies.GetAllDetails = {};
         if (url) details.url = url;
@@ -128,9 +128,9 @@ export async function handleSdkConfigGetAll(): Promise<{
 
 /** CONFIG_SET — store a config key in chrome.storage.local. */
 export async function handleSdkConfigSet(
-    msg: MessageRequest,
+    payload: MessageRequest,
 ): Promise<{ isOk: boolean }> {
-    const { key, value } = msg as MessageRequest & { key: string; value: JsonValue };
+    const { key, value } = payload as MessageRequest & { key: string; value: JsonValue };
     if (!key) return { isOk: false };
     const storageKey = `marco_config_${key}`;
     await chrome.storage.local.set({ [storageKey]: value });
@@ -143,18 +143,18 @@ export async function handleSdkConfigSet(
 
 /** XPATH_GET — test a single XPath expression on the sender's tab. */
 export async function handleSdkXPathGet(
-    msg: MessageRequest,
+    payload: MessageRequest,
     sender: chrome.runtime.MessageSender,
 ): Promise<unknown> {
-    return handleTestXPath(msg);
+    return handleTestXPath(payload);
 }
 
 /** XPATH_GET_ALL — return all recorded XPaths. */
 export async function handleSdkXPathGetAll(
-    msg: MessageRequest,
+    payload: MessageRequest,
     sender: chrome.runtime.MessageSender,
 ): Promise<unknown> {
-    return handleGetRecordedXPaths(msg, sender);
+    return handleGetRecordedXPaths(payload, sender);
 }
 
 /* ------------------------------------------------------------------ */
@@ -163,7 +163,7 @@ export async function handleSdkXPathGetAll(
 
 /** FILE_READ — read a project file by path. */
 export async function handleSdkFileRead(
-    msg: MessageRequest,
+    payload: MessageRequest,
 ): Promise<unknown> {
-    return handleFileGet(msg);
+    return handleFileGet(payload);
 }
