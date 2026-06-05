@@ -37,7 +37,14 @@ function readAuditRows(specRoot) {
 }
 
 function groupRows(items) {
-  return Map.groupBy(items, (row) => getFolderName(row.path));
+  const groups = new Map();
+  for (const row of items) {
+    const folder = getFolderName(row.path);
+    const currentRows = groups.get(folder) ?? [];
+    groups.set(folder, [...currentRows, row]);
+  }
+
+  return groups;
 }
 
 function getFolderName(path) {
