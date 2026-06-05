@@ -71,7 +71,7 @@ Required keys: `manifest_version` (=3), `name`, `version` (semver `X.Y.Z`),
 ├── <extension-1>/manifest.json
 ├── <extension-2>/manifest.json        # any number of siblings
 ├── release-assets/                    # ❌ git-ignored, build output
-└── CHANGELOG.md
+└── changelog.md
 ```
 
 ## Acceptance

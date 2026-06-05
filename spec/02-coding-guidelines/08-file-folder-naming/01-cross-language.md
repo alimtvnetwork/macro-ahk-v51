@@ -79,7 +79,7 @@ These are the only exceptions to the lowercase rule:
 ```
 ✅ README.md
 ✅ LICENSE
-✅ CHANGELOG.md
+✅ changelog.md
 ```
 
 ---

@@ -63,7 +63,7 @@ full registry → observability/12-failure-reason-codes.md
 
 ## W_DEPRECATION
 **Symptom:** Deprecated field/StepKind used.
-**Fix:** Migrate per macros/MIGRATION.md; will hard-fail at next MAJOR.
+**Fix:** Migrate per macros/migration.md; will hard-fail at next MAJOR.
 
 ## W_TRUNCATED
 **Symptom:** HTML/text truncated to 120/240 chars in non-verbose mode.

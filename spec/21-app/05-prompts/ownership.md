@@ -22,4 +22,4 @@ This spec subsystem (`spec/21-app/05-prompts/**`) is co-owned by:
 
 ## Drift detection
 - CI runs `audit-error-swallow` + spec cross-ref check (per 99-spec-issues/106).
-- Quarterly readiness re-score against BLIND-AI-SMOKE-TEST.md.
+- Quarterly readiness re-score against blind-ai-smoke-test.md.

@@ -15,9 +15,9 @@ Added 10 cross-cutting hardening documents to lift spec from "blind-AI implement
 | 5 | macros/engine/17-concurrency-model.md | R-01..R-05 races + teardown contract | 4 min |
 | 6 | macros/observability/14-error-taxonomy-quickref.md | Top-15 codes single-page | 3 min |
 | 7 | macros/storage/10-quota-and-eviction.md | Per-layer caps + eviction | 3 min |
-| 8 | ACRONYMS.md | Quick lookup companion to GLOSSARY | 2 min |
-| 9 | OWNERSHIP.md | Owners + review SLAs + change protocol | 2 min |
-| 10 | RELEASE-CHECKLIST.md | Pre-merge / schema / security / post-merge | 3 min |
+| 8 | acronyms.md | Quick lookup companion to GLOSSARY | 2 min |
+| 9 | ownership.md | Owners + review SLAs + change protocol | 2 min |
+| 10 | release-checklist.md | Pre-merge / schema / security / post-merge | 3 min |
 
 **Total elapsed**: ~30 min · **Drift findings**: 0
 
@@ -33,9 +33,9 @@ Added 10 cross-cutting hardening documents to lift spec from "blind-AI implement
 4. Author runbook for each top-15 reason code (link from observability/14) — **P2**
 5. Quarterly re-score automation against BLIND-AI-SMOKE-TEST — **P2**
 6. Translate GLOSSARY/ACRONYMS to in-product tooltips — **P3**
-7. Add `OWNERSHIP.md` enforcement via CODEOWNERS file — **P2**
+7. Add `ownership.md` enforcement via CODEOWNERS file — **P2**
 8. Storage pressure E-12 toast wired in UI (ui/14) — **P1**
 9. Add fixture pack for concurrency races R-01..R-05 (testing/13) — **P1**
-10. Publish MIGRATION.md template for future MAJOR bumps — **P3**
+10. Publish migration.md template for future MAJOR bumps — **P3**
 
 Say `next` to start the v5 wave (CI gates + cross-ref linter + INDEX.json).

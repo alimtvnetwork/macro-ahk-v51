@@ -247,7 +247,7 @@ Rules:
   Print only remediation hints; never log secret values.
 - Rotation: `RELEASE_PAT` ≤ 90 days; `CWS_REFRESH_TOKEN` on Google revocation
   events; `MINISIGN_*` only on key compromise. Rotation events MUST be recorded
-  in the repo's `CHANGELOG.md` under a `Security` heading (date + secret name,
+  in the repo's `changelog.md` under a `Security` heading (date + secret name,
   never the value).
 - §3 exit-code table extends: `10 = missing RELEASE_PAT`,
   `11 = missing CWS_* secret`, `12 = missing MINISIGN_* secret`.

@@ -6,7 +6,7 @@
 
 Answers to the four questions every team asks within their first week
 of adopting the `linters-cicd` pack. Bookmark this doc and link it from
-your repo's `CONTRIBUTING.md`.
+your repo's `contributing.md`.
 
 ---
 

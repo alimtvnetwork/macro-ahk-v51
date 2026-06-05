@@ -14,10 +14,10 @@ This 30-step batch closes the remaining content-density gaps so that the spec is
 
 ### Block A — Master indices & contracts (1–5)
 
-1. `GLOSSARY.md` — host-agnostic vocabulary table.
-2. `IMPLEMENTATION-CHECKLIST.md` — phase-by-phase blind-AI runbook bound to every folder.
-3. `BLIND-AI-SMOKE-TEST.md` — 20-question gate; each answer points to one file.
-4. `ACCEPTANCE-MATRIX.md` — every spec folder ↔ test-id binding.
+1. `glossary.md` — host-agnostic vocabulary table.
+2. `implementation-checklist.md` — phase-by-phase blind-AI runbook bound to every folder.
+3. `blind-ai-smoke-test.md` — 20-question gate; each answer points to one file.
+4. `acceptance-matrix.md` — every spec folder ↔ test-id binding.
 5. `README.md` rewritten as master index covering all subtrees.
 
 ### Block B — JSON Schemas (6–10)
@@ -62,7 +62,7 @@ This 30-step batch closes the remaining content-density gaps so that the spec is
 
 ## Verification
 
-- Every new file is linked from `README.md` and/or `IMPLEMENTATION-CHECKLIST.md` (no orphans).
+- Every new file is linked from `README.md` and/or `implementation-checklist.md` (no orphans).
 - JSON Schemas use draft 2020-12 + `additionalProperties:false` to fail-closed.
 - Pseudocode never swallows errors (compliant with `mem://constraints/no-retry-policy` + `mem://standards/error-logging-via-namespace-logger`).
 - CSS tokens HSL-only, dark-theme-enforced (Core memory).
@@ -86,7 +86,7 @@ The 4 latent content points that the 300 audit warned would surface under strict
 - `301-blind-ai-rescore-post-renumber.md` — structural 100/100
 - `302-gap-closure-30-step-proof.md` — structural gap closure
 - `README.md` — master index with all new subtrees
-- `ACCEPTANCE-MATRIX.md` — folder ↔ test-id binding
+- `acceptance-matrix.md` — folder ↔ test-id binding
 
 ## Acceptance
 

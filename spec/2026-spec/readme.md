@@ -14,7 +14,7 @@ not a replacement for the child specs.
 - [`02-ci-cd-spec-for-chrome-extensions/`](./02-ci-cd-spec-for-chrome-extensions/) — Manifest V3 CI/CD and release-hardening contracts.
 - [`03-chrome-ext-features/`](./03-chrome-ext-features/) — Runtime Chrome extension feature contracts.
 - [`03-db-and-sqlite-integration-with-chrome-extension/`](./03-db-and-sqlite-integration-with-chrome-extension/) — Storage and SQLite integration contracts.
-- [`OWNERS.md`](./OWNERS.md) — Cross-folder ownership map.
+- [`owners.md`](./owners.md) — Cross-folder ownership map.
 
 ## Current Spec Folders
 

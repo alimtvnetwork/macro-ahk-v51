@@ -22,7 +22,7 @@ Examples of broken-when-read-blind links:
 
 - `macros/00-concept.md` → references `mem://features/prompt-macros`
 - `macros/engine/04-audit-folder-writer.md` → references `mem://constraints/skipped-folders`
-- `macros/READINESS-SCORE.md` → references multiple `mem://` paths in the Evidence column
+- `macros/readiness-score.md` → references multiple `mem://` paths in the Evidence column
 
 ## Why a blind AI fails
 

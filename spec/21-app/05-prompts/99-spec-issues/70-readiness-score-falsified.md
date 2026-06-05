@@ -1,4 +1,4 @@
-# Audit — READINESS-SCORE.md (Bogus 100/100)
+# Audit — readiness-score.md (Bogus 100/100)
 **Audited:** 2026-06-02  · 44 lines
 ## Findings — line-by-line falsification
 | Row | Claim | Evidence cited | Reality | Verdict |

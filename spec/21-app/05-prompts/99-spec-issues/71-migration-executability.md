@@ -1,4 +1,4 @@
-# Audit — MIGRATION.md (Blind-AI Executability)
+# Audit — migration.md (Blind-AI Executability)
 **Audited:** 2026-06-02  · 93 lines
 ## Blind-AI walkthrough
 Stepping through as if a blind AI handed only this file:

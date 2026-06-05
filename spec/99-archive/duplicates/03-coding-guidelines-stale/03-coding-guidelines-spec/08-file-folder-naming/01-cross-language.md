@@ -82,7 +82,7 @@ No exceptions — all `.md` files use lowercase with hyphens:
 ✅ contributing.md
 ✅ axios-security-note.md
 ❌ README.md
-❌ CHANGELOG.md
+❌ changelog.md
 ```
 
 `LICENSE` (no extension) remains uppercase by convention.

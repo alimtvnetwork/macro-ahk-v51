@@ -8,13 +8,13 @@ Use for every MINOR or MAJOR spec release. PATCH releases may skip items marked 
 - [ ] All edited normative docs have updated `Status` line + version
 - [ ] JSON schemas validate sample fixtures (testing/13)
 - [ ] Cross-references resolved (no dangling `spec/...` paths)
-- [ ] BLIND-AI-SMOKE-TEST.md still passes 20/20
-- [ ] IMPLEMENTATION-CHECKLIST.md updated if surface changed
-- [ ] CHANGELOG.md entry under correct SemVer bucket
-- [ ] (P) GLOSSARY.md / ACRONYMS.md updated for new terms
+- [ ] blind-ai-smoke-test.md still passes 20/20
+- [ ] implementation-checklist.md updated if surface changed
+- [ ] changelog.md entry under correct SemVer bucket
+- [ ] (P) glossary.md / acronyms.md updated for new terms
 
 ## Schema/grammar changes (MAJOR only)
-- [ ] MIGRATION.md updated with before/after sample
+- [ ] migration.md updated with before/after sample
 - [ ] Deprecation announced ≥ 2 MINOR releases prior (governance/10)
 - [ ] Reason code added/updated (observability/12)
 
@@ -26,7 +26,7 @@ Use for every MINOR or MAJOR spec release. PATCH releases may skip items marked 
 ## Post-merge
 - [ ] Tag spec version in repo (`spec-v<major.minor.patch>`)
 - [ ] Update mem://features/prompt-macros + prompt-variables if surface changed
-- [ ] Notify owners listed in OWNERSHIP.md
+- [ ] Notify owners listed in ownership.md
 - [ ] File close-out note in 99-spec-issues/
 
 ## Rollback

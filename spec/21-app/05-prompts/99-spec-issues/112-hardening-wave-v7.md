@@ -14,8 +14,8 @@ and CI gates from v4..v6 cannot silently drift out of sync.
 | 3 | spec-gates.yml +2 jobs | runbook-smoke, tooltip-dict-gate wired into CI | 2 min |
 | 4 | 99-spec-issues/README.md | Issue tracker navigation map (file ranges + conventions) | 3 min |
 | 5 | mem://workflow/spec-hardening-waves | Cross-wave summary memory | 4 min |
-| 6 | SPEC-GATES-BADGE.md | README badge integration snippet | 2 min |
-| 7 | macros/CHANGELOG.md | Added v2.1.0–v2.4.0 entries (waves v4..v7) | 4 min |
+| 6 | spec-gates-badge.md | README badge integration snippet | 2 min |
+| 7 | macros/changelog.md | Added v2.1.0–v2.4.0 entries (waves v4..v7) | 4 min |
 | 8 | macros/testing/16-race-fixture-executor.md | Driver spec for fixture pack | 4 min |
 | 9 | Regression check — all 6 gates green | perf-budget, xref-lint, index-drift, smoke-rescore, runbook-smoke, tooltip-dict-gate | 1 min |
 | 10 | This close-out | v7 summary + backlog | 2 min |
@@ -44,7 +44,7 @@ and CI gates from v4..v6 cannot silently drift out of sync.
 5. Author MIGRATION-v2-to-v3.md (deferred until v3 planned)
 6. Wire governance-report.md artifact into Options "Spec health" panel
 7. Add vitest harness `race-fixtures` job to spec-gates
-8. CHANGELOG release note in root CHANGELOG.md (currently only macros/CHANGELOG)
+8. CHANGELOG release note in root changelog.md (currently only macros/CHANGELOG)
 9. Bot to auto-open issue when smoke-rescore drops below 20/20
 10. Quarterly memory-store snapshot diff (detect stale mem:// refs)
 

@@ -7,7 +7,7 @@
 | Metric | Value |
 |---|---|
 | **Blind-AI success score** | **88 / 100** |
-| **Confirmed?** | ✅ Yes — verifiable via `scripts/spec/smoke-rescore.mjs` against `BLIND-AI-SMOKE-TEST.md` (20/20 checklist pass) + cross-ref linter (0 hard-fails) |
+| **Confirmed?** | ✅ Yes — verifiable via `scripts/spec/smoke-rescore.mjs` against `blind-ai-smoke-test.md` (20/20 checklist pass) + cross-ref linter (0 hard-fails) |
 | Prior score (v3 closeout, 2026-06-02) | 100 / 100 (audited, narrow `spec/21-app/05-prompts/` scope) |
 | Why current is 88, not 100 | Structural defects in **folder numbering** of `spec/2026-spec/01-prompt-spec/` — not content gaps |
 

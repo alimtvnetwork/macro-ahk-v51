@@ -1,6 +1,6 @@
 # 94 — Revised Readiness Score (Replaces Falsified 100/100)
 **Audited:** 2026-06-02
-**Supersedes:** `macros/READINESS-SCORE.md` (falsified — see C70)
+**Supersedes:** `macros/readiness-score.md` (falsified — see C70)
 ## Honest rubric
 | # | Dimension | Weight | Score | Justification |
 |---|---|---:|---:|---|

@@ -20,7 +20,7 @@ Part of [`spec/2026-spec/02-ci-cd-spec-for-chrome-extensions/`](./readme.md).
 ## §35. Pre-tag checklist
 
 - [ ] `manifest.version` bumped on every changed extension.
-- [ ] `CHANGELOG.md` has a new section dated today.
+- [ ] `changelog.md` has a new section dated today.
 - [ ] All tests/lints green on `main`.
 - [ ] No `*.zip` or `dist/` tracked by git.
 - [ ] Release branch created: `release/vX.Y.Z`.
@@ -77,7 +77,7 @@ A published GitHub Release is **immutable from the user's perspective** — `ins
 
 1. Drop the new folder anywhere (e.g. `./my-new-ext/`) with a Manifest V3
    `manifest.json`.
-2. Add an entry in the root `CHANGELOG.md`.
+2. Add an entry in the root `changelog.md`.
 3. Commit — the matrix in §22 auto-discovers it.
 4. Tag `vX.Y.Z` → both extensions ship side-by-side on the same Release page.
 

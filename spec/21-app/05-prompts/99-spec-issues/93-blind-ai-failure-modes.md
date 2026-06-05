@@ -2,7 +2,7 @@
 **Audited:** 2026-06-02
 What actually breaks when a blind AI tries to implement the subsystem from `spec/21-app/05-prompts/` alone.
 ## Scenario 1 — "Implement the schema validator"
-- AI reads `READINESS-SCORE.md` row 4 → cited evidence `json/00`–`09`.
+- AI reads `readiness-score.md` row 4 → cited evidence `json/00`–`09`.
 - AI runs `ls spec/21-app/05-prompts/macros/json/` → **directory not found** (C29).
 - AI falls back to `folder-layout/02-schema-reference.md` (not advertised anywhere) → may miss it.
 - **Outcome:** validator written against guessed shape; round-trip fails (C38).
@@ -21,7 +21,7 @@ What actually breaks when a blind AI tries to implement the subsystem from `spec
 - AI greps Core memory for `Reason` codes → finds `JsThrew`, `SelectorMiss`, etc., but no authoritative complete enum.
 - **Outcome:** AI emits ad-hoc Reason strings; downstream UI panel + webhook validator reject them.
 ## Scenario 5 — "Migrate a legacy prompt"
-- AI follows `MIGRATION.md` step 1 (move file) — OK.
+- AI follows `migration.md` step 1 (move file) — OK.
 - Step 2 (add `info.json`) — schema not inlined, `json/` folder missing (C29, C71).
 - **Outcome:** AI guesses field names; CI guards `DuplicateMacroSlug`/`SlugFolderMismatch` cited but their implementation files unlinked → AI cannot run them.
 ## Scenario 6 — "Stop writing outside audit root"

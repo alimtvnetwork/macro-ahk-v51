@@ -1,4 +1,4 @@
-# Audit — CHANGELOG.md vs Actual Artifacts
+# Audit — changelog.md vs Actual Artifacts
 **Audited:** 2026-06-02  · 24 lines · single entry `[1.0.0] — 2026-06-02`
 ## Falsification table
 | CHANGELOG claim | Actual evidence | Verdict |

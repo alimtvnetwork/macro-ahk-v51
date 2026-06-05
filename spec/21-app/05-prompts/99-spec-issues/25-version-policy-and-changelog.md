@@ -3,7 +3,7 @@
 **Version:** 0.1.0
 **Updated:** 2026-06-02
 **Severity:** High
-**Files affected:** 95 (no doc declares semver intent) + `macros/CHANGELOG.md` is 24 lines for a 95-file subsystem
+**Files affected:** 95 (no doc declares semver intent) + `macros/changelog.md` is 24 lines for a 95-file subsystem
 
 ---
 
@@ -25,7 +25,7 @@ Add `spec/21-app/05-prompts/CONVENTIONS.md` § "Versioning":
 ## Sub-issue C24b — Changelog coverage gap
 
 ```
-$ wc -l spec/21-app/05-prompts/macros/CHANGELOG.md
+$ wc -l spec/21-app/05-prompts/macros/changelog.md
 24 lines
 ```
 

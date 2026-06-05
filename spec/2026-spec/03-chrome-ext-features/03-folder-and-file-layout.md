@@ -28,7 +28,7 @@ my-extension/
 ├── tsconfig.json
 ├── vite.config.ts                 # or rollup / webpack — one bundler config
 ├── README.md
-├── CHANGELOG.md
+├── changelog.md
 ├── public/                        # static assets copied verbatim to dist/
 │   ├── icons/{16,48,128}.png
 │   └── sql-wasm.wasm              # bundled, never CDN-loaded, only when SQLite exists

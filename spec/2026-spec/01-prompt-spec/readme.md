@@ -6,19 +6,19 @@
 
 ## How to read
 
-1. New implementer? Start with `IMPLEMENTATION-CHECKLIST.md`, then run `BLIND-AI-SMOKE-TEST.md` at the end.
-2. Vocabulary? `GLOSSARY.md` + `01-glossary/`.
-3. Want to verify acceptance? `ACCEPTANCE-MATRIX.md`.
+1. New implementer? Start with `implementation-checklist.md`, then run `blind-ai-smoke-test.md` at the end.
+2. Vocabulary? `glossary.md` + `01-glossary/`.
+3. Want to verify acceptance? `acceptance-matrix.md`.
 
 ## Top-level files
 
 - `00-overview.md` — narrative overview
 - `01-plan-tasks-1-20.md` — task list
 - `02-hardening-backlog.md` — known follow-ups
-- `GLOSSARY.md` — terms
-- `IMPLEMENTATION-CHECKLIST.md` — phase-by-phase runbook
-- `BLIND-AI-SMOKE-TEST.md` — 20-question gate
-- `ACCEPTANCE-MATRIX.md` — folder ↔ test-id binding
+- `glossary.md` — terms
+- `implementation-checklist.md` — phase-by-phase runbook
+- `blind-ai-smoke-test.md` — 20-question gate
+- `acceptance-matrix.md` — folder ↔ test-id binding
 
 ## Spec folders (dense 01–20)
 

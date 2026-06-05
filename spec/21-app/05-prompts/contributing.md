@@ -7,8 +7,8 @@ Welcome. This guide is the single entry point for contributing to
 
 ## 1. Before you start
 - Read `README.md` for subsystem overview.
-- Check `OWNERSHIP.md` for who must review your area.
-- Skim `GLOSSARY.md` + `ACRONYMS.md`.
+- Check `ownership.md` for who must review your area.
+- Skim `glossary.md` + `acronyms.md`.
 
 ## 2. Decide change type (SemVer)
 Per `macros/governance/10-versioning-deprecation.md`:
@@ -40,14 +40,14 @@ node scripts/spec/smoke-rescore.mjs
 All must exit 0 before PR.
 
 ## 6. PR checklist
-Follow `RELEASE-CHECKLIST.md` strictly. Required:
+Follow `release-checklist.md` strictly. Required:
 - Updated `Status` + version on every edited normative doc
 - CHANGELOG entry under correct SemVer bucket
 - `INDEX.json` regenerated and committed
 - BLIND-AI-SMOKE-TEST still 20/20
 
 ## 7. Reviewer assignment
-CI uses `.github/CODEOWNERS` (derived from `OWNERSHIP.md`).
+CI uses `.github/CODEOWNERS` (derived from `ownership.md`).
 Schema/security touching → mandatory second reviewer.
 
 ## 8. Post-merge

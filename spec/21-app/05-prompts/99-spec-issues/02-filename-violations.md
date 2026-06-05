@@ -19,9 +19,9 @@
 | Current name                              | Problem                          | Should be (proposed)            |
 |-------------------------------------------|----------------------------------|---------------------------------|
 | `macros/README.md`                        | Uppercase, no `NN-` prefix       | `macros/00-overview.md`         |
-| `macros/CHANGELOG.md`                     | Uppercase, no prefix             | `macros/98-changelog.md`        |
-| `macros/MIGRATION.md`                     | Uppercase, no prefix             | `macros/95-migration.md`        |
-| `macros/READINESS-SCORE.md`               | Uppercase, no prefix             | `macros/96-readiness-score.md`  |
+| `macros/changelog.md`                     | Uppercase, no prefix             | `macros/98-changelog.md`        |
+| `macros/migration.md`                     | Uppercase, no prefix             | `macros/95-migration.md`        |
+| `macros/readiness-score.md`               | Uppercase, no prefix             | `macros/96-readiness-score.md`  |
 | `variables/README.md`                     | Uppercase, no prefix             | `variables/00-overview.md`      |
 | `macro-prompts/README.md`                 | Uppercase, no prefix             | `macro-prompts/00-overview.md`  |
 
@@ -29,7 +29,7 @@
 
 ## Why a blind AI fails
 
-The scanner enumerates files by `^[0-9]{2}-.+\.md$`. `README.md`, `CHANGELOG.md`, `MIGRATION.md`, `READINESS-SCORE.md` are **invisible** to the scanner — they would not appear in the spec graph, table of contents, or AI prompt manifest. The AI would never read them.
+The scanner enumerates files by `^[0-9]{2}-.+\.md$`. `README.md`, `changelog.md`, `migration.md`, `readiness-score.md` are **invisible** to the scanner — they would not appear in the spec graph, table of contents, or AI prompt manifest. The AI would never read them.
 
 ## Fix outline
 

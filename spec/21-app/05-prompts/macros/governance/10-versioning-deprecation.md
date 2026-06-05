@@ -7,7 +7,7 @@ Status: Normative · v1.0.0 · 2026-06-02
 - MINOR — additive (new StepKind, new schema field with default)
 - PATCH — docs, clarifications, examples
 
-Current: **2.0.0** (see macros/CHANGELOG.md).
+Current: **2.0.0** (see macros/changelog.md).
 
 ## Deprecation lifecycle
 1. **Announce** — mark `@deprecated` in schema (`x-deprecated: true`) + CHANGELOG entry.
@@ -20,4 +20,4 @@ Current: **2.0.0** (see macros/CHANGELOG.md).
 - `MacroEvent` discriminant `type` strings are append-only.
 
 ## Migration docs
-Every MAJOR ships a `MIGRATION.md` with before/after JSON samples (see macros/MIGRATION.md).
+Every MAJOR ships a `migration.md` with before/after JSON samples (see macros/migration.md).

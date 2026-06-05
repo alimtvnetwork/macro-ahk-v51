@@ -8,11 +8,11 @@
 | 1 | `mem://features/prompt-macros` | Core memory P0 |
 | 2 | `mem://features/prompt-variables` | Core memory P0 |
 | 3 | `README.md` (root of 05-prompts) | Master index |
-| 4 | `GLOSSARY.md` | Terms |
-| 5 | `IMPLEMENTATION-CHECKLIST.md` | Blind-AI runbook |
-| 6 | `BLIND-AI-SMOKE-TEST.md` | 20-question smoke test |
-| 7 | `macros/SCHEMA-INDEX.md` | JSON-schema index |
-| 8 | `macros/EDGE-CASES.md` | 15 normative edge cases |
+| 4 | `glossary.md` | Terms |
+| 5 | `implementation-checklist.md` | Blind-AI runbook |
+| 6 | `blind-ai-smoke-test.md` | 20-question smoke test |
+| 7 | `macros/schema-index.md` | JSON-schema index |
+| 8 | `macros/edge-cases.md` | 15 normative edge cases |
 | 9 | `macros/json/10-macro-definition.schema.json` | schema |
 | 10 | `macros/json/11-run-state.schema.json` | schema |
 | 11 | `macros/json/12-audit-output.schema.json` | schema |
