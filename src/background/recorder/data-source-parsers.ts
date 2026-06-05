@@ -120,6 +120,8 @@ export function parseJsonRows(text: string): ParsedDataSource {
     };
 }
 
+export const parseJson = parseJsonRows;
+
 function collectJsonColumns(rows: ReadonlyArray<unknown>): string[] {
     const seen = new Set<string>();
     const ordered: string[] = [];
@@ -156,11 +158,11 @@ function collectJsonColumns(rows: ReadonlyArray<unknown>): string[] {
 export function evaluateJsDataSource(body: string): ParsedDataSource {
     let result: unknown;
     try {
-        const fn = new Function(`"use strict"; ${body}`);
-        result = fn();
-    } catch (err) {
-        const msg = err instanceof Error ? err.message : String(err);
-        throw new Error(`JsDataSourceThrew: ${msg}`);
+        const evaluator = new Function(`"use strict"; ${body}`);
+        result = evaluator();
+    } catch (caughtError) {
+        const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+        throw new Error(`JsDataSourceThrew: ${message}`);
     }
 
     const isArray = Array.isArray(result);
@@ -214,22 +216,87 @@ export async function fetchEndpointDataSource(
     const timeoutMs = init.TimeoutMs ?? 15_000;
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
+    const response = await requestEndpointData(init, fetchImpl, controller, timer);
+    const payload = await readEndpointPayload(response);
+    const rows = assertPayloadRows(payload);
+    const columns = collectJsonColumns(rows);
+    const normalized = rows.map((row) => normalizeRow(row as Record<string, unknown>));
 
-    let response: Response;
+    return {
+        DataSourceKindId: ExtendedDataSourceKindId.Endpoint,
+        Columns: columns,
+        RowCount: rows.length,
+        Rows: normalized,
+    };
+}
+
+async function requestEndpointData(
+    init: EndpointFetchInit,
+    fetchImpl: typeof fetch,
+    controller: AbortController,
+    timer: ReturnType<typeof setTimeout>,
+): Promise<Response> {
     try {
-        response = await fetchImpl(init.Url, {
+        return await fetchImpl(init.Url, {
             method: init.Method ?? "GET",
             headers: { Accept: "application/json", ...(init.Headers ?? {}) },
             body: init.Body,
             signal: controller.signal,
         });
-    } catch (err) {
+    } catch (caughtError) {
         clearTimeout(timer);
-        const msg = err instanceof Error ? err.message : String(err);
+        const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
         const isAbort = controller.signal.aborted;
         const reason = isAbort ? "EndpointTimeout" : "EndpointHttpError";
-        throw new Error(`${reason}: ${msg}`);
+        throw new Error(`${reason}: ${message}`);
     }
+}
+
+async function readEndpointPayload(response: Response): Promise<unknown> {
+    await assertResponseOk(response);
+
+    try {
+        return await response.json();
+    } catch (caughtError) {
+        const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+        throw new Error(`EndpointParseError: ${message}`);
+    }
+}
+
+async function assertResponseOk(response: Response): Promise<void> {
+    if (response.ok) {
+        return;
+    }
+
+    const snippet = await safeReadSnippet(response);
+    throw new Error(
+        `EndpointHttpError: ${response.status} ${response.statusText} — ${snippet}`,
+    );
+}
+
+function assertPayloadRows(payload: unknown): ReadonlyArray<unknown> {
+    if (Array.isArray(payload) === false) {
+        throw new Error("EndpointParseError: response must be a JSON array of objects");
+    }
+
+    if (payload.length === 0) {
+        throw new Error("EndpointParseError: response array is empty");
+    }
+
+    return payload;
+}
+
+async function safeReadSnippet(response: Response): Promise<string> {
+    try {
+        const text = await response.text();
+
+        return text.slice(0, 2048);
+    } catch (caughtError) {
+        const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+
+        return `<unreadable body: ${message}>`;
+    }
+}
     clearTimeout(timer);
 
     if (response.ok === false) {
