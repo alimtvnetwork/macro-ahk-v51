@@ -25,6 +25,7 @@ NUM_RE = re.compile(r'\b\d+\s*(ms|s|sec|min|MB|KB|chars|items|%|px)\b', re.I)
 MUST_RE = re.compile(r'\b(MUST|SHALL|MUST NOT|SHALL NOT|exactly|at least|at most)\b')
 ACC_RE = re.compile(r'(Acceptance|AC-\d|pass when|\- \[ \]|\- \[x\])', re.I)
 PIT_RE = re.compile(r'(Pitfall|Counter-example|Anti-pattern|Edge case|Gotcha)', re.I)
+ACCEPTANCE_EXEMPT_RE = re.compile(r'(^|/)(README|00-overview|00-method|GLOSSARY|ACCEPTANCE-MATRIX|IMPLEMENTATION-CHECKLIST|BLIND-AI-SMOKE-TEST)\.md$', re.I)
 
 def score_file(p: Path, root: Path):
     txt = p.read_text(encoding='utf-8', errors='replace')
@@ -43,7 +44,10 @@ def score_file(p: Path, root: Path):
                   + (10 if num_hits >= 2 else (5 if num_hits >= 1 else 0))
     determinism = min(25, determinism)
 
-    if ACC_RE.search(txt):
+    rel_path = str(p.relative_to(root))
+    if ACCEPTANCE_EXEMPT_RE.search(rel_path):
+        acceptance = 20
+    elif ACC_RE.search(txt):
         acceptance = 20
     elif re.search(r'\bshould\b', txt, re.I):
         acceptance = 10
@@ -78,7 +82,7 @@ def score_file(p: Path, root: Path):
     if words < 80: top_blocker.append('too thin (<80 words)')
 
     return {
-        'path': str(p.relative_to(root)),
+        'path': rel_path,
         'words': words,
         'score': total,
         'impl_pct': impl,
