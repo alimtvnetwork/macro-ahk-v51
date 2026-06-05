@@ -74,6 +74,19 @@ export interface WaitOptions {
     readonly Now?: () => number;
 }
 
+type WaitClock = {
+    readonly Sleep: (ms: number) => Promise<void>;
+    readonly Now: () => number;
+    readonly PollMs: number;
+    readonly Started: number;
+    readonly Deadline: number;
+};
+
+type PollResult = {
+    readonly Outcome: ConditionWaitOutcome | null;
+    readonly Trace: PredicateEvaluation[];
+};
+
 /* ------------------------------------------------------------------ */
 /*  Validation                                                         */
 /* ------------------------------------------------------------------ */
@@ -285,59 +298,102 @@ export async function waitForCondition(
     condition: Condition,
     options: WaitOptions,
 ): Promise<ConditionWaitOutcome> {
-    try { validateCondition(condition); }
-    catch (err) {
-        return {
-            Ok: false,
-            DurationMs: 0,
-            Polls: 0,
-            Reason: "InvalidSelector",
-            Detail: err instanceof Error ? err.message : String(err),
-            LastEvaluation: [],
-        };
-    }
+    const validationFailure = validateConditionForWait(condition);
+    if (validationFailure !== null) return validationFailure;
 
-    const sleep = options.Sleep ?? defaultSleep;
-    const now = options.Now ?? defaultNow;
-    const pollMs = Math.max(1, options.PollMs ?? 50);
-    const started = now();
-    const deadline = started + Math.max(0, options.TimeoutMs);
+    const clock = createWaitClock(options);
     let polls = 0;
     let lastTrace: PredicateEvaluation[] = [];
-    let lastError: string | null = null;
 
     for (;;) {
         polls++;
-        const trace: PredicateEvaluation[] = [];
-        let result: boolean;
-        try {
-            result = evaluateCondition(condition, { Doc: options.Doc, Trace: trace });
-        } catch (err) {
-            return {
-                Ok: false,
-                DurationMs: now() - started,
-                Polls: polls,
-                Reason: "InvalidSelector",
-                Detail: err instanceof Error ? err.message : String(err),
-                LastEvaluation: trace,
-            };
-        }
-        lastTrace = trace;
-        lastError = null;
+        const poll = evaluateConditionPoll(condition, options, clock, polls);
+        if (poll.Outcome !== null) return poll.Outcome;
 
-    if (result) return { Ok: true, DurationMs: now() - started, Polls: polls };
-        if (polls >= 2 && now() >= deadline) {
-            return {
-                Ok: false,
-                DurationMs: now() - started,
-                Polls: polls,
-                Reason: "ConditionTimeout",
-                Detail: lastError ?? `Condition not met within ${options.TimeoutMs}ms`,
-                LastEvaluation: lastTrace,
-            };
-        }
-        await sleep(pollMs);
+        lastTrace = poll.Trace;
+        if (isConditionTimedOut(polls, clock)) return createTimeoutOutcome(options, clock, polls, lastTrace);
+
+        await clock.Sleep(clock.PollMs);
     }
+}
+
+function validateConditionForWait(condition: Condition): ConditionWaitOutcome | null {
+    try { validateCondition(condition); }
+    catch (err) {
+        return createInvalidSelectorOutcome(err, 0, 0, []);
+    }
+
+    return null;
+}
+
+function createWaitClock(options: WaitOptions): WaitClock {
+    const now = options.Now ?? defaultNow;
+    const started = now();
+
+    return {
+        Sleep: options.Sleep ?? defaultSleep,
+        Now: now,
+        PollMs: Math.max(1, options.PollMs ?? 50),
+        Started: started,
+        Deadline: started + Math.max(0, options.TimeoutMs),
+    };
+}
+
+function evaluateConditionPoll(
+    condition: Condition,
+    options: WaitOptions,
+    clock: WaitClock,
+    polls: number,
+): PollResult {
+    const trace: PredicateEvaluation[] = [];
+    try {
+        const result = evaluateCondition(condition, { Doc: options.Doc, Trace: trace });
+        const outcome = result ? createSuccessOutcome(clock, polls) : null;
+
+        return { Outcome: outcome, Trace: trace };
+    } catch (err) {
+        return { Outcome: createInvalidSelectorOutcome(err, clock.Now() - clock.Started, polls, trace), Trace: trace };
+    }
+}
+
+function createSuccessOutcome(clock: WaitClock, polls: number): ConditionWaitOutcome {
+    return { Ok: true, DurationMs: clock.Now() - clock.Started, Polls: polls };
+}
+
+function isConditionTimedOut(polls: number, clock: WaitClock): boolean {
+    return polls >= 2 && clock.Now() >= clock.Deadline;
+}
+
+function createTimeoutOutcome(
+    options: WaitOptions,
+    clock: WaitClock,
+    polls: number,
+    lastTrace: PredicateEvaluation[],
+): ConditionWaitOutcome {
+    return {
+        Ok: false,
+        DurationMs: clock.Now() - clock.Started,
+        Polls: polls,
+        Reason: "ConditionTimeout",
+        Detail: `Condition not met within ${options.TimeoutMs}ms`,
+        LastEvaluation: lastTrace,
+    };
+}
+
+function createInvalidSelectorOutcome(
+    error: unknown,
+    durationMs: number,
+    polls: number,
+    trace: PredicateEvaluation[],
+): ConditionWaitOutcome {
+    return {
+        Ok: false,
+        DurationMs: durationMs,
+        Polls: polls,
+        Reason: "InvalidSelector",
+        Detail: error instanceof Error ? error.message : String(error),
+        LastEvaluation: trace,
+    };
 }
 
 function defaultSleep(ms: number): Promise<void> {
