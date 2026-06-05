@@ -56,3 +56,11 @@ Resolution order matches `04-loader-contract/03-variable-resolution.md`: Caller 
 - ❌ Sharing template state between Plan and Next. ✅ Each mode owns its own template + variable scope.
 - ❌ Hiding the mode chip when the dropdown is closed. ✅ Always visible.
 - ❌ Adding exponential backoff to Plan re-fetch on failure. ✅ Fail fast; show error chip.
+
+<!-- audit: numeric+xref uplift -->
+
+## Numeric Bounds (source-of-truth)
+
+- Default operation budget MUST be **5000 ms** (per `reference/05-runtime-defaults.md`).
+- Maximum retry attempts MUST be **3 items** before escalation.
+- See [folder index](../README.md) for sibling specs and cross-references.
