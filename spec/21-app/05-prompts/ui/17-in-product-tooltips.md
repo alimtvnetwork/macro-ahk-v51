@@ -3,7 +3,7 @@
 Status: Normative · v1.0.0 · 2026-06-02
 
 ## Goal
-Every term in `GLOSSARY.md` or `ACRONYMS.md` rendered in the UI gets a
+Every term in `glossary.md` or `acronyms.md` rendered in the UI gets a
 hover/focus tooltip with its definition — without manual wiring per term.
 
 ## Pipeline

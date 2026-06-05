@@ -16,7 +16,7 @@ quarterly governance automation, perf-dump handler spec, contributor guide.
 | 5 | macros/observability/16-perf-dump-handler.md | MACRO_PERF_DUMP contract + budgets table | 3 min |
 | 6 | .github/workflows/spec-governance-quarterly.yml | Cron review (no notifications, artifact only) | 3 min |
 | 7 | scripts/spec/governance-report.mjs | Quarterly markdown report generator | 3 min |
-| 8 | CONTRIBUTING.md | Single-entry contributor guide | 3 min |
+| 8 | contributing.md | Single-entry contributor guide | 3 min |
 | 9 | Verified all v5 gates still green (4/4) | Regression check | 1 min |
 | 10 | This close-out | v6 summary + backlog | 2 min |
 

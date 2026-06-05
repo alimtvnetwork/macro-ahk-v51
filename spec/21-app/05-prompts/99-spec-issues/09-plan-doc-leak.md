@@ -17,7 +17,7 @@ The spec tree must be **self-contained**. `.lovable/` is agent scratch space and
 $ grep -rln '\.lovable/plans' spec/21-app/05-prompts/ --include='*.md'
 spec/21-app/05-prompts/macros/README.md
 spec/21-app/05-prompts/macros/00-concept.md
-spec/21-app/05-prompts/macros/READINESS-SCORE.md
+spec/21-app/05-prompts/macros/readiness-score.md
 spec/21-app/05-prompts/99-spec-issues/00-overview.md       ← intentional, this audit
 spec/21-app/05-prompts/99-spec-issues/06-…                 ← intentional, this audit
 ```

@@ -6,7 +6,7 @@
 ## Phase 0 — Read
 
 - [ ] `00-overview.md`
-- [ ] `GLOSSARY.md`
+- [ ] `glossary.md`
 - [ ] `01-glossary/` (terms, actors, non-goals, vocabulary banlist, scope diagram)
 
 ## Phase 1 — Data
@@ -80,8 +80,8 @@
 
 ## Final gate
 
-- [ ] Pass `BLIND-AI-SMOKE-TEST.md` (20/20)
-- [ ] `ACCEPTANCE-MATRIX.md` fully ✅
+- [ ] Pass `blind-ai-smoke-test.md` (20/20)
+- [ ] `acceptance-matrix.md` fully ✅
 
 <!-- audit: determinism+pitfalls footer -->
 

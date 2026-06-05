@@ -3,7 +3,7 @@
 Status: Template · v1.0.0 · 2026-06-02
 
 Copy this file to `macros/MIGRATION-vN-to-vNplus1.md` on every MAJOR bump.
-Keep `macros/MIGRATION.md` as the canonical latest pointer.
+Keep `macros/migration.md` as the canonical latest pointer.
 
 ---
 

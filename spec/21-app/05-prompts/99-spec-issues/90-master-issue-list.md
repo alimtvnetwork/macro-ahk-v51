@@ -31,7 +31,7 @@
 | C68 | `mem://architecture/macro-prompts-folder` drift | 1 | `68` |
 | C69 | `.lovable/memory/index.md` stale references | 3 lines | `69` |
 | C70 | READINESS-SCORE 100/100 falsified | 1 | `70` |
-| C71 | MIGRATION.md not blind-AI executable | 1 | `71` |
-| C72 | CHANGELOG.md cites unwritten content | 1 | `72` |
+| C71 | migration.md not blind-AI executable | 1 | `71` |
+| C72 | changelog.md cites unwritten content | 1 | `72` |
 **Total distinct categories:** 33 (C1–C29 + C66–C72; C20–C23 mostly clean).
 **Total per-doc audits written:** 72.

@@ -95,6 +95,6 @@ Failure log (masked, with reason):
   structured `VariableContext[]` shape.
 - Stringifying the entire `MacroRunState` to a `console.log`.
 - Including raw variable values in toast / banner copy.
-- Writing variable values into `readme.txt`, `CHANGELOG.md`, or any
+- Writing variable values into `readme.txt`, `changelog.md`, or any
   user-facing artifact outside `spec/audit/<RunId>/` (which is itself
   redacted per the manifest rule above).

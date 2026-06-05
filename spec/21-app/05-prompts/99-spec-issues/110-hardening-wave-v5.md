@@ -14,9 +14,9 @@ Wired automation, ownership, and operability scaffolding so the spec stays at 10
 | 4 | scripts/spec/build-index.mjs | Emits INDEX.json (title/status/version/bytes) | 3 min |
 | 5 | scripts/spec/smoke-rescore.mjs | Re-runs BLIND-AI-SMOKE-TEST per push | 4 min |
 | 6 | macros/observability/15-runbooks-top15.md | Operator runbooks per reason code | 4 min |
-| 7 | .github/CODEOWNERS | Enforces OWNERSHIP.md at PR time | 3 min |
+| 7 | .github/CODEOWNERS | Enforces ownership.md at PR time | 3 min |
 | 8 | macros/testing/15-race-fixture-pack.md | R-01..R-05 deterministic fixtures | 4 min |
-| 9 | macros/MIGRATION-TEMPLATE.md | Reusable MAJOR migration scaffold | 3 min |
+| 9 | macros/migration-template.md | Reusable MAJOR migration scaffold | 3 min |
 | 10 | This close-out | v5 summary + remaining backlog | 2 min |
 
 **Total elapsed**: ~35 min · **Drift findings**: 0 · **Scripts**: fail-fast (no retry/backoff, per no-retry policy)

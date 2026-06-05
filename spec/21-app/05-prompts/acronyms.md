@@ -2,7 +2,7 @@
 
 Status: Normative · v1.0.0 · 2026-06-02
 
-Companion to GLOSSARY.md — short lookups only.
+Companion to glossary.md — short lookups only.
 
 | Acronym | Expansion | Spec ref |
 |---------|-----------|----------|
@@ -22,4 +22,4 @@ Companion to GLOSSARY.md — short lookups only.
 | TTL | Time To Live (token) | auth-bridge-service |
 | WCAG | Web Content Accessibility Guidelines | ui/11 |
 
-For full definitions see GLOSSARY.md.
+For full definitions see glossary.md.

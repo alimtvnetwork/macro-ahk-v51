@@ -15,8 +15,8 @@ The H1 should be the human-readable form of the filename slug. Major drift indic
 
 | File | Filename slug | Current H1 | Verdict |
 |------|---------------|-----------|---------|
-| `macros/CHANGELOG.md`              | `changelog` (after C2 rename) | `Prompt Macros — CHANGELOG` | OK after rename |
-| `macros/READINESS-SCORE.md`        | `readiness-score` | `Prompt Macros — Blind-AI Readiness Score` | OK |
+| `macros/changelog.md`              | `changelog` (after C2 rename) | `Prompt Macros — CHANGELOG` | OK after rename |
+| `macros/readiness-score.md`        | `readiness-score` | `Prompt Macros — Blind-AI Readiness Score` | OK |
 | `macros/engine/00-architecture.md` | `architecture` | `Engine Architecture` | OK |
 | `macros/engine/01-state-machine.md`| `state-machine` | `State Machine` | OK |
 | `macros/00-concept.md`             | `concept` | `Prompt Macros — Concept (Canonical)` | Parenthetical drift |

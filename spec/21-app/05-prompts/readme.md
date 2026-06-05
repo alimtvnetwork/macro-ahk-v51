@@ -1,15 +1,15 @@
 # Prompt-Macros Subsystem — Master Index
 
 **Spec version:** 2.0.0 (post-50-step upgrade, 2026-06-02)
-**Audit status:** Honest **100 / 100** — see `macros/READINESS-SCORE.md`
-**Blind-AI smoke test:** `BLIND-AI-SMOKE-TEST.md` (20 questions, 20 passes)
+**Audit status:** Honest **100 / 100** — see `macros/readiness-score.md`
+**Blind-AI smoke test:** `blind-ai-smoke-test.md` (20 questions, 20 passes)
 
 ## Reading order for a blind-AI implementer
 
-1. `GLOSSARY.md` — terms
+1. `glossary.md` — terms
 2. `macros/00-concept.md` — normative concept
 3. `macros/01-step-kinds.md` — 8 step kinds
-4. `macros/SCHEMA-INDEX.md` → `json/` — every JSON contract
+4. `macros/schema-index.md` → `json/` — every JSON contract
 5. `macros/engine/` — architecture + 7 pseudo-code appendices
 6. `variables/` — syntax + waterfall + sensitive masking
 7. `ui/` — panel, dialogs, keyboard, a11y
@@ -17,16 +17,16 @@
 9. `macros/observability/` — logging + metrics + failure schema
 10. `macros/testing/` — test inventories + fixtures + CI gates
 11. `macros/examples/` — runnable walkthroughs (happy / recovery / failure)
-12. `IMPLEMENTATION-CHECKLIST.md` — ship-it runbook
+12. `implementation-checklist.md` — ship-it runbook
 
 ## Folder map
 
 ```
 spec/21-app/05-prompts/
 ├── README.md                       (this file)
-├── GLOSSARY.md
-├── IMPLEMENTATION-CHECKLIST.md
-├── BLIND-AI-SMOKE-TEST.md
+├── glossary.md
+├── implementation-checklist.md
+├── blind-ai-smoke-test.md
 ├── folder-structure.md
 ├── 00-all-prompts.md
 ├── 01-start-prompt.md
@@ -43,7 +43,7 @@ spec/21-app/05-prompts/
 ├── macros/
 │   ├── 00-concept.md … 07-permissions-and-scope.md
 │   ├── README, CHANGELOG, MIGRATION, READINESS-SCORE
-│   ├── SCHEMA-INDEX.md, EDGE-CASES.md
+│   ├── schema-index.md, edge-cases.md
 │   ├── engine/        (10 + 7 pseudo-code)
 │   ├── examples/      (5 + 3 walkthroughs)
 │   ├── folder-layout/ (5)

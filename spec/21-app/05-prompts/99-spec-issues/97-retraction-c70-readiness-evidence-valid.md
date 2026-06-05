@@ -1,10 +1,10 @@
-# 97 — RETRACTION: C70 ("READINESS-SCORE.md falsified") is FALSE
+# 97 — RETRACTION: C70 ("readiness-score.md falsified") is FALSE
 
 **Retracts:** Issue #70 / category C70.
 
 ## Verification
 
-`macros/READINESS-SCORE.md` cites these as evidence:
+`macros/readiness-score.md` cites these as evidence:
 - `engine/00`–`09` → **exist** (10 files)
 - `json/00`–`09` → **exist** (10 files)
 - `ui/00`–`09` → **exist** (10 files)

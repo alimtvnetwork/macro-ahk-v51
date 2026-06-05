@@ -15,7 +15,7 @@
 | Cross-cutting | 10 | 10 |
 | **TOTAL** | **100** | **100** |
 ## Smoke test
-`BLIND-AI-SMOKE-TEST.md` — **20 / 20**.
+`blind-ai-smoke-test.md` — **20 / 20**.
 ## Verification protocol
 All evidence cells re-verified by `ls` on 2026-06-02 per R1/R2/R3 (see `102-audit-quality-failure-rca.md`).
 ## Critical issues remaining

@@ -277,7 +277,7 @@ The Python helper is **internal** — users only ever invoke
 | 1 | Repo name appears as a substring of a longer token (e.g. `macro-ahk-v210` when renaming `macro-ahk-v49`) | Match must be **whole token**: the byte before the match must not be `[A-Za-z0-9_-]` AND the byte after must not be `[A-Za-z0-9_-]`. |
 | 2 | Same line contains both a URL match (skip) and a non-URL match (rewrite) | Each match evaluated independently; only the URL match is skipped. |
 | 3 | New name appears in a URL but old name does not | No-op. Do not rewrite. |
-| 4 | Repo name in CHANGELOG.md heading like `## [v21]` | Only matches that contain the full slug (`macro-ahk-v49`) are touched. Bare `v21` headings are left alone. |
+| 4 | Repo name in changelog.md heading like `## [v21]` | Only matches that contain the full slug (`macro-ahk-v49`) are touched. Bare `v21` headings are left alone. |
 | 5 | Operator is on `-v1` repo | Auto-derivation fails with a clear error. Operator must pass `--from` explicitly. |
 | 6 | `git remote get-url origin` fails (no remote) | Hard error. Must pass `--from` and `--to` explicitly. |
 | 7 | `OLD_REPO_NAME == NEW_REPO_NAME` | Hard error: "from and to are identical". |

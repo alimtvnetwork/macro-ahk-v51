@@ -14,8 +14,8 @@
 | 46 | INDEX.json rebuild | N/A — this tree never had INDEX.json (different from `spec/21-app/05-prompts/`); will author fresh in Phase F |
 | 47 | `lint-cross-refs.mjs` | ✅ exit 0 |
 | 48 | `runbook-smoke.mjs` | ✅ 15 reason codes intact |
-| 49 | BLIND-AI-SMOKE-TEST.md update | N/A — file lives only under `spec/21-app/05-prompts/`; defer to Phase F if needed |
-| 50 | IMPLEMENTATION-CHECKLIST.md update | N/A — same reason |
+| 49 | blind-ai-smoke-test.md update | N/A — file lives only under `spec/21-app/05-prompts/`; defer to Phase F if needed |
+| 50 | implementation-checklist.md update | N/A — same reason |
 | +  | Residual stale-ref scan + banlist enforcement-recipe path fix | ✅ 1 manual edit in `01-glossary/04-vocabulary-banlist.md` |
 
 The changelog file itself (`99-spec-issues/200-renumber-baseline.md`) intentionally retains old folder names in the mapping tables.

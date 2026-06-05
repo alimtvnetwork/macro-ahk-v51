@@ -23,9 +23,9 @@ Any file claiming one of those slots MUST be that document type. Conversely, con
 
 | File | Slot it should occupy | Currently |
 |------|-----------------------|-----------|
-| `macros/CHANGELOG.md` | `macros/98-changelog.md` | Wrong filename (also C2) |
-| `macros/READINESS-SCORE.md` | Not a reserved slot — should be `macros/96-readiness-score.md` (since `96` is "AI-specific context notes", readiness fits) | Wrong filename (also C2) |
-| `macros/MIGRATION.md` | No reserved slot; pick `95-migration.md` (free range) | Wrong filename (also C2) |
+| `macros/changelog.md` | `macros/98-changelog.md` | Wrong filename (also C2) |
+| `macros/readiness-score.md` | Not a reserved slot — should be `macros/96-readiness-score.md` (since `96` is "AI-specific context notes", readiness fits) | Wrong filename (also C2) |
+| `macros/migration.md` | No reserved slot; pick `95-migration.md` (free range) | Wrong filename (also C2) |
 
 Also: `spec/21-app/05-prompts/00-all-prompts.md`, `01-start-prompt.md`, etc. occupy low numeric slots **but `00-all-prompts.md` is NOT the folder overview** — it's a prompt list. The actual overview slot at this folder root is empty (see C3).
 

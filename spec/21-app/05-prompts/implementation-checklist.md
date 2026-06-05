@@ -53,5 +53,5 @@ Tick every box in order. Each links to the normative spec doc.
 - [ ] CI gates per `macros/testing/14-ci-gates.md`
 
 ## Phase 8 — Verify
-- [ ] Run `BLIND-AI-SMOKE-TEST.md` — must pass 20/20
+- [ ] Run `blind-ai-smoke-test.md` — must pass 20/20
 - [ ] Examples walkthrough per `macros/examples/10`–`12`

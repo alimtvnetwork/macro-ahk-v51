@@ -578,21 +578,21 @@
     },
     {
       "path": "spec/21-app/05-prompts/99-spec-issues/70-readiness-score-falsified.md",
-      "title": "Audit — READINESS-SCORE.md (Bogus 100/100)",
+      "title": "Audit — readiness-score.md (Bogus 100/100)",
       "status": null,
       "version": null,
       "bytes": 2338
     },
     {
       "path": "spec/21-app/05-prompts/99-spec-issues/71-migration-executability.md",
-      "title": "Audit — MIGRATION.md (Blind-AI Executability)",
+      "title": "Audit — migration.md (Blind-AI Executability)",
       "status": null,
       "version": null,
       "bytes": 1525
     },
     {
       "path": "spec/21-app/05-prompts/99-spec-issues/72-changelog-falsified.md",
-      "title": "Audit — CHANGELOG.md vs Actual Artifacts",
+      "title": "Audit — changelog.md vs Actual Artifacts",
       "status": null,
       "version": null,
       "bytes": 2594
@@ -648,7 +648,7 @@
     },
     {
       "path": "spec/21-app/05-prompts/99-spec-issues/97-retraction-c70-readiness-evidence-valid.md",
-      "title": "97 — RETRACTION: C70 (\"READINESS-SCORE.md falsified\") is FALSE",
+      "title": "97 — RETRACTION: C70 (\"readiness-score.md falsified\") is FALSE",
       "status": null,
       "version": null,
       "bytes": 879
@@ -675,21 +675,21 @@
       "bytes": 1363
     },
     {
-      "path": "spec/21-app/05-prompts/ACRONYMS.md",
+      "path": "spec/21-app/05-prompts/acronyms.md",
       "title": "Acronyms & Terms",
       "status": "Normative",
       "version": "1.0.0",
       "bytes": 1110
     },
     {
-      "path": "spec/21-app/05-prompts/BLIND-AI-SMOKE-TEST.md",
+      "path": "spec/21-app/05-prompts/blind-ai-smoke-test.md",
       "title": "Blind-AI Smoke Test — 20 Questions",
       "status": null,
       "version": null,
       "bytes": 2304
     },
     {
-      "path": "spec/21-app/05-prompts/CONTRIBUTING.md",
+      "path": "spec/21-app/05-prompts/contributing.md",
       "title": "Spec Contributor Guide",
       "status": "Normative",
       "version": "1.0.0",
@@ -703,14 +703,14 @@
       "bytes": 6645
     },
     {
-      "path": "spec/21-app/05-prompts/GLOSSARY.md",
+      "path": "spec/21-app/05-prompts/glossary.md",
       "title": "Glossary",
       "status": null,
       "version": null,
       "bytes": 1861
     },
     {
-      "path": "spec/21-app/05-prompts/IMPLEMENTATION-CHECKLIST.md",
+      "path": "spec/21-app/05-prompts/implementation-checklist.md",
       "title": "Implementation Checklist (Blind-AI Runbook)",
       "status": null,
       "version": null,
@@ -906,14 +906,14 @@
       "bytes": 3012
     },
     {
-      "path": "spec/21-app/05-prompts/macros/CHANGELOG.md",
+      "path": "spec/21-app/05-prompts/macros/changelog.md",
       "title": "Prompt Macros — CHANGELOG",
       "status": null,
       "version": null,
       "bytes": 5524
     },
     {
-      "path": "spec/21-app/05-prompts/macros/EDGE-CASES.md",
+      "path": "spec/21-app/05-prompts/macros/edge-cases.md",
       "title": "Edge Cases — Normative",
       "status": null,
       "version": null,
@@ -1235,14 +1235,14 @@
       "bytes": 1324
     },
     {
-      "path": "spec/21-app/05-prompts/macros/MIGRATION-TEMPLATE.md",
+      "path": "spec/21-app/05-prompts/macros/migration-template.md",
       "title": "MIGRATION Template — Spec MAJOR vN → vN+1",
       "status": "Template",
       "version": "1.0.0",
       "bytes": 1664
     },
     {
-      "path": "spec/21-app/05-prompts/macros/MIGRATION.md",
+      "path": "spec/21-app/05-prompts/macros/migration.md",
       "title": "Prompt Macros — MIGRATION",
       "status": null,
       "version": null,
@@ -1347,7 +1347,7 @@
       "bytes": 2433
     },
     {
-      "path": "spec/21-app/05-prompts/macros/READINESS-SCORE.md",
+      "path": "spec/21-app/05-prompts/macros/readiness-score.md",
       "title": "Prompt Macros — Blind-AI Readiness Score",
       "status": null,
       "version": null,
@@ -1356,12 +1356,12 @@
     {
       "path": "spec/21-app/05-prompts/macros/readme.md",
       "title": "Prompt Macros — Spec Index",
-      "status": "** ✅ v2.0 complete. Audited readiness **100 / 100** (`readiness-score-v2.md`). See `../README.md` (root index) and `../IMPLEMENTATION-CHECKLIST.md` for the blind-AI runbook.",
+      "status": "** ✅ v2.0 complete. Audited readiness **100 / 100** (`readiness-score-v2.md`). See `../README.md` (root index) and `../implementation-checklist.md` for the blind-AI runbook.",
       "version": null,
       "bytes": 2464
     },
     {
-      "path": "spec/21-app/05-prompts/macros/SCHEMA-INDEX.md",
+      "path": "spec/21-app/05-prompts/macros/schema-index.md",
       "title": "Schema Index",
       "status": null,
       "version": null,
@@ -1501,7 +1501,7 @@
       "bytes": 606
     },
     {
-      "path": "spec/21-app/05-prompts/OWNERSHIP.md",
+      "path": "spec/21-app/05-prompts/ownership.md",
       "title": "Spec Ownership",
       "status": "Normative",
       "version": "1.0.0",
@@ -1515,14 +1515,14 @@
       "bytes": 2577
     },
     {
-      "path": "spec/21-app/05-prompts/RELEASE-CHECKLIST.md",
+      "path": "spec/21-app/05-prompts/release-checklist.md",
       "title": "Spec Release Checklist",
       "status": "Normative",
       "version": "1.0.0",
       "bytes": 1331
     },
     {
-      "path": "spec/21-app/05-prompts/SPEC-GATES-BADGE.md",
+      "path": "spec/21-app/05-prompts/spec-gates-badge.md",
       "title": "Spec-Gates Badge — README snippet",
       "status": "Reference",
       "version": "1.0.0",

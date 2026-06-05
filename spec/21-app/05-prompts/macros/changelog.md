@@ -18,8 +18,8 @@ Dates in **the user's local timezone**. Format: [Keep a Changelog](https://keepa
 - No retry / no exponential backoff on webhook delivery (single-attempt).
 ## [2.0.0] — 2026-06-02 (blind-AI upgrade)
 ### Added (47 new spec docs + 2 memory files)
-- `README.md`, `GLOSSARY.md`, `IMPLEMENTATION-CHECKLIST.md`, `BLIND-AI-SMOKE-TEST.md` at the prompts root.
-- `macros/SCHEMA-INDEX.md`, `macros/EDGE-CASES.md`, `macros/readiness-score-v2.md`.
+- `README.md`, `glossary.md`, `implementation-checklist.md`, `blind-ai-smoke-test.md` at the prompts root.
+- `macros/schema-index.md`, `macros/edge-cases.md`, `macros/readiness-score-v2.md`.
 - **5 JSON schemas** (draft-2020-12): `json/10`–`14` for MacroDefinition, RunState, AuditOutput, MacroEvent, PromptInfo.
 - **7 engine pseudo-code appendices**: `engine/10`–`16` (runner, interpolator, score-parser, watchdog, audit-writer, message-contract, runtime-defaults).
 - **6 variable references**: `variables/10`–`15` (BNF, waterfall, coercion, sensitive, built-ins, examples).
@@ -43,14 +43,14 @@ Dates in **the user's local timezone**. Format: [Keep a Changelog](https://keepa
 - `observability/14-error-taxonomy-quickref.md` — top-15 reason codes
 - `engine/17-concurrency-model.md` — R-01..R-05 race scenarios
 - `storage/10-quota-and-eviction.md` — per-layer caps and eviction
-- Root `ACRONYMS.md`, `OWNERSHIP.md`, `RELEASE-CHECKLIST.md`
+- Root `acronyms.md`, `ownership.md`, `release-checklist.md`
 ## [2.2.0] — 2026-06-02 (hardening wave v5)
 ### Added (CI enforcement)
 - `.github/workflows/spec-gates.yml` (4 jobs: perf-budget, xref-lint, index-drift, smoke-rescore)
 - `scripts/spec/{check-perf-budget,lint-cross-refs,build-index,smoke-rescore}.mjs` — all fail-fast, no retry
-- `.github/CODEOWNERS` derived from `OWNERSHIP.md`
+- `.github/CODEOWNERS` derived from `ownership.md`
 - `macros/testing/15-race-fixture-pack.md` — R-01..R-05 fixture spec
-- `macros/MIGRATION-TEMPLATE.md` — reusable MAJOR migration scaffold
+- `macros/migration-template.md` — reusable MAJOR migration scaffold
 ## [2.3.0] — 2026-06-02 (hardening wave v6)
 ### Added (real artifacts)
 - `ui/16-storage-pressure-toast-e12.md` — E-12 toast + blocking modal
@@ -58,12 +58,12 @@ Dates in **the user's local timezone**. Format: [Keep a Changelog](https://keepa
 - `macros/testing/fixtures/race/r01..r05.json` — deterministic race fixtures
 - `macros/observability/16-perf-dump-handler.md` — MACRO_PERF_DUMP contract
 - `.github/workflows/spec-governance-quarterly.yml` + `scripts/spec/governance-report.mjs` — cron, artifact-only
-- `CONTRIBUTING.md` — single-entry contributor guide
+- `contributing.md` — single-entry contributor guide
 ## [2.4.0] — 2026-06-02 (hardening wave v7)
 ### Added (drift gates + glue)
 - `scripts/spec/runbook-smoke.mjs` — every top-15 reason code must have a runbook section
 - `scripts/spec/tooltip-dict-gate.mjs` — `public/spec-tooltips.json` must match latest GLOSSARY/ACRONYMS
 - Two new spec-gates CI jobs: `runbook-smoke`, `tooltip-dict-gate`
 - `99-spec-issues/README.md` — issue tracker map
-- `SPEC-GATES-BADGE.md` — README badge integration snippet
+- `spec-gates-badge.md` — README badge integration snippet
 - `mem://workflow/spec-hardening-waves` — cross-wave summary memory

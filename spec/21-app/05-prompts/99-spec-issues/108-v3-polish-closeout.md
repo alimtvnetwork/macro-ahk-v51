@@ -6,8 +6,8 @@
 |---:|---|---|
 | 1 | Cross-doc consistency check | `106-cross-reference-verification.md` — 30 cross-refs, zero drift |
 | 2 | Schema sample validation | `107-schema-validation-samples.md` — pass + fail samples for all 5 schemas |
-| 3 | CHANGELOG v2.0.0 entry | `macros/CHANGELOG.md` updated |
-| 4 | MIGRATION 1.0 → 2.0 section | `macros/MIGRATION.md` updated (additive-only) |
+| 3 | CHANGELOG v2.0.0 entry | `macros/changelog.md` updated |
+| 4 | MIGRATION 1.0 → 2.0 section | `macros/migration.md` updated (additive-only) |
 | 5 | macros/README header refresh | points at v2 readiness + checklist |
 | 6 | Plan close-out with v3 status | `.lovable/plans/spec-prompt-macros-audit-100.md` updated |
 | 7 | Engine ↔ pseudo-code drift audit | row 1 of file 106 — zero drift across 10 docs |

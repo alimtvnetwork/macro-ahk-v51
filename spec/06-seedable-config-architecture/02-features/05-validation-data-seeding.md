@@ -563,7 +563,7 @@ threshold, _ := v.validationData.GetSeoNumber(SeoKeyTransitionDensityThreshold)
 │                          ↓                                               │
 │                                                                          │
 │  Update ConfigMeta.SeedVersion = '1.3.0'                               │
-│  Append to CHANGELOG.md                                                  │
+│  Append to changelog.md                                                  │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```

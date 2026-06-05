@@ -26,7 +26,7 @@ Use a SHA-pinned `softprops/action-gh-release` action (see §22a):
 
 ## §16. Release notes & changelog
 
-- Maintain `./CHANGELOG.md` in the repo (committed text only — never binaries).
+- Maintain `./changelog.md` in the repo (committed text only — never binaries).
 - Generate `release-assets/RELEASE_NOTES.md` at build time from the
   `${PREV_TAG}..${VER}` git range. **Exclude** the current tag from the
   candidate list when picking `PREV_TAG`, otherwise the range is empty.
@@ -65,7 +65,7 @@ Always upload, in addition to the ZIPs:
 - `install.sh`, `install.ps1`
 - `VERSION.txt` (plain version, no leading `v`)
 - `checksums.txt` (`sha256sum *` over the release-assets folder)
-- `CHANGELOG.md` (verbatim copy)
+- `changelog.md` (verbatim copy)
 - `RELEASE_NOTES.md` (auto-generated)
 
 **Installer exit-code contract** — `install.sh` / `install.ps1` MUST exit with

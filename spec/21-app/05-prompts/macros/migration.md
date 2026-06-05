@@ -76,4 +76,4 @@ What did NOT change:
 - The `Score: NN / 100` regex.
 - The `MacroEvent` union shape (additions go through schema versioning).
 Implementers who already shipped against v1 need do nothing. New
-implementations SHOULD start from `IMPLEMENTATION-CHECKLIST.md`.
+implementations SHOULD start from `implementation-checklist.md`.

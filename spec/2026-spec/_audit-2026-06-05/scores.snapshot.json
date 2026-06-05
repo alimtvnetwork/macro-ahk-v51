@@ -109,10 +109,10 @@
     "01-prompt-spec/99-spec-issues/301-blind-ai-rescore-post-renumber.md": 100,
     "01-prompt-spec/99-spec-issues/302-gap-closure-30-step-proof.md": 100,
     "01-prompt-spec/99-spec-issues/303-30-step-content-uplift.md": 100,
-    "01-prompt-spec/ACCEPTANCE-MATRIX.md": 100,
-    "01-prompt-spec/BLIND-AI-SMOKE-TEST.md": 100,
-    "01-prompt-spec/GLOSSARY.md": 100,
-    "01-prompt-spec/IMPLEMENTATION-CHECKLIST.md": 100,
+    "01-prompt-spec/acceptance-matrix.md": 100,
+    "01-prompt-spec/blind-ai-smoke-test.md": 100,
+    "01-prompt-spec/glossary.md": 100,
+    "01-prompt-spec/implementation-checklist.md": 100,
     "01-prompt-spec/pseudocode/01-loader-runner.md": 100,
     "01-prompt-spec/pseudocode/02-queue-engine.md": 100,
     "01-prompt-spec/pseudocode/03-delay-engine.md": 100,
@@ -232,7 +232,7 @@
     "03-db-and-sqlite-integration-with-chrome-extension/39-ci-gates.md": 100,
     "03-db-and-sqlite-integration-with-chrome-extension/40-acceptance-criteria.md": 100,
     "03-db-and-sqlite-integration-with-chrome-extension/readme.md": 100,
-    "OWNERS.md": 100,
+    "owners.md": 100,
     "readme.md": 100
   }
 }

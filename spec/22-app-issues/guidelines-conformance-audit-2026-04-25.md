@@ -26,7 +26,7 @@
 | L | Error management — `apperror`/`Logger.error()` everywhere | `03-error-manage/00-overview.md` §3, `mem://standards/error-logging-via-namespace-logger` | ❌ 142 `throw new Error(`, 126 `console.error/warn` | **CRITICAL** | broad |
 | M | Universal Response Envelope (`Status/Attributes/Results`) | `03-error-manage/00-overview.md` §2 | n/a — Chrome-extension messaging is in-process; envelope rule applies to backend HTTP only. **Document the exemption.** | Doc-only | — |
 | N | Split-DB Architecture (root.db + per-project DBs) | `05-split-db-architecture/00-overview.md`, `01-fundamentals.md` | ⚠️ Partial: we have `logs.db` + `errors.db` + per-project KV store, but no `Root.Projects` registry table and no `DbManager.GetOrCreateDb(slug, type, entityId)` helper | High | architectural |
-| O | Seedable Config (`config.seed.json` + `ConfigMeta.SeedVersion` + CHANGELOG flow) | `06-seedable-config-architecture/00-overview.md`, `01-fundamentals.md` | ⚠️ Partial: `ProjectConfigMeta(SourceHash)` exists; missing `SeedVersion` SemVer gate, missing `Changelog` field, no auto CHANGELOG.md updates | Medium | `src/background/config-seeder.ts` |
+| O | Seedable Config (`config.seed.json` + `ConfigMeta.SeedVersion` + CHANGELOG flow) | `06-seedable-config-architecture/00-overview.md`, `01-fundamentals.md` | ⚠️ Partial: `ProjectConfigMeta(SourceHash)` exists; missing `SeedVersion` SemVer gate, missing `Changelog` field, no auto changelog.md updates | Medium | `src/background/config-seeder.ts` |
 | P | JSON keys — PascalCase across the wire | `02-coding-guidelines/01-cross-language/11-key-naming-pascalcase.md` | ⚠️ DB rows are PascalCase (good); message-passing payload keys (`shared/messages.ts`) are camelCase by React/TS convention. **Decide & document the exemption** for in-process extension messaging vs. external API. | Medium | `src/shared/messages.ts` (588 lines) + every handler |
 | Q | View prefix `Vw…` | `04-database-conventions/01-naming-conventions.md` §Summary | ❌ Single view `UpdaterDetails` lacks `Vw` prefix | Low | 1 view |
 | R | Index naming `Idx{Table}_{Column}` | same | ⚠️ Mixed: most use `Idx…` without underscore separator (`IdxUtcUpdater`, `IdxStatsRecordedAt`) | Low | ~20 indexes |
@@ -281,12 +281,12 @@ The `apperror`-style facility partially exists as `src/background/bg-logger.ts` 
 1. `config.seed.json` with `Version` SemVer
 2. Table `ConfigMeta(SeedVersion, CurrentVersion, LastSeededAt, ChangelogUpdatedAt, ...)`
 3. `SeedWithVersionCheck()` — diff SemVer, merge new keys, preserve user overrides
-4. Auto-update `CHANGELOG.md` from the seed `Changelog` field
+4. Auto-update `changelog.md` from the seed `Changelog` field
 
 **What we have** (`src/background/config-seeder.ts`):
 
 - Table `ProjectConfigMeta(ConfigName, SourceHash, SeededAt, UpdatedAt)` — uses content hash, not SemVer.
-- No `SeedVersion` field, no `Changelog` in the seed payload, no `CHANGELOG.md` automation.
+- No `SeedVersion` field, no `Changelog` in the seed payload, no `changelog.md` automation.
 - No `config.seed.json` file in the repo root (the seeds are inlined in `src/background/default-project-seeder.ts` and `src/background/manifest-seeder.ts`).
 
 **Gap**: hash-based seeding is functionally similar (re-seed when content changes) but loses the SemVer-aware merge (preserve user overrides; gate by `seedVer.GreaterThan(currentVer)`) and the changelog auditability that the spec mandates.
@@ -413,7 +413,7 @@ DB rows are PascalCase ✅. But `src/shared/messages.ts` (588 lines) defines TS 
 |------|------|
 | 7.1 | Add a top-level `config.seed.json` and `config.schema.json`. Move inline seeds out of `default-project-seeder.ts` / `manifest-seeder.ts`. |
 | 7.2 | Migrate `ProjectConfigMeta` to add `SeedVersion TEXT`, `CurrentVersion TEXT`, `ChangelogUpdatedAt TEXT`. Keep `SourceHash` for cheap idempotency check. |
-| 7.3 | Implement `seedWithVersionCheck()` mirroring the spec algorithm: `semver.gt(seed.Version, current.SeedVersion)` → merge new keys, preserve overrides, append to `CHANGELOG.md`. |
+| 7.3 | Implement `seedWithVersionCheck()` mirroring the spec algorithm: `semver.gt(seed.Version, current.SeedVersion)` → merge new keys, preserve overrides, append to `changelog.md`. |
 | 7.4 | Add a CI step that diffs `config.seed.json` against the prior tag and fails when version is not bumped. |
 
 ---

@@ -102,7 +102,7 @@ When upgrading a project that does not yet have these keys:
 1. The seedable-config merge strategy (see
    [01-fundamentals.md](../01-fundamentals.md)) detects the missing
    keys and inserts them with the defaults above.
-2. `CHANGELOG.md` records the seed-version bump.
+2. `changelog.md` records the seed-version bump.
 3. No data migration is needed — the keys are read-only inputs to the
    update subsystem; they do not own any persisted state.
 
