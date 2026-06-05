@@ -3,32 +3,33 @@
 ## Why this step exists
 
 Steps 11 and 12 make errors structured and persistent. This step makes them
-visible and actionable. If errors only sit in SQLite or DevTools, users still
-experience a blank popup, a stuck injected panel, or a failed macro with no
-clear next action. The extension needs one routing path from logger write →
-unresolved count update → UI badge → Errors panel → diagnostics export.
+visible and actionable through a single background-owned route: logger write →
+SQLite insert → unresolved count recompute → `ERROR_COUNT_CHANGED` broadcast →
+UI badge → Errors panel → diagnostics export. Without one owner, the UI shows
+stale counts, blank panels, or detail rows that disagree with the badge.
 
 ## Contract
 
 1. **SQLite is source of truth.** Error rows are read from the same log store
-   written by the namespace logger. Do not maintain a separate error database.
-2. **Unresolved count is computed in background.** Popup, options, and panel UI
-   request counts from the background; they do not scan storage independently.
-3. **Broadcast on change.** Every new error row, resolved error, cleared error,
-   or imported diagnostic update broadcasts `ERROR_COUNT_CHANGED` to active
-   extension contexts.
-4. **Status panel links to Errors panel.** The step 07 Errors row opens this
-   panel and shows the last-24h count.
-5. **Errors panel is never blank.** Loading, no-error, error-loading, and
-   preview/no-chrome states all render explicit UI.
-6. **No polling as primary sync.** UI listens for broadcasts first. Slow polling
-   is only an eventual-consistency fallback for disconnected contexts.
-7. **Casing normalization is mandatory.** The panel, badges, and exports must
-   normalize PascalCase SQLite rows and camelCase frontend rows.
-8. **No retry loops.** Failed fetches show a typed failure and wait for the next
-   natural refresh or user action. No recursive retry or exponential backoff.
+   written by the namespace logger. No parallel error database.
+2. **Background owns all mutations.** Popup, options, panel, and floating UI
+   never write directly; they send typed envelopes to the background.
+3. **Sender-origin enforcement.** Resolve and clear are only honored from
+   trusted extension contexts (`popup`, `options`, `floating-panel`). Page MAIN
+   and content-script-originated messages are rejected with
+   `Reason="ResolveOriginNotAllowed"`.
+4. **Broadcast on change.** Every insert, resolve, or clear recomputes the
+   summary and broadcasts `ERROR_COUNT_CHANGED` after the DB write commits.
+5. **Polling is fallback only.** UI hooks listen for broadcasts; a single
+   per-mount 30s interval is the only fallback, paused while `document.hidden`.
+6. **Casing normalization is mandatory.** PascalCase SQLite rows and camelCase
+   frontend rows are unified by `normalizeLogRow()` before counting or render.
+7. **No retry loops.** Failed fetches return typed failure envelopes. No
+   recursive retry, no exponential backoff (per `mem://constraints/no-retry-policy`).
+8. **No explicit `unknown`.** All handler inputs are validated by type guards
+   against designed unions (per `mem://standards/unknown-usage-policy`).
 
-## Message contract
+## Message contract (G1, G4)
 
 ```ts
 // src/shared/messages.ts
@@ -38,23 +39,76 @@ export const MSG_RESOLVE_ERROR = "errors/resolve" as const;
 export const MSG_CLEAR_RESOLVED_ERRORS = "errors/clear-resolved" as const;
 export const ERROR_COUNT_CHANGED = "errors/count-changed" as const;
 
+export type TrustedSourceContext = "popup" | "options" | "floating-panel";
+
+export interface GetErrorSummaryRequest {
+  kind: typeof MSG_GET_ERROR_SUMMARY;
+  sourceContext: TrustedSourceContext | "background";
+}
+
+export interface GetErrorRowsRequest {
+  kind: typeof MSG_GET_ERROR_ROWS;
+  sourceContext: TrustedSourceContext | "background";
+  filter: {
+    includeResolved: boolean;
+    sinceIso: string | null;
+    namespace: string | null;
+    Reason: string | null;
+    limit: number; // bounded 1..500
+  };
+}
+
+export interface ResolveErrorRequest {
+  kind: typeof MSG_RESOLVE_ERROR;
+  sourceContext: TrustedSourceContext;
+  id: string;
+  resolvedBy: "user" | "system";
+}
+
+export interface ClearResolvedErrorsRequest {
+  kind: typeof MSG_CLEAR_RESOLVED_ERRORS;
+  sourceContext: TrustedSourceContext;
+}
+
+export type ErrorRoutingRequest =
+  | GetErrorSummaryRequest
+  | GetErrorRowsRequest
+  | ResolveErrorRequest
+  | ClearResolvedErrorsRequest;
+
+export type ErrorRoutingResponse<T> =
+  | { ok: true; data: T; buildId: string }
+  | { ok: false; Reason: string; ReasonDetail: string; buildId: string };
+
 export interface ErrorCountChangedMessage {
   kind: typeof ERROR_COUNT_CHANGED;
   unresolvedCount: number;
-  last24hCount: number;
+  last24hUnresolvedCount: number;
+  last24hTotalCount: number;
   buildId: string;
   occurredAtIso: string;
+  dirtyRows: true;
+}
+
+export function isErrorRoutingRequest(value: unknown): value is ErrorRoutingRequest {
+  if (typeof value !== "object" || value === null) return false;
+  const kind = (value as { kind?: unknown }).kind;
+  return (
+    kind === MSG_GET_ERROR_SUMMARY ||
+    kind === MSG_GET_ERROR_ROWS ||
+    kind === MSG_RESOLVE_ERROR ||
+    kind === MSG_CLEAR_RESOLVED_ERRORS
+  );
 }
 ```
 
 Rules:
 
-- Broadcast payloads contain counts only, not full error details.
-- Detail rows are fetched on demand by the Errors panel.
-- A context that cannot receive broadcasts must still reach eventual consistency
-  through slow polling.
+- Broadcast payloads carry counts only, never row details.
+- `dirtyRows: true` tells open panels to refetch rows once (G8).
+- Bounded `limit` prevents accidental megaqueries.
 
-## Error row contract
+## Error row contract (G7)
 
 ```ts
 // src/shared/errors/types.ts
@@ -63,8 +117,8 @@ export interface ErrorPanelRow {
   timestampIso: string;
   namespace: string;
   message: string;
-  path: string;
-  missing: string;
+  path: string | null;
+  missing: string | null;
   Reason: string;
   ReasonDetail: string;
   sourceContext: "background" | "popup" | "options" | "content-isolated" | "page-main";
@@ -73,14 +127,18 @@ export interface ErrorPanelRow {
   stage: string | null;
   triggerSource: string | null;
   resolved: boolean;
+  resolvedAtIso: string | null;
+  resolvedBy: "user" | "system" | null;
   repeatCount: number;
   SelectorAttempts: SelectorAttemptLog[];
   VariableContext: VariableContextLog[];
+  normalizationWarnings: string[]; // e.g. ["LegacyLogMissingReasonDetail"]
 }
 
 export interface ErrorSummary {
-  unresolvedCount: number;
-  last24hCount: number;
+  unresolvedCount: number;          // global unresolved
+  last24hUnresolvedCount: number;   // for badges
+  last24hTotalCount: number;        // for panel analytics
   newestErrorIso: string | null;
   byReason: Array<{ Reason: string; count: number }>;
   byNamespace: Array<{ namespace: string; count: number }>;
@@ -89,125 +147,205 @@ export interface ErrorSummary {
 
 Rules:
 
-- Every row shown in the panel must include Code Red fields from step 11.
-- If a legacy row lacks a field, render `null` plus a reason badge such as
-  `LegacyLogMissingReasonDetail`; never crash or render a blank line.
+- Missing legacy fields become `null` plus an entry in `normalizationWarnings`
+  (never silent). Exports MUST include warnings beside any synthesized `null`
+  (Code Red shape preserved).
 - `repeatCount` defaults to `1` when absent.
 
-## Background routing handler
+## Background routing handler (G2, G3, G4, G10)
 
 ```ts
 // src/background/errors/error-routing-handler.ts
 import { BUILD_ID } from "@shared/constants";
-import { ERROR_COUNT_CHANGED, MSG_GET_ERROR_ROWS, MSG_GET_ERROR_SUMMARY } from "@shared/messages";
-import { normalizeLogRow } from "@shared/logging/normalize-log-row";
+import {
+  ERROR_COUNT_CHANGED,
+  ErrorRoutingRequest,
+  ErrorRoutingResponse,
+  MSG_CLEAR_RESOLVED_ERRORS,
+  MSG_GET_ERROR_ROWS,
+  MSG_GET_ERROR_SUMMARY,
+  MSG_RESOLVE_ERROR,
+  TrustedSourceContext,
+  isErrorRoutingRequest,
+} from "@shared/messages";
+import { Logger } from "@shared/logging/namespace-logger";
+
+const TRUSTED: ReadonlySet<TrustedSourceContext> = new Set([
+  "popup",
+  "options",
+  "floating-panel",
+]);
+
+function reply<T>(
+  sendResponse: (r: ErrorRoutingResponse<T>) => void,
+  Reason: string,
+  ReasonDetail: string,
+): void {
+  sendResponse({ ok: false, Reason, ReasonDetail, buildId: BUILD_ID });
+}
 
 export function bindErrorRoutingHandler(): void {
-  chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
-    if (request?.kind === MSG_GET_ERROR_SUMMARY) {
-      void getErrorSummary().then(sendResponse);
+  chrome.runtime.onMessage.addListener((raw, sender, sendResponse) => {
+    if (!isErrorRoutingRequest(raw)) {
+      return false;
+    }
+    const req = raw;
+
+    // Origin gate: any sender with tab.id is a content-script context.
+    const fromContent = sender.tab?.id != null;
+    if (
+      (req.kind === MSG_RESOLVE_ERROR || req.kind === MSG_CLEAR_RESOLVED_ERRORS) &&
+      (fromContent || !TRUSTED.has(req.sourceContext as TrustedSourceContext))
+    ) {
+      reply(
+        sendResponse,
+        "ResolveOriginNotAllowed",
+        `sourceContext=${req.sourceContext} fromTab=${fromContent}`,
+      );
       return true;
     }
 
-    if (request?.kind === MSG_GET_ERROR_ROWS) {
-      void getErrorRows(request).then(sendResponse);
-      return true;
-    }
-
-    return false;
+    void handle(req)
+      .then(sendResponse)
+      .catch((cause) => {
+        Logger.error("errors.routing", {
+          path: "background://errors/error-routing-handler",
+          missing: "successful handler completion",
+          Reason: "ErrorRoutingHandlerThrew",
+          ReasonDetail: String(cause),
+        });
+        reply(sendResponse, "ErrorRoutingHandlerThrew", String(cause));
+      });
+    return true; // async sendResponse
   });
 }
 
+async function handle(req: ErrorRoutingRequest): Promise<ErrorRoutingResponse<unknown>> {
+  switch (req.kind) {
+    case MSG_GET_ERROR_SUMMARY: {
+      const data = await getErrorSummary();
+      return { ok: true, data, buildId: BUILD_ID };
+    }
+    case MSG_GET_ERROR_ROWS: {
+      const data = await getErrorRows(req.filter);
+      return { ok: true, data, buildId: BUILD_ID };
+    }
+    case MSG_RESOLVE_ERROR: {
+      await logStore.resolveError(req.id, req.resolvedBy);
+      await broadcastErrorCountChanged();
+      return { ok: true, data: { id: req.id }, buildId: BUILD_ID };
+    }
+    case MSG_CLEAR_RESOLVED_ERRORS: {
+      const removed = await logStore.clearResolvedErrors();
+      await broadcastErrorCountChanged();
+      return { ok: true, data: { removed }, buildId: BUILD_ID };
+    }
+  }
+}
+
 export async function broadcastErrorCountChanged(): Promise<void> {
-  const summary = await getErrorSummary();
-  const message = {
+  let summary: ErrorSummary;
+  try {
+    summary = await getErrorSummary();
+  } catch (cause) {
+    Logger.error("errors.routing", {
+      path: "sqlite://Logs/Errors#get-summary",
+      missing: "summary aggregation",
+      Reason: "ErrorSummaryComputationFailed",
+      ReasonDetail: String(cause),
+    });
+    return; // fail-fast, no retry
+  }
+
+  const message: ErrorCountChangedMessage = {
     kind: ERROR_COUNT_CHANGED,
     unresolvedCount: summary.unresolvedCount,
-    last24hCount: summary.last24hCount,
+    last24hUnresolvedCount: summary.last24hUnresolvedCount,
+    last24hTotalCount: summary.last24hTotalCount,
     buildId: BUILD_ID,
     occurredAtIso: new Date().toISOString(),
+    dirtyRows: true,
   };
 
-  await chrome.runtime.sendMessage(message).catch(() => {
-    // Some contexts may be closed. Do not retry; tabs broadcast handles pages.
-  });
+  // Phase 1: runtime fan-out (popup/options/floating). Closed contexts are normal.
+  try {
+    await chrome.runtime.sendMessage(message);
+  } catch {
+    /* not Code Red */
+  }
 
-  const tabs = await chrome.tabs.query({});
-  for (const tab of tabs) {
-    if (!tab.id) {
-      continue;
+  // Phase 2: tabs fan-out, each guarded independently.
+  let tabs: chrome.tabs.Tab[];
+  try {
+    tabs = await chrome.tabs.query({});
+  } catch (cause) {
+    const detail = String(cause);
+    if (detail.includes("Extension context invalidated")) {
+      return; // terminal, no retry
     }
+    Logger.error("errors.routing", {
+      path: "chrome.tabs.query",
+      missing: "tabs list",
+      Reason: "TabsQueryFailed",
+      ReasonDetail: detail,
+    });
+    return;
+  }
+
+  for (const tab of tabs) {
+    if (tab.id == null) continue;
     void chrome.tabs.sendMessage(tab.id, message).catch(() => {
-      // Expected for tabs without the extension relay. No retry.
+      /* tabs without relay: expected, no retry */
     });
   }
 }
 ```
 
-Rules:
-
-- `bindErrorRoutingHandler()` is registered synchronously during background
-  startup.
-- `broadcastErrorCountChanged()` is called immediately after a persisted error
-  insert, resolve, or clear operation.
-- Failed broadcasts are not Code Red by themselves; closed contexts are normal.
-- Failed summary computation is Code Red because the UI cannot trust counts.
-
-## Summary computation
+## Summary computation (G5, G6)
 
 ```ts
 // src/background/errors/error-store.ts
 export async function getErrorSummary(): Promise<ErrorSummary> {
-  const since = Date.now() - 86_400_000;
-  const rows = await logStore.getErrorRows({ since, includeResolved: false });
-  const normalized = rows.map(normalizeLogRow);
+  const sinceMs = Date.now() - 86_400_000;
+  // SQL MUST be: SELECT ... FROM Errors WHERE TimestampMs >= ?
+  //              ORDER BY TimestampIso DESC, Id DESC
+  const last24hRowsRaw = await logStore.getErrorRows({
+    sinceMs,
+    includeResolved: true,
+    orderBy: "TimestampIso DESC, Id DESC",
+  });
+  const last24h = last24hRowsRaw.map(normalizeLogRow);
+
+  const unresolvedAllRaw = await logStore.countUnresolved();
+  const unresolved24h = last24h.filter((r) => !r.resolved);
 
   return {
-    unresolvedCount: normalized.filter((row) => !row.resolved).length,
-    last24hCount: normalized.length,
-    newestErrorIso: normalized[0]?.timestampIso ?? null,
-    byReason: countBy(normalized, "Reason"),
-    byNamespace: countBy(normalized, "namespace"),
+    unresolvedCount: unresolvedAllRaw,
+    last24hUnresolvedCount: unresolved24h.length,
+    last24hTotalCount: last24h.length,
+    newestErrorIso: last24h[0]?.timestampIso ?? null,
+    byReason: countBy(unresolved24h, "Reason"),
+    byNamespace: countBy(unresolved24h, "namespace"),
   };
 }
 ```
 
 Rules:
 
-- Use the database timestamp for 24h filtering, not the UI clock.
-- Normalize casing before counting.
-- Exclude resolved rows from unresolved counts.
-- Include resolved rows only when the panel filter requests them.
+- SQL `ORDER BY TimestampIso DESC, Id DESC` is required; `newestErrorIso` is
+  taken from the sorted result, not from raw insert order.
+- `unresolvedCount` is global; `last24h*` is windowed.
+- DB timestamp drives windowing, never the UI clock.
 
 ## UI panel contract
 
-The Errors panel is reachable from:
-
-- Status & Health panel Errors row from step 07,
-- popup footer/detail route,
-- options Activity Log link,
-- floating panel badge when injected runtime is present.
-
-Required sections:
-
-1. **Summary header** — unresolved count, last-24h count, newest error relative
-   time, and build id.
-2. **Filters** — severity/error level, namespace, reason, source context,
-   resolved/unresolved.
-3. **Error list** — rows grouped by newest first, showing namespace, Reason,
-   path, missing item, stage, source context, and repeat count.
-4. **Details drawer** — full `ReasonDetail`, selector attempts, variable
-   context, URL, tab id, trigger source, and timestamp.
-5. **Actions** — copy error JSON, mark resolved, clear resolved, export
-   diagnostics.
-
-## Reference component
+Reachable from Status & Health (step 07) Errors row, popup footer, options
+Activity Log, and floating-panel badge. Sections: summary header, filters,
+list, details drawer, actions (copy JSON, mark resolved, clear resolved,
+export diagnostics).
 
 ```tsx
 // src/popup/errors/ErrorsPanel.tsx
-import { useErrorRows } from "./useErrorRows";
-import { useErrorSummary } from "./useErrorSummary";
-
 export function ErrorsPanel() {
   const summary = useErrorSummary();
   const rows = useErrorRows();
@@ -215,30 +353,37 @@ export function ErrorsPanel() {
   if (summary.state === "preview") {
     return <section role="status">Preview mode — error store unavailable.</section>;
   }
-
   if (summary.state === "loading") {
     return <section role="status">Loading errors…</section>;
   }
-
   if (summary.state === "failed") {
-    return <section role="alert">{summary.reasonDetail}</section>;
+    return (
+      <section role="alert">
+        <strong>{summary.Reason}</strong>
+        <p>{summary.ReasonDetail}</p>
+      </section>
+    );
   }
-
   if (rows.items.length === 0) {
     return <section role="status">No unresolved errors.</section>;
   }
-
   return (
     <section aria-label="Errors">
       <header>
         <strong>{summary.data.unresolvedCount}</strong>
         <span>unresolved</span>
+        <span aria-label="last 24h unresolved">
+          {summary.data.last24hUnresolvedCount} / {summary.data.last24hTotalCount}
+        </span>
       </header>
       {rows.items.map((row) => (
         <article key={row.id} data-reason={row.Reason}>
           <h3>{row.namespace}</h3>
           <p>{row.Reason}</p>
-          <code>{row.path}</code>
+          <code>{row.path ?? "—"}</code>
+          {row.normalizationWarnings.length > 0 && (
+            <span data-warning>{row.normalizationWarnings.join(",")}</span>
+          )}
           <button type="button" onClick={() => rows.openDetails(row.id)}>Details</button>
         </article>
       ))}
@@ -247,120 +392,127 @@ export function ErrorsPanel() {
 }
 ```
 
-Rules:
-
-- The panel uses semantic sections/articles and keyboard-focusable row actions.
-- Text must fit inside the popup width; long paths wrap or truncate with a
-  tooltip, never overflow horizontally.
-- The panel must not require DevTools to understand the error.
-
-## Broadcast hook
+## Broadcast hook (G8, G9)
 
 ```ts
 // src/popup/errors/useErrorSummary.ts
 export function useErrorSummary(): ErrorSummaryState {
+  const [state, setState] = useState<ErrorSummaryState>({ state: "loading" });
+  const visibleRef = useRef(true);
+
   useEffect(() => {
-    const onMessage = (message: ErrorCountChangedMessage): void => {
-      if (message?.kind !== ERROR_COUNT_CHANGED) {
-        return;
-      }
-      setSummary((current) => mergeCounts(current, message));
+    let intervalId: number | null = null;
+
+    const refresh = async (): Promise<void> => {
+      const res = await sendErrorRoutingRequest({
+        kind: MSG_GET_ERROR_SUMMARY,
+        sourceContext: "popup",
+      });
+      setState(res.ok
+        ? { state: "ready", data: res.data, buildId: res.buildId }
+        : { state: "failed", Reason: res.Reason, ReasonDetail: res.ReasonDetail });
+    };
+
+    const onMessage = (m: unknown): void => {
+      if (!isErrorCountChanged(m)) return;
+      setState((current) =>
+        current.state === "ready"
+          ? {
+              ...current,
+              data: {
+                ...current.data,
+                unresolvedCount: m.unresolvedCount,
+                last24hUnresolvedCount: m.last24hUnresolvedCount,
+                last24hTotalCount: m.last24hTotalCount,
+              },
+            }
+          : current,
+      );
+    };
+
+    const onVisibility = (): void => {
+      visibleRef.current = !document.hidden;
     };
 
     chrome.runtime.onMessage.addListener(onMessage);
+    document.addEventListener("visibilitychange", onVisibility);
+    void refresh();
 
-    const intervalId = window.setInterval(() => {
-      if (!document.hidden) {
-        void refreshSummary();
-      }
+    intervalId = window.setInterval(() => {
+      if (visibleRef.current) void refresh();
     }, 30_000);
 
     const teardown = (): void => {
       chrome.runtime.onMessage.removeListener(onMessage);
-      window.clearInterval(intervalId);
+      document.removeEventListener("visibilitychange", onVisibility);
+      if (intervalId !== null) window.clearInterval(intervalId);
+      intervalId = null;
     };
 
     window.addEventListener("pagehide", teardown, { once: true });
-
     return teardown;
   }, []);
+
+  return state;
 }
 ```
 
 Rules:
 
-- Broadcast updates are immediate.
-- Slow polling floor is 30 seconds and must pause while `document.hidden`.
-- `pagehide` teardown is mandatory.
-- Poll failure renders a typed warning but does not spam Code Red repeatedly.
+- Exactly one interval per mount. `pagehide` and unmount both teardown.
+- Hidden tabs pause polling (per `mem://standards/timer-and-observer-teardown`).
+- Poll failure renders a typed warning; never spams Code Red.
 
-## Resolving and clearing errors
+## Resolving and clearing (G10)
 
-Resolving an error means the user or system marks it no longer active. It does
-not delete the original log row.
+- `MSG_RESOLVE_ERROR` sets `resolved=true`, `resolvedAtIso`, `resolvedBy`.
+- `MSG_CLEAR_RESOLVED_ERRORS` deletes or archives only resolved rows.
+- Unresolved Code Red rows are never removed by clear.
+- Background rejects both from page MAIN / content-script senders.
+- Write completes → recompute summary → broadcast → respond.
 
-Rules:
+## Diagnostics export (G11)
 
-- `MSG_RESOLVE_ERROR` sets `resolved=true`, `resolvedAtIso`, and
-  `resolvedBy="user" | "system"`.
-- `MSG_CLEAR_RESOLVED_ERRORS` may delete or archive only resolved rows.
-- Unresolved Code Red rows are never deleted by a blanket clear action.
-- Every resolve/clear operation broadcasts `ERROR_COUNT_CHANGED` after the
-  database write completes.
+ZIP MUST include:
 
-## Diagnostics export
-
-The Errors panel export action uses the existing diagnostics ZIP format and
-must include:
-
-- summary counts,
-- unresolved rows,
-- resolved rows when filter includes them,
-- injection events,
-- per-script final status,
-- build id and extension version,
-- normalized casing for both raw SQLite and UI-rendered rows.
-
-The export must preserve Code Red fields and diagnostic arrays so a support
-person can diagnose the issue without a screenshot.
+- summary counts (all three),
+- unresolved rows, plus resolved rows when filter requested,
+- injection events and per-script final status,
+- build id, extension version, schema version,
+- normalized PascalCase + camelCase fields with `normalizationWarnings`,
+- when present: `marco_last_boot_failure` (step 14), `WasmProbeResult`,
+  frozen click trail, benign-warning tally.
 
 ## Pitfalls
 
-- **Counting in the popup from stale rows** — the background owns counts and
-  broadcasts changes.
-- **Polling every second** — broadcasts are primary; slow polling is fallback.
-- **Deleting unresolved errors** — clearing resolved rows must not hide active
-  failures.
-- **Rendering raw SQLite rows directly** — PascalCase/camelCase mismatch causes
-  blank activity lines. Normalize first.
-- **Treating closed-tab broadcast failures as Code Red** — closed contexts are
-  normal. Log only summary/write failures.
-- **Showing counts with no detail path** — every badge/count must link to a row
-  list or detail panel.
+- Counting in popup from stale rows — background owns counts.
+- Polling faster than 30s or while hidden.
+- Deleting unresolved errors via blanket clear.
+- Rendering raw SQLite rows without normalization.
+- Treating closed-tab broadcast failure as Code Red.
+- Treating `Extension context invalidated` as a retryable error.
 
-## Acceptance
+## Acceptance (G12)
 
-- [ ] New error inserts trigger `ERROR_COUNT_CHANGED` with unresolved and 24h
-      counts.
-- [ ] Status panel Errors row opens the Errors panel and shows last-24h count.
-- [ ] Errors panel renders loading, empty, failed, preview, list, and details
-      states without blank UI.
-- [ ] Rows display namespace, Reason, ReasonDetail, path, missing item, stage,
-      source context, selector attempts, and variable context.
-- [ ] Resolve and clear-resolved actions update SQLite first, then broadcast
-      updated counts.
-- [ ] UI hooks teardown message listeners and polling timers on `pagehide`.
-- [ ] Diagnostics export includes normalized logs and Code Red diagnostic arrays.
+- [ ] Every insert/resolve/clear broadcasts `ERROR_COUNT_CHANGED` after DB commit.
+- [ ] Resolve/clear from page MAIN sender returns `ResolveOriginNotAllowed`.
+- [ ] Status panel Errors row shows `last24hUnresolvedCount`.
+- [ ] PascalCase SQLite rows, camelCase frontend rows, and mixed legacy rows
+      all normalize without crash; missing fields → `null` + `normalizationWarnings`.
+- [ ] `buildId` mismatch surfaces a warning banner; counts are NOT overwritten
+      from a stale build broadcast.
+- [ ] Hooks have exactly one interval, pause on hidden, teardown on `pagehide`.
+- [ ] Diagnostics export contains Code Red fields, selector attempts, variable
+      context, and `normalizationWarnings`.
 
-## Tests to ship with this step
+## Tests to ship
 
-- Unit: `error-summary.test.ts` — asserts counts exclude resolved rows and use
-  last-24h filtering.
-- Unit: `error-broadcast.test.ts` — asserts insert/resolve/clear operations
-  broadcast `ERROR_COUNT_CHANGED` after DB write.
-- Hook: `useErrorSummary.test.ts` — asserts broadcast update, 30s fallback poll,
-  hidden pause, and `pagehide` teardown.
-- Component: `ErrorsPanel.test.tsx` — asserts loading, empty, failed, preview,
-  list, and details states render.
-- Export: `diagnostics-export-errors.test.ts` — asserts exported rows include
-  Code Red fields, selector attempts, variable context, and normalized casing.
+- Unit: `error-summary.test.ts` — three count fields + ORDER BY semantics.
+- Unit: `error-broadcast.test.ts` — insert/resolve/clear → broadcast after commit.
+- Unit: `error-routing-origin.test.ts` — page-main resolve rejected.
+- Unit: `normalize-log-row.test.ts` — PascalCase, camelCase, mixed, legacy.
+- Unit: `build-id-mismatch.test.ts` — stale build broadcast does not overwrite.
+- Hook: `useErrorSummary.test.ts` — broadcast update, 30s poll, hidden pause,
+  `pagehide` teardown, single interval invariant.
+- Component: `ErrorsPanel.test.tsx` — loading/empty/failed/preview/list states.
+- Export: `diagnostics-export-errors.test.ts` — normalized rows + warnings.
