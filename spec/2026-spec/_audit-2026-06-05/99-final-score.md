@@ -8,28 +8,28 @@
 | Metric | Value |
 | --- | --- |
 | Files audited | 229 |
-| Repo composite score | **80.73 / 100** |
-| Files ≥ 90 (pass bar) | 107 |
+| Repo composite score | **82.91 / 100** |
+| Files ≥ 90 (pass bar) | 126 |
 | Files < 60 (red) | 0 |
-| Pass-rate | 46.7% |
+| Pass-rate | 55.0% |
 
 ## Per-folder
 
 | Folder | Files | Mean | <60 | ≥90 |
 | --- | --- | --- | --- | --- |
 | `01-prompt-spec` | 131 | 77.4 | 0 | 53 |
-| `02-ci-cd-spec-for-chrome-extensions` | 20 | 79.0 | 0 | 9 |
-| `03-chrome-ext-features` | 35 | 81.5 | 0 | 7 |
+| `02-ci-cd-spec-for-chrome-extensions` | 20 | 89.5 | 0 | 14 |
+| `03-chrome-ext-features` | 35 | 89.7 | 0 | 21 |
 | `03-db-and-sqlite-integration-with-chrome-extension` | 42 | **91.1** | 0 | 37 |
 | top-level `README.md` | 1 | 90.0 | 0 | 1 |
 
 ## Top-5 remaining blockers (repo-wide)
 
-1. **Pass-bar gap** — 122 files still in 60–89; need targeted determinism + cross-ref uplift to clear 90.
-2. **`01-prompt-spec` long tail** — 78 files below 90; biggest absolute headroom for composite uplift.
-3. **`02-ci-cd-spec` mean (79.0)** — needs per-topic MUST/pitfall pass on the remaining 11 files.
-4. **`03-chrome-ext-features` mean (81.5)** — only 7/35 at ≥90; pitfalls remain generic.
-5. **Pitfalls specificity** — DB folder now has per-topic pitfalls; other folders still use the generic 4-rule footer.
+1. **`01-prompt-spec` long tail** — 78 files below 90; only folder still under 80 mean; biggest absolute headroom.
+2. **Pitfalls specificity in `01-prompt-spec`** — auto-footer still generic; needs per-topic counter-examples (loader, queue, paste, plan-mode).
+3. **CI workflow snapshot** — add `scores.json` artefact upload to `spec-audit.yml` for regression tracking.
+4. **Top-level `README.md`** — currently 90; push to 95+ with deterministic links to the four sub-folders.
+5. **`audit/` subfolder in `03-chrome-ext-features`** — 14 files; needs proper Acceptance + per-topic Pitfalls instead of the generic footer.
 
 ## Fix-to-100 path (rough ETA, 1 dev)
 
