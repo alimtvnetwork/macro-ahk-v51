@@ -10,13 +10,13 @@
 - `node scripts/audit/check-quarantine.mjs` → every quarantined draft declares a Graduation Plan.
 - `node scripts/audit/check-pitfalls.mjs` → every source spec includes a pitfall/counter-example signal.
 - `node scripts/audit/check-score-floor.mjs` → every source spec scores ≥100 and composite stays ≥99.5.
+- `node scripts/audit/check-score-snapshot.mjs` → per-file scores and composite never regress below `scores.snapshot.json`.
 - `node scripts/audit/render-reports.mjs` → this audit directory is reproducible from current scores.
 
 ## Remaining machine-check hooks
 
-1. Add a score snapshot lock at `_audit-2026-06-05/scores.snapshot.json`.
-2. Add no-bare-fetch and footer-lint guards for new prose.
-3. Wire every audit check into `.github/workflows/spec-audit.yml`.
+1. Add no-bare-fetch and footer-lint guards for new prose.
+2. Wire every audit check into `.github/workflows/spec-audit.yml`.
 
 ## Remaining qualitative work
 
