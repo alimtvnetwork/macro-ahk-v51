@@ -103,18 +103,25 @@ export interface NamespaceLogPayload {
   VariableContext: VariableContextLog[];
 }
 
+export interface CodeRedLogPayload extends NamespaceLogPayload {
+  path: string;
+  missing: string;
+  Reason: string;
+  ReasonDetail: string;
+}
+
 export interface NamespaceLogger {
   debug(namespace: string, payload: NamespaceLogPayload): void;
   info(namespace: string, payload: NamespaceLogPayload): void;
   warn(namespace: string, payload: NamespaceLogPayload): void;
-  error(namespace: string, payload: NamespaceLogPayload): void;
+  error(namespace: string, payload: CodeRedLogPayload): void;
 }
 ```
 
 Rules:
 
-- `error()` requires Code Red fields. If `path`, `missing`, `Reason`, or
-  `ReasonDetail` is absent, tests must fail.
+- `error()` requires Code Red fields at the type level. If `path`, `missing`,
+  `Reason`, or `ReasonDetail` is absent, TypeScript and tests must fail.
 - `debug/info/warn` may omit Code Red fields only when they are not failure
   events.
 - All levels still include `buildId`, `sourceContext`, and timestamp at write
