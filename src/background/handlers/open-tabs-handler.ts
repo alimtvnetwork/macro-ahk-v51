@@ -178,6 +178,19 @@ function buildOpenLovableTabInfo(args: {
     };
 }
 
+function resolveProjectBinding(
+    record: TabInjectionRecord | undefined,
+    probePayload: ProbeOutcome["payload"],
+): { projectId: string | null; bindingSource: OpenLovableTabInfo["bindingSource"] } {
+    let projectId: string | null = record?.projectId ?? null;
+    let bindingSource: OpenLovableTabInfo["bindingSource"] = record !== undefined ? "injection" : "none";
+    if (projectId === null && probePayload && typeof probePayload.projectId === "string" && probePayload.projectId !== "") {
+        projectId = probePayload.projectId;
+        bindingSource = "probe";
+    }
+    return { projectId, bindingSource };
+}
+
 /**
  * Identify which UrlRule on the bound project caused this tab to bind.
  *
