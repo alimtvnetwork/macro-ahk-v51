@@ -110,9 +110,9 @@ declare global {
     }
 
     interface NamespaceLogApi {
-        info: (msg: string, meta?: Record<string, unknown>) => unknown;
-        warn: (msg: string, meta?: Record<string, unknown>) => unknown;
-        error: (msg: string, meta?: Record<string, unknown>) => unknown;
+        info: (message: string, meta?: Record<string, unknown>) => unknown;
+        warn: (message: string, meta?: Record<string, unknown>) => unknown;
+        error: (message: string, meta?: Record<string, unknown>) => unknown;
     }
 
     interface NamespaceScriptInfoPublic {
