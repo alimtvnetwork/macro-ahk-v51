@@ -13,7 +13,11 @@ _None — TS Migration V2 backlog cleared. See "Recently Completed" below._
 
 Per `mem://preferences/deferred-workstreams`, only the discuss-later marketplace workstream remains deferred. React component tests and manual Chrome E2E are allowed again as of 2026-05-25 and must not be treated as blockers.
 
-These deferred items must NOT be surfaced as recommended next actions until the user explicitly reopens them.
+- **Exact path:** `spec/21-app/02-features/misc-features/pstore-marketplace.md`
+- **Missing item:** backend API/service contract and implementation for the marketplace workstream.
+- **Reason:** user preference keeps this in discuss-later mode; do not auto-pick, recommend, or surface it as a next action until explicitly reopened.
+
+This deferred item must NOT be surfaced as a recommended next action until the user explicitly reopens it.
 
 ## Recently Completed (v2.225.0 — 2026-04-23)
 
