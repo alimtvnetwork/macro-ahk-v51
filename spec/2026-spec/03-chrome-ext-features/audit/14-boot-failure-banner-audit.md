@@ -138,11 +138,14 @@ The missing `14-boot-failure-banner.md` should contain:
 the current BootFailureBanner mounting/data contracts, and mapped the missing
 portable spec requirements from memory and source.
 
-## Remaining audits (post this file)
+## Post-audit status
 
-1. 15-floating-panel-minimize-and-drag
-2. 16-sqlite-integration
-3. 17-indexeddb-cache
-4. 18-chrome-storage-local-usage
+The remaining files named by this audit were later created or aligned under the
+canonical step-01 slugs:
+
+1. 15-floating-in-page-panel
+2. 16-storage-sqlite-pointer
+3. 17-storage-indexeddb-pointer
+4. 18-storage-chrome-local-pointer
 5. 19-testing-matrix
 6. 20-acceptance-criteria

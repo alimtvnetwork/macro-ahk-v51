@@ -127,12 +127,15 @@ warning state rather than overwriting current counts.
 ~3 minutes: read source spec, checked prior audits and project memories, traced
 the route from logger write → count broadcast → panel state → export.
 
-## Remaining audits (post this file)
+## Post-audit status
+
+The remaining files named by this audit were later created or aligned under the
+canonical step-01 slugs:
 
 1. 14-boot-failure-banner
-2. 15-floating-panel-minimize-and-drag
-3. 16-sqlite-integration
-4. 17-indexeddb-cache
-5. 18-chrome-storage-local-usage
+2. 15-floating-in-page-panel
+3. 16-storage-sqlite-pointer
+4. 17-storage-indexeddb-pointer
+5. 18-storage-chrome-local-pointer
 6. 19-testing-matrix
 7. 20-acceptance-criteria
