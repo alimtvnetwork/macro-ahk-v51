@@ -3,11 +3,29 @@
  * Blocks fixed timezone/city/country tokens from source, specs, docs, workflows,
  * and memory. Timestamps must be stored as UTC and rendered with the user's
  * local timezone at display time.
+ *
+ * Pedagogical counter-examples (docs/specs/memory that teach the rule using
+ * the forbidden tokens) are skipped when the same line also contains any of:
+ *   - `Intl.DateTimeFormat` (canonical fix referenced inline — SAFE_RENDER_MARKER)
+ *   - `<!-- allow-timezone-example -->` (explicit opt-out — INLINE_ALLOW_MARKER)
+ *   - both ❌ and ✅ (paired bad/good counter-example pattern)
  */
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 const ROOT = process.cwd();
+
+const SAFE_RENDER_MARKER = 'Intl.DateTimeFormat';
+const INLINE_ALLOW_MARKER = '<!-- allow-timezone-example -->';
+const CROSS_MARK = '\u274C';
+const CHECK_MARK = '\u2705';
+
+function isPedagogicalCounterExample(line) {
+  if (line.includes(SAFE_RENDER_MARKER)) return true;
+  if (line.includes(INLINE_ALLOW_MARKER)) return true;
+  if (line.includes(CROSS_MARK) && line.includes(CHECK_MARK)) return true;
+  return false;
+}
 
 const SKIP_DIRS = new Set([
   '.git',
