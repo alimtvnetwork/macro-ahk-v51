@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-06-05T15:46:08.591Z",
+  "generatedAt": "2026-06-05T15:51:36.161Z",
   "root": "spec/21-app/05-prompts",
   "fileCount": 252,
   "files": [
@@ -669,7 +669,7 @@
       "bytes": 1146
     },
     {
-      "path": "spec/21-app/05-prompts/99-spec-issues/README.md",
+      "path": "spec/21-app/05-prompts/99-spec-issues/readme.md",
       "title": "99-spec-issues — Index",
       "status": "Reference",
       "version": "1.0.0",
@@ -844,7 +844,7 @@
       "bytes": 3431
     },
     {
-      "path": "spec/21-app/05-prompts/macro-prompts/README.md",
+      "path": "spec/21-app/05-prompts/macro-prompts/readme.md",
       "title": "Macro-Prompts — Separation Rationale",
       "status": null,
       "version": null,
@@ -1355,7 +1355,7 @@
       "bytes": 2926
     },
     {
-      "path": "spec/21-app/05-prompts/macros/README.md",
+      "path": "spec/21-app/05-prompts/macros/readme.md",
       "title": "Prompt Macros — Spec Index",
       "status": "** ✅ v2.0 complete. Audited readiness **100 / 100** (`READINESS-SCORE-v2.md`). See `../README.md` (root index) and `../IMPLEMENTATION-CHECKLIST.md` for the blind-AI runbook.",
       "version": null,
@@ -1509,7 +1509,7 @@
       "bytes": 1077
     },
     {
-      "path": "spec/21-app/05-prompts/README.md",
+      "path": "spec/21-app/05-prompts/readme.md",
       "title": "Prompt-Macros Subsystem — Master Index",
       "status": null,
       "version": null,
@@ -1761,7 +1761,7 @@
       "bytes": 1437
     },
     {
-      "path": "spec/21-app/05-prompts/variables/README.md",
+      "path": "spec/21-app/05-prompts/variables/readme.md",
       "title": "Variables & Templating — Spec Index",
       "status": null,
       "version": null,
