@@ -121,7 +121,6 @@ export default tseslint.config(
   // graduate off this list as their authored-source debt is cleaned.
   {
     files: [
-      "src/background/recorder/data-source-parsers.ts",
       "src/background/recorder/drift-element-diff.ts",
       "src/background/recorder/failure-logger.ts",
       "src/background/recorder/field-reference-resolver.ts",
