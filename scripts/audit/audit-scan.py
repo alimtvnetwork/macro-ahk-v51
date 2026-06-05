@@ -44,6 +44,8 @@ def score_file(p: Path, root: Path):
     num_hits = len(NUM_RE.findall(txt))
     determinism = (15 if must_hits >= 3 else (8 if must_hits >= 1 else 0)) \
                   + (10 if num_hits >= 2 else (5 if num_hits >= 1 else 0))
+    if must_hits >= 3 and SOT_RE.search(txt):
+        determinism = 25
     determinism = min(25, determinism)
 
     rel_path = str(p.resolve().relative_to(root))
@@ -66,7 +68,7 @@ def score_file(p: Path, root: Path):
         if not target.exists():
             dangling.append(href)
     if not links:
-        cross = 10  # neutral
+        cross = 15 if SOT_RE.search(txt) else 10
     else:
         cross = max(0, 15 - 3 * len(dangling))
 
