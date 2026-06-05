@@ -13,6 +13,12 @@ import { DEFAULT_SPEC_ROOT, listMarkdownFiles } from './spec-file-list.mjs';
 const ROOT_ARG = '--root=';
 const SPEC_ROOT = getArg(ROOT_ARG, DEFAULT_SPEC_ROOT);
 const LINK_RE = /\[[^\]]+\]\(([^)\s#]+)(?:#[^)]*)?\)/g;
+const FENCE_RE = /```[\s\S]*?```/g;
+const INLINE_CODE_RE = /`[^`\n]*`/g;
+
+function stripCode(text) {
+  return text.replace(FENCE_RE, '').replace(INLINE_CODE_RE, '');
+}
 
 function getArg(prefix, fallback) {
   return process.argv.find((value) => value.startsWith(prefix))?.slice(prefix.length) ?? fallback;
@@ -20,7 +26,7 @@ function getArg(prefix, fallback) {
 
 const failures = [];
 for (const path of listMarkdownFiles(SPEC_ROOT)) {
-  const txt = readFileSync(path, 'utf8');
+  const txt = stripCode(readFileSync(path, 'utf8'));
   const dir = dirname(path);
   for (const m of txt.matchAll(LINK_RE)) {
     const href = m[1];
