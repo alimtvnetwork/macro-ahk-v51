@@ -110,8 +110,8 @@ Validation script errors must include `Path`, `Missing`, `Reason`, and `ReasonDe
 ## Cross-references
 
 - [pipeline/04-validation-scripts.md](../../../pipeline/04-validation-scripts.md) — validation script conventions.
-- [step-07](./step-07-required-packages-and-no-remote-fetch.md) — no remote fetch.
-- [step-25](./step-25-chrome-storage-local-usage.md) — storage key preservation.
-- [step-36](./step-36-code-red-logging-rule.md) — Code Red field requirements.
-- [step-38](./step-38-testing.md) — tests that prove the gates work.
+- [step-07](./07-required-packages-and-no-remote-fetch.md) — no remote fetch.
+- [step-25](./25-chrome-storage-local-usage.md) — storage key preservation.
+- [step-36](./36-code-red-logging-rule.md) — Code Red field requirements.
+- [step-38](./38-testing.md) — tests that prove the gates work.
 - Core memory: CI push trigger unfiltered; no CI notifications; test-with-features.

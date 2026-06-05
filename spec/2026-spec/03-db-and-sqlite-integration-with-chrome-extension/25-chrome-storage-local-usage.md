@@ -194,8 +194,8 @@ Every failure must include `Path`, `Missing`, `Reason`, and `ReasonDetail`.
 
 ## See also
 
-- [step-02](./step-02-four-tier-storage-decision-matrix.md) — Tier matrix
-- [step-03](./step-03-quota-persistence-eviction.md) — Quota/error behavior
-- [step-21](./step-21-indexeddb-when-to-choose.md) — Large rebuildable cache lane
-- [step-26](./step-26-chrome-storage-local-quota.md) — Byte guard and pruner
-- [step-28](./step-28-cross-version-migration.md) — Safe storage migration rules
+- [step-02](./02-four-tier-storage-decision-matrix.md) — Tier matrix
+- [step-03](./03-quota-persistence-eviction.md) — Quota/error behavior
+- [step-21](./21-indexeddb-when-to-choose.md) — Large rebuildable cache lane
+- [step-26](./26-chrome-storage-local-quota.md) — Byte guard and pruner
+- [step-28](./28-cross-version-storage-migration.md) — Safe storage migration rules

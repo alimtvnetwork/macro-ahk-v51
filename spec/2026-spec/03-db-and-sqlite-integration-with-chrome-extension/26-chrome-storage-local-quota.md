@@ -221,8 +221,8 @@ Every error must include `Path`, `Missing`, `Reason`, `ReasonDetail`, `Key`, `Va
 
 ## See also
 
-- [step-03](./step-03-quota-persistence-eviction.md) — Generic quota/error model
-- [step-21](./step-21-indexeddb-when-to-choose.md) — Move large rebuildable blobs to IDB
-- [step-25](./step-25-chrome-storage-local-usage.md) — Allowed key and payload lane
-- [step-31](./step-31-error-model.md) — Shared `QuotaError` shape
-- [step-39](./step-39-ci-gates.md) — Storage policy CI checks
+- [step-03](./03-quota-persistence-eviction.md) — Generic quota/error model
+- [step-21](./21-indexeddb-when-to-choose.md) — Move large rebuildable blobs to IDB
+- [step-25](./25-chrome-storage-local-usage.md) — Allowed key and payload lane
+- [step-31](./31-error-model.md) — Shared `QuotaError` shape
+- [step-39](./39-ci-gates.md) — Storage policy CI checks

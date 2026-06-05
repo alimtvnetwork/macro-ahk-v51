@@ -150,7 +150,7 @@ await runTx(db, ["Scripts"], "readwrite", (stores) => {
 
 ## See also
 
-- [step-21](./step-21-indexeddb-when-to-choose.md) — Tier decision rule
-- [step-23](./step-23-indexeddb-injection-cache.md) — Canonical consumer
-- [step-24](./step-24-indexeddb-invalidation.md) — Cache invalidation policy
-- [step-18](./step-18-flush-strategy.md) — Drain points shared with SQLite
+- [step-21](./21-indexeddb-when-to-choose.md) — Tier decision rule
+- [step-23](./23-indexeddb-injection-cache.md) — Canonical consumer
+- [step-24](./24-indexeddb-invalidation.md) — Cache invalidation policy
+- [step-18](./18-flush-strategy.md) — Drain points shared with SQLite

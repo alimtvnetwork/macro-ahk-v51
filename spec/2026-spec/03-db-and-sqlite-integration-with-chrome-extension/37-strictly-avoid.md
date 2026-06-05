@@ -76,9 +76,9 @@ All runtime violations that survive CI must route through step-32 error routing 
 
 ## Cross-references
 
-- [step-07](./step-07-required-packages-and-no-remote-fetch.md) — no remote `sql.js`.
-- [step-16](./step-16-bind-safety-proxy-net.md) — bind-safety backstop.
-- [step-23](./step-23-indexeddb-injection-cache.md) — cache never stores stubs or source-of-truth data.
-- [step-25](./step-25-chrome-storage-local-usage.md) — camelCase preservation.
-- [step-36](./step-36-code-red-logging-rule.md) — no vague Code Red diagnostics.
-- [step-39](./step-39-ci-gates.md) — CI enforcement.
+- [step-07](./07-required-packages-and-no-remote-fetch.md) — no remote `sql.js`.
+- [step-16](./16-bind-safety-proxy-net.md) — bind-safety backstop.
+- [step-23](./23-indexeddb-injection-cache.md) — cache never stores stubs or source-of-truth data.
+- [step-25](./25-chrome-storage-local-usage.md) — camelCase preservation.
+- [step-36](./36-code-red-logging-rule.md) — no vague Code Red diagnostics.
+- [step-39](./39-ci-gates.md) — CI enforcement.

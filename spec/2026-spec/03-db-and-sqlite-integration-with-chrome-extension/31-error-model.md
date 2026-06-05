@@ -170,9 +170,9 @@ Every `message-router` handler returns this shape instead of throwing across the
 
 ## Cross-references
 
-- [step-16](./step-16-bind-safety-proxy-net.md) — BindError as specialized error type.
-- [step-29](./step-29-cross-context-access.md) — response envelope uses `reason` and `reasonDetail`.
-- [step-32](./step-32-error-routing.md) — sends normalized errors to logs/UI.
-- [step-33](./step-33-errors-panel-ui-hookup.md) — user-visible error rows.
-- [step-36](./step-36-code-red-logging-rule.md) — Code Red path/missing/reason requirements.
+- [step-16](./16-bind-safety-proxy-net.md) — BindError as specialized error type.
+- [step-29](./29-cross-context-access.md) — response envelope uses `reason` and `reasonDetail`.
+- [step-32](./32-error-routing.md) — sends normalized errors to logs/UI.
+- [step-33](./33-errors-panel-ui-hookup.md) — user-visible error rows.
+- [step-36](./36-code-red-logging-rule.md) — Code Red path/missing/reason requirements.
 - Core memory: Failure logs mandatory shape, namespace logging, no explicit `unknown`, no-retry policy.

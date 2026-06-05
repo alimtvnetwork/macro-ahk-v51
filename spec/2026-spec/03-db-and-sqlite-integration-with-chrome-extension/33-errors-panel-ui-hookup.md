@@ -121,8 +121,8 @@ UI failures must not create infinite error-routing loops. If the panel itself ca
 
 ## Cross-references
 
-- [step-31](./step-31-error-model.md) — row fields come from the canonical diagnostic.
-- [step-32](./step-32-error-routing.md) — source of persisted rows and broadcasts.
-- [step-34](./step-34-boot-failure-banner.md) — boot-critical errors also appear here.
-- [step-35](./step-35-logging-tables-and-retention.md) — table schema and retention.
+- [step-31](./31-error-model.md) — row fields come from the canonical diagnostic.
+- [step-32](./32-error-routing.md) — source of persisted rows and broadcasts.
+- [step-34](./34-boot-failure-banner.md) — boot-critical errors also appear here.
+- [step-35](./35-logging-tables-and-retention.md) — table schema and retention.
 - Core memory: Dark-only theme; failure logs mandatory shape; namespace logging.

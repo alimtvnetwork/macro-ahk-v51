@@ -135,8 +135,8 @@ Every bridge failure report must include `Reason`, `ReasonDetail`, `SelectorAtte
 
 ## Cross-references
 
-- [step-15](./step-15-bind-safety-entry-point-guards.md) — handler payload validation.
-- [step-18](./step-18-flush-strategy.md) — dirty flush and drain points.
-- [step-27](./step-27-localstorage-usage.md) — page-origin access limits.
-- [step-30](./step-30-sdk-content-script-contract.md) — detailed SDK bridge contract.
-- [step-32](./step-32-error-routing.md) — routes failures into logs and panel surfaces.
+- [step-15](./15-bind-safety-entry-point-guards.md) — handler payload validation.
+- [step-18](./18-flush-strategy.md) — dirty flush and drain points.
+- [step-27](./27-localstorage-usage.md) — page-origin access limits.
+- [step-30](./30-sdk-content-script-contract.md) — detailed SDK bridge contract.
+- [step-32](./32-error-routing.md) — routes failures into logs and panel surfaces.

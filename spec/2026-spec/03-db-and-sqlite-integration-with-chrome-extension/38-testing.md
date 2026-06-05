@@ -98,9 +98,9 @@ Manual Chrome E2E is allowed for this project. Run it for implementation close-o
 
 ## Cross-references
 
-- [step-16](./step-16-bind-safety-proxy-net.md) — bind-safety regression.
-- [step-18](./step-18-flush-strategy.md) — flush tests.
-- [step-23](./step-23-indexeddb-injection-cache.md) — cache tests.
-- [step-31](./step-31-error-model.md) — diagnostic field tests.
-- [step-39](./step-39-ci-gates.md) — CI enforcement.
+- [step-16](./16-bind-safety-proxy-net.md) — bind-safety regression.
+- [step-18](./18-flush-strategy.md) — flush tests.
+- [step-23](./23-indexeddb-injection-cache.md) — cache tests.
+- [step-31](./31-error-model.md) — diagnostic field tests.
+- [step-39](./39-ci-gates.md) — CI enforcement.
 - Core memory: test-with-features; manual Chrome E2E ban lifted.

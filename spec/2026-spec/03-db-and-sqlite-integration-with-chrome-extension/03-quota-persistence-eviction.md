@@ -1,6 +1,6 @@
 # Step 03 — Quota, Persistence, and Eviction
 
-> Part of [`spec/2026-spec/03-db-and-sqlite-integration-with-chrome-extension/`](./README.md). Previous: [`step-02-four-tier-storage-decision-matrix.md`](./step-02-four-tier-storage-decision-matrix.md). Next: [`step-04-choose-a-tier-flowchart.md`](./step-04-choose-a-tier-flowchart.md).
+> Part of [`spec/2026-spec/03-db-and-sqlite-integration-with-chrome-extension/`](./README.md). Previous: [`step-02-four-tier-storage-decision-matrix.md`](./02-four-tier-storage-decision-matrix.md). Next: [`step-04-choose-a-tier-flowchart.md`](./04-choose-a-tier-flowchart.md).
 
 ## Goal
 
@@ -185,9 +185,9 @@ All hard failures must call `RiseupAsiaMacroExt.Logger.error()` or the project-a
 
 ## Cross-references
 
-- Previous: [`step-02-four-tier-storage-decision-matrix.md`](./step-02-four-tier-storage-decision-matrix.md)
-- Next: [`step-04-choose-a-tier-flowchart.md`](./step-04-choose-a-tier-flowchart.md)
-- Persistence backend details: [`step-17-persistence-backends.md`](./step-17-persistence-backends.md)
-- Flush timing: [`step-18-flush-strategy.md`](./step-18-flush-strategy.md)
-- `chrome.storage.local` quota: [`step-26-chrome-storage-local-quota.md`](./step-26-chrome-storage-local-quota.md)
-- Error model: [`step-31-error-model.md`](./step-31-error-model.md)
+- Previous: [`step-02-four-tier-storage-decision-matrix.md`](./02-four-tier-storage-decision-matrix.md)
+- Next: [`step-04-choose-a-tier-flowchart.md`](./04-choose-a-tier-flowchart.md)
+- Persistence backend details: [`step-17-persistence-backends.md`](./17-persistence-backends.md)
+- Flush timing: [`step-18-flush-strategy.md`](./18-flush-strategy.md)
+- `chrome.storage.local` quota: [`step-26-chrome-storage-local-quota.md`](./26-chrome-storage-local-quota.md)
+- Error model: [`step-31-error-model.md`](./31-error-model.md)

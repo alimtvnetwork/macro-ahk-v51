@@ -140,7 +140,7 @@ All hard failures MUST log `Path`, `Missing`, `Reason`, and `ReasonDetail`.
 
 ## See also
 
-- [step-17](./step-17-persistence-backends.md) — Persistence backend waterfall
-- [step-18](./step-18-flush-strategy.md) — Export as an explicit drain point
-- [step-26](./step-26-chrome-storage-local-quota.md) — Quota handling during storage fallback
-- [step-35](./step-35-logging-tables-and-retention.md) — Diagnostics files included in export
+- [step-17](./17-persistence-backends.md) — Persistence backend waterfall
+- [step-18](./18-flush-strategy.md) — Export as an explicit drain point
+- [step-26](./26-chrome-storage-local-quota.md) — Quota handling during storage fallback
+- [step-35](./35-logging-tables-and-retention.md) — Diagnostics files included in export

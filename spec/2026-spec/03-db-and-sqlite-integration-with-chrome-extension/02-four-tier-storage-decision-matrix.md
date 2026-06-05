@@ -1,6 +1,6 @@
 # Step 02 — Four-Tier Storage Decision Matrix
 
-> Part of [`spec/2026-spec/03-db-and-sqlite-integration-with-chrome-extension/`](./README.md). Previous: [`step-01-purpose-and-mindset.md`](./step-01-purpose-and-mindset.md).
+> Part of [`spec/2026-spec/03-db-and-sqlite-integration-with-chrome-extension/`](./README.md). Previous: [`step-01-purpose-and-mindset.md`](./01-purpose-and-mindset.md).
 
 ## Goal
 
@@ -99,8 +99,8 @@ const collapsed = localStorage.getItem("ui:panel:collapsed") === "1";
 
 ## Cross-references
 
-- Previous: [`step-01-purpose-and-mindset.md`](./step-01-purpose-and-mindset.md)
-- Next: [`step-03-quota-persistence-eviction.md`](./step-03-quota-persistence-eviction.md)
-- Flowchart: [`step-04-choose-a-tier-flowchart.md`](./step-04-choose-a-tier-flowchart.md)
-- MV3 constraints: [`step-05-mv3-constraints.md`](./step-05-mv3-constraints.md)
-- Error model: [`step-31-error-model.md`](./step-31-error-model.md)
+- Previous: [`step-01-purpose-and-mindset.md`](./01-purpose-and-mindset.md)
+- Next: [`step-03-quota-persistence-eviction.md`](./03-quota-persistence-eviction.md)
+- Flowchart: [`step-04-choose-a-tier-flowchart.md`](./04-choose-a-tier-flowchart.md)
+- MV3 constraints: [`step-05-mv3-constraints.md`](./05-mv3-constraints.md)
+- Error model: [`step-31-error-model.md`](./31-error-model.md)

@@ -190,7 +190,7 @@ Every logged failure MUST include `Path`, `Missing`, `Reason`, and `ReasonDetail
 
 ## See also
 
-- [step-14](./step-14-per-namespace-db-pattern.md) — Namespace guard rules
-- [step-15](./step-15-bind-safety-entry-point-guards.md) — Handler boundary normalization
-- [step-16](./step-16-bind-safety-proxy-net.md) — Global bind-safety proxy
-- [step-18](./step-18-flush-strategy.md) — Dirty marking and flush debounce
+- [step-14](./14-per-namespace-db-pattern.md) — Namespace guard rules
+- [step-15](./15-bind-safety-entry-point-guards.md) — Handler boundary normalization
+- [step-16](./16-bind-safety-proxy-net.md) — Global bind-safety proxy
+- [step-18](./18-flush-strategy.md) — Dirty marking and flush debounce

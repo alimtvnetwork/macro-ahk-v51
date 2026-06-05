@@ -126,8 +126,8 @@ export async function routeError(input: ErrorRouteInput): Promise<ErrorRouteResu
 
 ## Cross-references
 
-- [step-31](./step-31-error-model.md) — canonical diagnostic shape.
-- [step-33](./step-33-errors-panel-ui-hookup.md) — consumes persisted errors and broadcasts.
-- [step-34](./step-34-boot-failure-banner.md) — boot-critical routing surface.
-- [step-36](./step-36-code-red-logging-rule.md) — Code Red minimum fields.
+- [step-31](./31-error-model.md) — canonical diagnostic shape.
+- [step-33](./33-errors-panel-ui-hookup.md) — consumes persisted errors and broadcasts.
+- [step-34](./34-boot-failure-banner.md) — boot-critical routing surface.
+- [step-36](./36-code-red-logging-rule.md) — Code Red minimum fields.
 - Memory: SQLite bind safety layer; failure logs mandatory shape; namespace logging.

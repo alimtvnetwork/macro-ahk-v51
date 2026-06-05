@@ -129,9 +129,9 @@ Acceptance failures must be logged with exact path, missing item, reason, and re
 
 ## Cross-references
 
-- [step-01](./step-01-purpose-and-mindset.md) — implementation intent.
-- [step-17](./step-17-persistence-backends.md) — durability baseline.
-- [step-31](./step-31-error-model.md) — diagnostics baseline.
-- [step-37](./step-37-strictly-avoid.md) — no-go patterns.
-- [step-38](./step-38-testing.md) — required tests.
-- [step-39](./step-39-ci-gates.md) — required CI gates.
+- [step-01](./01-purpose-and-mindset.md) — implementation intent.
+- [step-17](./17-persistence-backends.md) — durability baseline.
+- [step-31](./31-error-model.md) — diagnostics baseline.
+- [step-37](./37-strictly-avoid.md) — no-go patterns.
+- [step-38](./38-testing.md) — required tests.
+- [step-39](./39-ci-gates.md) — required CI gates.

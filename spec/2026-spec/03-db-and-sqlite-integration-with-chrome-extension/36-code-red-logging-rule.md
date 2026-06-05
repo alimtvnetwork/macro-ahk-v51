@@ -162,8 +162,8 @@ The logger helper must validate all required strings are non-empty before writin
 
 ## Cross-references
 
-- [step-09](./step-09-initializing-sql-js.md) — wasm missing Code Red example.
-- [step-16](./step-16-bind-safety-proxy-net.md) — SQLite bind Code Red example.
-- [step-31](./step-31-error-model.md) — `FailureDiagnostic` shape.
-- [step-32](./step-32-error-routing.md) — persistence/routing for Code Red rows.
+- [step-09](./09-initializing-sql-js.md) — wasm missing Code Red example.
+- [step-16](./16-bind-safety-proxy-net.md) — SQLite bind Code Red example.
+- [step-31](./31-error-model.md) — `FailureDiagnostic` shape.
+- [step-32](./32-error-routing.md) — persistence/routing for Code Red rows.
 - Memory: Code Red Logging; Namespace Logging; Failure logs mandatory shape.

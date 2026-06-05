@@ -173,8 +173,8 @@ All failure logs MUST include `Path`, `Missing`, `Reason`, and `ReasonDetail`. S
 
 ## See also
 
-- [step-18](./step-18-flush-strategy.md) — Drain points and no retry/backoff policy
-- [step-21](./step-21-indexeddb-when-to-choose.md) — Why this cache belongs in IDB
-- [step-22](./step-22-indexeddb-wrapper-pattern.md) — Wrapper and close behavior
-- [step-23](./step-23-indexeddb-injection-cache.md) — Cache schema and resolver contract
-- [step-26](./step-26-chrome-storage-local-quota.md) — Quota and pruning behavior
+- [step-18](./18-flush-strategy.md) — Drain points and no retry/backoff policy
+- [step-21](./21-indexeddb-when-to-choose.md) — Why this cache belongs in IDB
+- [step-22](./22-indexeddb-wrapper-pattern.md) — Wrapper and close behavior
+- [step-23](./23-indexeddb-injection-cache.md) — Cache schema and resolver contract
+- [step-26](./26-chrome-storage-local-quota.md) — Quota and pruning behavior
