@@ -30,7 +30,11 @@ popup, options, isolated content scripts, and MAIN-world page runtime.
    PascalCase keys and frontend camelCase keys to avoid blank log rows.
 7. **No swallowed catches.** Every `catch` must either call the correct logger
    with Code Red context or rethrow to a boundary that does.
-8. **Logger failure must not recurse.** If persistence fails, emit through the
+8. **Namespace limits are enforced.** `System.*` is reserved for logger/runtime
+   internals; `Injection.*`, `Status.*`, `Storage.*`, `Replay.*`, `Recorder.*`,
+   and `Reload.*` are feature domains. A build may define at most 25 top-level
+   domains, enforced by `scripts/audit-namespaces.mjs`.
+9. **Logger failure must not recurse.** If persistence fails, emit through the
    logger's recursion-guarded fallback once and return a typed failure. Do not
    recursively call the same failing logger path.
 
@@ -52,7 +56,7 @@ Examples:
 - `Replay.VariableFailed`
 - `Recorder.SelectorFailed`
 - `Storage.KeyMissing`
-- `Logger.PersistenceFailed`
+- `System.Logger.PersistenceFailed`
 
 Rules:
 
@@ -99,18 +103,25 @@ export interface NamespaceLogPayload {
   VariableContext: VariableContextLog[];
 }
 
+export interface CodeRedLogPayload extends NamespaceLogPayload {
+  path: string;
+  missing: string;
+  Reason: string;
+  ReasonDetail: string;
+}
+
 export interface NamespaceLogger {
   debug(namespace: string, payload: NamespaceLogPayload): void;
   info(namespace: string, payload: NamespaceLogPayload): void;
   warn(namespace: string, payload: NamespaceLogPayload): void;
-  error(namespace: string, payload: NamespaceLogPayload): void;
+  error(namespace: string, payload: CodeRedLogPayload): void;
 }
 ```
 
 Rules:
 
-- `error()` requires Code Red fields. If `path`, `missing`, `Reason`, or
-  `ReasonDetail` is absent, tests must fail.
+- `error()` requires Code Red fields at the type level. If `path`, `missing`,
+  `Reason`, or `ReasonDetail` is absent, TypeScript and tests must fail.
 - `debug/info/warn` may omit Code Red fields only when they are not failure
   events.
 - All levels still include `buildId`, `sourceContext`, and timestamp at write

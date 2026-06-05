@@ -25,20 +25,24 @@ diagnosable from the log row alone.
    catches, and silent returns are forbidden for errors.
 5. **Fail-fast.** Logging a failure does not authorize retry. The owning flow
    returns a typed failure result and stops, following the no-retry policy.
-6. **Verbose data gate.** Full HTML and untruncated text may be persisted only
-   when `Project.VerboseLogging` is enabled. Default logs keep the existing
-   truncation limits and mask sensitive values.
+6. **Verbose data gate.** `logCodeRedFailure()` is the only truncation/masking
+   owner. Callers pass raw designed values; the helper reads cached
+   `Project.VerboseLogging` and applies `TRUNC_DEFAULT_CHARS = 120` for normal
+   text plus `TRUNC_LONG_FIELD_CHARS = 240` for HTML/log-line fields.
 7. **Human and machine readable.** The same structured fields are written to
    SQLite/OPFS and mirrored to DevTools; do not create a console-only error.
 8. **One failure, one row.** Deduplicate repeated probe/status failures by a
-   stable key such as `(Reason, path, tabId, stage)` per session.
+   stable key in `globalThis.__codeRedDedup` for the service-worker lifetime;
+   persisted stores update `RepeatCount` and `LastSeenIso` when supported.
 
 ## Code Red event contract
 
 ```ts
 // src/shared/logging/code-red-types.ts
+import type { JsonValue } from "@shared/types";
+
 export interface SelectorAttemptLog {
-  id: string | null;
+  attemptId: string | null;
   strategy: string;
   expression: string;
   matched: boolean;
@@ -51,7 +55,7 @@ export interface VariableContextLog {
   source: string;
   row: number | null;
   column: number | null;
-  resolvedValue: string | number | boolean | null;
+  resolvedValue: JsonValue | null;
   type: string;
   reason: string;
 }
@@ -86,9 +90,16 @@ Field rules:
   `InjectionStageFailed`, `SelectorNotFound`, or `ProbeFailed`.
 - `ReasonDetail` is a full sentence that explains what was attempted and why it
   failed.
-- `SelectorAttempts` records every selector tried, not only the final selector.
+- `SelectorAttempts` records every selector tried, not only the final selector;
+  `attemptId` is a stable per-step label such as `primary`, `fallback-1`, or
+  `text-contains`, never the DOM `id` attribute.
 - `VariableContext` records every variable used by the failing step, including
   row/column when the value came from tabular data.
+- Complex `resolvedValue` entries stay JSON-compatible. They are stringified
+  only at render/export boundaries, then truncated by the verbose gate.
+- Sensitive variable names matching
+  `/^(password|pwd|token|bearer|secret|api[-_]?key|authorization|cookie|otp|pin|ssn|cvv|card)$/i`
+  are persisted as `***masked(len=<n>)***`.
 
 ## Logger helper
 
@@ -98,11 +109,18 @@ import { BUILD_ID } from "@shared/constants";
 import { Logger } from "@shared/logger";
 
 export function logCodeRedFailure(event: Omit<CodeRedLogEvent, "level" | "buildId" | "occurredAtIso">): void {
+  let occurredAtIso = "1970-01-01T00:00:00.000Z";
+  try {
+    occurredAtIso = new Date().toISOString();
+  } catch {
+    occurredAtIso = "1970-01-01T00:00:00.000Z";
+  }
+
   Logger.error(event.namespace, {
     ...event,
     level: "error",
     buildId: BUILD_ID,
-    occurredAtIso: new Date().toISOString(),
+    occurredAtIso,
     SelectorAttempts: event.SelectorAttempts ?? [],
     VariableContext: event.VariableContext ?? [],
   });
@@ -114,6 +132,7 @@ Rules:
 - Callers must pass designed typed values. Do not accept arbitrary error shapes.
 - The helper may normalize empty arrays, but callers still own meaningful
   `ReasonDetail` text.
+- The helper owns verbose-gate truncation/masking and timestamp fallback.
 - The helper must not throw. If persistence fails, mirror to DevTools and return
   a typed logging failure to the caller's diagnostics sink.
 
@@ -178,7 +197,7 @@ logCodeRedFailure({
   triggerSource: "replay-step",
   SelectorAttempts: [
     {
-      id: "primary-data-testid",
+      attemptId: "primary-data-testid",
       strategy: "data-testid",
       expression: "[data-testid='submit']",
       matched: false,
@@ -229,8 +248,9 @@ logCodeRedFailure({
 
 Variable rules:
 
-- Sensitive values must be masked before logging.
-- If verbose logging is off, truncate long strings using the existing limits.
+- Sensitive values are masked by the helper as `***masked(len=<n>)***`.
+- If verbose logging is off, truncate normal text to 120 chars and long
+  HTML/log fields to 240 chars.
 - If value type cannot be derived, log `type="unresolved"` and explain why in
   `reason`.
 
@@ -261,7 +281,8 @@ Rules:
 
 - For `chrome-extension://` fetches, log the full absolute URL.
 - For `chrome.storage.local`, log the exact key.
-- For SQLite, log namespace, database name, table name, and statement purpose.
+- For SQLite, use `sqlite://<dbName>/<table>#<statementPurpose>` such as
+  `sqlite://session/error_events#insertCodeRed`.
 - Never log private tokens or bearer values.
 
 ## DevTools mirroring

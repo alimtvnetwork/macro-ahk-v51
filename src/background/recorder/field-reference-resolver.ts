@@ -16,6 +16,9 @@
  * Pure: no DOM, no chrome, no async — fully unit-testable.
  */
 
+import type { JsonValue } from "../handlers/handler-types";
+import { isSensitiveDiagnosticName, maskDiagnosticValue } from "./sensitive-diagnostics";
+
 const TOKEN_PATTERN = /\\?\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g;
 
 export type FieldRow = Readonly<Record<string, string>>;
@@ -26,7 +29,7 @@ export type FieldRow = Readonly<Record<string, string>>;
  * step output. We accept all of them so the variable-failure log can
  * report the *actual* type that arrived rather than crashing the resolver.
  */
-export type LooseFieldRow = Readonly<Record<string, unknown>>;
+export type LooseFieldRow = Readonly<Record<string, JsonValue | undefined>>;
 
 /**
  * Per-variable diagnostic record attached to failure logs. One entry per
@@ -53,7 +56,7 @@ export interface VariableContext {
     readonly Source: string;               // e.g. "DataSource:CustomersV2", "Row", "ProjectVar"
     readonly RowIndex: number | null;
     readonly Column: string | null;
-    readonly ResolvedValue: string | null; // stringified for log readability; null when MissingColumn/NullValue/UndefinedValue
+    readonly ResolvedValue: JsonValue | null; // JSON-compatible value; null when MissingColumn/NullValue/UndefinedValue
     readonly ValueType: VariableValueType;
     readonly FailureReason: VariableFailureReason;
     readonly FailureDetail: string | null; // human sentence; null when Resolved
@@ -131,7 +134,7 @@ export function resolveFieldReferencesDetailed(
         // Deduplicate per-name so repeated tokens produce one diagnostic.
         const cached = seen.get(name);
         if (cached !== undefined) {
-            return cached.ResolvedValue ?? "";
+            return valueToReplacement(cached.ResolvedValue);
         }
 
         const ctx = classifyVariable(name, row, source, rowIndex, expected);
@@ -139,7 +142,7 @@ export function resolveFieldReferencesDetailed(
         if (ctx.FailureReason !== "Resolved" && firstFailure === null) {
             firstFailure = ctx;
         }
-        return ctx.ResolvedValue ?? "";
+        return valueToReplacement(ctx.ResolvedValue);
     });
 
     return {
@@ -213,15 +216,17 @@ function classifyVariable(
     // Type-mismatch only fires when caller expected a primitive but got object/array.
     const isPrimitive = valueType === "string" || valueType === "number" || valueType === "boolean";
     if (!isPrimitive && expected !== "object" && expected !== "array") {
-        const stringified = safeStringify(raw);
-        return baseFailure(name, source, rowIndex, stringified, valueType, "TypeMismatch",
+        const redacted = sanitizeDiagnosticValue(name, raw);
+        const display = safeStringify(redacted);
+        return baseFailure(name, source, rowIndex, redacted, valueType, "TypeMismatch",
             `Variable {{${name}}} expected ${expected} but got ${valueType} ` +
-            `(source=${source}, column=${name}, value=${stringified}).`);
+            `(source=${source}, column=${name}, value=${display}).`);
     }
 
+    const resolved = sanitizeDiagnosticValue(name, raw);
     return {
         Name: name, Source: source, RowIndex: rowIndex, Column: name,
-        ResolvedValue: stringifyPrimitive(raw),
+        ResolvedValue: resolved,
         ValueType: valueType,
         FailureReason: "Resolved",
         FailureDetail: null,
@@ -232,7 +237,7 @@ function baseFailure(
     name: string,
     source: string,
     rowIndex: number | null,
-    resolved: string | null,
+    resolved: JsonValue | null,
     valueType: VariableValueType,
     reason: VariableFailureReason,
     detail: string,
@@ -244,7 +249,7 @@ function baseFailure(
     };
 }
 
-function classifyType(v: unknown): VariableValueType {
+function classifyType(v: JsonValue | undefined): VariableValueType {
     if (v === null) { return "null"; }
     if (v === undefined) { return "undefined"; }
     if (Array.isArray(v)) { return "array"; }
@@ -253,12 +258,19 @@ function classifyType(v: unknown): VariableValueType {
     return "object";
 }
 
-function stringifyPrimitive(v: unknown): string {
-    if (typeof v === "string") { return v; }
-    if (typeof v === "number" || typeof v === "boolean") { return String(v); }
-    return safeStringify(v);
+function sanitizeDiagnosticValue(name: string, value: JsonValue): JsonValue {
+    if (isSensitiveDiagnosticName(name)) {
+        return maskDiagnosticValue(value);
+    }
+    return value;
 }
 
-function safeStringify(v: unknown): string {
+function safeStringify(v: JsonValue): string {
     try { return JSON.stringify(v) ?? "undefined"; } catch { return String(v); }
+}
+
+function valueToReplacement(value: JsonValue | null): string {
+    if (value === null) { return ""; }
+    if (typeof value === "string") { return value; }
+    return safeStringify(value);
 }
