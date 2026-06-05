@@ -74,13 +74,28 @@ export interface WaitOptions {
     readonly Now?: () => number;
 }
 
+type WaitClock = {
+    readonly Sleep: (ms: number) => Promise<void>;
+    readonly Now: () => number;
+    readonly PollMs: number;
+    readonly Started: number;
+    readonly Deadline: number;
+};
+
+type PollResult = {
+    readonly Outcome: ConditionWaitOutcome | null;
+    readonly Trace: PredicateEvaluation[];
+};
+
+type CaughtError = unknown;
+
 /* ------------------------------------------------------------------ */
 /*  Validation                                                         */
 /* ------------------------------------------------------------------ */
 
-export function validateCondition(c: Condition): void {
+export function validateCondition(condition: Condition): void {
     let predicateCount = 0;
-    walk(c, 0, "");
+    walk(condition, 0, "");
 
     function walk(node: Condition, depth: number, path: string): void {
         if (depth > MAX_CONDITION_DEPTH) {
@@ -111,21 +126,21 @@ function joinPath(prefix: string, segment: string): string {
     return prefix.length === 0 ? segment : `${prefix}.${segment}`;
 }
 
-function validateMatcher(p: Predicate, path: string): void {
-    const m = p.Matcher;
-    if (m.Kind === "TextRegex") {
-        try { new RegExp(m.Pattern, m.Flags ?? ""); }
-        catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            throw new Error(`InvalidSelector: bad regex /${m.Pattern}/ at ${path} — ${msg}`);
+function validateMatcher(predicate: Predicate, path: string): void {
+    const matcher = predicate.Matcher;
+    if (matcher.Kind === "TextRegex") {
+        try { new RegExp(matcher.Pattern, matcher.Flags ?? ""); }
+        catch (caughtError) {
+            const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+            throw new Error(`InvalidSelector: bad regex /${matcher.Pattern}/ at ${path} — ${message}`);
         }
         return;
     }
-    if ((m.Kind === "AttrEquals" || m.Kind === "AttrContains") && m.Name.length === 0) {
-        throw new Error(`InvalidSelector: ${m.Kind} requires non-empty Name at ${path}`);
+    if ((matcher.Kind === "AttrEquals" || matcher.Kind === "AttrContains") && matcher.Name.length === 0) {
+        throw new Error(`InvalidSelector: ${matcher.Kind} requires non-empty Name at ${path}`);
     }
-    if (m.Kind === "Count" && m.N < 0) {
-        throw new Error(`InvalidSelector: Count.N must be >= 0 at ${path} (got ${m.N})`);
+    if (matcher.Kind === "Count" && matcher.N < 0) {
+        throw new Error(`InvalidSelector: Count.N must be >= 0 at ${path} (got ${matcher.N})`);
     }
 }
 
@@ -133,106 +148,106 @@ function validateMatcher(p: Predicate, path: string): void {
 /*  Evaluation                                                         */
 /* ------------------------------------------------------------------ */
 
-export function evaluateCondition(c: Condition, options: EvaluateOptions): boolean {
-    if ("All" in c) {
-        for (const child of c.All) {
+export function evaluateCondition(condition: Condition, options: EvaluateOptions): boolean {
+    if ("All" in condition) {
+        for (const child of condition.All) {
             if (evaluateCondition(child, options) === false) return false;
         }
         return true;
     }
-    if ("Any" in c) {
-        for (const child of c.Any) {
+    if ("Any" in condition) {
+        for (const child of condition.Any) {
             if (evaluateCondition(child, options)) return true;
         }
         return false;
     }
-    if ("Not" in c) return evaluateCondition(c.Not, options) === false;
+    if ("Not" in condition) return evaluateCondition(condition.Not, options) === false;
 
-    const result = evaluatePredicate(c, options);
-    return c.Negate === true ? result === false : result;
+    const result = evaluatePredicate(condition, options);
+    return condition.Negate === true ? result === false : result;
 }
 
-function evaluatePredicate(p: Predicate, options: EvaluateOptions): boolean {
-    const kind = resolveSelectorKind(p.SelectorKind ?? "Auto", p.Selector);
+function evaluatePredicate(predicate: Predicate, options: EvaluateOptions): boolean {
+    const kind = resolveSelectorKind(predicate.SelectorKind ?? "Auto", predicate.Selector);
 
-    if (p.Matcher.Kind === "Count") {
-        const count = locateAll(p.Selector, kind, options.Doc).length;
-        const result = compareCount(count, p.Matcher.Op, p.Matcher.N);
-        recordTrace(options, p, kind, result, `count=${count}`);
+    if (predicate.Matcher.Kind === "Count") {
+        const count = locateAll(predicate.Selector, kind, options.Doc).length;
+        const result = compareCount(count, predicate.Matcher.Op, predicate.Matcher.N);
+        recordTrace(options, predicate, kind, result, `count=${count}`);
         return result;
     }
 
-    const el = locateFirst(p.Selector, kind, options.Doc);
-    if (el === null) {
-        recordTrace(options, p, kind, p.Matcher.Kind === "Exists" ? false : false, "no match");
+    const element = locateFirst(predicate.Selector, kind, options.Doc);
+    if (element === null) {
+        recordTrace(options, predicate, kind, predicate.Matcher.Kind === "Exists" ? false : false, "no match");
         return false;
     }
 
-    const result = applyMatcher(el, p.Matcher);
-    recordTrace(options, p, kind, result);
+    const result = applyMatcher(element, predicate.Matcher);
+    recordTrace(options, predicate, kind, result);
     return result;
 }
 
 function recordTrace(
     options: EvaluateOptions,
-    p: Predicate,
+    predicate: Predicate,
     kind: "XPath" | "Css",
     result: boolean,
     detail?: string,
 ): void {
     if (options.Trace === undefined) return;
     options.Trace.push({
-        Selector: p.Selector,
+        Selector: predicate.Selector,
         Kind: kind,
-        Matcher: p.Matcher.Kind,
-        Result: p.Negate === true ? result === false : result,
+        Matcher: predicate.Matcher.Kind,
+        Result: predicate.Negate === true ? result === false : result,
         Detail: detail,
     });
 }
 
-function applyMatcher(el: Element, m: Matcher): boolean {
-    switch (m.Kind) {
+function applyMatcher(element: Element, matcher: Matcher): boolean {
+    switch (matcher.Kind) {
         case "Exists":
             return true;
         case "Visible":
-            return isVisible(el);
+            return isVisible(element);
         case "TextEquals": {
-            const a = (el.textContent ?? "").trim();
-            const b = m.Value;
-            return m.CaseSensitive === false
-                ? a.toLowerCase() === b.toLowerCase()
-                : a === b;
+            const actualText = (element.textContent ?? "").trim();
+            const expectedText = matcher.Value;
+            return matcher.CaseSensitive === false
+                ? actualText.toLowerCase() === expectedText.toLowerCase()
+                : actualText === expectedText;
         }
         case "TextContains": {
-            const a = el.textContent ?? "";
-            const b = m.Value;
-            return m.CaseSensitive === false
-                ? a.toLowerCase().includes(b.toLowerCase())
-                : a.includes(b);
+            const actualText = element.textContent ?? "";
+            const expectedText = matcher.Value;
+            return matcher.CaseSensitive === false
+                ? actualText.toLowerCase().includes(expectedText.toLowerCase())
+                : actualText.includes(expectedText);
         }
         case "TextRegex": {
-            const re = new RegExp(m.Pattern, m.Flags ?? "");
-            return re.test(el.textContent ?? "");
+            const regex = new RegExp(matcher.Pattern, matcher.Flags ?? "");
+            return regex.test(element.textContent ?? "");
         }
         case "AttrEquals": {
-            const v = el.getAttribute(m.Name);
-            return v !== null && v === m.Value;
+            const value = element.getAttribute(matcher.Name);
+            return value !== null && value === matcher.Value;
         }
         case "AttrContains": {
-            const v = el.getAttribute(m.Name);
-            return v !== null && v.includes(m.Value);
+            const value = element.getAttribute(matcher.Name);
+            return value !== null && value.includes(matcher.Value);
         }
         case "Count":
             return false; // handled above
     }
 }
 
-function isVisible(el: Element): boolean {
-    const win = el.ownerDocument?.defaultView;
-    if (win === null || win === undefined) return false;
-    const rect = el.getBoundingClientRect();
+function isVisible(element: Element): boolean {
+    const windowObject = element.ownerDocument?.defaultView;
+    if (windowObject === null || windowObject === undefined) return false;
+    const rect = element.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return false;
-    const styles = win.getComputedStyle(el);
+    const styles = windowObject.getComputedStyle(element);
     if (styles.display === "none") return false;
     if (styles.visibility === "hidden") return false;
     return true;
@@ -285,59 +300,102 @@ export async function waitForCondition(
     condition: Condition,
     options: WaitOptions,
 ): Promise<ConditionWaitOutcome> {
-    try { validateCondition(condition); }
-    catch (err) {
-        return {
-            Ok: false,
-            DurationMs: 0,
-            Polls: 0,
-            Reason: "InvalidSelector",
-            Detail: err instanceof Error ? err.message : String(err),
-            LastEvaluation: [],
-        };
-    }
+    const validationFailure = validateConditionForWait(condition);
+    if (validationFailure !== null) return validationFailure;
 
-    const sleep = options.Sleep ?? defaultSleep;
-    const now = options.Now ?? defaultNow;
-    const pollMs = Math.max(1, options.PollMs ?? 50);
-    const started = now();
-    const deadline = started + Math.max(0, options.TimeoutMs);
+    const clock = createWaitClock(options);
     let polls = 0;
     let lastTrace: PredicateEvaluation[] = [];
-    let lastError: string | null = null;
 
     for (;;) {
         polls++;
-        const trace: PredicateEvaluation[] = [];
-        let result: boolean;
-        try {
-            result = evaluateCondition(condition, { Doc: options.Doc, Trace: trace });
-        } catch (err) {
-            return {
-                Ok: false,
-                DurationMs: now() - started,
-                Polls: polls,
-                Reason: "InvalidSelector",
-                Detail: err instanceof Error ? err.message : String(err),
-                LastEvaluation: trace,
-            };
-        }
-        lastTrace = trace;
-        lastError = null;
+        const poll = evaluateConditionPoll(condition, options, clock, polls);
+        if (poll.Outcome !== null) return poll.Outcome;
 
-    if (result) return { Ok: true, DurationMs: now() - started, Polls: polls };
-        if (polls >= 2 && now() >= deadline) {
-            return {
-                Ok: false,
-                DurationMs: now() - started,
-                Polls: polls,
-                Reason: "ConditionTimeout",
-                Detail: lastError ?? `Condition not met within ${options.TimeoutMs}ms`,
-                LastEvaluation: lastTrace,
-            };
-        }
-        await sleep(pollMs);
+        lastTrace = poll.Trace;
+        if (isConditionTimedOut(polls, clock)) return createTimeoutOutcome(options, clock, polls, lastTrace);
+
+        await clock.Sleep(clock.PollMs);
     }
+}
+
+function validateConditionForWait(condition: Condition): ConditionWaitOutcome | null {
+    try { validateCondition(condition); }
+    catch (err) {
+        return createInvalidSelectorOutcome(err, 0, 0, []);
+    }
+
+    return null;
+}
+
+function createWaitClock(options: WaitOptions): WaitClock {
+    const now = options.Now ?? defaultNow;
+    const started = now();
+
+    return {
+        Sleep: options.Sleep ?? defaultSleep,
+        Now: now,
+        PollMs: Math.max(1, options.PollMs ?? 50),
+        Started: started,
+        Deadline: started + Math.max(0, options.TimeoutMs),
+    };
+}
+
+function evaluateConditionPoll(
+    condition: Condition,
+    options: WaitOptions,
+    clock: WaitClock,
+    polls: number,
+): PollResult {
+    const trace: PredicateEvaluation[] = [];
+    try {
+        const result = evaluateCondition(condition, { Doc: options.Doc, Trace: trace });
+        const outcome = result ? createSuccessOutcome(clock, polls) : null;
+
+        return { Outcome: outcome, Trace: trace };
+    } catch (err) {
+        return { Outcome: createInvalidSelectorOutcome(err, clock.Now() - clock.Started, polls, trace), Trace: trace };
+    }
+}
+
+function createSuccessOutcome(clock: WaitClock, polls: number): ConditionWaitOutcome {
+    return { Ok: true, DurationMs: clock.Now() - clock.Started, Polls: polls };
+}
+
+function isConditionTimedOut(polls: number, clock: WaitClock): boolean {
+    return polls >= 2 && clock.Now() >= clock.Deadline;
+}
+
+function createTimeoutOutcome(
+    options: WaitOptions,
+    clock: WaitClock,
+    polls: number,
+    lastTrace: PredicateEvaluation[],
+): ConditionWaitOutcome {
+    return {
+        Ok: false,
+        DurationMs: clock.Now() - clock.Started,
+        Polls: polls,
+        Reason: "ConditionTimeout",
+        Detail: `Condition not met within ${options.TimeoutMs}ms`,
+        LastEvaluation: lastTrace,
+    };
+}
+
+function createInvalidSelectorOutcome(
+    error: CaughtError,
+    durationMs: number,
+    polls: number,
+    trace: PredicateEvaluation[],
+): ConditionWaitOutcome {
+    return {
+        Ok: false,
+        DurationMs: durationMs,
+        Polls: polls,
+        Reason: "InvalidSelector",
+        Detail: error instanceof Error ? error.message : String(error),
+        LastEvaluation: trace,
+    };
 }
 
 function defaultSleep(ms: number): Promise<void> {
