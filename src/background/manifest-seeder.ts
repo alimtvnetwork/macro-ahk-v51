@@ -648,23 +648,6 @@ export function migrateLegacyProjectRecords(
 /** Builds a canonical `StoredProject` from a manifest project entry. */
 export function buildStoredProjectFromSeed(project: SeedProjectEntry): StoredProject {
     const now = new Date().toISOString();
-    const targetUrls: UrlRule[] = (project.TargetUrls ?? []).map((t) => ({
-        pattern: t.Pattern,
-        matchType: t.MatchType,
-    }));
-
-    const scripts: ScriptEntry[] = project.Scripts.map((s) => ({
-        path: s.SeedId,
-        order: s.Order,
-        runAt: s.RunAt,
-        configBinding: s.ConfigBinding ? resolveConfigSeedId(s.ConfigBinding, project) : undefined,
-        description: s.Description || project.Description,
-    }));
-
-    const configs: ConfigEntry[] = project.Configs.map((c) => ({
-        path: c.SeedId,
-        description: c.Description,
-    }));
 
     return {
         id: project.SeedId,
@@ -673,28 +656,60 @@ export function buildStoredProjectFromSeed(project: SeedProjectEntry): StoredPro
         name: project.DisplayName || project.Name,
         version: project.Version,
         description: project.Description,
-        targetUrls,
-        scripts,
-        configs,
-        cookies: (project.Cookies ?? []).map((c) => ({
-            cookieName: c.CookieName,
-            url: c.Url,
-            role: c.Role === "other" ? "custom" : c.Role,
-            description: c.Description,
-        })),
-        settings: {
-            onlyRunAsDependency: project.Settings?.OnlyRunAsDependency,
-            isolateScripts: project.Settings?.IsolateScripts,
-            logLevel: project.Settings?.LogLevel,
-            retryOnNavigate: project.Settings?.RetryOnNavigate,
-            chatBoxXPath: project.Settings?.ChatBoxXPath,
-            allowDynamicRequests: project.Settings?.AllowDynamicRequests,
-        },
-        dependencies: project.Dependencies.map((d) => ({ projectId: d, version: "*" })),
+        targetUrls: buildProjectTargetUrls(project),
+        scripts: buildProjectScripts(project),
+        configs: buildProjectConfigs(project),
+        cookies: buildProjectCookies(project),
+        settings: buildProjectSettings(project),
+        dependencies: project.Dependencies.map((dependency) => ({ projectId: dependency, version: "*" })),
         isGlobal: project.IsGlobal,
         isRemovable: project.IsRemovable,
         createdAt: now,
         updatedAt: now,
+    };
+}
+
+function buildProjectTargetUrls(project: SeedProjectEntry): UrlRule[] {
+    return (project.TargetUrls ?? []).map((targetUrl) => ({
+        pattern: targetUrl.Pattern,
+        matchType: targetUrl.MatchType,
+    }));
+}
+
+function buildProjectScripts(project: SeedProjectEntry): ScriptEntry[] {
+    return project.Scripts.map((script) => ({
+        path: script.SeedId,
+        order: script.Order,
+        runAt: script.RunAt,
+        configBinding: script.ConfigBinding ? resolveConfigSeedId(script.ConfigBinding, project) : undefined,
+        description: script.Description || project.Description,
+    }));
+}
+
+function buildProjectConfigs(project: SeedProjectEntry): ConfigEntry[] {
+    return project.Configs.map((config) => ({
+        path: config.SeedId,
+        description: config.Description,
+    }));
+}
+
+function buildProjectCookies(project: SeedProjectEntry): StoredProject["cookies"] {
+    return (project.Cookies ?? []).map((cookie) => ({
+        cookieName: cookie.CookieName,
+        url: cookie.Url,
+        role: cookie.Role === "other" ? "custom" : cookie.Role,
+        description: cookie.Description,
+    }));
+}
+
+function buildProjectSettings(project: SeedProjectEntry): StoredProject["settings"] {
+    return {
+        onlyRunAsDependency: project.Settings?.OnlyRunAsDependency,
+        isolateScripts: project.Settings?.IsolateScripts,
+        logLevel: project.Settings?.LogLevel,
+        retryOnNavigate: project.Settings?.RetryOnNavigate,
+        chatBoxXPath: project.Settings?.ChatBoxXPath,
+        allowDynamicRequests: project.Settings?.AllowDynamicRequests,
     };
 }
 
