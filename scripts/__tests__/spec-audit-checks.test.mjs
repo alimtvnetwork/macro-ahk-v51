@@ -83,6 +83,44 @@ test('dangling-link checker fails when relative markdown link is missing', () =>
     rmSync(rootPath, { recursive: true, force: true });
   }
 });
+
+test('dangling-link checker validates reference-style markdown links', () => {
+  const rootPath = createRoot();
+  try {
+    writeFixture(rootPath, '01-demo/target.md', '# Target\n');
+    writeFixture(rootPath, '01-demo/source.md', '[Target][owner]\n\n[owner]: ./target.md\n');
+    const result = runScript(LINKS_SCRIPT, rootPath);
+    assert.equal(result.status, 0, result.stderr);
+  } finally {
+    rmSync(rootPath, { recursive: true, force: true });
+  }
+});
+
+test('dangling-link checker fails when reference-style target is missing', () => {
+  const rootPath = createRoot();
+  try {
+    writeFixture(rootPath, '01-demo/source.md', '[Missing][owner]\n\n[owner]: ./missing.md\n');
+    const result = runScript(LINKS_SCRIPT, rootPath);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /Dangling reference-style link/);
+    assert.match(result.stderr, /missing\.md/);
+  } finally {
+    rmSync(rootPath, { recursive: true, force: true });
+  }
+});
+
+test('dangling-link checker fails when reference definition is absent', () => {
+  const rootPath = createRoot();
+  try {
+    writeFixture(rootPath, '01-demo/source.md', '[Missing][owner]\n');
+    const result = runScript(LINKS_SCRIPT, rootPath);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /Undefined reference-style link/);
+    assert.match(result.stderr, /\[owner]/);
+  } finally {
+    rmSync(rootPath, { recursive: true, force: true });
+  }
+});
 const PITFALLS_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-pitfalls.mjs');
 
 test('pitfalls checker passes when file has Pitfall block', () => {
