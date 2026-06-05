@@ -34,7 +34,8 @@
 | `check-quarantine.mjs` | ✅ green |
 | `check-pitfalls.mjs` | ✅ green |
 | `check-score-floor.mjs` | ✅ green |
+| `check-score-snapshot.mjs` | ✅ green |
 
 ## Remaining headroom
 
-Future work focuses on regression locks: score snapshot lock, workflow wiring, and qualitative duplicate-rule consolidation.
+Future work focuses on no-bare-fetch / footer-lint guards, full workflow wiring, and qualitative duplicate-rule consolidation.
