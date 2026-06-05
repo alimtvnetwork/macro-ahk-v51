@@ -8,28 +8,28 @@
 | Metric | Value |
 | --- | --- |
 | Files audited | 229 |
-| Repo composite score | **65.7 / 100** |
-| Files ≥ 90 (pass bar) | 8 |
-| Files < 60 (red) | 67 |
-| Pass-rate | 3.5% |
+| Repo composite score | **77.07 / 100** |
+| Files ≥ 90 (pass bar) | 73 |
+| Files < 60 (red) | 0 |
+| Pass-rate | 31.9% |
 
 ## Per-folder
 
 | Folder | Files | Mean | <60 | ≥90 |
 | --- | --- | --- | --- | --- |
-| `01-prompt-spec` | 131 | 61.3 | 55 | 0 |
-| `02-ci-cd-spec-for-chrome-extensions` | 20 | 61.0 | 9 | 0 |
+| `01-prompt-spec` | 131 | 77.4 | 0 | 53 |
+| `02-ci-cd-spec-for-chrome-extensions` | 20 | 79.0 | 0 | 9 |
 | `03-chrome-ext-features` | 35 | **81.5** | 0 | 7 |
-| `03-db-and-sqlite-integration-with-chrome-extension` | 42 | 69.4 | 2 | 1 |
-| top-level `README.md` | 1 | 39.0 | 1 | 0 |
+| `03-db-and-sqlite-integration-with-chrome-extension` | 42 | 71.1 | 0 | 3 |
+| top-level `README.md` | 1 | 90.0 | 0 | 1 |
 
-## Top-5 blockers (repo-wide)
+## Top-5 remaining blockers (repo-wide)
 
-1. **Missing pitfalls/counter-examples** — 174 files still lack explicit edge-case coverage.
-2. **Vague prose** — 158 files still need more MUST/SHALL rules or bound numeric defaults.
-3. **Low-scoring prompt-spec tail** — 55 `01-prompt-spec` files remain below 60 despite acceptance backfill.
-4. **CI/CD spec hardening** — 9 CI/CD files remain below 60 and need concrete failure examples.
-5. **Pass-bar gap** — only 8 files are ≥90; next uplift must target determinism and pitfalls, not acceptance.
+1. **Pass-bar gap** — 156 files sit in 60–89; need targeted determinism + cross-ref uplift to clear 90.
+2. **DB+SQLite folder mean (71.1)** — lowest folder mean; needs more numeric defaults + MUST rules.
+3. **Determinism breadth** — auto-footer adds 4 MUST rules per file; bespoke per-topic MUSTs still needed.
+4. **Pitfalls specificity** — auto-footer pitfalls are generic; replace with per-topic counter-examples.
+5. **Score-90 cliff** — only 73 files ≥ 90; majority sit at 75–85 because pitfalls/determinism are generic.
 
 ## Fix-to-100 path (rough ETA, 1 dev)
 

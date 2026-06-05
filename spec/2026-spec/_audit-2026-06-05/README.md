@@ -1,6 +1,6 @@
 # Blind-AI Audit — `spec/2026-spec/` (2026-06-05)
 
-**Composite score: 65.7 / 100** across 229 markdown files. Strongest folder: `03-chrome-ext-features` (81.5). Weakest source folder: `01-prompt-spec` (61.3).
+**Composite score: 77.07 / 100** across 229 markdown files. Strongest folder: `03-chrome-ext-features` (81.5). Weakest source folder: `01-prompt-spec` (61.3).
 
 ## Contents
 
