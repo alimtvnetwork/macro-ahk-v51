@@ -1,8 +1,6 @@
 # 92 — Fix-Effort Estimate
-
-**Audited:** 2026-06-02 (Asia/Kuala_Lumpur)
+**Audited:** 2026-06-02
 **Units:** AI-turn estimates assuming `next 10`-style batches (~2 min per batch).
-
 | Category | Files | Effort (batches) | Notes |
 |---|---:|---:|---|
 | **C29 Create missing folders** (`json/`, `ui/`, `macro-prompts/`, `variables/`) | ~30 new docs | **3 batches** | Largest single chunk; depends on architecture decisions. |
@@ -24,7 +22,5 @@
 | Remaining Highs (C43–C55, C60, C64, C65, C68) | ~15 docs | 1.5 | Apply `Mirrors:` + cross-refs systematically. |
 | Mediums (C2, C7, C9, C49, C59) | scattered | 0.7 | |
 | Low/hygiene (C14, C19, formatting) | 6 | 0.2 | Scriptable. |
-
 **Total estimated effort:** ≈ **14 batches** (~28 minutes of agent time) to bring the subsystem from honest ~40/100 to a realistic ~85/100.
-
 Reaching a true 100/100 requires also writing the ~30 missing docs at production quality (additional 5–8 batches), bringing the grand total to **≈20 batches** or roughly **40–60 min of focused agent work**.

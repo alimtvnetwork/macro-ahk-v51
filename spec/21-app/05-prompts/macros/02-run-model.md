@@ -1,19 +1,13 @@
 # Run Model — Lifecycle, runId, Resume
-
-**Created:** 2026-06-02 (Asia/Kuala_Lumpur)
-
+**Created:** 2026-06-02
 ## runId format
-
 ```
 runId = "<macroSlug>-<yyyymmdd>-<HHmmss>"
 ```
-
-- Timezone: **Asia/Kuala_Lumpur** (`mem://localization/timezone`).
+- Timezone: **the user's local timezone** (`mem://localization/timezone`).
 - Generated once at `RunStarted`; never regenerated on resume.
 - Example: `spec-tighten-cycle-20260602-094312`.
-
 ## Lifecycle states
-
 ```mermaid
 stateDiagram-v2
     [*] --> Idle
@@ -30,7 +24,6 @@ stateDiagram-v2
     Failed --> [*]
     Stopped --> [*]
 ```
-
 | State    | `LastEvent`           | `chrome.storage.local` persisted? |
 |----------|-----------------------|-----------------------------------|
 | Idle     | none                  | no                                |
@@ -40,9 +33,7 @@ stateDiagram-v2
 | Done     | `RunFinished`         | yes (TTL 7 days)                  |
 | Failed   | `RunFailed`           | yes (TTL 7 days)                  |
 | Stopped  | `RunStopped`          | yes (TTL 7 days)                  |
-
 ## SW-restart resume contract
-
 1. On every state transition, write `MacroRunState.<runId>` to
    `chrome.storage.local`. Identity-only mapping — **no** PascalCase rewrite
    (`mem://constraints/no-storage-pascalcase-migration`).
@@ -54,9 +45,7 @@ stateDiagram-v2
      surface a toast.
 3. Stale runs (`> MaxStaleMs`) are auto-`Paused`; user must Resume or Stop.
 4. **No automatic retry** of failed steps (`mem://constraints/no-retry-policy`).
-
 ## Persisted shape
-
 ```ts
 type MacroRunState = {
   RunId: string;
@@ -67,12 +56,11 @@ type MacroRunState = {
   LoopCount: number;
   LastScore: number | null;
   Variables: Record<string, string | number | boolean>;
-  StartedAt: string;       // ISO 8601, Asia/Kuala_Lumpur
+  StartedAt: string;       // ISO 8601, the user's local timezone
   UpdatedAt: string;
   LastReason?: string;
   LastReasonDetail?: string;
 };
 ```
-
 Storage key: `MacroRunState.<RunId>`. TTL pruning happens lazily on next boot.
 See [`06-storage-contract.md`](./06-storage-contract.md) for the full key map.

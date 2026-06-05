@@ -1,11 +1,7 @@
 # Macro-Prompts — `info.json` Schema
-
-**Created:** 2026-06-02 (Asia/Kuala_Lumpur)
-
+**Created:** 2026-06-02
 PascalCase keys throughout (matches the rest of the extension's on-disk convention; storage layer is identity-only per `mem://constraints/no-storage-pascalcase-migration`).
-
 ## Canonical example
-
 ```json
 {
   "Slug": "audit-spec",
@@ -41,9 +37,7 @@ PascalCase keys throughout (matches the rest of the extension's on-disk conventi
   "EmitsScore": true
 }
 ```
-
 ## Field reference
-
 | Key              | Type                    | Required | Notes                                                                 |
 |------------------|-------------------------|----------|-----------------------------------------------------------------------|
 | `Slug`           | string                  | yes      | Must match directory slug; globally unique. Regex per `01-…md`.       |
@@ -56,9 +50,7 @@ PascalCase keys throughout (matches the rest of the extension's on-disk conventi
 | `Variables`      | Variable[] (see below)  | yes      | May be empty array; never omit the key.                               |
 | `WritesTo`       | string[] (path globs)   | no       | Engine asserts every write target matches one of these globs.         |
 | `EmitsScore`     | boolean                 | no       | If `true`, output must include `Score: <0-100>/100` line.             |
-
 ## Variable[] entry
-
 | Key            | Type                                              | Required | Notes                                              |
 |----------------|---------------------------------------------------|----------|----------------------------------------------------|
 | `Name`         | `[A-Z][A-Za-z0-9]*`                               | yes      | PascalCase. Matches `{{ Name }}` placeholder.     |
@@ -69,7 +61,5 @@ PascalCase keys throughout (matches the rest of the extension's on-disk conventi
 | `Sensitive`    | boolean                                           | no       | Masks value in all logs (`***`).                  |
 | `Source`       | `User` \| `RunContext` \| `Macro` \| `Step`       | no       | Hint to the UI; defaults to `User`.                |
 | `Description`  | string ≤ 200                                      | yes      | Shown in the inline prompt dialog.                 |
-
 ## Hard validation
-
 Aggregator validates each `info.json` against `schemas/prompt.schema.json` (Ajv, strict). Any failure aborts the build with a non-zero exit code and emits the standard failure-log shape (`Reason`, `ReasonDetail`, `VariableContext[]`) per repo standard.

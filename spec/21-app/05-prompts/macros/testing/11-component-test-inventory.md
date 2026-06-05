@@ -1,7 +1,5 @@
 # Component Test Inventory (Required)
-
 Total: **12 tests**. Framework: vitest + @testing-library/react.
-
 | # | File | Test |
 |---:|---|---|
 | 1 | `RunBanner.test.tsx` | shows Slug + Status |
@@ -13,8 +11,7 @@ Total: **12 tests**. Framework: vitest + @testing-library/react.
 | 7 | `MacrosTab.test.tsx` | renders empty state with CTA |
 | 8 | `MacrosTab.test.tsx` | filters by category chip |
 | 9 | `MacroBuilder.test.tsx` | enforces StepKindId 1..8 |
-| 10 | `RunHistoryList.test.tsx` | groups runs by day in Asia/Kuala_Lumpur tz |
+| 10 | `RunHistoryList.test.tsx` | groups runs by day in the user's local timezone tz |
 | 11 | `ErrorToast.test.tsx` | role=alert for fatal, status for warning |
 | 12 | `KeyboardShortcuts.test.tsx` | ignores shortcuts inside textarea |
-
 CI gate: `tests:component:macros` must report `12 passed, 0 failed`.

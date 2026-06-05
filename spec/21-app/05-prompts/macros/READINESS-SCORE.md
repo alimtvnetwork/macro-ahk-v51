@@ -1,10 +1,7 @@
 # Prompt Macros — Blind-AI Readiness Score
-
-**Date:** 2026-06-02 (Asia/Kuala_Lumpur)
+**Date:** 2026-06-02
 **Target:** 100/100 — a blind AI with only `spec/21-app/05-prompts/` can implement the subsystem with zero clarifying questions.
-
 ## Rubric
-
 | # | Dimension | Weight | Score | Evidence |
 |---|---|---:|---:|---|
 | 1 | **Concept clarity** — purpose, scope, non-goals | 10 | 10 | `plan.md` Part A.1–A.5, `engine/00-architecture.md` |
@@ -17,13 +14,9 @@
 | 8 | **Observability** — logging, metrics, failure-log shape, diagnostics, UI errors | 10 | 10 | `observability/00`–`04` (5 files) |
 | 9 | **Testing** — unit, component, e2e, coverage, fixtures | 10 | 10 | `testing/00`–`04` (5 files, 8 unit + 7 component + 8 e2e) |
 | 10 | **Cross-cutting** — folder layout, migration, changelog, memory entries | 10 | 10 | `macro-prompts-folder` memory, CHANGELOG, MIGRATION, this file |
-
 **TOTAL: 100 / 100**
-
 ## Blind-AI smoke checklist
-
 A blind AI should be able to answer YES to every line below using ONLY files under `spec/21-app/05-prompts/`:
-
 - [x] What is the exact JSON shape of a `MacroDefinition`?
 - [x] How is `RunId` generated and where is it persisted?
 - [x] What happens if SW restarts mid-`next-loop`? (→ `engine/02-resume-after-sw-restart.md`)
@@ -38,7 +31,5 @@ A blind AI should be able to answer YES to every line below using ONLY files und
 - [x] What is `WEBHOOK_RESULT_SCHEMA_VERSION`? (2)
 - [x] How do component tests query DOM? (RTL `findBy*` / `getByRole` only, no snapshots)
 - [x] What does the diagnostics ZIP include from a run? (`_log.jsonl`, audit files, redacted variables, capped 5 MB)
-
 ## Sign-off
-
 Subsystem is **READY FOR IMPLEMENTATION** by a blind AI. No outstanding ambiguities. Next action is engineering, not specification.
