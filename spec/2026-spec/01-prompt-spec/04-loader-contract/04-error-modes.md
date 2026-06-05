@@ -72,3 +72,20 @@ project's failure logs.
 
 - [ ] The implementation satisfies the `T39 · Error modes` contract in this file and the folder-level acceptance target: loader calls return typed successes, typed errors, and bounded cache behavior.
 - [ ] Verification passes when `UT-loader-001..012` passes, and `node scripts/audit/check-acceptance.mjs --root=spec/2026-spec` reports this file has a machine-checkable acceptance contract.
+
+<!-- audit: determinism+pitfalls footer -->
+
+## Determinism (MUST)
+
+- **MUST** expose the loader as `loadPrompts(): Promise<LoaderResult>` returning `{ prompts, categories, errors }` — never throw; surface errors in the result object.
+- **MUST** populate `JsonCopy` + `HtmlCopy` IndexedDB caches in the same transaction; partial writes are rejected with `Reason="LoaderCacheSplit"`.
+- **MUST** resolve every `{{var}}` placeholder via the variable resolver from `04-loader-contract/03-variable-resolution.md`; unresolved variables throw `Reason="VariableUnresolved"` with the full `VariableContext[]`.
+- **MUST** invalidate caches by **manifest hash**, never by wall-clock; auto-load only on hash change.
+
+## Pitfalls / Counter-examples
+
+- ❌ `loadPrompts()` throws and the UI shows a blank dropdown. ✅ Return `LoaderResult.errors` and render an empty-state with the reason chip.
+- ❌ Writing `JsonCopy` then awaiting before writing `HtmlCopy`. ✅ Single IndexedDB transaction; both succeed or both rollback.
+- ❌ Silent `?? ""` for missing variables. ✅ Throw with full `VariableContext` (name/source/row/column/resolvedValue/type/reason).
+- ❌ Polling the manifest every N seconds. ✅ Manual-load + hash-diff (see `mem://features/prompt-management`).
+- ❌ Retrying a failed load with exponential backoff. ✅ Fail fast per `mem://constraints/no-retry-policy`.

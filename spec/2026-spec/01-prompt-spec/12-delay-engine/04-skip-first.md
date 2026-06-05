@@ -42,3 +42,20 @@ async function maybeDelay(cfg: DelayConfig): Promise<void> {
 <!-- audit: numeric constants source-of-truth -->
 
 Numeric defaults referenced in this file are canonical in [Runtime Defaults](../reference/05-runtime-defaults.md). If a value differs, the SOT wins.
+
+<!-- audit: determinism+pitfalls footer -->
+
+## Determinism (MUST)
+
+- **MUST** bind `DELAY_MS`, `JITTER_MS`, `SKIP_FIRST_DELAY` to `reference/05-runtime-defaults.md`; settings UI MUST clamp to declared min/max.
+- **MUST** compute jitter as `DELAY_MS + randInt(-JITTER_MS, +JITTER_MS)` with `Math.random()` seeded by `crypto.getRandomValues` when available.
+- **MUST** honour `SKIP_FIRST_DELAY=true` by emitting the first prompt with zero delay; subsequent prompts apply the full delay+jitter.
+- **MUST** pause the delay timer when `pauseRequested=true` and resume from the remaining ms — never restart from zero.
+
+## Pitfalls / Counter-examples
+
+- ❌ `setTimeout(fn, DELAY_MS)` with no `clearTimeout` on cancel. ✅ Pair with teardown (see `mem://standards/timer-and-observer-teardown`).
+- ❌ Jitter that can produce negative delays. ✅ `Math.max(0, DELAY_MS + jitter)`.
+- ❌ Restarting the delay on pause/resume. ✅ Track `remainingMs` at pause; resume schedules `remainingMs`.
+- ❌ Hardcoding 1500ms inline. ✅ Import the named constant.
+- ❌ Adding exponential backoff on send failure. ✅ Fail fast; surface to user (no-retry policy).
