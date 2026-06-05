@@ -60,8 +60,8 @@ async function saveMetrics(metrics: CycleMetric[]): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 /** Records a single cycle metric. */
-export async function handleRecordCycleMetric(msg: { projectId: string; cycleMs: number; loopCount: number; action: string }): Promise<{ isOk: true }> {
-    const m = msg as {
+export async function handleRecordCycleMetric(payload: { projectId: string; cycleMs: number; loopCount: number; action: string }): Promise<{ isOk: true }> {
+    const cycleInput = payload as {
         cycleNumber: number;
         startTime: string;
         endTime: string;
@@ -69,16 +69,16 @@ export async function handleRecordCycleMetric(msg: { projectId: string; cycleMs:
         errorMessage?: string;
     };
 
-    const start = new Date(m.startTime).getTime();
-    const end = new Date(m.endTime).getTime();
+    const start = new Date(cycleInput.startTime).getTime();
+    const end = new Date(cycleInput.endTime).getTime();
 
     const metric: CycleMetric = {
-        cycleNumber: m.cycleNumber,
-        startTime: m.startTime,
-        endTime: m.endTime,
+        cycleNumber: cycleInput.cycleNumber,
+        startTime: cycleInput.startTime,
+        endTime: cycleInput.endTime,
         durationMs: end - start,
-        status: m.status,
-        ...(m.errorMessage ? { errorMessage: m.errorMessage } : {}),
+        status: cycleInput.status,
+        ...(cycleInput.errorMessage ? { errorMessage: cycleInput.errorMessage } : {}),
     };
 
     const existing = await loadMetrics();
