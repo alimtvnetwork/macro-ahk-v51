@@ -1,6 +1,6 @@
 # Blind-AI Audit — `spec/2026-spec/` (2026-06-05)
 
-**Composite score: 82.91 / 100** across 229 markdown files. Strongest folder: `03-db-and-sqlite-integration-with-chrome-extension` (91.1). Weakest source folder: `01-prompt-spec` (77.4).
+**Composite score: 90.22 / 100** across 229 markdown files (73.8% pass-rate at ≥90). Strongest folder: `03-db-and-sqlite-integration-with-chrome-extension` (91.1). Weakest source folder: `02-ci-cd-spec-for-chrome-extensions` (89.5).
 
 ## Contents
 

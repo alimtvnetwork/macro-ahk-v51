@@ -42,3 +42,20 @@ Users must tick "I reviewed the contents" before the download button enables.
 
 - [ ] The implementation satisfies the `05 — Export & Diagnostics` contract in this file and the folder-level acceptance target: events, metrics, debug panel rows, and diagnostics exports follow the observability schema.
 - [ ] Verification passes when `UT-obs-001..008` passes, and `node scripts/audit/check-acceptance.mjs --root=spec/2026-spec` reports this file has a machine-checkable acceptance contract.
+
+<!-- audit: determinism+pitfalls footer -->
+
+## Determinism (MUST)
+
+- **MUST** emit every observability event with the schema in `02-event-schema.md` — `{ ts: number, scope: string, level: "info"|"warn"|"error", reason?: string, payload?: JsonValue }`.
+- **MUST** keep metrics names in `03-metrics.md` lowercase snake_case; new metrics require a PR to the metrics glossary.
+- **MUST** expose the debug panel only when `Settings.verboseLogging=true`; default OFF (see `mem://features/verbose-logging-toggle`).
+- **MUST** export diagnostics as a ZIP per `05-export-diagnostics.md`; no raw text dumps.
+
+## Pitfalls / Counter-examples
+
+- ❌ Free-text scope strings ("ui", "thing"). ✅ Use the canonical `feature.subfeature` namespace.
+- ❌ Logging PII without masking. ✅ Sensitive fields auto-masked unless verbose-logging is ON.
+- ❌ Sending events to a remote endpoint. ✅ Local-only — never `mem://constraints/no-ci-notifications`.
+- ❌ Hardcoded timestamp formatting. ✅ Store UTC ms; render with `Intl.DateTimeFormat().resolvedOptions().timeZone`.
+- ❌ Retrying failed metric writes. ✅ Drop on floor with a single `Logger.warn` (fail-fast).

@@ -44,3 +44,20 @@ The only automatic recovery is the readiness-grace re-check inside `runOne` for 
 
 - [ ] The implementation satisfies the `04 — Recovery` contract in this file and the folder-level acceptance target: every failure path emits the mandatory failure-log shape and user-visible feedback.
 - [ ] Verification passes when `UT-fail-001..010` passes, and `node scripts/audit/check-acceptance.mjs --root=spec/2026-spec` reports this file has a machine-checkable acceptance contract.
+
+<!-- audit: determinism+pitfalls footer -->
+
+## Determinism (MUST)
+
+- **MUST** assign every failure a stable `Reason` code from `reference/02-failure-reason-codes.md` plus a `ReasonDetail` string; missing codes are rejected by `check-must-constants.mjs`.
+- **MUST** log via `Logger.error(scope, reason, caughtError)` — never bare `console.error`, never empty `catch {}`.
+- **MUST** populate `SelectorAttempts[]` (id/strategy/expression/matched/matchCount/reason) on every selector miss; unknown fields written as `null` with a reason.
+- **MUST** populate `VariableContext[]` (name/source/row/column/resolvedValue/type/reason) on every variable/data failure.
+
+## Pitfalls / Counter-examples
+
+- ❌ `catch (e) { /* TODO */ }`. ✅ Rejected by `public/error-swallow-audit.json`.
+- ❌ Logging only the message string. ✅ Pass the `caught` object so stack + cause survive.
+- ❌ Omitting `SelectorAttempts` because "only one selector was tried". ✅ Still log the single attempt with `matchCount=0`.
+- ❌ Masking the user value in `VariableContext` by default. ✅ Always log the field name + type; mask the value only when verbose-logging is OFF.
+- ❌ Retrying after `Reason="HostBlocked"`. ✅ Surface to user; require manual unblock.
