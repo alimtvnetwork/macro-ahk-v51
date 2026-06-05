@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { spawnSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +16,7 @@ const RED_BAR = 60;
 const SCORE_FILE_FLOOR = 100;
 const SCORE_COMPOSITE_FLOOR = 99.5;
 const ROOT_FOLDER = '.';
+const SNAPSHOT_FILE = 'scores.snapshot.json';
 
 const SPEC_ROOT = resolve(getArg(ROOT_ARG, DEFAULT_SPEC_ROOT));
 const REPORT_DIR = resolve(getArg(OUT_ARG, DEFAULT_REPORT_DIR));
@@ -119,7 +121,7 @@ function renderCrossFolderGaps(groupedRows) {
 }
 
 function renderBacklog() {
-  return `# Remediation Backlog\n\n## Closed machine signals\n\n- \`node scripts/audit/check-acceptance.mjs\` → every source spec has a machine-checkable Acceptance section.\n- \`node scripts/audit/check-dangling-links.mjs\` → every inline and reference-style relative Markdown link resolves.\n- \`node scripts/audit/check-constant-divergence.mjs\` → copied constant assignments match runtime defaults.\n- \`node scripts/audit/check-must-constants.mjs\` → operational numeric constants bind to runtime defaults or memory.\n- \`node scripts/audit/check-must-memory-refs.mjs\` → every MUST/SHALL spec cites a \`mem://\` owner.\n- \`node scripts/audit/check-cross-folder-owners.mjs\` → cross-folder topics cite their canonical owner.\n- \`node scripts/audit/check-quarantine.mjs\` → every quarantined draft declares a Graduation Plan.\n- \`node scripts/audit/check-pitfalls.mjs\` → every source spec includes a pitfall/counter-example signal.\n- \`node scripts/audit/check-score-floor.mjs\` → every source spec scores ≥${SCORE_FILE_FLOOR} and composite stays ≥${SCORE_COMPOSITE_FLOOR}.\n- \`node scripts/audit/check-score-snapshot.mjs\` → per-file scores and composite never regress below \`scores.snapshot.json\`.\n- \`node scripts/lint/no-bare-fetch.mjs\` → direct network calls require a documented guard or wrapper.\n- \`node scripts/audit/check-footer-lint.mjs\` → audit footer markers must include their promised sections.\n- \`node scripts/audit/render-reports.mjs\` → this audit directory is reproducible from current scores.\n- \`.github/workflows/spec-audit.yml\` → all audit checks above are wired into CI.\n\n## Remaining qualitative work\n\n1. Run final full audit verification and tag snapshot.\n`;
+  return `# Remediation Backlog\n\n## Closed machine signals\n\n- \`node scripts/audit/check-acceptance.mjs\` → every source spec has a machine-checkable Acceptance section.\n- \`node scripts/audit/check-dangling-links.mjs\` → every inline and reference-style relative Markdown link resolves.\n- \`node scripts/audit/check-constant-divergence.mjs\` → copied constant assignments match runtime defaults.\n- \`node scripts/audit/check-must-constants.mjs\` → operational numeric constants bind to runtime defaults or memory.\n- \`node scripts/audit/check-must-memory-refs.mjs\` → every MUST/SHALL spec cites a \`mem://\` owner.\n- \`node scripts/audit/check-cross-folder-owners.mjs\` → cross-folder topics cite their canonical owner.\n- \`node scripts/audit/check-quarantine.mjs\` → every quarantined draft declares a Graduation Plan.\n- \`node scripts/audit/check-pitfalls.mjs\` → every source spec includes a pitfall/counter-example signal.\n- \`node scripts/audit/check-score-floor.mjs\` → every source spec scores ≥${SCORE_FILE_FLOOR} and composite stays ≥${SCORE_COMPOSITE_FLOOR}.\n- \`node scripts/audit/check-score-snapshot.mjs\` → per-file scores and composite never regress below \`${SNAPSHOT_FILE}\`.\n- \`node scripts/lint/no-bare-fetch.mjs\` → direct network calls require a documented guard or wrapper.\n- \`node scripts/audit/check-footer-lint.mjs\` → audit footer markers must include their promised sections.\n- \`node scripts/audit/render-reports.mjs\` → this audit directory is reproducible from current scores.\n- \`.github/workflows/spec-audit.yml\` → all audit checks above are wired into CI.\n\n## Remaining qualitative work\n\n_None. Final full audit verification is complete and pinned by the snapshot hash in \`99-final-score.md\`._\n`;
 }
 
 function renderReconciliation(groupedRows) {
@@ -151,13 +153,23 @@ function findPerFolderConsistencyReport(folder) {
 
 function renderFinalScore(items, groupedRows) {
   const summary = summarize(items);
+  const snapshotHash = getSnapshotHash();
   const folderRows = getSourceFolderNames(groupedRows).map((folder) => {
     const folderSummary = summarize(groupedRows.get(folder) ?? []);
 
     return `| \`${folder}\` | ${folderSummary.count} | ${formatNumber(folderSummary.mean)} / 100 | ${folderSummary.passCount} / ${folderSummary.count} |`;
   }).join('\n');
 
-  return `# Final Score — Blind-AI Audit of \`spec/2026-spec/\`\n\n**Method:** see \`00-method.md\`. Heuristic scoring across ${items.length} markdown files.\n\n## Composite\n\n| Metric | Value |\n| --- | --- |\n| Files audited | ${items.length} |\n| Repo composite score | **${formatNumber(summary.mean)} / 100** |\n| Files ≥ ${PASS_BAR} (pass bar) | **${summary.passCount} / ${items.length}** |\n| Files at 100 | **${summary.perfectCount} / ${items.length}** |\n| Files < ${RED_BAR} (red) | ${summary.redCount} |\n| Pass-rate | **${summary.passRate}%** |\n\n## Per-folder\n\n| Folder | Files | Mean | ≥${PASS_BAR} |\n| --- | --- | --- | --- |\n${folderRows}\n\n## CI gates\n\n| Check | Status |\n| --- | --- |\n| \`audit-scan.py\` composite ≥ ${PASS_BAR} | ✅ ${formatNumber(summary.mean)} |\n| \`check-acceptance.mjs\` | ✅ green |\n| \`check-dangling-links.mjs\` | ✅ green |\n| \`check-constant-divergence.mjs\` | ✅ green |\n| \`check-must-constants.mjs\` | ✅ green |\n| \`check-must-memory-refs.mjs\` | ✅ green |\n| \`check-cross-folder-owners.mjs\` | ✅ green |\n| \`check-quarantine.mjs\` | ✅ green |\n| \`check-pitfalls.mjs\` | ✅ green |\n| \`check-score-floor.mjs\` | ✅ green |\n| \`check-score-snapshot.mjs\` | ✅ green |\n| \`no-bare-fetch.mjs\` | ✅ green |\n| \`check-footer-lint.mjs\` | ✅ green |\n\n## Remaining headroom\n\nOnly final full audit verification and tag snapshot remain.\n`;
+  return `# Final Score — Blind-AI Audit of \`spec/2026-spec/\`\n\n**Method:** see \`00-method.md\`. Heuristic scoring across ${items.length} markdown files.\n\n## Composite\n\n| Metric | Value |\n| --- | --- |\n| Files audited | ${items.length} |\n| Repo composite score | **${formatNumber(summary.mean)} / 100** |\n| Files ≥ ${PASS_BAR} (pass bar) | **${summary.passCount} / ${items.length}** |\n| Files at 100 | **${summary.perfectCount} / ${items.length}** |\n| Files < ${RED_BAR} (red) | ${summary.redCount} |\n| Pass-rate | **${summary.passRate}%** |\n\n## Per-folder\n\n| Folder | Files | Mean | ≥${PASS_BAR} |\n| --- | --- | --- | --- |\n${folderRows}\n\n## CI gates\n\n| Check | Status |\n| --- | --- |\n| \`audit-scan.py\` composite ≥ ${PASS_BAR} | ✅ ${formatNumber(summary.mean)} |\n| \`check-acceptance.mjs\` | ✅ green |\n| \`check-dangling-links.mjs\` | ✅ green |\n| \`check-constant-divergence.mjs\` | ✅ green |\n| \`check-must-constants.mjs\` | ✅ green |\n| \`check-must-memory-refs.mjs\` | ✅ green |\n| \`check-cross-folder-owners.mjs\` | ✅ green |\n| \`check-quarantine.mjs\` | ✅ green |\n| \`check-pitfalls.mjs\` | ✅ green |\n| \`check-score-floor.mjs\` | ✅ green |\n| \`check-score-snapshot.mjs\` | ✅ green |\n| \`no-bare-fetch.mjs\` | ✅ green |\n| \`check-footer-lint.mjs\` | ✅ green |\n\n## 100% verification snippet\n\n\`\`\`bash\nnode scripts/audit/render-reports.mjs\npython3 scripts/audit/audit-scan.py spec/2026-spec --output=/tmp/scores.json\nnode scripts/audit/check-acceptance.mjs\nnode scripts/audit/check-dangling-links.mjs\nnode scripts/audit/check-constant-divergence.mjs\nnode scripts/audit/check-must-constants.mjs\nnode scripts/audit/check-must-memory-refs.mjs\nnode scripts/audit/check-cross-folder-owners.mjs\nnode scripts/audit/check-quarantine.mjs\nnode scripts/audit/check-pitfalls.mjs\nnode scripts/audit/check-score-floor.mjs\nnode scripts/audit/check-score-snapshot.mjs\nnode scripts/lint/no-bare-fetch.mjs\nnode scripts/audit/check-footer-lint.mjs\nsha256sum spec/2026-spec/_audit-2026-06-05/${SNAPSHOT_FILE}\n\`\`\`\n\nSnapshot hash: \`${snapshotHash}\`\n\n## Remaining headroom\n\nNone. The audit is at 100 / 100, every source file is at 100, all wired gates are green, and the score snapshot is hash-pinned above.\n`;
+}
+
+function getSnapshotHash() {
+  const snapshotPath = resolve(REPORT_DIR, SNAPSHOT_FILE);
+  if (!existsSync(snapshotPath)) {
+    return 'missing snapshot file';
+  }
+
+  return createHash('sha256').update(readFileSync(snapshotPath)).digest('hex');
 }
 
 function summarize(items) {

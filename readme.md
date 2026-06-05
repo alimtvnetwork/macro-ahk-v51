@@ -850,6 +850,30 @@ A monorepo with three primary trees: **runtime code** (extension + standalone sc
 
 > **Spec-tree layout authority:** `spec/01-spec-authoring-guide/` is the source of truth. Slots **01–20 are reserved for foundations only** (no app-specific content). App content lives at slot **21+**. The `.spec-folder-registry.json` + `pnpm run check:spec-folders` guards against auto-cleanup pruning sparse folders. Validation reports under `spec/validation-reports/` document migrations and audits.
 
+### `spec/2026-spec/` audit verification
+
+The generated Blind-AI audit under [`spec/2026-spec/_audit-2026-06-05/`](spec/2026-spec/_audit-2026-06-05/) is locked at **100 / 100** across **230 / 230** markdown files. Every source file is at 100, every file is ≥90, and all wired CI gates are green.
+
+```bash
+node scripts/audit/render-reports.mjs
+python3 scripts/audit/audit-scan.py spec/2026-spec --output=/tmp/scores.json
+node scripts/audit/check-acceptance.mjs
+node scripts/audit/check-dangling-links.mjs
+node scripts/audit/check-constant-divergence.mjs
+node scripts/audit/check-must-constants.mjs
+node scripts/audit/check-must-memory-refs.mjs
+node scripts/audit/check-cross-folder-owners.mjs
+node scripts/audit/check-quarantine.mjs
+node scripts/audit/check-pitfalls.mjs
+node scripts/audit/check-score-floor.mjs
+node scripts/audit/check-score-snapshot.mjs
+node scripts/lint/no-bare-fetch.mjs
+node scripts/audit/check-footer-lint.mjs
+sha256sum spec/2026-spec/_audit-2026-06-05/scores.snapshot.json
+```
+
+Snapshot hash: `b79ef8f879b41da70a4d78b4b34bc558f843656a2c6fd7466d6098daf2b52c03`
+
 ---
 
 ## For AI Agents — What To Read First
