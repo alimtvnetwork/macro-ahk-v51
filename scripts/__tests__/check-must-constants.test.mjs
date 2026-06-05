@@ -32,6 +32,10 @@ function runChecker(rootPath) {
   return spawnSync(process.execPath, [SCRIPT, `--root=${rootPath}`], { encoding: 'utf8' });
 }
 
+function runStrictChecker(rootPath) {
+  return spawnSync(process.execPath, [SCRIPT, `--root=${rootPath}`, '--strict'], { encoding: 'utf8' });
+}
+
 test('passes when numeric constants cite runtime defaults by constant name', () => {
   const rootPath = createFixture();
   try {
@@ -52,6 +56,18 @@ test('fails when numeric constants are unbound prose', () => {
     assert.equal(result.status, 1);
     assert.match(result.stderr, /CODE RED/);
     assert.match(result.stderr, /reference\/05-runtime-defaults\.md/);
+  } finally {
+    rmSync(rootPath, { recursive: true, force: true });
+  }
+});
+
+test('strict mode rejects file-level binding without a line-level constant', () => {
+  const rootPath = createFixture();
+  try {
+    writeSpec(rootPath, '01-prompt-spec/12-delay-engine/01-default.md', 'Defaults cite reference/05-runtime-defaults.md.\nDelay default is 1500 ms.\n');
+    const result = runStrictChecker(rootPath);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /Delay default is 1500 ms/);
   } finally {
     rmSync(rootPath, { recursive: true, force: true });
   }
