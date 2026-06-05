@@ -83,3 +83,27 @@ test('dangling-link checker fails when relative markdown link is missing', () =>
     rmSync(rootPath, { recursive: true, force: true });
   }
 });
+const PITFALLS_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-pitfalls.mjs');
+
+test('pitfalls checker passes when file has Pitfall block', () => {
+  const rootPath = createRoot();
+  try {
+    writeFixture(rootPath, '01-demo/01-good.md', '# Good\n\n## Pitfalls\n- Anti-pattern: foo.\n');
+    const result = runScript(PITFALLS_SCRIPT, rootPath);
+    assert.equal(result.status, 0, result.stderr);
+  } finally {
+    rmSync(rootPath, { recursive: true, force: true });
+  }
+});
+
+test('pitfalls checker fails when no pitfall keyword present', () => {
+  const rootPath = createRoot();
+  try {
+    writeFixture(rootPath, '01-demo/01-bad.md', '# Bad\n\nNo warnings here.\n');
+    const result = runScript(PITFALLS_SCRIPT, rootPath);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /missing pitfalls/);
+  } finally {
+    rmSync(rootPath, { recursive: true, force: true });
+  }
+});
