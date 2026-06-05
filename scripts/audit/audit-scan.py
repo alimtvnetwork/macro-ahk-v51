@@ -26,6 +26,7 @@ NUM_RE = re.compile(r'\b\d+\s*(ms|s|sec|min|MB|KB|chars|items|%|px)\b', re.I)
 MUST_RE = re.compile(r'\b(MUST|SHALL|MUST NOT|SHALL NOT|exactly|at least|at most)\b')
 ACC_RE = re.compile(r'(Acceptance|AC-\d|pass when|\- \[ \]|\- \[x\])', re.I)
 PIT_RE = re.compile(r'(Pitfall|Counter-example|Anti-pattern|Edge case|Gotcha)', re.I)
+SOT_RE = re.compile(r'(mem://|reference/05-runtime-defaults\.md|runtime defaults)', re.I)
 ACCEPTANCE_EXEMPT_RE = re.compile(r'(^|/)(README|00-overview|00-method|GLOSSARY|ACCEPTANCE-MATRIX|IMPLEMENTATION-CHECKLIST|BLIND-AI-SMOKE-TEST)\.md$', re.I)
 
 def score_file(p: Path, root: Path):
