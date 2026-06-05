@@ -17,6 +17,11 @@ Single source of truth for rules that recur across folders. Child specs MUST lin
 
 `scripts/audit/check-cross-folder-owners.mjs` fails CI when a spec mentions an owned topic without a link to its owner mem:// URL. Run locally with `node scripts/audit/check-cross-folder-owners.mjs`.
 
+## Acceptance
+
+- [ ] Every cross-folder topic named in source specs either appears in this owner table or cites a local owner spec.
+- [ ] Verification passes when `node scripts/audit/check-cross-folder-owners.mjs` and `node scripts/audit/check-acceptance.mjs --root=spec/2026-spec` both pass.
+
 ## Pitfalls
 
 - **Pitfall**: A spec restates the verbose-logging rule inline and drifts from the owner over time. **Counter-example**: paste a "MUST gate full payloads with verboseLogging" sentence without a link to `mem://standards/verbose-logging-and-failure-diagnostics` — the cross-folder owners check fails.
