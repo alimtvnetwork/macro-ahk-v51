@@ -236,8 +236,8 @@ describe("Verbose toggle never alters JS-step classification", () => {
         const on = build(true);
         const pwdOff = off.Variables.find((v) => v.Name === "Password");
         const pwdOn = on.Variables.find((v) => v.Name === "Password");
-        expect(pwdOff?.ResolvedValue).toBe("***");
-        expect(pwdOn?.ResolvedValue).toBe("***");
+        expect(pwdOff?.ResolvedValue).toBe("***masked(len=8)***");
+        expect(pwdOn?.ResolvedValue).toBe("***masked(len=8)***");
     });
 
     it("truncates JsLog entries to 240 chars on non-verbose, full length on verbose", () => {
