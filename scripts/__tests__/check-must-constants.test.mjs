@@ -35,7 +35,7 @@ function runChecker(rootPath) {
 test('passes when numeric constants cite runtime defaults by constant name', () => {
   const rootPath = createFixture();
   try {
-    writeSpec(rootPath, '01-prompt-spec/12-delay-engine/01-default.md', 'Delay MUST use `DELAY_MS` from runtime defaults.\n');
+    writeSpec(rootPath, '01-prompt-spec/12-delay-engine/01-default.md', 'Delay MUST use `DELAY_MS` (1500 ms) from runtime defaults.\n');
     const result = runChecker(rootPath);
     assert.equal(result.status, 0, result.stderr);
     assert.match(result.stdout, /OK/);
