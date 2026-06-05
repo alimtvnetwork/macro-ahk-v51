@@ -134,7 +134,7 @@ export function resolveFieldReferencesDetailed(
         // Deduplicate per-name so repeated tokens produce one diagnostic.
         const cached = seen.get(name);
         if (cached !== undefined) {
-            return cached.ResolvedValue ?? "";
+            return valueToReplacement(cached.ResolvedValue);
         }
 
         const ctx = classifyVariable(name, row, source, rowIndex, expected);
@@ -142,7 +142,7 @@ export function resolveFieldReferencesDetailed(
         if (ctx.FailureReason !== "Resolved" && firstFailure === null) {
             firstFailure = ctx;
         }
-        return ctx.ResolvedValue ?? "";
+        return valueToReplacement(ctx.ResolvedValue);
     });
 
     return {
@@ -267,4 +267,10 @@ function sanitizeDiagnosticValue(name: string, value: JsonValue): JsonValue {
 
 function safeStringify(v: JsonValue): string {
     try { return JSON.stringify(v) ?? "undefined"; } catch { return String(v); }
+}
+
+function valueToReplacement(value: JsonValue | null): string {
+    if (value === null) { return ""; }
+    if (typeof value === "string") { return value; }
+    return safeStringify(value);
 }
