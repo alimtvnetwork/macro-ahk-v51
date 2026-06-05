@@ -86,10 +86,55 @@ function scanLineForConstant(filePath, lineText, lineNumber, constantName, runti
 
 function extractAssignedConstantValue(lineText, constantName) {
   const escapedConstant = escapeRegExp(constantName);
-  const assignmentRe = new RegExp(String.raw`\b${escapedConstant}\b\s*(?:=|:|is|defaults?\s+to|must\s+be)\s*(?:\*\*)?` + String.raw`(${NUMERIC_VALUE})`, 'i');
+  const assignmentRe = new RegExp(String.raw`\b${escapedConstant}\b\s*(?:=|:|is|defaults?\s+to|must\s+be)\s*(?:\*\*)?([^` + '`' + String.raw`\n,.;|)]+)`, 'i');
   const match = lineText.match(assignmentRe);
 
-  return match ? normalizeNumber(match[1]) : null;
+  return match ? normalizeConstantExpression(match[1]) : null;
+}
+
+function normalizeConstantExpression(expressionText) {
+  const productValue = evaluateProductExpression(expressionText);
+  if (productValue !== null) {
+    return productValue;
+  }
+
+  const unitValue = evaluateUnitExpression(expressionText);
+
+  return unitValue ?? normalizeValue(expressionText);
+}
+
+function evaluateProductExpression(expressionText) {
+  const parts = expressionText.trim().split(/\s*\*\s*/);
+  const hasProduct = parts.length > 1;
+  if (!hasProduct) {
+    return null;
+  }
+
+  const hasOnlyNumbers = parts.every((part) => NUMBER_RE.test(part.trim()));
+  NUMBER_RE.lastIndex = 0;
+
+  return hasOnlyNumbers ? String(parts.reduce((total, part) => total * Number(part.trim()), 1)) : null;
+}
+
+function evaluateUnitExpression(expressionText) {
+  const match = expressionText.trim().match(new RegExp(String.raw`^(${NUMERIC_VALUE})\s*(ki?b|mi?b|bytes?)\b`, 'i'));
+  if (match === null) {
+    return null;
+  }
+
+  return String(Number(match[1]) * unitMultiplier(match[2]));
+}
+
+function unitMultiplier(unitText) {
+  if (/^mi?b$/i.test(unitText)) {
+    return 1048576;
+  }
+
+  if (/^ki?b$/i.test(unitText)) {
+    return 1024;
+  }
+
+  return 1;
 }
 
 function buildFailure(filePath, lineNumber, lineText, constantName, actualValue, expectedValue) {
