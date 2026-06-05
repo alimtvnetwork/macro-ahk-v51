@@ -172,7 +172,7 @@ export function TokenSeederStatusIndicator() {
 
     const retryLine = isReady
         ? "Retrying on next poll."
-        : `Next retry at ${formatRetryTimestamp(nextRetryAt)} MYT (in ${formatRemaining(nextRetryMs)}).`;
+        : `Next retry at ${formatRetryTimestamp(nextRetryAt)} (in ${formatRemaining(nextRetryMs)}).`;
 
     const tooltip =
         `${targets.length} tab(s) blocked Chrome scripting access.\n` +

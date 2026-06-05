@@ -61,8 +61,7 @@ describe('formatCount', () => {
 });
 
 describe('formatLocalReset', () => {
-  it('renders ISO timestamp as a short MYT clock', () => {
-    // 2026-05-25 16:00 UTC = 2026-05-26 00:00 MYT (Tuesday).
+  it('renders ISO timestamp as a short local clock', () => {
     expect(formatLocalReset('2026-05-26T00:00:00.000Z')).toBe('Tue 00:00');
   });
   it('returns em-dash for invalid input', () => {
