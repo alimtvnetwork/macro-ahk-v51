@@ -197,14 +197,13 @@ function getSourceFolderNames(groupedRows) {
   return Array.from(groupedRows.keys()).filter((folder) => folder !== ROOT_FOLDER).sort();
 }
 
-function getFolderReportName(index) {
+function getFolderReportName(index, folder) {
   const folderAliases = new Map([
     ['01-prompt-spec', '01-prompt-spec'],
     ['02-ci-cd-spec-for-chrome-extensions', '02-ci-cd'],
     ['03-chrome-ext-features', '03-chrome-ext-features'],
     ['03-db-and-sqlite-integration-with-chrome-extension', '03-db-and-sqlite'],
   ]);
-  const folder = arguments[1];
   const name = folderAliases.get(folder) ?? folder;
 
   return `${String(index + 10).padStart(2, '0')}-folder-${name}.md`;
