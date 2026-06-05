@@ -6,7 +6,7 @@
  * Expired/Canceled row in the UI. Free workspaces don't carry a paid
  * subscription — the canceled flag is a downgrade artefact, not a real lapse.
  *
- * Mirrors the real workspace JSON shared in the issue (`z L30 E3 Malaysia`,
+ * Mirrors the real workspace JSON shared in the issue (`z L30 E3 sample`,
  * plan="free", subscription_status="canceled", credits 10/10 still available).
  */
 
@@ -46,10 +46,10 @@ const TWENTY_SIX_DAYS_AGO = new Date(Date.now() - 26 * 86_400_000).toISOString()
 
  
 describe('Free-plan expiry suppression (E2E)', () => {
-  it('FREE + canceled (z L30 E3 Malaysia case) → normal, no canceled badge', () => {
+  it('FREE + canceled (z L30 E3 sample case) → normal, no canceled badge', () => {
     const free = ws({
       id: 'ws-free-canceled',
-      fullName: 'z L30 E3 Malaysia',
+      fullName: 'z L30 E3 sample',
       tier: 'FREE',
       plan: 'free',
       available: 10,
