@@ -1,10 +1,20 @@
 # 2026 Spec — Root Index
 
+## Overview
+
 This folder is the entry point for every 2026-dated product, extension, storage,
 and delivery specification. A blind AI agent MUST start here, choose exactly one
 folder below, then follow that folder's README and child `*.md` contracts before
 editing implementation code. This file is intentionally a navigation contract,
 not a replacement for the child specs.
+
+## Files
+
+- [`01-prompt-spec/`](./01-prompt-spec/) — Prompt Library plus Next/Plan automation loop contracts.
+- [`02-ci-cd-spec-for-chrome-extensions/`](./02-ci-cd-spec-for-chrome-extensions/) — Manifest V3 CI/CD and release-hardening contracts.
+- [`03-chrome-ext-features/`](./03-chrome-ext-features/) — Runtime Chrome extension feature contracts.
+- [`03-db-and-sqlite-integration-with-chrome-extension/`](./03-db-and-sqlite-integration-with-chrome-extension/) — Storage and SQLite integration contracts.
+- [`OWNERS.md`](./OWNERS.md) — Cross-folder ownership map.
 
 ## Current Spec Folders
 
