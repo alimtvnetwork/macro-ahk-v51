@@ -1,5 +1,11 @@
 # Macro Controller — Changelog
 
+## v3.53.0 (2026-06-05)
+
+### Changed
+- Removed residual hardcoded timezone examples from runtime fixtures and remaining spec documents.
+- Version bump 3.52.0 → 3.53.0 across manifest, version.json, constants.ts, all 8 instruction.ts, and shared-state.ts.
+
 ## v3.52.0 (2026-06-05)
 
 ### Changed
