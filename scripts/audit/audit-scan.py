@@ -132,7 +132,7 @@ def resolve_spec_root(folder: Path) -> Path:
         if candidate.name == '2026-spec':
             return candidate
 
-    return Path('spec/2026-spec')
+    return resolved
 
 def iter_markdown_files(folder: Path):
     return sorted(path for path in folder.rglob('*.md') if is_scored_path(path))
