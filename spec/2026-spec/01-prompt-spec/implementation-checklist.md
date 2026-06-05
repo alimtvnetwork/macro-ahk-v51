@@ -114,3 +114,5 @@
 - [ ] No operational numeric constant is hardcoded here without binding to `reference/05-runtime-defaults.md` (verified by `scripts/audit/check-must-constants.mjs --strict`).
 - [ ] Composite audit score for this folder is `100 / 100` (verified by `scripts/audit/audit-scan.py`).
 
+
+> Owner: see [Documentation standards](mem://workflow/documentation-standards) for the authoritative rule.
