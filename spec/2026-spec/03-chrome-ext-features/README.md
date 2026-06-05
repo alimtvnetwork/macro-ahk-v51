@@ -29,8 +29,8 @@ acceptance.
 14. `14-boot-failure-banner.md` — visible top-level banner when bootstrap fails.
 15. `15-floating-in-page-panel.md` — minimize / restore / drag-drop / position persistence.
 16. `16-storage-sqlite-pointer.md` — sql.js bundling, per-namespace DB pattern (see `../03-db-and-sqlite-integration-with-chrome-extension/`).
-17. `17-indexeddb-cache.md` — injection cache, invalidation on build-id change.
-18. `18-chrome-storage-local-usage.md` — when to use `chrome.storage.local` vs SQLite vs IDB.
+17. `17-storage-indexeddb-pointer.md` — injection cache, invalidation on build-id change.
+18. `18-storage-chrome-local-pointer.md` — when to use `chrome.storage.local` vs SQLite vs IDB.
 19. `19-testing-matrix.md` — unit, component, manual Chrome E2E coverage requirements.
 20. `20-acceptance-criteria.md` — pass/fail checklist for an implementing AI.
 
