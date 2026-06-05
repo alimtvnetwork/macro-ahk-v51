@@ -8,10 +8,10 @@
 | Metric | Value |
 | --- | --- |
 | Files audited | 229 |
-| Repo composite score | **77.07 / 100** |
-| Files ≥ 90 (pass bar) | 73 |
+| Repo composite score | **80.73 / 100** |
+| Files ≥ 90 (pass bar) | 107 |
 | Files < 60 (red) | 0 |
-| Pass-rate | 31.9% |
+| Pass-rate | 46.7% |
 
 ## Per-folder
 
@@ -19,17 +19,17 @@
 | --- | --- | --- | --- | --- |
 | `01-prompt-spec` | 131 | 77.4 | 0 | 53 |
 | `02-ci-cd-spec-for-chrome-extensions` | 20 | 79.0 | 0 | 9 |
-| `03-chrome-ext-features` | 35 | **81.5** | 0 | 7 |
-| `03-db-and-sqlite-integration-with-chrome-extension` | 42 | 71.1 | 0 | 3 |
+| `03-chrome-ext-features` | 35 | 81.5 | 0 | 7 |
+| `03-db-and-sqlite-integration-with-chrome-extension` | 42 | **91.1** | 0 | 37 |
 | top-level `README.md` | 1 | 90.0 | 0 | 1 |
 
 ## Top-5 remaining blockers (repo-wide)
 
-1. **Pass-bar gap** — 156 files sit in 60–89; need targeted determinism + cross-ref uplift to clear 90.
-2. **DB+SQLite folder mean (71.1)** — lowest folder mean; needs more numeric defaults + MUST rules.
-3. **Determinism breadth** — auto-footer adds 4 MUST rules per file; bespoke per-topic MUSTs still needed.
-4. **Pitfalls specificity** — auto-footer pitfalls are generic; replace with per-topic counter-examples.
-5. **Score-90 cliff** — only 73 files ≥ 90; majority sit at 75–85 because pitfalls/determinism are generic.
+1. **Pass-bar gap** — 122 files still in 60–89; need targeted determinism + cross-ref uplift to clear 90.
+2. **`01-prompt-spec` long tail** — 78 files below 90; biggest absolute headroom for composite uplift.
+3. **`02-ci-cd-spec` mean (79.0)** — needs per-topic MUST/pitfall pass on the remaining 11 files.
+4. **`03-chrome-ext-features` mean (81.5)** — only 7/35 at ≥90; pitfalls remain generic.
+5. **Pitfalls specificity** — DB folder now has per-topic pitfalls; other folders still use the generic 4-rule footer.
 
 ## Fix-to-100 path (rough ETA, 1 dev)
 
