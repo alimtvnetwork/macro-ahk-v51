@@ -59,12 +59,12 @@ function __marcoNotify(message,level,durationMs){
 
 /** Builds the SDK IIFE string for injection into a page (MAIN world). */
 // eslint-disable-next-line max-lines-per-function
-export function buildMarcoSdkScript(ctx: SdkContext): string {
-    const safeProjectId = escapeForTemplate(ctx.projectId);
-    const safeScriptId = escapeForTemplate(ctx.scriptId);
-    const safeConfigId = escapeForTemplate(ctx.configId);
-    const safeUrlRuleId = escapeForTemplate(ctx.urlRuleId);
-    const safeVersion = escapeForTemplate(ctx.version);
+export function buildMarcoSdkScript(sdkContext: SdkContext): string {
+    const safeProjectId = escapeForTemplate(sdkContext.projectId);
+    const safeScriptId = escapeForTemplate(sdkContext.scriptId);
+    const safeConfigId = escapeForTemplate(sdkContext.configId);
+    const safeUrlRuleId = escapeForTemplate(sdkContext.urlRuleId);
+    const safeVersion = escapeForTemplate(sdkContext.version);
 
     return `(function(){
 if(window.marco){

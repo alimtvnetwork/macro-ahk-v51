@@ -242,9 +242,9 @@ async function seedScriptsFromManifest(
                     }
                 }
             } catch (err) {
-                const msg = `[seedScriptsFromManifest] Failed to seed script ${scriptDef.File} for ${project.Name}: ${err}`;
-                errors.push(msg);
-                logBgWarnError(BgLogTag.MANIFEST_SEEDER, msg);
+                const seedErrorMessage = `[seedScriptsFromManifest] Failed to seed script ${scriptDef.File} for ${project.Name}: ${err}`;
+                errors.push(seedErrorMessage);
+                logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
             }
         }
     }
@@ -404,11 +404,11 @@ async function seedConfigsFromManifest(
                     }
                 }
             } catch (err) {
-                const msg = `[seedConfigsFromManifest→fetchConfigJson] Failed to seed config ${configDef.File} for ${project.Name}: ${err}`;
-                errors.push(msg);
+                const seedErrorMessage = `[seedConfigsFromManifest→fetchConfigJson] Failed to seed config ${configDef.File} for ${project.Name}: ${err}`;
+                errors.push(seedErrorMessage);
                 // Use warn instead of error — config fetch failures are non-fatal
                 // (hardcoded defaults are used) and should not inflate the error table
-                logBgWarnError(BgLogTag.MANIFEST_SEEDER, msg);
+                logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
             }
         }
     }
@@ -555,9 +555,9 @@ export async function seedProjectsFromManifest(
                 seeded++;
             }
         } catch (err) {
-            const msg = `[seedProjectsFromManifest] Failed to seed project ${project.Name}: ${err}`;
-            errors.push(msg);
-            logBgWarnError(BgLogTag.MANIFEST_SEEDER, msg);
+            const seedErrorMessage = `[seedProjectsFromManifest] Failed to seed project ${project.Name}: ${err}`;
+            errors.push(seedErrorMessage);
+            logBgWarnError(BgLogTag.MANIFEST_SEEDER, seedErrorMessage);
         }
     }
 
