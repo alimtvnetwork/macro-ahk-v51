@@ -251,8 +251,8 @@ function findPasteTarget(xpath?: string, selector?: string): HTMLElement | null 
     }
     // Try selector
     if (selector) {
-        const el = document.querySelector<HTMLElement>(selector);
-        if (el) return el;
+        const found = document.querySelector<HTMLElement>(selector);
+        if (found) return found;
     }
     // Fallback selectors
     const fallbacks = [
@@ -262,8 +262,8 @@ function findPasteTarget(xpath?: string, selector?: string): HTMLElement | null 
         '[data-testid="prompt-input"]',
     ];
     for (const sel of fallbacks) {
-        const el = document.querySelector<HTMLElement>(sel);
-        if (el) return el;
+        const found = document.querySelector<HTMLElement>(sel);
+        if (found) return found;
     }
     return null;
 }
