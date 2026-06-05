@@ -297,7 +297,7 @@ export default tseslint.config(
       
       "standalone-scripts/marco-sdk/src/logger.ts",
       "standalone-scripts/marco-sdk/src/notify.ts",
-      "standalone-scripts/marco-sdk/src/prompts.ts",
+      
       "standalone-scripts/marco-sdk/src/self-namespace.ts",
       "standalone-scripts/marco-sdk/src/self-test.ts",
       "standalone-scripts/marco-sdk/src/utils.ts",
