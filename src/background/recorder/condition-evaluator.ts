@@ -78,9 +78,9 @@ export interface WaitOptions {
 /*  Validation                                                         */
 /* ------------------------------------------------------------------ */
 
-export function validateCondition(c: Condition): void {
+export function validateCondition(condition: Condition): void {
     let predicateCount = 0;
-    walk(c, 0, "");
+    walk(condition, 0, "");
 
     function walk(node: Condition, depth: number, path: string): void {
         if (depth > MAX_CONDITION_DEPTH) {
@@ -111,21 +111,21 @@ function joinPath(prefix: string, segment: string): string {
     return prefix.length === 0 ? segment : `${prefix}.${segment}`;
 }
 
-function validateMatcher(p: Predicate, path: string): void {
-    const m = p.Matcher;
-    if (m.Kind === "TextRegex") {
-        try { new RegExp(m.Pattern, m.Flags ?? ""); }
-        catch (err) {
-            const msg = err instanceof Error ? err.message : String(err);
-            throw new Error(`InvalidSelector: bad regex /${m.Pattern}/ at ${path} — ${msg}`);
+function validateMatcher(predicate: Predicate, path: string): void {
+    const matcher = predicate.Matcher;
+    if (matcher.Kind === "TextRegex") {
+        try { new RegExp(matcher.Pattern, matcher.Flags ?? ""); }
+        catch (caughtError) {
+            const message = caughtError instanceof Error ? caughtError.message : String(caughtError);
+            throw new Error(`InvalidSelector: bad regex /${matcher.Pattern}/ at ${path} — ${message}`);
         }
         return;
     }
-    if ((m.Kind === "AttrEquals" || m.Kind === "AttrContains") && m.Name.length === 0) {
-        throw new Error(`InvalidSelector: ${m.Kind} requires non-empty Name at ${path}`);
+    if ((matcher.Kind === "AttrEquals" || matcher.Kind === "AttrContains") && matcher.Name.length === 0) {
+        throw new Error(`InvalidSelector: ${matcher.Kind} requires non-empty Name at ${path}`);
     }
-    if (m.Kind === "Count" && m.N < 0) {
-        throw new Error(`InvalidSelector: Count.N must be >= 0 at ${path} (got ${m.N})`);
+    if (matcher.Kind === "Count" && matcher.N < 0) {
+        throw new Error(`InvalidSelector: Count.N must be >= 0 at ${path} (got ${matcher.N})`);
     }
 }
 
@@ -133,59 +133,59 @@ function validateMatcher(p: Predicate, path: string): void {
 /*  Evaluation                                                         */
 /* ------------------------------------------------------------------ */
 
-export function evaluateCondition(c: Condition, options: EvaluateOptions): boolean {
-    if ("All" in c) {
-        for (const child of c.All) {
+export function evaluateCondition(condition: Condition, options: EvaluateOptions): boolean {
+    if ("All" in condition) {
+        for (const child of condition.All) {
             if (evaluateCondition(child, options) === false) return false;
         }
         return true;
     }
-    if ("Any" in c) {
-        for (const child of c.Any) {
+    if ("Any" in condition) {
+        for (const child of condition.Any) {
             if (evaluateCondition(child, options)) return true;
         }
         return false;
     }
-    if ("Not" in c) return evaluateCondition(c.Not, options) === false;
+    if ("Not" in condition) return evaluateCondition(condition.Not, options) === false;
 
-    const result = evaluatePredicate(c, options);
-    return c.Negate === true ? result === false : result;
+    const result = evaluatePredicate(condition, options);
+    return condition.Negate === true ? result === false : result;
 }
 
-function evaluatePredicate(p: Predicate, options: EvaluateOptions): boolean {
-    const kind = resolveSelectorKind(p.SelectorKind ?? "Auto", p.Selector);
+function evaluatePredicate(predicate: Predicate, options: EvaluateOptions): boolean {
+    const kind = resolveSelectorKind(predicate.SelectorKind ?? "Auto", predicate.Selector);
 
-    if (p.Matcher.Kind === "Count") {
-        const count = locateAll(p.Selector, kind, options.Doc).length;
-        const result = compareCount(count, p.Matcher.Op, p.Matcher.N);
-        recordTrace(options, p, kind, result, `count=${count}`);
+    if (predicate.Matcher.Kind === "Count") {
+        const count = locateAll(predicate.Selector, kind, options.Doc).length;
+        const result = compareCount(count, predicate.Matcher.Op, predicate.Matcher.N);
+        recordTrace(options, predicate, kind, result, `count=${count}`);
         return result;
     }
 
-    const el = locateFirst(p.Selector, kind, options.Doc);
-    if (el === null) {
-        recordTrace(options, p, kind, p.Matcher.Kind === "Exists" ? false : false, "no match");
+    const element = locateFirst(predicate.Selector, kind, options.Doc);
+    if (element === null) {
+        recordTrace(options, predicate, kind, predicate.Matcher.Kind === "Exists" ? false : false, "no match");
         return false;
     }
 
-    const result = applyMatcher(el, p.Matcher);
-    recordTrace(options, p, kind, result);
+    const result = applyMatcher(element, predicate.Matcher);
+    recordTrace(options, predicate, kind, result);
     return result;
 }
 
 function recordTrace(
     options: EvaluateOptions,
-    p: Predicate,
+    predicate: Predicate,
     kind: "XPath" | "Css",
     result: boolean,
     detail?: string,
 ): void {
     if (options.Trace === undefined) return;
     options.Trace.push({
-        Selector: p.Selector,
+        Selector: predicate.Selector,
         Kind: kind,
-        Matcher: p.Matcher.Kind,
-        Result: p.Negate === true ? result === false : result,
+        Matcher: predicate.Matcher.Kind,
+        Result: predicate.Negate === true ? result === false : result,
         Detail: detail,
     });
 }
