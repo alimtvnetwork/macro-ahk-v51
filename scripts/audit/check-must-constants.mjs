@@ -9,18 +9,30 @@ import { DEFAULT_SPEC_ROOT, listMarkdownFiles } from './spec-file-list.mjs';
 
 const ROOT_ARG = '--root=';
 const SOT_ARG = '--sot=';
+const STRICT_ARG = '--strict';
+const REPORT_ARG = '--report';
 const DEFAULT_SOT_REL = '01-prompt-spec/reference/05-runtime-defaults.md';
 const SOT_LINK_TEXT = 'reference/05-runtime-defaults.md';
 const UNIT_CONSTANT_RE = /\b\d+(?:\.\d+)?\s*(?:ms|milliseconds?|s|sec(?:onds?)?|minutes?|hours?|days?|items?|rows?|entries?|tasks?|kib|mib|bytes?|retries?|attempts?|chars?)\b/i;
 const OPERATIONAL_KEYWORD_RE = /\b(?:default|timeout|cap|capacity|limit|budget|window|deadline|retry|retries|interval|ttl|truncate|lru|max|min|debounce|frame|quota)\b/i;
 const KEYWORD_RANGE_RE = /\b(?:default|timeout|cap|capacity|limit|budget|window|deadline|retry|retries|interval|ttl|truncate|lru|max|min)\b.*\b\d+\s*(?:\.\.|-|–)\s*\d+\b/i;
-const IDENTIFIER_CONSTANT_RE = /\b[a-zA-Z][\w]*(?:Ms|MS|Timeout|Limit|Cap|Size|Retries|Capacity)\b.*\b\d+\b/;
+const IDENTIFIER_CONSTANT_RE = /\b[A-Z][A-Z0-9_]*(?:_MS|_TIMEOUT|_LIMIT|_CAP|_SIZE|_RETRIES|_CAPACITY|_BYTES|_DAYS|_ITEMS|_ATTEMPTS)\b.*\b\d+\b/;
 const RUNTIME_CONSTANT_RE = /^\|\s*`([^`]+)`/gm;
+const RUNTIME_ROW_RE = /^\|\s*`([^`]+)`\s*\|\s*([^|]+)\|\s*([^|]+)\|/gm;
+const NUMBER_RE = /\b\d(?:[\d_ ]*\d)?(?:\.\d+)?\b/g;
+const UNIT_VALUE_RE = /\b(\d(?:[\d_ ]*\d)?(?:\.\d+)?)\s*(ms|milliseconds?|s|sec(?:onds?)?|minutes?|hours?|days?|items?|rows?|entries?|tasks?|kib|mib|bytes?|retries?|attempts?|chars?)\b/gi;
+const RANGE_VALUE_RE = /\b(\d(?:[\d_ ]*\d)?(?:\.\d+)?)\s*(?:\.\.|-|–)\s*(\d(?:[\d_ ]*\d)?(?:\.\d+)?)\b/g;
+const KEYWORD_NUMBER_RE = /\b(?:default|timeout|cap|capacity|limit|budget|window|deadline|retry|retries|interval|ttl|truncate|lru|max|min|debounce|frame|quota)\b[^\n|`]*?\b(\d(?:[\d_ ]*\d)?(?:\.\d+)?)\b/gi;
 
 const specRoot = getArg(ROOT_ARG, DEFAULT_SPEC_ROOT);
 const sotPath = resolve(specRoot, getArg(SOT_ARG, DEFAULT_SOT_REL));
-const runtimeConstants = readRuntimeConstants(sotPath);
-const failures = scanFiles(specRoot, sotPath, runtimeConstants);
+const isStrict = process.argv.includes(STRICT_ARG);
+const runtimeDefaults = readRuntimeDefaults(sotPath);
+const failures = scanFiles(specRoot, sotPath, runtimeDefaults, isStrict);
+
+if (process.argv.includes(REPORT_ARG)) {
+  writeReport(failures, isStrict);
+}
 
 if (failures.length === 0) {
   process.stdout.write(`[check-must-constants] OK — operational constants cite ${SOT_LINK_TEXT}\n`);
@@ -34,22 +46,39 @@ function getArg(prefix, fallback) {
   return process.argv.find((value) => value.startsWith(prefix))?.slice(prefix.length) ?? fallback;
 }
 
-function readRuntimeConstants(filePath) {
+function readRuntimeDefaults(filePath) {
   if (!existsSync(filePath)) {
     writeMissingSot(filePath);
     process.exit(1);
   }
 
-  return Array.from(readFileSync(filePath, 'utf8').matchAll(RUNTIME_CONSTANT_RE)).map((match) => match[1]);
+  const fileText = readFileSync(filePath, 'utf8');
+
+  return {
+    constants: readRuntimeConstants(fileText),
+    numbers: readRuntimeNumbers(fileText),
+  };
 }
 
-function scanFiles(rootPath, canonicalSotPath, constants) {
+function readRuntimeConstants(fileText) {
+  return Array.from(fileText.matchAll(RUNTIME_CONSTANT_RE)).map((match) => match[1]);
+}
+
+function readRuntimeNumbers(fileText) {
+  const values = Array.from(fileText.matchAll(RUNTIME_ROW_RE)).flatMap((match) => {
+    return extractRuntimeNumbers(`${match[2]} ${match[3]}`);
+  });
+
+  return new Set(values.flatMap(expandNumericAliases));
+}
+
+function scanFiles(rootPath, canonicalSotPath, defaults, strictMode) {
   return listMarkdownFiles(rootPath).flatMap((filePath) => {
-    return scanFile(filePath, canonicalSotPath, constants);
+    return scanFile(filePath, canonicalSotPath, defaults, strictMode);
   });
 }
 
-function scanFile(filePath, canonicalSotPath, constants) {
+function scanFile(filePath, canonicalSotPath, defaults, strictMode) {
   if (isSkippedPath(filePath, canonicalSotPath)) {
     return [];
   }
@@ -59,12 +88,12 @@ function scanFile(filePath, canonicalSotPath, constants) {
   // mem:// rule) OR names any canonical constant, every operational
   // number in that file is considered bound. This avoids per-line noise
   // while still flagging files that never reference the SOT.
-  if (hasFileLevelSotBinding(fileText, constants)) {
+  if (hasFileLevelSotBinding(fileText, defaults.constants) && !strictMode) {
     return [];
   }
 
   return fileText.split(/\r?\n/).flatMap((line, index) => {
-    return scanLine(filePath, line, index + 1, constants);
+    return scanLine(filePath, line, index + 1, defaults);
   });
 }
 
@@ -102,6 +131,44 @@ function hasSourceOfTruthBinding(lineText, constants) {
   return lineText.includes(SOT_LINK_TEXT) || lineText.includes('mem://') || constants.some((constantName) => {
     return lineText.includes(constantName);
   });
+}
+
+function extractRuntimeNumbers(text) {
+  return Array.from(text.matchAll(NUMBER_RE)).map((match) => normalizeNumber(match[0]));
+}
+
+function extractLineNumbers(text) {
+  const unitNumbers = Array.from(text.matchAll(UNIT_VALUE_RE)).map((match) => normalizeNumber(match[1]));
+  const rangeNumbers = Array.from(text.matchAll(RANGE_VALUE_RE)).flatMap((match) => [normalizeNumber(match[1]), normalizeNumber(match[2])]);
+  const keywordNumbers = Array.from(text.matchAll(KEYWORD_NUMBER_RE)).map((match) => normalizeNumber(match[1]));
+
+  return Array.from(new Set([...unitNumbers, ...rangeNumbers, ...keywordNumbers]));
+}
+
+function normalizeNumber(value) {
+  return String(Number(value.replace(/[ _]/g, '')));
+}
+
+function expandNumericAliases(value) {
+  const numericValue = Number(value);
+  const aliases = [value];
+
+  return [...aliases, ...millisecondAliases(numericValue), ...byteAliases(numericValue)].filter(Boolean);
+}
+
+function millisecondAliases(value) {
+  if (value < 1000 || value % 1000 !== 0) {
+    return [];
+  }
+
+  return [String(value / 1000)];
+}
+
+function byteAliases(value) {
+  const isKib = value >= 1024 && value % 1024 === 0;
+  const isMib = value >= 1048576 && value % 1048576 === 0;
+
+  return [isKib ? String(value / 1024) : '', isMib ? String(value / 1048576) : ''];
 }
 
 function buildFailure(filePath, lineNumber, lineText) {
