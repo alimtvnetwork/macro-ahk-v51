@@ -12,7 +12,7 @@ import { DEFAULT_SPEC_ROOT, listMarkdownFiles } from './spec-file-list.mjs';
 
 const ROOT_ARG = '--root=';
 const SPEC_ROOT = getArg(ROOT_ARG, DEFAULT_SPEC_ROOT);
-const PITFALL_RE = /\b(Pitfall|Counter-example|Anti-pattern|Edge case|Gotcha)\b/i;
+const PITFALL_RE = /(Pitfall|Counter-example|Anti-pattern|Edge case|Gotcha)/i;
 
 function getArg(prefix, fallback) {
   return process.argv.find((value) => value.startsWith(prefix))?.slice(prefix.length) ?? fallback;
