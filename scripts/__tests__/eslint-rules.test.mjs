@@ -130,14 +130,14 @@ test('id-denylist reports staged placeholder identifiers in cleaned files', asyn
 test('id-denylist quarantines legacy cb/obj/fn/el/msg/ctx debt without re-allowing val', async () => {
     const legacyMessages = await lintMessages(
         DENYLIST_QUARANTINED,
-        'src/background/recorder/data-source-parsers.ts',
+        'src/background/recorder/drift-element-diff.ts',
         'id-denylist',
     );
     assert.equal(legacyMessages.length, 0);
 
     const valMessages = await lintMessages(
         DENYLIST_STILL_VIOLATING_IN_QUARANTINE,
-        'src/background/recorder/data-source-parsers.ts',
+        'src/background/recorder/drift-element-diff.ts',
         'id-denylist',
     );
     assert.ok(valMessages.some((message) => /val/.test(message.message)));
@@ -160,6 +160,7 @@ test('id-denylist fully applies to cleaned XPath source files', async () => {
 test('id-denylist fully applies to newly graduated 0.8 cleanup files', async () => {
     const cleanedFiles = [
         'src/background/auth-health-handler.ts',
+        'src/background/recorder/data-source-parsers.ts',
         'src/background/recorder/condition-evaluator.ts',
         'src/background/recorder/__tests__/xpath-of-element.test.ts',
         'src/background/recorder/condition-step.ts',
