@@ -246,9 +246,9 @@ export async function handleInjectScripts(
 
     // ✅ 15.5: Parallelize independent stages 1.5, 2a, 2b
     await time("stage1_5_2a_2b_parallel", () => Promise.all([
-        bootstrapNamespaceRoot(msg.tabId),
-        ensureRelayInjected(msg.tabId),
-        seedTokensIntoTab(msg.tabId),
+        bootstrapNamespaceRoot(injectRequest.tabId),
+        ensureRelayInjected(injectRequest.tabId),
+        seedTokensIntoTab(injectRequest.tabId),
     ]));
     console.log("[injection] 2/4 SEED     — bootstrap+relay+token completed in %.1fms", timings["stage1_5_2a_2b_parallel"]);
 
@@ -389,7 +389,7 @@ async function executeCachedPayload(
     cached: PipelineCachePayload,
     pipelineStart: number,
     timings: Record<string, number>,
-    time: <T>(label: string, fn: () => Promise<T>) => Promise<T>,
+    time: <T>(label: string, operation: () => Promise<T>) => Promise<T>,
 ): Promise<InjectScriptsResponse> {
     const allProjects = await time("readAllProjects", () =>
         readAllProjects().catch(() => [] as StoredProject[]));
@@ -606,13 +606,13 @@ async function ensureRelayInjected(tabId: number): Promise<void> {
 export async function handleGetTabInjections(
     message: MessageRequest,
 ): Promise<{ injections: Record<number, unknown> }> {
-    const msg = message as MessageRequest & { tabId: number };
+    const injectionRequest = message as MessageRequest & { tabId: number };
     const allInjections = getTabInjections();
-    const hasTabId = msg.tabId !== undefined;
+    const hasTabId = injectionRequest.tabId !== undefined;
 
     if (hasTabId) {
-        const tabRecord = allInjections[msg.tabId] ?? null;
-        return { injections: { [msg.tabId]: tabRecord } };
+        const tabRecord = allInjections[injectionRequest.tabId] ?? null;
+        return { injections: { [injectionRequest.tabId]: tabRecord } };
     }
 
     return { injections: allInjections };
