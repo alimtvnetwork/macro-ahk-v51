@@ -47,11 +47,11 @@ interface AssertionFailure {
 }
 
 function assertState(
-    el: HTMLElement,
+    element: HTMLElement,
     step: string,
     expected: BannerState | null,
 ): AssertionFailure | null {
-    const actual = el.getAttribute(STATE_ATTR);
+    const actual = element.getAttribute(STATE_ATTR);
     const expectedStr = expected === null ? "(none)" : expected;
 
     if (expected === null && actual === null) {
@@ -70,12 +70,12 @@ function wait(ms: number): Promise<void> {
 }
 
 function buildFakeBanner(): HTMLElement {
-    const el = document.createElement("div");
-    el.id = "pbh-smoke-test-banner";
-    el.textContent = "Payment issue detected.";
-    document.body.appendChild(el);
+    const element = document.createElement("div");
+    element.id = "pbh-smoke-test-banner";
+    element.textContent = "Payment issue detected.";
+    document.body.appendChild(element);
 
-    return el;
+    return element;
 }
 
 export async function runPaymentBannerHiderSmokeTest(): Promise<boolean> {
