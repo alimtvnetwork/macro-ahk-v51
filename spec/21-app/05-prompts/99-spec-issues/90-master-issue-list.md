@@ -1,8 +1,6 @@
 # 90 — Master Issue List (Consolidated)
-
-**Audited:** 2026-06-02 (Asia/Kuala_Lumpur)
+**Audited:** 2026-06-02
 **Source:** all `99-spec-issues/01-72*.md`
-
 | ID | Category | Files affected | Top doc(s) |
 |---|---|---:|---|
 | C1 | Missing metadata header | ~95 / 95 | `01-missing-metadata-header.md` |
@@ -35,6 +33,5 @@
 | C70 | READINESS-SCORE 100/100 falsified | 1 | `70` |
 | C71 | MIGRATION.md not blind-AI executable | 1 | `71` |
 | C72 | CHANGELOG.md cites unwritten content | 1 | `72` |
-
 **Total distinct categories:** 33 (C1–C29 + C66–C72; C20–C23 mostly clean).
 **Total per-doc audits written:** 72.

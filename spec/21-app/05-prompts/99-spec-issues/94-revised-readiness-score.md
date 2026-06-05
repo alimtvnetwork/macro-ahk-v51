@@ -1,10 +1,7 @@
 # 94 — Revised Readiness Score (Replaces Falsified 100/100)
-
-**Audited:** 2026-06-02 (Asia/Kuala_Lumpur)
+**Audited:** 2026-06-02
 **Supersedes:** `macros/READINESS-SCORE.md` (falsified — see C70)
-
 ## Honest rubric
-
 | # | Dimension | Weight | Score | Justification |
 |---|---|---:|---:|---|
 | 1 | Concept clarity | 10 | **5** | 3 docs claim canonical (C10, C26, C57). |
@@ -17,13 +14,9 @@
 | 8 | Observability | 10 | **5** | Schema doc exists but drifts from Core memory (C53); export bundle drifts (C54); UI errors drift (C55). |
 | 9 | Testing | 10 | **3** | 5 docs, all without concrete file paths (C46–C50); ban-lift not cited (C47, C48). |
 | 10 | Cross-cutting | 10 | **3** | 2/3 memories missing (C66, C67); CHANGELOG fabricated (C72); MIGRATION not executable (C71). |
-
 **HONEST TOTAL: 37 / 100**
-
 (Earlier finger-in-the-air guess of 35-40 in `00-overview.md` was within ±3 of this scorecard.)
-
 ## Blind-AI smoke checklist — honest answers
-
 | Question | Answer | Pass? |
 |---|---|---|
 | What is the exact JSON shape of `MacroDefinition`? | Only in `folder-layout/02`, not advertised | ⚠️ |
@@ -36,13 +29,9 @@
 | What `chrome.storage.local` keys are read/written? | **UNKNOWN** (C63) | ❌ |
 | Is Supabase allowed? | Clear NO | ✅ |
 | Where do tests live? | **UNKNOWN** (C28) | ❌ |
-
 **Pass rate: 2 / 10.**
-
 ## Path to genuine 100/100
-
 Per C92, ~14 batches of agent work fixes the structural defects to ≈85; another ~6 batches to write the 30 missing docs at production quality.
-
 ## Verdict
 **Do NOT ship to a blind AI in current state.** Either:
 - Run the fix-pass plan (next deliverable), OR

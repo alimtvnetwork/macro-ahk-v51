@@ -1,7 +1,5 @@
 # Runtime Defaults
-
 Authoritative source for all numeric/string defaults referenced elsewhere.
-
 | Key | Value | Used by |
 |---|---:|---|
 | `runtimeDefaults.stepTimeoutMs` | 60_000 | watchdog (any step) |
@@ -17,16 +15,12 @@ Authoritative source for all numeric/string defaults referenced elsewhere.
 | `runtimeDefaults.scoreRegex` | `/^\s*Score:\s*(\d{1,3})\s*\/\s*100\s*$/gm` | score-parser |
 | `runtimeDefaults.tokenPattern` | `/\{\{\s*([A-Z][A-Za-z0-9]*)\s*\}\}/g` | interpolator |
 | `runtimeDefaults.sensitivePattern` | `/password\|token\|secret\|api[_-]?key\|bearer/i` | masking |
-| `runtimeDefaults.timezone` | `Asia/Kuala_Lumpur` | all timestamps |
+| `runtimeDefaults.timezone` | `the user's local timezone` | all timestamps |
 | `runtimeDefaults.runIdGen` | `crypto.randomUUID` | start of run |
-
 ## Override surface
-
 - Macro-wide: top-level fields on `MacroDefinition`
 - Step-wide: optional fields on `Step`
 - Project-wide: `chrome.storage.local["Project.RuntimeDefaultsOverride"]`
 - User-wide: NOT supported (defaults are spec-level)
-
 ## Override precedence
-
 `Step > Macro > Project > Spec default`.

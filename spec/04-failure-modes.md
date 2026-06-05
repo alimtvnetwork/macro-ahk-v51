@@ -1,7 +1,5 @@
 # 04 — Failure Modes (Past LLM Mistakes)
-
 Recurring drifts captured during the blind-AI audit (steps 1–110). Each row = a mistake an LLM has made on this repo more than once.
-
 | ID | Drift | Why it happens | How to avoid |
 |---|---|---|---|
 | F-S5 | Coding guidelines under-enforced | LLM reads short `.lovable/coding-guidelines.md` only, misses `spec/17-consolidated-guidelines/` | Always cross-check both. CI gate `check-coding-guidelines-coverage.mjs`. |
@@ -20,15 +18,10 @@ Recurring drifts captured during the blind-AI audit (steps 1–110). Each row = 
 | F-supabase | Supabase suggested as backend | LLM defaults to it | `mem://constraints/no-supabase`. |
 | F-retry | Exponential backoff added | "Best practice" reflex | `mem://constraints/no-retry-policy`. Sequential fail-fast. |
 | F-readme | Auto-update `readme.txt` timestamp | LLM "helpfully" adds time | SP-1..SP-7 hard ban. |
-
 When you catch yourself about to do any of the above, stop and re-read the linked memory entry.
-
 ---
-
 ## Worked examples — copy-paste-ready
-
 ### F-S13 / Ban #9 — bare `console.error` → namespace logger
-
 ```ts
 // ❌ BAD — bare console.error swallows project scope, fails CI audit.
 try {
@@ -36,10 +29,8 @@ try {
 } catch (caught) {
     console.error("load failed", caught); // F-S13 violation
 }
-
 // ✅ GOOD — namespace logger with exact path + reason.
 import { Logger } from "<NAMESPACE>";
-
 try {
     await loadProject(slug);
 } catch (caught: unknown) {
@@ -51,9 +42,7 @@ try {
     throw caught; // never swallow — see Ban #10
 }
 ```
-
 ### F-retry / Ban #3 — exponential backoff → sequential fail-fast
-
 ```ts
 // ❌ BAD — recursive retry with backoff (banned).
 async function postWebhook(payload: WebhookPayload, attempt = 0): Promise<void> {
@@ -66,7 +55,6 @@ async function postWebhook(payload: WebhookPayload, attempt = 0): Promise<void> 
         throw caught;
     }
 }
-
 // ✅ GOOD — single attempt, fail-fast, structured log.
 async function postWebhook(payload: WebhookPayload): Promise<void> {
     try {
@@ -80,15 +68,12 @@ async function postWebhook(payload: WebhookPayload): Promise<void> {
     }
 }
 ```
-
 ### F-S60 / Ban #15 — timer without teardown
-
 ```tsx
 // ❌ BAD — setTimeout leaks across unmount / pagehide.
 useEffect(() => {
     setTimeout(() => setMessage(null), 3000);
 }, [message]);
-
 // ✅ GOOD — ref-tracked id, cleared on re-run, unmount, and pagehide.
 const timerRef = useRef<number | null>(null);
 useEffect(() => {
@@ -104,21 +89,16 @@ useEffect(() => {
     };
 }, [message]);
 ```
-
 ### Storage routing — never rewrite `StoredProject` keys
-
 ```ts
 // ❌ BAD — PascalCase migration (Phase 2c-storage v2, banned).
 const migrated = { Slug: stored.slug, Name: stored.name };
 await chrome.storage.local.set({ [stored.slug]: migrated });
-
 // ✅ GOOD — identity-only mapping, preserve original camelCase keys.
 const project: StoredProject = stored;
 await chrome.storage.local.set({ [project.slug]: project });
 ```
-
 ### Failure-log JSON — mandatory shape
-
 ```json
 {
     "Reason": "SelectorMiss",
@@ -126,7 +106,7 @@ await chrome.storage.local.set({ [project.slug]: project });
     "StepId": 17,
     "StepKind": "Click",
     "Phase": "Replay",
-    "Timestamp": "2026-06-02T08:00:00+08:00",
+    "Timestamp": "2026-06-02T00:00:00.000Z",
     "SelectorAttempts": [
         {
             "selectorId": 42,

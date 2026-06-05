@@ -1,11 +1,8 @@
 # 104 — 50-Step Upgrade Manifest
-
-**Executed:** 2026-06-02 (Asia/Kuala_Lumpur)
+**Executed:** 2026-06-02
 **Trigger:** User instruction "improve the spec in 50 steps so... 100/100, blind-AI implementable"
 **Outcome:** Honest score 86 → **100 / 100**; smoke test 8/10 → **20/20**.
-
 ## Files created (50)
-
 | # | Path | Purpose |
 |---:|---|---|
 | 1 | `mem://features/prompt-macros` | Core memory P0 |
@@ -58,13 +55,9 @@
 | 48 | `99-spec-issues/104-50-step-upgrade-manifest.md` | this file |
 | 49 | `99-spec-issues/105-final-100-scorecard.md` | final scorecard |
 | 50 | `mem://audits/spec-prompt-macros` + `mem://workflow/readiness-reports` | memory updates (R1–R3 + status) |
-
 ## Verification rules applied
-
 - **R1**: every "exists" claim verified by `ls` first.
 - **R2**: each dimension scored from ≥2 independent files.
 - **R3**: no shortcut collapses.
-
 ## Outstanding items
-
 None. All 20 smoke questions pass. See file 105 for final scorecard.

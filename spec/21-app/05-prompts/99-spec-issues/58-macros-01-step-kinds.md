@@ -1,7 +1,5 @@
 # Audit — macros/01-step-kinds.md
-
-**Audited:** 2026-06-02 (Asia/Kuala_Lumpur) · 125 lines
-
+**Audited:** 2026-06-02  · 125 lines
 ## Findings
 - **C1** Missing metadata header.
 - **C15 Bare fences (2).**
@@ -9,10 +7,8 @@
 - **C8** No `Mirrors: mem://features/js-step-diagnostics` for JsInline section.
 - **C28** No fixture path showing each kind in JSON form.
 - **C13** Failure-handling subsections duplicate `05-failure-modes.md`.
-
 ## Severity
 **Critical.** Step Kinds = the type system; gaps here = runtime errors.
-
 ## Fix order
 1. Add `StepKindId` column to enum table.
 2. `Mirrors:` JS-step memory.

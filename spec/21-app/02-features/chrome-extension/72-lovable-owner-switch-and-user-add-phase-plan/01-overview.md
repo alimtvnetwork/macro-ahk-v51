@@ -1,24 +1,18 @@
 # Lovable Owner Switch + User Add — 20-Phase Implementation Plan
-
-**Created**: 2026-04-24 (Asia/Kuala_Lumpur)
+**Created**: 2026-04-24
 **Status**: 📋 Pending — execute one phase per `next` command.
 **Scope**: Implements three pending specs together because they share the same
 shared module, login flow, sign-out flow, and SQLite plumbing:
-
 1. `spec/.../70-lovable-owner-switch/`
 2. `spec/.../71-lovable-user-add/` (v2, two-step Owner promotion)
 3. Shared module `lovable-common-xpath` + shared `LovableApiClient`
-
 ## Execution rules
-
 - One phase per `next` invocation. No phase merges another phase's deliverables.
 - Each phase ends with: code committed in tree, lint clean, plan.md row flipped to ✅.
 - Coding rules from `70-lovable-owner-switch/05-coding-rules-recap.md` apply to every phase: ≤100-line files, ≤15-line functions, no `!important`, no inline `<style>`, no `as` casts, no `unknown`, no magic strings, class-based, blank line before return, namespace logger on every catch.
 - After each phase: update `.lovable/plan.md` (P1..P20 row → ✅) and append a one-line note in this folder's `02-progress-log.md`.
 - If a phase reveals a blocker, STOP and write a question into `03-open-questions.md` instead of guessing.
-
 ## The 20 phases
-
 | # | Phase | Primary deliverable | Touches |
 |---|---|---|---|
 | P1  | Shared XPath module scaffold | `standalone-scripts/lovable-common-xpath/src/index.ts` exporting `XPathKeyCode` enum, `DefaultXPaths` map, `DefaultDelaysMs` map | new project folder, info.json, manifest entry |
@@ -41,9 +35,7 @@ shared module, login flow, sign-out flow, and SQLite plumbing:
 | P18 | Shared XPath/delay editor + Reset | One UI component used by both popups; reads/writes `XPathSetting`; Reset restores defaults from `lovable-common-xpath` | `lovable-common-xpath/ui/xpath-editor.ts` (or shared UI module) |
 | P19 | Logs viewer + copy-to-clipboard | Tail latest task log in popup, copy button; Step A vs Step B lines clearly distinguishable | `ui/logs-panel.ts` reused by both |
 | P20 | Cross-spec audit + version bump | Verify R12 (no duplicate `promoteToOwner` REST), all coding rules pass lint, manifest + constants.ts + standalone-scripts versions unified, plan.md and memory updated | `.lovable/plan.md`, `.lovable/memory/features/lovable-user-add-v2-two-step-owner.md`, version bump |
-
 ## Acceptance criteria coverage map
-
 | Spec AC | Phase(s) |
 |---|---|
 | Owner Switch AC 1–4 (upload, file manager, CSV validation, migration) | P4–P7 |
@@ -52,8 +44,6 @@ shared module, login flow, sign-out flow, and SQLite plumbing:
 | User Add AC 1–6 (CSV, role enum, role fallback, migration, seed) | P11–P14 |
 | User Add AC 7–9 (POST per row, Owner Step B uses shared client) | P15–P17 |
 | User Add AC 10–15 (sign-out, XPath editor, logs, shared module, coding rules) | P17–P20 |
-
 ## Open questions (answer before P1)
-
 See `03-open-questions.md`. Phases that depend on an unanswered question are
 blocked until the user clarifies.

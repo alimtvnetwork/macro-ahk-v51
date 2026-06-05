@@ -1,21 +1,15 @@
 # Variable Validation & Failure-Log Shape
-
 **Created:** 2026-06-02 ()
-
 Two distinct validation phases run:
-
 1. **Static** — at macro load / save time, via Ajv against
    `schemas/variable.schema.json` (Block 4 Task 36). Catches schema-level
    problems (duplicate Names, missing `EnumValues`, type mismatches between
    `Default` and `Type`, etc.).
 2. **Run-time** — at render time, in the engine. Catches missing values,
    coercion failures, range/pattern violations, and injection attempts.
-
 Both phases emit failures using the mandatory shape from
 `mem://standards/verbose-logging-and-failure-diagnostics`.
-
 ## Static schema (excerpt)
-
 ```jsonc
 {
   "$id": "https://riseup.asia/schemas/variable.schema.json",
@@ -43,14 +37,10 @@ Both phases emit failures using the mandatory shape from
   ]
 }
 ```
-
 The full schema is authored in Block 4 Task 36; this excerpt is normative
 for the shape and conditionals.
-
 ## Run-time check order
-
 For each declared variable, in order, the engine performs:
-
 1. **Resolution** — walk tiers 1 → 5. If unresolved and `Required`, fail
    `MissingVariable`.
 2. **Coercion** — apply `Type` coercion per `04-types.md`. Fail
@@ -65,11 +55,8 @@ For each declared variable, in order, the engine performs:
    Fail `VariableTypeMismatch` on violation.
 7. **Injection guard** — after first-pass interpolation, scan the rendered
    body for any remaining `{{ … }}`. Fail `VariableInjection` if found.
-
 Steps 1–6 run **per variable**; step 7 runs once on the assembled body.
-
 ## Failure-log shape
-
 ```ts
 type VariableFailureLog = {
   RunId: string;
@@ -82,7 +69,6 @@ type VariableFailureLog = {
   VariableContext: VariableContext[];   // never null, never empty
   At: string;
 };
-
 type VariableContext = {
   name: string;
   source: "step" | "macro" | "context" | "default" | "missing";
@@ -91,16 +77,13 @@ type VariableContext = {
   reason: string;                  // "ok" | "coerce failed" | "out of range" | …
 };
 ```
-
 - **Every** declared variable for the current step appears in
   `VariableContext[]` — not just the one that failed. This lets the operator
   see the full resolution snapshot at the moment of failure.
 - `SelectorAttempts` is **always** `null` for variable failures; the field
   must still exist (don't omit it) — paired with the reason
   `"NotApplicable — variable failure"` documented in `05-failure-modes.md`.
-
 ## Worked log
-
 ```json
 {
   "RunId": "spec-tighten-cycle-20260602-094312",
@@ -114,12 +97,10 @@ type VariableContext = {
     { "name": "Depth",        "source": "step",    "resolvedValue": 9,             "type": "integer", "reason": "out of range (Max=8)" },
     { "name": "RunId",        "source": "context", "resolvedValue": "spec-tighten-cycle-20260602-094312", "type": "string",  "reason": "ok" }
   ],
-  "At": "2026-06-02T09:45:01+08:00"
+  "At": "2026-06-02T01:45:01.000Z"
 }
 ```
-
 ## No retry
-
 Per `mem://constraints/no-retry-policy`: a variable failure terminates the
 step (and the run) immediately. The engine MUST NOT auto-substitute the
 default and retry — that would mask real misconfiguration.

@@ -1,7 +1,5 @@
 # Audit — observability/01-metrics.md
-
-**Audited:** 2026-06-02 (Asia/Kuala_Lumpur) · 51 lines
-
+**Audited:** 2026-06-02  · 51 lines
 ## Findings
 - **C1** Missing metadata header.
 - **C15 Bare fence (1).**
@@ -9,10 +7,8 @@
 - **C28** No exporter/transport named (push? scrape? `chrome.storage`?).
 - **C27** Cardinality budget not declared (label-set explosion risk).
 - **C8** No link to `mem://features/macro-controller/credit-totals-exclude-free` (similar telemetry doc).
-
 ## Severity
 High. Metric names without exporter = unimplementable.
-
 ## Fix order
 1. Add "Prometheus-naming-exception" callout.
 2. Declare exporter + cardinality budget per metric.

@@ -1,10 +1,7 @@
 # 108 — v3 Polish Wave Close-out
-
-**Date:** 2026-06-02 (Asia/Kuala_Lumpur)
+**Date:** 2026-06-02
 **Trigger:** "next 10 with proper reasoning" after the 50-step upgrade.
-
 ## What this wave added (10 logical tasks)
-
 | # | Task | Output |
 |---:|---|---|
 | 1 | Cross-doc consistency check | `106-cross-reference-verification.md` — 30 cross-refs, zero drift |
@@ -17,13 +14,9 @@
 | 8 | Variables ↔ engine consistency | row 2 of file 106 — built-ins + masking confirmed |
 | 9 | UI ↔ failure-code 1:1 mapping | row 3 of file 106 — 15 codes both sides |
 | 10 | Guards ↔ tests ↔ runtime defaults | rows 4–5 of file 106 — budgets identical |
-
 ## Verification protocol
-
 R1 (`ls` proof), R2 (two-evidence), R3 (no shortcut collapse) all honored. Every claim in this wave cites a file the reader can open.
-
 ## State of the spec
-
 | Metric | Value |
 |---|---:|
 | Readiness score (audited) | 100 / 100 |
@@ -33,7 +26,5 @@ R1 (`ls` proof), R2 (two-evidence), R3 (no shortcut collapse) all honored. Every
 | Total spec docs | ~140 |
 | Total cross-references verified | 30 |
 | Drift findings | 0 |
-
 ## Next user action
-
 The spec is ready for the build phase. Awaiting your next instruction.
