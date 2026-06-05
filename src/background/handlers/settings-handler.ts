@@ -90,9 +90,9 @@ export async function handleGetSettings(): Promise<{ settings: ExtensionSettings
 export async function handleSaveSettings(
     message: MessageRequest,
 ): Promise<OkResponse> {
-    const msg = message as MessageRequest & { settings: Partial<ExtensionSettings> };
+    const payload = message as MessageRequest & { settings: Partial<ExtensionSettings> };
     const current = await loadSettings();
-    const merged = { ...DEFAULT_SETTINGS, ...current, ...msg.settings };
+    const merged = { ...DEFAULT_SETTINGS, ...current, ...payload.settings };
     await saveSettings(merged);
     setVerboseLogging(null, merged.verboseLogging);
     invalidateSettingsNsCache();
@@ -154,8 +154,8 @@ export async function handleGetPromptVariables(): Promise<{ variables: Record<st
 export async function handleSavePromptVariables(
     message: MessageRequest,
 ): Promise<OkResponse> {
-    const msg = message as MessageRequest & { variables: Record<string, string> };
-    await chrome.storage.local.set({ [VARIABLES_KEY]: msg.variables });
+    const payload = message as MessageRequest & { variables: Record<string, string> };
+    await chrome.storage.local.set({ [VARIABLES_KEY]: payload.variables });
     return { isOk: true };
 }
 

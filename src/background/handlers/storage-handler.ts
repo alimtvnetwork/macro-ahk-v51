@@ -83,7 +83,7 @@ export async function handleGetStorageStats(): Promise<Record<string, unknown>> 
 export async function handleQueryLogs(
     message: MessageRequest,
 ): Promise<{ rows: SqlRow[]; total: number }> {
-    const msg = message as MessageRequest & {
+    const payload = message as MessageRequest & {
         database: "logs" | "errors";
         offset: number;
         limit: number;
@@ -93,29 +93,29 @@ export async function handleQueryLogs(
         caseSensitive?: boolean;
     };
 
-    const db = resolveDb(msg.database);
-    const table = resolveTable(msg.database);
+    const db = resolveDb(payload.database);
+    const table = resolveTable(payload.database);
 
     const conditions: string[] = [];
     const params: SqlValue[] = [];
 
-    if (msg.source) {
+    if (payload.source) {
         conditions.push("source = ?");
-        params.push(msg.source);
+        params.push(payload.source);
     }
-    if (msg.category) {
+    if (payload.category) {
         conditions.push("category = ?");
-        params.push(msg.category);
+        params.push(payload.category);
     }
-    if (msg.search) {
+    if (payload.search) {
         const searchColumns = table === "Errors"
             ? ["error_code", "message"]
             : ["action", "detail", "source", "category"];
-        const likeOp = msg.caseSensitive ? "LIKE" : "LIKE";
-        const collate = msg.caseSensitive ? "" : " COLLATE NOCASE";
+        const likeOp = payload.caseSensitive ? "LIKE" : "LIKE";
+        const collate = payload.caseSensitive ? "" : " COLLATE NOCASE";
         const orClauses = searchColumns.map(col => `${col} ${likeOp} ?${collate}`);
         conditions.push(`(${orClauses.join(" OR ")})`);
-        const pattern = `%${msg.search}%`;
+        const pattern = `%${payload.search}%`;
         searchColumns.forEach(() => params.push(pattern));
     }
 
@@ -132,7 +132,7 @@ export async function handleQueryLogs(
     const queryStmt = db.prepare(
         `SELECT * FROM ${table}${whereClause} ORDER BY timestamp DESC LIMIT ? OFFSET ?`,
     );
-    queryStmt.bind([...params, msg.limit, msg.offset]);
+    queryStmt.bind([...params, payload.limit, payload.offset]);
     const rows = collectRows(queryStmt);
 
     return { rows, total };
@@ -141,16 +141,16 @@ export async function handleQueryLogs(
 export async function handleGetLogDetail(
     message: MessageRequest,
 ): Promise<{ row: SqlRow | null }> {
-    const msg = message as MessageRequest & {
+    const payload = message as MessageRequest & {
         database: "logs" | "errors";
         rowId: number;
     };
 
-    const db = resolveDb(msg.database);
-    const table = resolveTable(msg.database);
+    const db = resolveDb(payload.database);
+    const table = resolveTable(payload.database);
 
     const stmt = db.prepare(`SELECT * FROM ${table} WHERE id = ?`);
-    stmt.bind([msg.rowId]);
+    stmt.bind([payload.rowId]);
     const hasRow = stmt.step();
     const row = hasRow ? stmt.getAsObject() : null;
     stmt.free();

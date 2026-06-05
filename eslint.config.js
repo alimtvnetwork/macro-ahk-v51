@@ -132,11 +132,9 @@ export default tseslint.config(
       "src/background/handlers/project-config-handler.ts",
       "src/background/handlers/prompt-chain-handler.ts",
       "src/background/handlers/prompt-handler.ts",
-      "src/background/handlers/run-stats-handler.ts",
+      
       "src/background/handlers/sdk-bridge-handler.ts",
       "src/background/handlers/sdk-selftest-handler.ts",
-      "src/background/handlers/settings-handler.ts",
-      "src/background/handlers/storage-handler.ts",
       "src/background/handlers/user-script-log-handler.ts",
       "src/background/handlers/xpath-test-handler.ts",
       "src/background/injection-diagnostics.ts",

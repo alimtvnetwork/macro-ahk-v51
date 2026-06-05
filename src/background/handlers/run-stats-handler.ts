@@ -60,8 +60,8 @@ async function saveMetrics(metrics: CycleMetric[]): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 /** Records a single cycle metric. */
-export async function handleRecordCycleMetric(msg: { projectId: string; cycleMs: number; loopCount: number; action: string }): Promise<{ isOk: true }> {
-    const m = msg as {
+export async function handleRecordCycleMetric(payload: { projectId: string; cycleMs: number; loopCount: number; action: string }): Promise<{ isOk: true }> {
+    const cycleInput = payload as {
         cycleNumber: number;
         startTime: string;
         endTime: string;
@@ -69,16 +69,16 @@ export async function handleRecordCycleMetric(msg: { projectId: string; cycleMs:
         errorMessage?: string;
     };
 
-    const start = new Date(m.startTime).getTime();
-    const end = new Date(m.endTime).getTime();
+    const start = new Date(cycleInput.startTime).getTime();
+    const end = new Date(cycleInput.endTime).getTime();
 
     const metric: CycleMetric = {
-        cycleNumber: m.cycleNumber,
-        startTime: m.startTime,
-        endTime: m.endTime,
+        cycleNumber: cycleInput.cycleNumber,
+        startTime: cycleInput.startTime,
+        endTime: cycleInput.endTime,
         durationMs: end - start,
-        status: m.status,
-        ...(m.errorMessage ? { errorMessage: m.errorMessage } : {}),
+        status: cycleInput.status,
+        ...(cycleInput.errorMessage ? { errorMessage: cycleInput.errorMessage } : {}),
     };
 
     const existing = await loadMetrics();
@@ -93,17 +93,17 @@ export async function handleGetRunStats(): Promise<RunStatsResponse> {
     const metrics = await loadMetrics();
 
     const totalCycles = metrics.length;
-    const successCount = metrics.filter(m => m.status === "success").length;
-    const errorCount = metrics.filter(m => m.status === "error").length;
-    const skippedCount = metrics.filter(m => m.status === "skipped").length;
+    const successCount = metrics.filter(entry => entry.status === "success").length;
+    const errorCount = metrics.filter(entry => entry.status === "error").length;
+    const skippedCount = metrics.filter(entry => entry.status === "skipped").length;
     const successRate = totalCycles > 0 ? Math.round((successCount / totalCycles) * 1000) / 10 : 0;
 
-    const durations = metrics.filter(m => m.durationMs > 0).map(m => m.durationMs);
+    const durations = metrics.filter(entry => entry.durationMs > 0).map(entry => entry.durationMs);
     const avgDurationMs = durations.length > 0
         ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
         : 0;
 
-    const errorMetrics = metrics.filter(m => m.status === "error");
+    const errorMetrics = metrics.filter(entry => entry.status === "error");
     const lastErrorMessage = errorMetrics.length > 0
         ? errorMetrics[errorMetrics.length - 1].errorMessage ?? null
         : null;
