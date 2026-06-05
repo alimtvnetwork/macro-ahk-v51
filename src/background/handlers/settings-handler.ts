@@ -90,9 +90,9 @@ export async function handleGetSettings(): Promise<{ settings: ExtensionSettings
 export async function handleSaveSettings(
     message: MessageRequest,
 ): Promise<OkResponse> {
-    const msg = message as MessageRequest & { settings: Partial<ExtensionSettings> };
+    const payload = message as MessageRequest & { settings: Partial<ExtensionSettings> };
     const current = await loadSettings();
-    const merged = { ...DEFAULT_SETTINGS, ...current, ...msg.settings };
+    const merged = { ...DEFAULT_SETTINGS, ...current, ...payload.settings };
     await saveSettings(merged);
     setVerboseLogging(null, merged.verboseLogging);
     invalidateSettingsNsCache();
