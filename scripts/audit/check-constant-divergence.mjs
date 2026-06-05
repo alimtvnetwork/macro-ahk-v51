@@ -86,7 +86,7 @@ function scanLineForConstant(filePath, lineText, lineNumber, constantName, runti
 
 function extractAssignedConstantValue(lineText, constantName) {
   const escapedConstant = escapeRegExp(constantName);
-  const assignmentRe = new RegExp(String.raw`\b${escapedConstant}\b\s*(?:=|:|is|defaults?\s+to|must\s+be)\s*(?:\*\*)?([^` + '`' + String.raw`\n,.;|)]+)`, 'i');
+  const assignmentRe = new RegExp(String.raw`\b${escapedConstant}\b\s*(?:=|:|is|defaults?\s+to|must\s+be)\s*(?:\*\*)?([^` + '`' + String.raw`\n,;|)]+)`, 'i');
   const match = lineText.match(assignmentRe);
 
   return match ? normalizeConstantExpression(match[1]) : null;
@@ -110,8 +110,7 @@ function evaluateProductExpression(expressionText) {
     return null;
   }
 
-  const hasOnlyNumbers = parts.every((part) => NUMBER_RE.test(part.trim()));
-  NUMBER_RE.lastIndex = 0;
+  const hasOnlyNumbers = parts.every((part) => /^\d+(?:\.\d+)?$/.test(part.trim()));
 
   return hasOnlyNumbers ? String(parts.reduce((total, part) => total * Number(part.trim()), 1)) : null;
 }
