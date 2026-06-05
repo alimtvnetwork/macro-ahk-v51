@@ -44,7 +44,7 @@ def score_file(p: Path, root: Path):
                   + (10 if num_hits >= 2 else (5 if num_hits >= 1 else 0))
     determinism = min(25, determinism)
 
-    rel_path = str(p.relative_to(root))
+    rel_path = str(p.resolve().relative_to(root))
     if ACCEPTANCE_EXEMPT_RE.search(rel_path):
         acceptance = 20
     elif ACC_RE.search(txt):
