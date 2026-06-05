@@ -268,12 +268,12 @@ function buildRowObject(
     columns: string[],
     values: SqlValue[],
 ): Record<string, unknown> {
-    const obj: Record<string, unknown> = {};
+    const record: Record<string, unknown> = {};
 
     for (let i = 0; i < columns.length; i++) {
-        obj[columns[i]] = values[i];
+        record[columns[i]] = values[i];
     }
-    return obj;
+    return record;
 }
 
 /** Builds a standardized export filename. */
