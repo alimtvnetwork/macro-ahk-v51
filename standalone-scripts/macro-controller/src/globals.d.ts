@@ -124,7 +124,7 @@ interface MarcoSDK {
     dismissAll(): void;
     onError(callback: (error: unknown) => void): void;
     getRecentErrors(): unknown[];
-    _setStopLoopCallback(fn: () => void): void;
+    _setStopLoopCallback(callback: () => void): void;
     _setVersion(v: string): void;
     [key: string]: unknown;
   };
