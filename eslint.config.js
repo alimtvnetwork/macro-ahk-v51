@@ -121,9 +121,6 @@ export default tseslint.config(
   // graduate off this list as their authored-source debt is cleaned.
   {
     files: [
-      "src/background/message-registry.ts",
-      "src/background/project-namespace-builder.ts",
-      "src/background/project-query-builder.ts",
       "src/background/recorder/__tests__/__fixtures__/failure-report-fixtures.ts",
       "src/background/recorder/__tests__/condition-ac-19-2.test.ts",
       "src/background/recorder/__tests__/condition-evaluator.test.ts",
