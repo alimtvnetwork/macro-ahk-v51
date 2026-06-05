@@ -4,11 +4,11 @@
 
 Total Markdown files under `spec/2026-spec/`: **229**
 
-- `.`: 1 file(s)
 - `01-prompt-spec`: 131 file(s)
 - `02-ci-cd-spec-for-chrome-extensions`: 20 file(s)
 - `03-chrome-ext-features`: 35 file(s)
 - `03-db-and-sqlite-integration-with-chrome-extension`: 42 file(s)
+- `.`: 1 file(s)
 
 ## Blind-AI protocol
 
@@ -30,20 +30,7 @@ Each file is reviewed as if the implementer can see only that file plus explicit
 | Cross-refs | 15 | Dependencies and canonical sources are linked and resolvable. |
 | Pitfalls | 15 | Known failure modes and edge cases are explicit. |
 
-Pass bar: **90/100**.
-
-## Score mapping
-
-- **90–100:** Blind-AI ready.
-- **75–89:** Mostly implementable; needs targeted gap closure.
-- **60–74:** Risky; likely partial implementation or silent drift.
-- **0–59:** Not safe for blind-AI implementation without human clarification.
-
-## Implementable and failure percentages
-
-- **Implementable %** estimates how much can be shipped without escalation.
-- **Failure %** estimates how much is likely to fail, drift, or require human interpretation.
-- `Implementable % + Failure %` should equal 100 for every file row.
+Pass bar: **90/100**. Red bar: **<60/100**.
 
 ## Guidelines applied
 
