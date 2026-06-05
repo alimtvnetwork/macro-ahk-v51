@@ -493,7 +493,7 @@ Memory: `.lovable/memory/features/release-installer.md`
 
 | # | Task | Effort | Impact | Blocker |
 |---|------|--------|--------|---------|
-| 1 | **Priority 0.8** — continue staged authored-source id-denylist quarantine retirement (`cb`, `obj`, `fn`, `el`, `msg`, `ctx`) | High | Medium — 19 entries graduated; 185 exact-file quarantine entries + 3 glob quarantines remain | Effort budget |
+| 1 | **Priority 0.8** — continue staged authored-source id-denylist quarantine retirement (`cb`, `obj`, `fn`, `el`, `msg`, `ctx`) | High | Medium — 20 entries graduated; 184 exact-file quarantine entries + 3 glob quarantines remain | Effort budget |
 | 2 | **Optional minisign release signing** | Low | Medium | Requires `MINISIGN_SECRET_KEY` operator secret |
 
 **Recommended next**: Continue Priority 0.8 quarantine retirement — remove legacy `cb`/`obj`/`fn`/`el`/`msg`/`ctx` entries file-by-file after descriptive identifier renames. Defer optional minisign signing until `MINISIGN_SECRET_KEY` exists.
