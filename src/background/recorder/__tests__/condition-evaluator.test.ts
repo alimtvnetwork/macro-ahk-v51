@@ -170,9 +170,9 @@ describe("waitForCondition", () => {
                 PollMs: 5,
                 Sleep: async () => {
                     if (document.getElementById("late") === null) {
-                        const el = document.createElement("div");
-                        el.id = "late";
-                        document.body.appendChild(el);
+                        const element = document.createElement("div");
+                        element.id = "late";
+                        document.body.appendChild(element);
                     }
                 },
             },
