@@ -313,7 +313,7 @@ export default tseslint.config(
       "standalone-scripts/macro-controller/src/ui/section-open-tabs.ts",
       "standalone-scripts/macro-controller/src/ui/settings-tab-panels.ts",
       "standalone-scripts/macro-controller/src/ui/settings-ui.ts",
-      "standalone-scripts/macro-controller/src/ui/skeleton.ts",
+      
       "standalone-scripts/macro-controller/src/ui/summary-bar/component.ts",
       "standalone-scripts/macro-controller/src/ui/task-next-ui.ts",
       "standalone-scripts/macro-controller/src/ui/ui-status-renderer.ts",
