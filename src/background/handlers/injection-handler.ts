@@ -189,16 +189,16 @@ export async function handleInjectScripts(
     const didReseedBuiltins = await time("stage0_guard", () => ensureBuiltinScriptsExist(allProjects));
     if (didReseedBuiltins) {
         await mirrorDiagnosticToTab(
-            msg.tabId,
+            injectRequest.tabId,
             "[builtin-guard] Missing built-in scripts were detected and reseeded from manifest",
             "warn",
         );
     }
 
     // Stage 0: Dependency resolution — prepend dependency project scripts
-    const scriptsWithDeps = await time("stage0_deps", () => prependDependencyScripts(msg.scripts, allProjects));
+    const scriptsWithDeps = await time("stage0_deps", () => prependDependencyScripts(injectRequest.scripts, allProjects));
     console.log("[injection] 0/4 DEPS     — %d scripts after dependency resolution (was %d)",
-        scriptsWithDeps.length, msg.scripts.length);
+        scriptsWithDeps.length, injectRequest.scripts.length);
 
     // Stage 1: Resolve
     const { prepared: preparedScripts, skipped: skippedScripts } = await time("stage1_resolve", () =>
@@ -225,13 +225,13 @@ export async function handleInjectScripts(
     }));
     const preflightFailureResults = [...inlineSyntaxFailures, ...skipResults];
 
-    await mirrorSkippedResultsToTab(msg.tabId, preflightFailureResults);
+    await mirrorSkippedResultsToTab(injectRequest.tabId, preflightFailureResults);
 
     if (sorted.length === 0) {
         const totalMs = Math.round((performance.now() - pipelineStart) * 10) / 10;
         console.log("[injection] ── PIPELINE END (empty) ── total=%.1fms breakdown=%s",
             totalMs, JSON.stringify(timings));
-        void mirrorPipelineLogsToTab(msg.tabId, [
+        void mirrorPipelineLogsToTab(injectRequest.tabId, [
             { msg: `[Marco] ── INJECTION PIPELINE (empty) ── 0 scripts resolved, ${preflightFailureResults.length} skipped/failed, ${totalMs}ms`, level: "warn" },
             ...preflightFailureResults.map((r) => ({
                 msg: `[Marco]   ⏭ ${r.scriptName ?? r.scriptId} — ${r.errorMessage ?? r.skipReason ?? "skipped"}`,
@@ -259,14 +259,14 @@ export async function handleInjectScripts(
     const scriptInjectStart = performance.now();
     const nsInjectStart = performance.now();
     const [execResults] = await time("stage3_4_5_parallel", () => Promise.all([
-        injectAllScripts(msg.tabId, filteredPreparedScripts, launchSource, isForceRun).then(r => {
+        injectAllScripts(injectRequest.tabId, filteredPreparedScripts, launchSource, isForceRun).then(r => {
             timings["stage3_4_scripts"] = Math.round((performance.now() - scriptInjectStart) * 10) / 10;
             return r;
         }),
-        injectSettingsNamespace(msg.tabId, allProjects).then(() => {
+        injectSettingsNamespace(injectRequest.tabId, allProjects).then(() => {
             timings["stage5a_settings"] = Math.round((performance.now() - nsInjectStart) * 10) / 10;
         }),
-        injectProjectNamespaces(msg.tabId, allProjects).then(() => {
+        injectProjectNamespaces(injectRequest.tabId, allProjects).then(() => {
             timings["stage5b_namespaces"] = Math.round((performance.now() - nsInjectStart) * 10) / 10;
         }),
     ]));
@@ -294,7 +294,7 @@ export async function handleInjectScripts(
     const pipelineLines: PipelineLine[] = [
         // ── Stage Summary sub-group ──
         { msg: `📊 Stage Summary (${totalMs}ms)`, level: "__group__" },
-        { msg: `0/4 DEPS      ${scriptsWithDeps.length} scripts (${msg.scripts.length} raw + deps)`, level: "log" },
+        { msg: `0/4 DEPS      ${scriptsWithDeps.length} scripts (${injectRequest.scripts.length} raw + deps)`, level: "log" },
         { msg: `1/4 RESOLVE   ${sorted.length} resolved, ${preflightFailureResults.length} skipped/failed (${(timings["stage1_resolve"] ?? 0)}ms)`, level: "log" },
         { msg: `2/4 SEED      bootstrap+relay+token (${(timings["stage1_5_2a_2b_parallel"] ?? 0)}ms)`, level: "log" },
         { msg: `3/4 BATCH     ${sorted.length} scripts combined (${(timings["stage3_4_scripts"] ?? 0)}ms)`, level: "log" },
@@ -325,7 +325,7 @@ export async function handleInjectScripts(
 
     // Fire-and-forget: don't block pipeline on tab mirroring
     const groupIcon = failCount > 0 ? "❌" : "✅";
-    void mirrorPipelineLogsToTab(msg.tabId, pipelineLines, `${groupIcon} Marco Injection — ${successCount}/${execResults.length} scripts (${totalMs}ms)`);
+    void mirrorPipelineLogsToTab(injectRequest.tabId, pipelineLines, `${groupIcon} Marco Injection — ${successCount}/${execResults.length} scripts (${totalMs}ms)`);
 
     // Performance budget alert — configurable via Settings > Injection Budget
     let budgetMs = 500;
@@ -339,7 +339,7 @@ export async function handleInjectScripts(
             `PERFORMANCE BUDGET EXCEEDED — ${totalMs}ms (budget: ${budgetMs}ms) breakdown=${JSON.stringify(timings)}`,
         );
         void mirrorDiagnosticToTab(
-            msg.tabId,
+            injectRequest.tabId,
             `[Marco] ⚠️ PERFORMANCE BUDGET EXCEEDED — ${totalMs}ms (budget: ${budgetMs}ms)`,
             "warn",
         );
@@ -351,26 +351,26 @@ export async function handleInjectScripts(
     const lastSuccess = execResults.find((r) => r.isSuccess);
     const lastSuccessPath = lastSuccess?.injectionPath;
     const lastDomTarget = lastSuccess?.domTarget;
-    recordInjection(msg.tabId, sorted, lastSuccessPath, lastDomTarget, totalMs, budgetMs);
+    recordInjection(injectRequest.tabId, sorted, lastSuccessPath, lastDomTarget, totalMs, budgetMs);
 
     // ── Post-injection verification — confirm globals actually landed in MAIN world ──
     if (successCount > 0) {
-        void verifyPostInjectionGlobals(msg.tabId).catch((verifyErr) => {
-            logBgWarnError(BgLogTag.INJECTION, `verifyPostInjectionGlobals scheduling failed (tab ${msg.tabId}) — verification skipped, pipeline already succeeded`, verifyErr);
+        void verifyPostInjectionGlobals(injectRequest.tabId).catch((verifyErr) => {
+            logBgWarnError(BgLogTag.INJECTION, `verifyPostInjectionGlobals scheduling failed (tab ${injectRequest.tabId}) — verification skipped, pipeline already succeeded`, verifyErr);
         });
     }
 
     // ── Show injection toasts if enabled ──
     const toastEnabled = await isInjectionToastEnabled();
     if (toastEnabled && successCount > 0) {
-        void showInjectionToastInTab(msg.tabId, successCount, execResults.length, totalMs).catch((toastErr) => {
-            logBgWarnError(BgLogTag.INJECTION, `showInjectionToastInTab (success) failed (tab ${msg.tabId}) — UI cosmetic only`, toastErr);
+        void showInjectionToastInTab(injectRequest.tabId, successCount, execResults.length, totalMs).catch((toastErr) => {
+            logBgWarnError(BgLogTag.INJECTION, `showInjectionToastInTab (success) failed (tab ${injectRequest.tabId}) — UI cosmetic only`, toastErr);
         });
     }
     if (toastEnabled && failCount > 0) {
         const failedNames = execResults.filter(r => !r.isSuccess).map(r => r.scriptName ?? r.scriptId);
-        void showInjectionFailureToastInTab(msg.tabId, failedNames, failCount, execResults.length, totalMs).catch((toastErr) => {
-            logBgWarnError(BgLogTag.INJECTION, `showInjectionFailureToastInTab failed (tab ${msg.tabId}, ${failCount} failed scripts) — UI cosmetic only`, toastErr);
+        void showInjectionFailureToastInTab(injectRequest.tabId, failedNames, failCount, execResults.length, totalMs).catch((toastErr) => {
+            logBgWarnError(BgLogTag.INJECTION, `showInjectionFailureToastInTab failed (tab ${injectRequest.tabId}, ${failCount} failed scripts) — UI cosmetic only`, toastErr);
         });
     }
 
