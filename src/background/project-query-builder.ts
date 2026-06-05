@@ -77,13 +77,13 @@ function buildWhere(where?: WhereClause): { clause: string; params: SqlValue[] }
 
     for (const [col, whereValue] of Object.entries(where)) {
         if (typeof whereValue === 'object' && whereValue !== null && !(whereValue instanceof Uint8Array)) {
-            const obj = whereValue as Record<string, unknown>;
-            if ('ilike' in obj) {
+            const whereObject = whereValue as Record<string, unknown>;
+            if ('ilike' in whereObject) {
                 conditions.push(`"${col}" LIKE ? COLLATE NOCASE`);
-                params.push(obj.ilike as SqlValue);
-            } else if ('like' in obj) {
+                params.push(whereObject.ilike as SqlValue);
+            } else if ('like' in whereObject) {
                 conditions.push(`"${col}" LIKE ?`);
-                params.push(obj.like as SqlValue);
+                params.push(whereObject.like as SqlValue);
             } else {
                 conditions.push(`"${col}" = ?`);
                 params.push(whereValue as unknown as SqlValue);

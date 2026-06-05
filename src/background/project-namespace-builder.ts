@@ -100,20 +100,20 @@ function buildDocsObject(cn: string): string {
  * message-bridge communication.
  */
 // eslint-disable-next-line max-lines-per-function
-export function buildProjectNamespaceScript(ctx: NamespaceContext): string {
+export function buildProjectNamespaceScript(context: NamespaceContext): string {
     const safe = (v: string) =>
         v.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n");
 
-    const cn = safe(ctx.codeName);
-    const slug = safe(ctx.slug);
-    const name = safe(ctx.projectName);
-    const version = safe(ctx.projectVersion);
-    const pid = safe(ctx.projectId);
-    const description = safe(ctx.description ?? "");
+    const cn = safe(context.codeName);
+    const slug = safe(context.slug);
+    const name = safe(context.projectName);
+    const version = safe(context.projectVersion);
+    const pid = safe(context.projectId);
+    const description = safe(context.description ?? "");
 
     // Serialize scripts array as inline JSON
     const scriptsJson = JSON.stringify(
-        (ctx.scripts ?? []).map(s => ({
+        (context.scripts ?? []).map(s => ({
             name: s.name,
             order: s.order,
             isEnabled: s.isEnabled,
@@ -122,7 +122,7 @@ export function buildProjectNamespaceScript(ctx: NamespaceContext): string {
 
     // Serialize dependencies array as inline JSON
     const depsJson = JSON.stringify(
-        (ctx.dependencies ?? []).map(d => ({
+        (context.dependencies ?? []).map(d => ({
             projectId: d.projectId,
             version: d.version,
         })),
@@ -130,14 +130,14 @@ export function buildProjectNamespaceScript(ctx: NamespaceContext): string {
 
     // Serialize file cache as a frozen object { "filename": "content", ... }
     const fileCacheObj: Record<string, string> = {};
-    for (const f of ctx.fileCache ?? []) {
+    for (const f of context.fileCache ?? []) {
         fileCacheObj[f.name] = f.data;
     }
     const fileCacheJson = JSON.stringify(fileCacheObj);
 
     // Serialize cookie bindings for runtime role-based lookup
     const cookieBindingsJson = JSON.stringify(
-        (ctx.cookieBindings ?? []).map(b => ({
+        (context.cookieBindings ?? []).map(b => ({
             cookieName: b.cookieName,
             url: b.url,
             role: b.role,
@@ -290,7 +290,7 @@ console.log("[namespace] Registered RiseupAsiaMacroExt.Projects.${cn}");
        contract. Emits the exact missing sub-namespace list. */
     assertEmittedShape(
         iife,
-        `buildProjectNamespaceScript(codeName="${ctx.codeName}")`,
+        `buildProjectNamespaceScript(codeName="${context.codeName}")`,
     );
     /* Touch the imported keys list so tree-shaking keeps it for runtime
        diagnostics consumers that import it from this module. */
