@@ -190,49 +190,49 @@ function recordTrace(
     });
 }
 
-function applyMatcher(el: Element, m: Matcher): boolean {
-    switch (m.Kind) {
+function applyMatcher(element: Element, matcher: Matcher): boolean {
+    switch (matcher.Kind) {
         case "Exists":
             return true;
         case "Visible":
-            return isVisible(el);
+            return isVisible(element);
         case "TextEquals": {
-            const a = (el.textContent ?? "").trim();
-            const b = m.Value;
-            return m.CaseSensitive === false
-                ? a.toLowerCase() === b.toLowerCase()
-                : a === b;
+            const actualText = (element.textContent ?? "").trim();
+            const expectedText = matcher.Value;
+            return matcher.CaseSensitive === false
+                ? actualText.toLowerCase() === expectedText.toLowerCase()
+                : actualText === expectedText;
         }
         case "TextContains": {
-            const a = el.textContent ?? "";
-            const b = m.Value;
-            return m.CaseSensitive === false
-                ? a.toLowerCase().includes(b.toLowerCase())
-                : a.includes(b);
+            const actualText = element.textContent ?? "";
+            const expectedText = matcher.Value;
+            return matcher.CaseSensitive === false
+                ? actualText.toLowerCase().includes(expectedText.toLowerCase())
+                : actualText.includes(expectedText);
         }
         case "TextRegex": {
-            const re = new RegExp(m.Pattern, m.Flags ?? "");
-            return re.test(el.textContent ?? "");
+            const regex = new RegExp(matcher.Pattern, matcher.Flags ?? "");
+            return regex.test(element.textContent ?? "");
         }
         case "AttrEquals": {
-            const v = el.getAttribute(m.Name);
-            return v !== null && v === m.Value;
+            const value = element.getAttribute(matcher.Name);
+            return value !== null && value === matcher.Value;
         }
         case "AttrContains": {
-            const v = el.getAttribute(m.Name);
-            return v !== null && v.includes(m.Value);
+            const value = element.getAttribute(matcher.Name);
+            return value !== null && value.includes(matcher.Value);
         }
         case "Count":
             return false; // handled above
     }
 }
 
-function isVisible(el: Element): boolean {
-    const win = el.ownerDocument?.defaultView;
-    if (win === null || win === undefined) return false;
-    const rect = el.getBoundingClientRect();
+function isVisible(element: Element): boolean {
+    const windowObject = element.ownerDocument?.defaultView;
+    if (windowObject === null || windowObject === undefined) return false;
+    const rect = element.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) return false;
-    const styles = win.getComputedStyle(el);
+    const styles = windowObject.getComputedStyle(element);
     if (styles.display === "none") return false;
     if (styles.visibility === "hidden") return false;
     return true;
