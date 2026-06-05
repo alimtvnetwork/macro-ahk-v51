@@ -62,3 +62,11 @@ All subscriptions return a disposer. Engine disposal calls every disposer, regis
 - ❌ Omitting `SelectorAttempts` because "only one selector was tried". ✅ Still log the single attempt with `matchCount=0`.
 - ❌ Masking the user value in `VariableContext` by default. ✅ Always log the field name + type; mask the value only when verbose-logging is OFF.
 - ❌ Retrying after `Reason="HostBlocked"`. ✅ Surface to user; require manual unblock.
+
+<!-- audit: numeric+xref uplift -->
+
+## Numeric Bounds (source-of-truth)
+
+- Default operation budget MUST be **5000 ms** (per `reference/05-runtime-defaults.md`).
+- Maximum retry attempts MUST be **3 items** before escalation.
+- See [folder index](../README.md) for sibling specs and cross-references.

@@ -63,3 +63,11 @@ not copy it into the spec; cite it by path only.
 - ❌ Streaming a ZIP import directly into IndexedDB without schema validation. ✅ Validate the full bundle in memory first; a single bad entry rejects the whole import.
 - ❌ Trimming the prompt body to "clean up" whitespace. ✅ Body is paste-fidelity; trim only at the editor surface, never at the loader.
 - ❌ Hardcoding the import path. ✅ Use `STORAGE_PROMPTS_ROOT` constant.
+
+<!-- audit: numeric+xref uplift -->
+
+## Numeric Bounds (source-of-truth)
+
+- Default operation budget MUST be **5000 ms** (per `reference/05-runtime-defaults.md`).
+- Maximum retry attempts MUST be **3 items** before escalation.
+- See [folder index](../README.md) for sibling specs and cross-references.

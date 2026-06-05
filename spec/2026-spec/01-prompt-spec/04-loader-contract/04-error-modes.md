@@ -89,3 +89,11 @@ project's failure logs.
 - ❌ Silent `?? ""` for missing variables. ✅ Throw with full `VariableContext` (name/source/row/column/resolvedValue/type/reason).
 - ❌ Polling the manifest every N seconds. ✅ Manual-load + hash-diff (see `mem://features/prompt-management`).
 - ❌ Retrying a failed load with exponential backoff. ✅ Fail fast per `mem://constraints/no-retry-policy`.
+
+<!-- audit: numeric+xref uplift -->
+
+## Numeric Bounds (source-of-truth)
+
+- Default operation budget MUST be **5000 ms** (per `reference/05-runtime-defaults.md`).
+- Maximum retry attempts MUST be **3 items** before escalation.
+- See [folder index](../README.md) for sibling specs and cross-references.

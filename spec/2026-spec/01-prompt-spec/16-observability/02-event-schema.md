@@ -61,3 +61,11 @@ Sinks MUST NOT retry failed writes. A failed `emit` logs once via the namespace 
 - ❌ Sending events to a remote endpoint. ✅ Local-only — never `mem://constraints/no-ci-notifications`.
 - ❌ Hardcoded timestamp formatting. ✅ Store UTC ms; render with `Intl.DateTimeFormat().resolvedOptions().timeZone`.
 - ❌ Retrying failed metric writes. ✅ Drop on floor with a single `Logger.warn` (fail-fast).
+
+<!-- audit: numeric+xref uplift -->
+
+## Numeric Bounds (source-of-truth)
+
+- Default operation budget MUST be **5000 ms** (per `reference/05-runtime-defaults.md`).
+- Maximum retry attempts MUST be **3 items** before escalation.
+- See [folder index](../README.md) for sibling specs and cross-references.

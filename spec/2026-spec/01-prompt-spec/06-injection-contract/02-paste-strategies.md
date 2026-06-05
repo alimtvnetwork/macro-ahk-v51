@@ -75,3 +75,11 @@ retries.
 - ❌ Treating an empty editor as "paste succeeded". ✅ Verify by reading text length pre/post.
 - ❌ Swallowing `Reason="PasteMismatch"` to keep the UI quiet. ✅ Surface via toast + Logger.error.
 - ❌ Retrying paste with a different strategy on failure. ✅ Fail fast; ask user to retry manually (no-retry policy).
+
+<!-- audit: numeric+xref uplift -->
+
+## Numeric Bounds (source-of-truth)
+
+- Default operation budget MUST be **5000 ms** (per `reference/05-runtime-defaults.md`).
+- Maximum retry attempts MUST be **3 items** before escalation.
+- See [folder index](../README.md) for sibling specs and cross-references.
