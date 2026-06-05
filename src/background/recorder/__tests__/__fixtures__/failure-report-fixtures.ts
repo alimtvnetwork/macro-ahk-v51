@@ -238,14 +238,14 @@ export function fixtureReplayJsInlineThrew(): FixtureBundle {
     const err = new JsExecError(
         "InlineJs execution failed: TypeError: cannot read 'Email'",
     );
-    const ctx = {
+    const contextFixture = {
         Vars: { TenantId: "acme", AuthToken: "secret-abc" },
         Row: { Email: "alice@example.com" },
     };
     const base = {
         Body: "return Ctx.Row.Email.toUpperCase();",
         Error: err,
-        Context: ctx,
+        Context: contextFixture,
         LogLines: ["entered hot path"],
         StepId: 18,
         Index: 4,

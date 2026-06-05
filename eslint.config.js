@@ -121,9 +121,6 @@ export default tseslint.config(
   // graduate off this list as their authored-source debt is cleaned.
   {
     files: [
-      "src/background/recorder/__tests__/__fixtures__/failure-report-fixtures.ts",
-      "src/background/recorder/__tests__/condition-ac-19-2.test.ts",
-      "src/background/recorder/__tests__/condition-evaluator.test.ts",
       "src/background/recorder/__tests__/drift-element-diff.test.ts",
       "src/background/recorder/__tests__/failure-report-fixtures.test.ts",
       "src/background/recorder/__tests__/hover-highlighter.test.ts",

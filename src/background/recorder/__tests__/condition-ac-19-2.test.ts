@@ -39,17 +39,17 @@ describe("Spec 19 §2.4 — Appearance-Wait AC suite", () => {
         const sleep = vi.fn(async (ms: number) => {
             sleepCalls++;
             if (sleepCalls === 1) {
-                const el = document.createElement("div");
-                el.id = "target";
-                el.style.display = "block";
-                el.textContent = "Loaded";
+                const element = document.createElement("div");
+                element.id = "target";
+                element.style.display = "block";
+                element.textContent = "Loaded";
                 // jsdom returns zero-size rects by default; mock a visible box
                 // so the Visible matcher succeeds (spec 18 §2.1).
-                el.getBoundingClientRect = () => ({
+                element.getBoundingClientRect = () => ({
                     x: 0, y: 0, top: 0, left: 0, right: 100, bottom: 20,
                     width: 100, height: 20,
                 } as DOMRect);
-                document.body.appendChild(el);
+                document.body.appendChild(element);
             }
             await new Promise((r) => setTimeout(r, ms));
         });
