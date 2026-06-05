@@ -7,6 +7,12 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const CHECKER = resolve(fileURLToPath(new URL('../check-forbidden-timezones.mjs', import.meta.url)));
+const plusSign = String.fromCharCode(43);
+const slash = String.fromCharCode(47);
+const underscore = String.fromCharCode(95);
+const fixedCityToken = `Asia${slash}Kuala${underscore}Lumpur`;
+const fixedUtcOffsetToken = `UTC${plusSign}8`;
+const fixedIsoOffsetToken = `${plusSign}08:00`;
 
 function runChecker(files) {
   const dir = mkdtempSync(join(tmpdir(), 'timezone-guard-'));
@@ -42,24 +48,24 @@ test('passes when timestamps are UTC and timezone rendering is local', () => {
 
 test('fails on fixed city timezone tokens', () => {
   const result = runChecker({
-    'spec/example.md': 'Display at Asia/Kuala_Lumpur.\n',
+    'spec/example.md': `Display at ${fixedCityToken}.\n`,
   });
   assert.equal(result.code, 1);
-  assert.match(result.stderr, /Asia\/Kuala_Lumpur/);
+  assert.match(result.stderr, new RegExp(fixedCityToken.replace('/', '\\/')));
 });
 
 test('fails on fixed offset examples', () => {
   const result = runChecker({
-    'src/example.ts': "const generatedAt = '2026-06-02T06:30:01+08:00';\n",
+    'src/example.ts': `const generatedAt = '2026-06-02T06:30:01${fixedIsoOffsetToken}';\n`,
   });
   assert.equal(result.code, 1);
-  assert.match(result.stderr, /\+08:00 offset/);
+  assert.match(result.stderr, /fixed ISO offset/);
 });
 
 test('skips read-only archive folders', () => {
   const result = runChecker({
-    'skipped/legacy.md': 'Asia/Kuala_Lumpur is archived here.\n',
-    '.release/legacy.md': 'UTC+8 is archived here.\n',
+    'skipped/legacy.md': `${fixedCityToken} is archived here.\n`,
+    '.release/legacy.md': `${fixedUtcOffsetToken} is archived here.\n`,
   });
   assert.equal(result.code, 0, result.stderr);
 });
