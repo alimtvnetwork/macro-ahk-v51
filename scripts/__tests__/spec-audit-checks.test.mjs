@@ -12,6 +12,7 @@ const LINKS_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-dangling-links.mjs'
 const CONSTANT_DIVERGENCE_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-constant-divergence.mjs');
 const PITFALLS_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-pitfalls.mjs');
 const MEMORY_REFS_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-must-memory-refs.mjs');
+const CROSS_FOLDER_OWNERS_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-cross-folder-owners.mjs');
 const SCORE_FLOOR_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-score-floor.mjs');
 const NO_BARE_FETCH_SCRIPT = resolve(TEST_DIR, '..', 'lint', 'no-bare-fetch.mjs');
 const FOOTER_LINT_SCRIPT = resolve(TEST_DIR, '..', 'audit', 'check-footer-lint.mjs');
@@ -210,6 +211,30 @@ test('memory-refs checker ignores MUST words inside code fences', () => {
     writeFixture(rootPath, '01-demo/01-fenced.md', '# Fenced\n\n```\nlog: MUST retry\n```\n');
     const result = runScript(MEMORY_REFS_SCRIPT, rootPath);
     assert.equal(result.status, 0, result.stderr);
+  } finally {
+    rmSync(rootPath, { recursive: true, force: true });
+  }
+});
+
+test('cross-folder owners checker passes when owned topic cites mem owner', () => {
+  const rootPath = createRoot();
+  try {
+    writeFixture(rootPath, '01-demo/good.md', '# Good\n\nVerbose logging follows mem://standards/verbose-logging-and-failure-diagnostics.\n');
+    const result = runScript(CROSS_FOLDER_OWNERS_SCRIPT, rootPath);
+    assert.equal(result.status, 0, result.stderr);
+  } finally {
+    rmSync(rootPath, { recursive: true, force: true });
+  }
+});
+
+test('cross-folder owners checker fails when owned topic lacks mem owner', () => {
+  const rootPath = createRoot();
+  try {
+    writeFixture(rootPath, '01-demo/bad.md', '# Bad\n\nVerbose logging is required but no owner is linked.\n');
+    const result = runScript(CROSS_FOLDER_OWNERS_SCRIPT, rootPath);
+    assert.equal(result.status, 1);
+    assert.match(result.stderr, /CODE RED/);
+    assert.match(result.stderr, /owner mem:\/\/ link/);
   } finally {
     rmSync(rootPath, { recursive: true, force: true });
   }
