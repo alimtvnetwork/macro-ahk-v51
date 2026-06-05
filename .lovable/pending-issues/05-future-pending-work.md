@@ -11,17 +11,9 @@ _None — TS Migration V2 backlog cleared. See "Recently Completed" below._
 
 ## Deferred — Do NOT Pick Automatically
 
-Per `mem://preferences/deferred-workstreams` (2026-04-23):
+Per `mem://preferences/deferred-workstreams`, only the discuss-later marketplace workstream remains deferred. React component tests and manual Chrome E2E are allowed again as of 2026-05-25 and must not be treated as blockers.
 
-| # | Item | Reason |
-|---|------|--------|
-| D1 | React Component Tests (target 900+) | Deferred by user — skip in `next` rotation |
-| D2 | E2E Verification — React UI (Step 10) | Manual Chrome testing avoided |
-| D3 | Prompt Click E2E Verification (Issues 52/53) | Manual Chrome testing avoided |
-| D4 | P Store Marketplace (Issue 82) | Discuss-later mode |
-| D5 | Cross-Project Sync & Shared Library | Depends on D4 (P Store) |
-
-These items must NOT be surfaced as recommended next actions until the user explicitly reopens them.
+These deferred items must NOT be surfaced as recommended next actions until the user explicitly reopens them.
 
 ## Recently Completed (v2.225.0 — 2026-04-23)
 
