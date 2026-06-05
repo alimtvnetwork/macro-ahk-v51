@@ -13,7 +13,7 @@ This folder is written so a blind AI agent (no prior context) can read it top-to
    - **Code sample** — copy-pasteable TypeScript.
    - **Error model** — which error type, which logger tag, what the user sees.
    - **Acceptance** — testable conditions.
-3. The final step ([`step-40-acceptance-criteria.md`](./step-40-acceptance-criteria.md)) is a hand-off checklist.
+3. The final step ([`step-40-acceptance-criteria.md`](./40-acceptance-criteria.md)) is a hand-off checklist.
 
 ## Scope
 
@@ -33,4 +33,4 @@ This folder is written so a blind AI agent (no prior context) can read it top-to
 
 ## Versioning
 
-Edits to this spec must bump the version footer in [`step-40-acceptance-criteria.md`](./step-40-acceptance-criteria.md) and add a row to the change log in [`step-01-purpose-and-mindset.md`](./step-01-purpose-and-mindset.md).
+Edits to this spec must bump the version footer in [`step-40-acceptance-criteria.md`](./40-acceptance-criteria.md) and add a row to the change log in [`step-01-purpose-and-mindset.md`](./01-purpose-and-mindset.md).

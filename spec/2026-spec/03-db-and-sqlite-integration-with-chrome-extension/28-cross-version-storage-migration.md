@@ -130,8 +130,8 @@ RiseupAsiaMacroExt.Logger.error("Storage.Migration", "storage migration failed",
 
 ## Cross-references
 
-- [step-13](./step-13-migration-runner-pattern.md) — SQLite schema migration runner; do not merge it with storage migrations.
-- [step-24](./step-24-indexeddb-invalidation.md) — derived IndexedDB caches are cleared, not migrated.
-- [step-25](./step-25-chrome-storage-local-usage.md) — wrapper and camelCase preservation rules.
-- [step-26](./step-26-chrome-storage-local-quota.md) — disposable-key list.
+- [step-13](./13-migration-runner-pattern.md) — SQLite schema migration runner; do not merge it with storage migrations.
+- [step-24](./24-indexeddb-invalidation.md) — derived IndexedDB caches are cleared, not migrated.
+- [step-25](./25-chrome-storage-local-usage.md) — wrapper and camelCase preservation rules.
+- [step-26](./26-chrome-storage-local-quota.md) — disposable-key list.
 - Core memory: No Storage PascalCase Migration; no-retry policy; Code Red exact path logging.

@@ -153,8 +153,8 @@ Failure reports must include `requestId`, `messageType`, `projectId`, `Reason`, 
 
 ## Cross-references
 
-- [step-15](./step-15-bind-safety-entry-point-guards.md) — required field guards.
-- [step-16](./step-16-bind-safety-proxy-net.md) — last-resort BindError defense.
-- [step-27](./step-27-localstorage-usage.md) — auth reads remain behind `getBearerToken()`.
-- [step-29](./step-29-cross-context-access.md) — context boundary diagram.
+- [step-15](./15-bind-safety-entry-point-guards.md) — required field guards.
+- [step-16](./16-bind-safety-proxy-net.md) — last-resort BindError defense.
+- [step-27](./27-localstorage-usage.md) — auth reads remain behind `getBearerToken()`.
+- [step-29](./29-cross-context-access.md) — context boundary diagram.
 - Memory: SQLite bind safety layer and single-path auth contract.

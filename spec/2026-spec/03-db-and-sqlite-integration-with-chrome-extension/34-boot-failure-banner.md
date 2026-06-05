@@ -138,8 +138,8 @@ Boot state persistence failure must not hide the underlying boot failure. Log th
 
 ## Cross-references
 
-- [step-09](./step-09-initializing-sql-js.md) — wasm HEAD probe.
-- [step-17](./step-17-persistence-backends.md) — memory mode is a hard failure surface.
-- [step-32](./step-32-error-routing.md) — boot failures are routed and persisted.
-- [step-33](./step-33-errors-panel-ui-hookup.md) — full diagnostic row surface.
-- [step-36](./step-36-code-red-logging-rule.md) — Code Red fields.
+- [step-09](./09-initializing-sql-js.md) — wasm HEAD probe.
+- [step-17](./17-persistence-backends.md) — memory mode is a hard failure surface.
+- [step-32](./32-error-routing.md) — boot failures are routed and persisted.
+- [step-33](./33-errors-panel-ui-hookup.md) — full diagnostic row surface.
+- [step-36](./36-code-red-logging-rule.md) — Code Red fields.

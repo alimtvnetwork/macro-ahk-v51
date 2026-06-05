@@ -114,7 +114,7 @@ export async function flushAllProjectDbs(): Promise<void> {
 
 ## See also
 
-- [step-17](./step-17-persistence-backends.md) — Persistence backends waterfall
-- [step-26](./step-26-chrome-storage-local-quota.md) — Quota
-- [step-29](./step-29-cross-context-access.md) — `onSuspend` and cross-context drain
+- [step-17](./17-persistence-backends.md) — Persistence backends waterfall
+- [step-26](./26-chrome-storage-local-quota.md) — Quota
+- [step-29](./29-cross-context-access.md) — `onSuspend` and cross-context drain
 - Core: no-retry policy, Code-Red logging, namespaced logger

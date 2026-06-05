@@ -1,6 +1,6 @@
 # Step 04 — Choose a Tier Flowchart
 
-> Part of [`spec/2026-spec/03-db-and-sqlite-integration-with-chrome-extension/`](./README.md). Previous: [`step-03-quota-persistence-eviction.md`](./step-03-quota-persistence-eviction.md). Next: [`step-05-mv3-constraints.md`](./step-05-mv3-constraints.md).
+> Part of [`spec/2026-spec/03-db-and-sqlite-integration-with-chrome-extension/`](./README.md). Previous: [`step-03-quota-persistence-eviction.md`](./03-quota-persistence-eviction.md). Next: [`step-05-mv3-constraints.md`](./05-mv3-constraints.md).
 
 ## Goal
 
@@ -239,10 +239,10 @@ Every policy violation must include the exact file path and key/store name when 
 
 ## Cross-references
 
-- Previous: [`step-03-quota-persistence-eviction.md`](./step-03-quota-persistence-eviction.md)
-- Next: [`step-05-mv3-constraints.md`](./step-05-mv3-constraints.md)
-- Decision matrix: [`step-02-four-tier-storage-decision-matrix.md`](./step-02-four-tier-storage-decision-matrix.md)
-- IndexedDB selection: [`step-21-indexeddb-when-to-choose.md`](./step-21-indexeddb-when-to-choose.md)
-- `chrome.storage.local` usage: [`step-25-chrome-storage-local-usage.md`](./step-25-chrome-storage-local-usage.md)
-- `localStorage` usage: [`step-27-localstorage-usage.md`](./step-27-localstorage-usage.md)
-- CI gates: [`step-39-ci-gates.md`](./step-39-ci-gates.md)
+- Previous: [`step-03-quota-persistence-eviction.md`](./03-quota-persistence-eviction.md)
+- Next: [`step-05-mv3-constraints.md`](./05-mv3-constraints.md)
+- Decision matrix: [`step-02-four-tier-storage-decision-matrix.md`](./02-four-tier-storage-decision-matrix.md)
+- IndexedDB selection: [`step-21-indexeddb-when-to-choose.md`](./21-indexeddb-when-to-choose.md)
+- `chrome.storage.local` usage: [`step-25-chrome-storage-local-usage.md`](./25-chrome-storage-local-usage.md)
+- `localStorage` usage: [`step-27-localstorage-usage.md`](./27-localstorage-usage.md)
+- CI gates: [`step-39-ci-gates.md`](./39-ci-gates.md)

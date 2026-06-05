@@ -100,7 +100,7 @@ Every Code-Red log MUST include `Path:`, `Missing:`, `Reason:` lines per the fil
 
 ## See also
 
-- [step-10](./step-10-extensiondb-lifecycle.md) — ExtensionDb lifecycle
-- [step-18](./step-18-flush-strategy.md) — Flush strategy (debounce + dirty tracking)
-- [step-26](./step-26-chrome-storage-local-quota.md) — Quota handling
-- [step-34](./step-34-boot-failure-banner.md) — BootFailureBanner
+- [step-10](./10-extensiondb-lifecycle.md) — ExtensionDb lifecycle
+- [step-18](./18-flush-strategy.md) — Flush strategy (debounce + dirty tracking)
+- [step-26](./26-chrome-storage-local-quota.md) — Quota handling
+- [step-34](./34-boot-failure-banner.md) — BootFailureBanner

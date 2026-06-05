@@ -149,8 +149,8 @@ Every failure includes exact path, e.g. `OPFS:session-logs/session-{id}/errors.l
 
 ## Cross-references
 
-- [step-17](./step-17-persistence-backends.md) — DB persistence waterfall.
-- [step-18](./step-18-flush-strategy.md) — dirty flush and export drain.
-- [step-31](./step-31-error-model.md) — normalized diagnostic fields.
-- [step-33](./step-33-errors-panel-ui-hookup.md) — UI consumes `Errors` rows.
+- [step-17](./17-persistence-backends.md) — DB persistence waterfall.
+- [step-18](./18-flush-strategy.md) — dirty flush and export drain.
+- [step-31](./31-error-model.md) — normalized diagnostic fields.
+- [step-33](./33-errors-panel-ui-hookup.md) — UI consumes `Errors` rows.
 - Memory: Session logging system; verbose logging gate; failure logs mandatory shape.

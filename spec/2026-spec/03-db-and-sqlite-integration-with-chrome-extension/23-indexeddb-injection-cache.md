@@ -184,7 +184,7 @@ No cache operation may hide an injection failure. Cache failures degrade to a fe
 
 ## See also
 
-- [step-21](./step-21-indexeddb-when-to-choose.md) — Why script bytes belong in IDB
-- [step-22](./step-22-indexeddb-wrapper-pattern.md) — Required wrapper
-- [step-24](./step-24-indexeddb-invalidation.md) — Purge triggers and manual clear
-- [step-30](./step-30-sdk-content-script-contract.md) — Content-script execution contract
+- [step-21](./21-indexeddb-when-to-choose.md) — Why script bytes belong in IDB
+- [step-22](./22-indexeddb-wrapper-pattern.md) — Required wrapper
+- [step-24](./24-indexeddb-invalidation.md) — Purge triggers and manual clear
+- [step-30](./30-sdk-content-script-contract.md) — Content-script execution contract

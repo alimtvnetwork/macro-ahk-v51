@@ -132,8 +132,8 @@ Failure logs MUST include `Reason` and `ReasonDetail`; if the key name is sensit
 
 ## Cross-references
 
-- [step-02](./step-02-four-tier-storage-decision-matrix.md) — storage tier boundaries.
-- [step-25](./step-25-chrome-storage-local-usage.md) — extension-wide small JSON belongs in `chrome.storage.local`.
-- [step-28](./step-28-cross-version-storage-migration.md) — migrations must not rewrite page-origin localStorage.
-- [step-30](./step-30-sdk-content-script-contract.md) — MAIN-world bridge owns page-context access.
+- [step-02](./02-four-tier-storage-decision-matrix.md) — storage tier boundaries.
+- [step-25](./25-chrome-storage-local-usage.md) — extension-wide small JSON belongs in `chrome.storage.local`.
+- [step-28](./28-cross-version-storage-migration.md) — migrations must not rewrite page-origin localStorage.
+- [step-30](./30-sdk-content-script-contract.md) — MAIN-world bridge owns page-context access.
 - Core memory: No Supabase, single-path `getBearerToken()`, no Storage PascalCase migration.

@@ -24,7 +24,7 @@ This spec encodes the **defaults that prevent each failure**, with a copy-pastea
 |---|---|
 | New AI agent (no repo context) | Read `README.md`, then `01-forty-planning-steps.md`, then each `step-NN-*.md` in order. Stop and implement when the agent has enough to write the storage layer. |
 | Human reviewer | Use the **Acceptance** block at the bottom of each step file as a PR checklist. |
-| Maintainer of this spec | Update the change log below on every edit. Bump the version in [`step-40-acceptance-criteria.md`](./step-40-acceptance-criteria.md). |
+| Maintainer of this spec | Update the change log below on every edit. Bump the version in [`step-40-acceptance-criteria.md`](./40-acceptance-criteria.md). |
 
 ## The "hand to any AI" mindset — rules
 
@@ -58,5 +58,5 @@ This spec encodes the **defaults that prevent each failure**, with a copy-pastea
 
 ## Cross-references
 
-- Next: [`step-02-four-tier-storage-decision-matrix.md`](./step-02-four-tier-storage-decision-matrix.md)
-- Hand-off checklist: [`step-40-acceptance-criteria.md`](./step-40-acceptance-criteria.md)
+- Next: [`step-02-four-tier-storage-decision-matrix.md`](./02-four-tier-storage-decision-matrix.md)
+- Hand-off checklist: [`step-40-acceptance-criteria.md`](./40-acceptance-criteria.md)

@@ -88,7 +88,7 @@ All hard failures MUST include `Path`, `Missing`, `Reason`, and `ReasonDetail` p
 
 ## See also
 
-- [step-02](./step-02-four-tier-storage-decision-matrix.md) — Master four-tier matrix
-- [step-22](./step-22-indexeddb-wrapper-pattern.md) — Wrapper implementation
-- [step-23](./step-23-indexeddb-injection-cache.md) — Canonical IDB consumer
-- [step-25](./step-25-chrome-storage-local-usage.md) — When `chrome.storage.local` wins instead
+- [step-02](./02-four-tier-storage-decision-matrix.md) — Master four-tier matrix
+- [step-22](./22-indexeddb-wrapper-pattern.md) — Wrapper implementation
+- [step-23](./23-indexeddb-injection-cache.md) — Canonical IDB consumer
+- [step-25](./25-chrome-storage-local-usage.md) — When `chrome.storage.local` wins instead
