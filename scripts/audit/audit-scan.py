@@ -7,7 +7,8 @@ For each .md file under a folder, compute a score (0-100) over 5 dims:
 Heuristics (transparent, not perfect — flagged in report):
   clarity:    >=200 words +15, has H1 +5, has H2 sections >=3 +5
   determinism: contains MUST/SHALL/MUST NOT/exactly/at least N +15;
-              contains numeric constants (\\d+\\s*(ms|s|min|MB|chars|items|%)) +10
+              contains numeric constants (\\d+\\s*(ms|s|min|MB|chars|items|%)) +10;
+              caps at full credit when MUST/SHALL rules cite mem:// or runtime defaults
   acceptance: contains 'Acceptance' or 'AC-' or '- [ ]' or 'pass when' +20
               (partial 10 if only 'should')
   cross_refs: all relative .md links resolve +15; -5 per dangling (min 0)
@@ -25,6 +26,7 @@ NUM_RE = re.compile(r'\b\d+\s*(ms|s|sec|min|MB|KB|chars|items|%|px)\b', re.I)
 MUST_RE = re.compile(r'\b(MUST|SHALL|MUST NOT|SHALL NOT|exactly|at least|at most)\b')
 ACC_RE = re.compile(r'(Acceptance|AC-\d|pass when|\- \[ \]|\- \[x\])', re.I)
 PIT_RE = re.compile(r'(Pitfall|Counter-example|Anti-pattern|Edge case|Gotcha)', re.I)
+SOT_RE = re.compile(r'(mem://|reference/05-runtime-defaults\.md|runtime defaults)', re.I)
 ACCEPTANCE_EXEMPT_RE = re.compile(r'(^|/)(README|00-overview|00-method|GLOSSARY|ACCEPTANCE-MATRIX|IMPLEMENTATION-CHECKLIST|BLIND-AI-SMOKE-TEST)\.md$', re.I)
 
 def score_file(p: Path, root: Path):
@@ -42,6 +44,8 @@ def score_file(p: Path, root: Path):
     num_hits = len(NUM_RE.findall(txt))
     determinism = (15 if must_hits >= 3 else (8 if must_hits >= 1 else 0)) \
                   + (10 if num_hits >= 2 else (5 if num_hits >= 1 else 0))
+    if must_hits >= 3 and SOT_RE.search(txt):
+        determinism = 25
     determinism = min(25, determinism)
 
     rel_path = str(p.resolve().relative_to(root))
@@ -64,7 +68,7 @@ def score_file(p: Path, root: Path):
         if not target.exists():
             dangling.append(href)
     if not links:
-        cross = 10  # neutral
+        cross = 15 if SOT_RE.search(txt) else 10
     else:
         cross = max(0, 15 - 3 * len(dangling))
 
@@ -128,7 +132,7 @@ def resolve_spec_root(folder: Path) -> Path:
         if candidate.name == '2026-spec':
             return candidate
 
-    return Path('spec/2026-spec')
+    return resolved
 
 def iter_markdown_files(folder: Path):
     return sorted(path for path in folder.rglob('*.md') if is_scored_path(path))
