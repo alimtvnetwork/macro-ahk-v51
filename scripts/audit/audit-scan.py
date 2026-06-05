@@ -19,6 +19,8 @@ import re, sys, json, os
 from pathlib import Path
 
 LINK_RE = re.compile(r'\[[^\]]+\]\(([^)\s#]+)(?:#[^)]*)?\)')
+FENCE_RE = re.compile(r'```[\s\S]*?```')
+INLINE_CODE_RE = re.compile(r'`[^`\n]*`')
 NUM_RE = re.compile(r'\b\d+\s*(ms|s|sec|min|MB|KB|chars|items|%|px)\b', re.I)
 MUST_RE = re.compile(r'\b(MUST|SHALL|MUST NOT|SHALL NOT|exactly|at least|at most)\b')
 ACC_RE = re.compile(r'(Acceptance|AC-\d|pass when|\- \[ \]|\- \[x\])', re.I)
@@ -26,6 +28,7 @@ PIT_RE = re.compile(r'(Pitfall|Counter-example|Anti-pattern|Edge case|Gotcha)', 
 
 def score_file(p: Path, root: Path):
     txt = p.read_text(encoding='utf-8', errors='replace')
+    scan_txt = strip_code(txt)
     words = len(txt.split())
     h1 = bool(re.search(r'^# ', txt, re.M))
     h2_count = len(re.findall(r'^## ', txt, re.M))
@@ -48,10 +51,10 @@ def score_file(p: Path, root: Path):
         acceptance = 0
 
     # cross-refs
-    links = LINK_RE.findall(txt)
+    links = LINK_RE.findall(scan_txt)
     dangling = []
     for href in links:
-        if href.startswith(('http://', 'https://', 'mailto:')):
+        if href.startswith(('http://', 'https://', 'mailto:', 'mem://', '#')):
             continue
         target = (p.parent / href).resolve()
         if not target.exists():
@@ -88,6 +91,10 @@ def score_file(p: Path, root: Path):
         'dangling': dangling,
         'top_blocker': '; '.join(top_blocker) or 'OK',
     }
+
+def strip_code(txt: str) -> str:
+    without_fences = FENCE_RE.sub('', txt)
+    return INLINE_CODE_RE.sub('', without_fences)
 
 def main():
     folder = Path(sys.argv[1])
