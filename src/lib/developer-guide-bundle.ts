@@ -55,9 +55,9 @@ function buildHeader(options: ExportOptions): string {
   }
 
   if (options.projectContext) {
-    const ctx = options.projectContext;
-    lines.push(`> Project: ${ctx.name} (${ctx.slug}) v${ctx.version}`);
-    lines.push(`> SDK Namespace: \`RiseupAsiaMacroExt.Projects.${ctx.codeName}\``);
+    const projectInfo = options.projectContext;
+    lines.push(`> Project: ${projectInfo.name} (${projectInfo.slug}) v${projectInfo.version}`);
+    lines.push(`> SDK Namespace: \`RiseupAsiaMacroExt.Projects.${projectInfo.codeName}\``);
   }
 
   lines.push("", "---", "", "");
