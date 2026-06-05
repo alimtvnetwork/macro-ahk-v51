@@ -1,10 +1,10 @@
 #!/usr/bin/env node
-// Blind-AI smoke rescore — verifies every Q in BLIND-AI-SMOKE-TEST.md has a
+// Blind-AI smoke rescore — verifies every Q in blind-ai-smoke-test.md has a
 // resolvable spec/... or mem://... reference. Fail if score < 20/20.
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-const FILE = 'spec/21-app/05-prompts/BLIND-AI-SMOKE-TEST.md';
+const FILE = 'spec/21-app/05-prompts/blind-ai-smoke-test.md';
 const MEM_ROOT = '.lovable/memory';
 
 if (!existsSync(FILE)) {
