@@ -93,17 +93,17 @@ export async function handleGetRunStats(): Promise<RunStatsResponse> {
     const metrics = await loadMetrics();
 
     const totalCycles = metrics.length;
-    const successCount = metrics.filter(m => m.status === "success").length;
-    const errorCount = metrics.filter(m => m.status === "error").length;
-    const skippedCount = metrics.filter(m => m.status === "skipped").length;
+    const successCount = metrics.filter(entry => entry.status === "success").length;
+    const errorCount = metrics.filter(entry => entry.status === "error").length;
+    const skippedCount = metrics.filter(entry => entry.status === "skipped").length;
     const successRate = totalCycles > 0 ? Math.round((successCount / totalCycles) * 1000) / 10 : 0;
 
-    const durations = metrics.filter(m => m.durationMs > 0).map(m => m.durationMs);
+    const durations = metrics.filter(entry => entry.durationMs > 0).map(entry => entry.durationMs);
     const avgDurationMs = durations.length > 0
         ? Math.round(durations.reduce((a, b) => a + b, 0) / durations.length)
         : 0;
 
-    const errorMetrics = metrics.filter(m => m.status === "error");
+    const errorMetrics = metrics.filter(entry => entry.status === "error");
     const lastErrorMessage = errorMetrics.length > 0
         ? errorMetrics[errorMetrics.length - 1].errorMessage ?? null
         : null;
