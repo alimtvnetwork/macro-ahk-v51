@@ -1,0 +1,17 @@
+{
+  "version": "3.54.0",
+  "branch": "release/v3.54.0",
+  "sourceBranch": "main",
+  "commit": "d6698f882e9db659e04f69b661828c2ad557caa2",
+  "tag": "v3.54.0",
+  "assets": [],
+  "changelog": [
+    "Version bump: 3.53.0 → 3.54.0 across manifest, `src/shared/constants.ts`, `version.json`, and all standalone-script `instruction.ts` / `shared-state.ts` files.",
+    "Pinned root `readme.md` install snippets and \"Pinned version\" callouts to `v3.54.0`.",
+    "**E2E-24 cross-project-sync**: Scoped `getByText('Alpha Automation')` to the `project-group-member-${PROJECT_ALPHA_ID}` test-id container to avoid strict-mode collision with the post-drag toast."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-06-05T19:19:03Z",
+  "isLatest": false
+}
