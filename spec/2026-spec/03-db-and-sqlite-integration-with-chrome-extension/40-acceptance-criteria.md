@@ -135,6 +135,7 @@ Acceptance failures must be logged with exact path, missing item, reason, and re
 - [step-37](./37-strictly-avoid.md) — no-go patterns.
 - [step-38](./38-testing.md) — required tests.
 - [step-39](./39-ci-gates.md) — required CI gates.
+- [verbose logging owner](mem://standards/verbose-logging-and-failure-diagnostics) — authoritative diagnostic payload rule.
 
 ## Acceptance
 
