@@ -84,25 +84,26 @@ function scanFile(filePath, canonicalSotPath, defaults, strictMode) {
   }
 
   const fileText = readFileSync(filePath, 'utf8');
+  const hasFileBinding = hasFileLevelSotBinding(fileText, defaults.constants);
   // File-level binding: if the file as a whole cites the SOT (link or
   // mem:// rule) OR names any canonical constant, every operational
   // number in that file is considered bound. This avoids per-line noise
   // while still flagging files that never reference the SOT.
-  if (hasFileLevelSotBinding(fileText, defaults.constants) && !strictMode) {
+  if (hasFileBinding && !strictMode) {
     return [];
   }
 
   return fileText.split(/\r?\n/).flatMap((line, index) => {
-    return scanLine(filePath, line, index + 1, defaults);
+    return scanLine(filePath, line, index + 1, defaults, hasFileBinding);
   });
 }
 
-function scanLine(filePath, lineText, lineNumber, defaults) {
+function scanLine(filePath, lineText, lineNumber, defaults, hasFileBinding) {
   if (!isOperationalConstantLine(lineText)) {
     return [];
   }
 
-  if (hasSourceOfTruthBinding(lineText, defaults)) {
+  if (hasSourceOfTruthBinding(lineText, defaults, hasFileBinding)) {
     return [];
   }
 
@@ -127,10 +128,19 @@ function isOperationalConstantLine(lineText) {
   return (hasUnitConstant && hasOperationalKeyword) || KEYWORD_RANGE_RE.test(text) || IDENTIFIER_CONSTANT_RE.test(text);
 }
 
-function hasSourceOfTruthBinding(lineText, defaults) {
+function hasSourceOfTruthBinding(lineText, defaults, hasFileBinding) {
   return lineText.includes(SOT_LINK_TEXT) || lineText.includes('mem://') || defaults.constants.some((constantName) => {
     return lineText.includes(constantName);
-  });
+  }) || hasRuntimeNumberBinding(lineText, defaults.numbers, hasFileBinding);
+}
+
+function hasRuntimeNumberBinding(lineText, runtimeNumbers, hasFileBinding) {
+  if (!hasFileBinding) {
+    return false;
+  }
+
+  const lineNumbers = extractLineNumbers(lineText);
+  return lineNumbers.length > 0 && lineNumbers.every((value) => runtimeNumbers.has(value));
 }
 
 function extractRuntimeNumbers(text) {
