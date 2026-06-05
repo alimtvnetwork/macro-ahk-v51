@@ -232,9 +232,9 @@ export async function handleInjectScripts(
         console.log("[injection] ── PIPELINE END (empty) ── total=%.1fms breakdown=%s",
             totalMs, JSON.stringify(timings));
         void mirrorPipelineLogsToTab(injectRequest.tabId, [
-            { msg: `[Marco] ── INJECTION PIPELINE (empty) ── 0 scripts resolved, ${preflightFailureResults.length} skipped/failed, ${totalMs}ms`, level: "warn" },
+            { "msg": `[Marco] ── INJECTION PIPELINE (empty) ── 0 scripts resolved, ${preflightFailureResults.length} skipped/failed, ${totalMs}ms`, level: "warn" },
             ...preflightFailureResults.map((r) => ({
-                msg: `[Marco]   ⏭ ${r.scriptName ?? r.scriptId} — ${r.errorMessage ?? r.skipReason ?? "skipped"}`,
+                "msg": `[Marco]   ⏭ ${r.scriptName ?? r.scriptId} — ${r.errorMessage ?? r.skipReason ?? "skipped"}`,
                 level: "warn" as const,
             })),
         ], `⚠️ Marco Injection — 0 scripts (${totalMs}ms)`);
@@ -290,20 +290,20 @@ export async function handleInjectScripts(
     );
 
     // ── Mirror full pipeline summary to tab console (visible in DevTools) ──
-    type PipelineLine = { msg: string; level: "log" | "warn" | "error" | "__group__" | "__groupEnd__" };
+    type PipelineLine = { "msg": string; level: "log" | "warn" | "error" | "__group__" | "__groupEnd__" };
     const pipelineLines: PipelineLine[] = [
         // ── Stage Summary sub-group ──
-        { msg: `📊 Stage Summary (${totalMs}ms)`, level: "__group__" },
-        { msg: `0/4 DEPS      ${scriptsWithDeps.length} scripts (${injectRequest.scripts.length} raw + deps)`, level: "log" },
-        { msg: `1/4 RESOLVE   ${sorted.length} resolved, ${preflightFailureResults.length} skipped/failed (${(timings["stage1_resolve"] ?? 0)}ms)`, level: "log" },
-        { msg: `2/4 SEED      bootstrap+relay+token (${(timings["stage1_5_2a_2b_parallel"] ?? 0)}ms)`, level: "log" },
-        { msg: `3/4 BATCH     ${sorted.length} scripts combined (${(timings["stage3_4_scripts"] ?? 0)}ms)`, level: "log" },
-        { msg: `4/4 EXECUTE   ✅ ${successCount} succeeded, ${failCount} failed, ${preflightFailureResults.length} skipped/failed`, level: successCount > 0 ? "log" : "warn" },
-        { msg: `TOTAL ${totalMs}ms — scripts:${(timings["stage3_4_scripts"] ?? 0)}ms | ns:${(timings["stage5a_settings"] ?? 0)}ms+${(timings["stage5b_namespaces"] ?? 0)}ms`, level: "log" },
-        { msg: "", level: "__groupEnd__" },
+        { "msg": `📊 Stage Summary (${totalMs}ms)`, level: "__group__" },
+        { "msg": `0/4 DEPS      ${scriptsWithDeps.length} scripts (${injectRequest.scripts.length} raw + deps)`, level: "log" },
+        { "msg": `1/4 RESOLVE   ${sorted.length} resolved, ${preflightFailureResults.length} skipped/failed (${(timings["stage1_resolve"] ?? 0)}ms)`, level: "log" },
+        { "msg": `2/4 SEED      bootstrap+relay+token (${(timings["stage1_5_2a_2b_parallel"] ?? 0)}ms)`, level: "log" },
+        { "msg": `3/4 BATCH     ${sorted.length} scripts combined (${(timings["stage3_4_scripts"] ?? 0)}ms)`, level: "log" },
+        { "msg": `4/4 EXECUTE   ✅ ${successCount} succeeded, ${failCount} failed, ${preflightFailureResults.length} skipped/failed`, level: successCount > 0 ? "log" : "warn" },
+        { "msg": `TOTAL ${totalMs}ms — scripts:${(timings["stage3_4_scripts"] ?? 0)}ms | ns:${(timings["stage5a_settings"] ?? 0)}ms+${(timings["stage5b_namespaces"] ?? 0)}ms`, level: "log" },
+        { "msg": "", level: "__groupEnd__" },
 
         // ── Per-Script Results sub-group ──
-        { msg: `📜 Per-Script Results (${execResults.length + preflightFailureResults.length})`, level: "__group__" },
+        { "msg": `📜 Per-Script Results (${execResults.length + preflightFailureResults.length})`, level: "__group__" },
     ];
 
     for (const r of execResults) {
