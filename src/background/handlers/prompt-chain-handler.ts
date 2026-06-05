@@ -72,8 +72,8 @@ export async function handleGetPromptChains(): Promise<{ chains: PromptChain[] }
     return { chains: await loadChains() };
 }
 
-export async function handleSavePromptChain(msg: MessageRequest): Promise<{ isOk: true; chain: PromptChain }> {
-    const { chain } = msg as SaveChainMessage;
+export async function handleSavePromptChain(payload: MessageRequest): Promise<{ isOk: true; chain: PromptChain }> {
+    const { chain } = payload as SaveChainMessage;
     const chains = await loadChains();
     const idx = chains.findIndex((c) => c.id === chain.id);
     if (idx >= 0) {
@@ -85,8 +85,8 @@ export async function handleSavePromptChain(msg: MessageRequest): Promise<{ isOk
     return { isOk: true, chain };
 }
 
-export async function handleDeletePromptChain(msg: MessageRequest): Promise<{ isOk: true }> {
-    const { chainId } = msg as DeleteChainMessage;
+export async function handleDeletePromptChain(payload: MessageRequest): Promise<{ isOk: true }> {
+    const { chainId } = payload as DeleteChainMessage;
     const chains = await loadChains();
     await saveChains(chains.filter((c) => c.id !== chainId));
     return { isOk: true };
@@ -159,8 +159,8 @@ async function clearPendingArg(correlationId: string): Promise<void> {
 
 function isPromptResultMessage(value: unknown, correlationId: string): value is PromptInjectResultMessage {
     if (!value || typeof value !== "object") return false;
-    const msg = value as Record<string, unknown>;
-    return msg.type === PROMPT_INJECT_RESULT && msg.correlationId === correlationId;
+    const messageRecord = value as Record<string, unknown>;
+    return messageRecord.type === PROMPT_INJECT_RESULT && messageRecord.correlationId === correlationId;
 }
 
 /**
@@ -185,8 +185,8 @@ function awaitInjectResult(correlationId: string): Promise<PromptInjectResultMes
     });
 }
 
-export async function handleExecuteChainStep(msg: MessageRequest): Promise<{ isOk: true }> {
-    const step = msg as ExecuteChainStepMessage;
+export async function handleExecuteChainStep(payload: MessageRequest): Promise<{ isOk: true }> {
+    const step = payload as ExecuteChainStepMessage;
 
     // Apply template variable substitution (e.g. {{date}}, {{workspace}})
     const resolvedText = await applyTemplateVariables(step.promptText);

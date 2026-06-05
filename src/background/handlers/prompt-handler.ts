@@ -474,10 +474,10 @@ export async function handleGetPrompts(): Promise<{ prompts: PromptEntry[] }> {
 }
 
 // eslint-disable-next-line max-lines-per-function, sonarjs/cognitive-complexity
-export async function handleSavePrompt(msg: { prompt: Partial<PromptEntry> }): Promise<{ isOk: true; prompt: PromptEntry }> {
+export async function handleSavePrompt(payload: { prompt: Partial<PromptEntry> }): Promise<{ isOk: true; prompt: PromptEntry }> {
     await migrateFromStorageIfNeeded();
 
-    const input = msg;
+    const input = payload;
     const now = new Date().toISOString();
     const db = getDb();
 
@@ -545,10 +545,10 @@ export async function handleSavePrompt(msg: { prompt: Partial<PromptEntry> }): P
     return { isOk: true, prompt: rowToPrompt(row) };
 }
 
-export async function handleDeletePrompt(msg: { promptId: string }): Promise<{ isOk: true } | HandlerErrorResponse> {
+export async function handleDeletePrompt(payload: { promptId: string }): Promise<{ isOk: true } | HandlerErrorResponse> {
     await migrateFromStorageIfNeeded();
 
-    const promptIdStr = requireField(msg?.promptId);
+    const promptIdStr = requireField(payload?.promptId);
     if (promptIdStr === null) return missingFieldError("promptId", "DELETE_PROMPT");
 
     const numId = Number(promptIdStr);
@@ -562,10 +562,10 @@ export async function handleDeletePrompt(msg: { promptId: string }): Promise<{ i
     return { isOk: true };
 }
 
-export async function handleReorderPrompts(msg: { promptIds: string[] }): Promise<{ isOk: true } | HandlerErrorResponse> {
+export async function handleReorderPrompts(payload: { promptIds: string[] }): Promise<{ isOk: true } | HandlerErrorResponse> {
     await migrateFromStorageIfNeeded();
 
-    const promptIds = Array.isArray(msg?.promptIds) ? msg.promptIds : null;
+    const promptIds = Array.isArray(payload?.promptIds) ? payload.promptIds : null;
     if (promptIds === null) return missingFieldError("promptIds (array)", "REORDER_PROMPTS");
 
     const db = getDb();
