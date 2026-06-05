@@ -197,9 +197,9 @@ describe("executeReplay — persisted per-step wait bridge", () => {
         // proves that the executor actually polled, not just lucked out.
         btn.addEventListener("click", () => {
             queueMicrotask(() => {
-                const el = document.createElement("div");
-                el.id = "after";
-                document.body.appendChild(el);
+                const element = document.createElement("div");
+                element.id = "after";
+                document.body.appendChild(element);
             });
         });
 
