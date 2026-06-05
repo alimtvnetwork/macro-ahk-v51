@@ -112,8 +112,8 @@ export function buildJsStepVariableContext(
     const varKeys = Object.keys(ctx.Vars).sort();
     for (const key of varKeys) {
         const raw = ctx.Vars[key];
-        const sensitive = SENSITIVE_KEY_PATTERN.test(key);
-        const display = sensitive ? MASKED : classifyValue(raw).Display;
+        const sensitive = isSensitiveDiagnosticName(key);
+        const display = sensitive ? maskDiagnosticValue(raw) : classifyValue(raw).Display;
         out.push({
             Name: key,
             Source: "Vars",
@@ -130,8 +130,8 @@ export function buildJsStepVariableContext(
         const rowKeys = Object.keys(ctx.Row).sort();
         for (const key of rowKeys) {
             const raw = ctx.Row[key];
-            const sensitive = SENSITIVE_KEY_PATTERN.test(key);
-            const display = sensitive ? MASKED : classifyValue(raw).Display;
+            const sensitive = isSensitiveDiagnosticName(key);
+            const display = sensitive ? maskDiagnosticValue(raw) : classifyValue(raw).Display;
             out.push({
                 Name: key,
                 Source: "Row",
