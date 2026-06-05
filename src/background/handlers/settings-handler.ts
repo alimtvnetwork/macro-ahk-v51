@@ -154,8 +154,8 @@ export async function handleGetPromptVariables(): Promise<{ variables: Record<st
 export async function handleSavePromptVariables(
     message: MessageRequest,
 ): Promise<OkResponse> {
-    const msg = message as MessageRequest & { variables: Record<string, string> };
-    await chrome.storage.local.set({ [VARIABLES_KEY]: msg.variables });
+    const payload = message as MessageRequest & { variables: Record<string, string> };
+    await chrome.storage.local.set({ [VARIABLES_KEY]: payload.variables });
     return { isOk: true };
 }
 
