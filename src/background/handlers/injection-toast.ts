@@ -102,6 +102,7 @@ export async function showInjectionToastInTab(
 
                 let dismissTimer: ReturnType<typeof setTimeout> | null = null;
                 let removeTimer: ReturnType<typeof setTimeout> | null = null;
+                // eslint-disable-next-line sonarjs/no-identical-functions
                 const cleanup = () => {
                     if (loaderTimer !== null) { clearTimeout(loaderTimer); loaderTimer = null; }
                     if (dismissTimer !== null) { clearTimeout(dismissTimer); dismissTimer = null; }
