@@ -59,6 +59,8 @@ import type { TaskNextDeps } from './task-next-ui';
 import { logError } from '../error-utils';
 import { showToast } from '../toast';
 import { batchRefreshProOneCreditBalances } from '../credit-balance/batch-refresh';
+import { requestCredits, hasInlineCredits } from '../credit-balance-update/credit-fetch-controller';
+import { mapPlanFromWire, shouldFetchCreditBalanceForPlan } from '../credit-balance-update/plan-mapper';
 import { CssFragment } from '../types';
 // ============================================
 
