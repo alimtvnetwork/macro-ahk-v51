@@ -65,6 +65,15 @@ function buildCsvRow(
   const daysSinceChange = ws.subscriptionStatusChangedAt ? daysBetween(ws.subscriptionStatusChangedAt) : '';
   const refillIso = ws.nextRefillAt || ws.billingPeriodEndAt || '';
   const dToRefill = refillIso ? daysUntil(refillIso) : -1;
+  // RCA 2026-06-06: Credits in CSV must reflect resolver state — Pending /
+  // Timeout rows export as blank to avoid polluting analytics with phantom 0s
+  // for new-free workspaces whose /credit-balance hasn't landed yet.
+  const summary = resolveCreditSummary(ws);
+  const totalCreditsCsv: string | number = summary.renderDash ? '' : summary.total;
+  const totalUsedCsv: string | number = summary.renderDash
+    ? ''
+    : (ws.totalCreditsUsed != null ? ws.totalCreditsUsed : (r.total_credits_used != null ? r.total_credits_used : ''));
+  const availableCsv: string | number = summary.renderDash ? '' : summary.available;
   return [
     csvVal(ws.fullName),
     csvVal(ws.name),
