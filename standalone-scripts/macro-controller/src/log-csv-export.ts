@@ -29,6 +29,7 @@ import type { WorkspaceCredit } from './types';
 import { log } from './logging';
 import { getEffectiveStatus, daysBetween, daysUntil } from './workspace-status';
 import { getWorkspaceLifecycleConfig, type WorkspaceLifecycleConfig } from './workspace-lifecycle-config';
+import { resolveCreditSummary } from './credit-balance-update/credit-summary-resolver';
 
 // ── CSV Helpers ──
 
