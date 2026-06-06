@@ -175,8 +175,41 @@ describe('credit-fetch-controller', () => {
         expect(getTimeoutMs()).toBe(4500);
     });
 
-    it('detects inline grant_type_balances even when billing limit is zero', () => {
-        const workspace = ws({ rawApi: { grant_type_balances: [{ grant_type: 'daily' }] } });
+    /**
+     * Regression — `.lovable/plan.md` 2026-06-06 RCA #3.
+     *
+     * New free / Lite (ktlo) / Cancelled accounts return zero-valued grant
+     * rows. The legacy `length > 0` check classified them as InlineHit and
+     * suppressed the /credit-balance fetch, so the panel kept rendering
+     * 0/0 forever. hasInlineCredits() must now look at the row values.
+     */
+    it('treats grant_type_balances with non-zero totals as inline data', () => {
+        const workspace = ws({
+            rawApi: {
+                grant_type_balances: [{ grant_type: 'monthly_subscription', total_granted: 100, total_remaining: 42 }],
+            },
+        });
         expect(hasInlineCredits(workspace)).toBe(true);
+    });
+
+    it('treats all-zero grant_type_balances rows as missing inline data', () => {
+        const workspace = ws({
+            rawApi: {
+                grant_type_balances: [{
+                    grant_type: 'free_daily',
+                    total_granted: 0,
+                    total_remaining: 0,
+                    total_billing_period_used: 0,
+                    daily_limit: 0,
+                    daily_remaining: 0,
+                }],
+            },
+        });
+        expect(hasInlineCredits(workspace)).toBe(false);
+    });
+
+    it('treats empty grant_type_balances array as missing inline data', () => {
+        const workspace = ws({ rawApi: { grant_type_balances: [] } });
+        expect(hasInlineCredits(workspace)).toBe(false);
     });
 });
