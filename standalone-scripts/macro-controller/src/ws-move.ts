@@ -14,7 +14,7 @@
 
 import { MacroController } from './core/MacroController';
 import { log, logSub } from './logging';
-import { resolveToken, invalidateSessionBridgeKey, recoverAuthOnce } from './auth';
+import { resolveToken, invalidateSessionBridgeKey, recoverAuthOnce, getBearerToken } from './auth';
 import { extractProjectIdFromUrl } from './workspace-detection';
 import { showToast } from './toast';
 import { CREDIT_API_BASE, state } from './shared-state';
@@ -272,7 +272,15 @@ async function executeMove(
   targetWorkspaceName: string,
   isRetry: boolean,
 ): Promise<void> {
-  const token = resolveToken();
+  // Use unified getBearerToken() contract — on retry, force a fresh fetch
+  // so we never re-send the token that just got 401/403'd.
+  let token = '';
+  try {
+    token = await getBearerToken(isRetry ? { force: true } : undefined);
+  } catch (caught: unknown) {
+    logError('executeMove.getBearerToken', 'token fetch threw', caught);
+    token = resolveToken();
+  }
 
   if (!token) {
     handleMoveNoToken();
@@ -332,7 +340,13 @@ async function executeSwitchContext(
   targetWorkspaceName: string,
   isRetry: boolean,
 ): Promise<void> {
-  const token = resolveToken();
+  let token = '';
+  try {
+    token = await getBearerToken(isRetry ? { force: true } : undefined);
+  } catch (caught: unknown) {
+    logError('executeSwitchContext.getBearerToken', 'token fetch threw', caught);
+    token = resolveToken();
+  }
 
   if (!token) {
     handleMoveNoToken();
@@ -421,25 +435,34 @@ export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspace
     return;
   }
 
-  let token = resolveToken();
+  // Unified auth contract: getBearerToken() handles TTL freshness,
+  // localStorage fast-path, AND full waterfall recovery (extension bridge,
+  // cookie fallback). Replaces the older resolveToken+recoverAuthOnce dance
+  // which silently failed when the bridge was the only source of a valid
+  // token. See mem://auth/unified-auth-contract.
+  let token = '';
+
+  try {
+    token = await getBearerToken();
+  } catch (caught: unknown) {
+    logError('moveToWorkspace.getBearerToken', 'token fetch threw', caught);
+    token = '';
+  }
 
   if (!token) {
-    log('No bearer token — recovering before move request', 'warn');
-
+    // Last-ditch: force a fresh refresh (skip TTL cache) before giving up.
     try {
-      const recoveredToken = await recoverAuthOnce();
-      token = recoveredToken || resolveToken();
-    } catch {
-      handleMoveNoToken();
-
-      return;
+      token = await getBearerToken({ force: true });
+    } catch (caught: unknown) {
+      logError('moveToWorkspace.getBearerToken.force', 'forced refresh threw', caught);
+      token = '';
     }
+  }
 
-    if (!token) {
-      handleMoveNoToken();
+  if (!token) {
+    handleMoveNoToken();
 
-      return;
-    }
+    return;
   }
 
   const projectId = extractProjectIdFromUrl();
