@@ -1,0 +1,17 @@
+{
+  "version": "3.56.0",
+  "branch": "release/v3.56.0",
+  "sourceBranch": "main",
+  "commit": "945d4975ab337c030bb4f657de86fb9fd4822281",
+  "tag": "v3.56.0",
+  "assets": [],
+  "changelog": [
+    "**Project Move regression**: `ws-checkbox-handler.ts` now falls back to `getLoopWsCheckedIds()` when no keyboard-navigated row is active, so ticking a workspace checkbox and clicking Move no longer dead-ends with \"No workspace selected\".",
+    "**Silent move on non-project tabs**: `ws-move.ts` now logs a warning and surfaces a toast when the active tab is not `/projects/{id}`, instead of silently switching context without moving.",
+    "Version bump 3.55.0 → 3.56.0 across `manifest.json`, `version.json`, `src/shared/constants.ts`, all standalone-script `instruction.ts` files, and `standalone-scripts/macro-controller/src/shared-state.ts`."
+  ],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-06-18T17:36:56Z",
+  "isLatest": false
+}
