@@ -163,7 +163,7 @@ export function triggerLoopMoveFromSelection(): void {
     ? selectedEl.getAttribute('data-selected-name')
     : '';
 
-  // Fallback: if nothing explicitly selected, use the keyboard-navigated item
+  // Fallback 1: if nothing explicitly selected, use the keyboard-navigated item
   if (!wsId) {
     const listEl = document.getElementById(DomId.LoopWsList);
     const currentNavIndex = navState().getIndex();
@@ -175,6 +175,25 @@ export function triggerLoopMoveFromSelection(): void {
         wsName = navItem.getAttribute('data-ws-name') || '';
         log('Move fallback: using keyboard-navigated item idx=' + currentNavIndex + ' (' + wsName + ')', 'info');
       }
+    }
+  }
+
+  // Fallback 2: if still nothing, use the first checked checkbox.
+  // Users frequently tick a checkbox and press Move without clicking the row;
+  // without this fallback Move silently fails with "Select a workspace first".
+  if (!wsId) {
+    const checkedIds = Object.keys(getLoopWsCheckedIds());
+    if (checkedIds.length > 0) {
+      const firstCheckedId = checkedIds[0];
+      const listEl = document.getElementById(DomId.LoopWsList);
+      const matchedItem = listEl
+        ? listEl.querySelector('[' + DataAttr.WsId + '="' + firstCheckedId + '"]') as HTMLElement | null
+        : null;
+      wsId = firstCheckedId;
+      wsName = matchedItem ? (matchedItem.getAttribute('data-ws-name') || '') : '';
+      log('Move fallback: using first checked workspace id=' + wsId + ' (' + wsName + ')'
+        + (checkedIds.length > 1 ? ' [' + (checkedIds.length - 1) + ' other checks ignored]' : ''),
+        'info');
     }
   }
 
