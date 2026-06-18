@@ -402,6 +402,16 @@ async function executeSwitchContext(
       { baseUrl: CREDIT_API_BASE },
     );
 
+    if (isCastleDenied(resp.status, resp.data)) {
+      const castleMsg = extractCastleMessage(resp.data);
+      logError('Switch blocked', 'Castle 403 castle_denied — ' + castleMsg);
+      updateLoopMoveStatus('error', 'Blocked by Lovable security (castle_denied)');
+      showToast('Switch blocked by Lovable security: ' + castleMsg + ' Verify your account on lovable.dev, then retry.', 'error', { noStop: true });
+      clearDelegationState();
+
+      return;
+    }
+
     if (isAuthFailure(resp.status) && !isRetry) {
       const invalidatedKey = invalidateSessionBridgeKey(token);
       log('Switch got ' + resp.status + ' — invalidated "' + invalidatedKey + '", retrying with fallback', 'warn');
