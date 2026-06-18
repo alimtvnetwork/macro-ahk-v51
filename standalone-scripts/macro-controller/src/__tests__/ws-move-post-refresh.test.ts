@@ -22,6 +22,7 @@ vi.mock('../auth', () => ({
     resolveToken: vi.fn(() => 'tok_abc123def456'),
     invalidateSessionBridgeKey: vi.fn(() => 'fallback'),
     recoverAuthOnce: vi.fn(async () => 'tok_abc123def456'),
+    getBearerToken: vi.fn(async () => 'tok_abc123def456'),
 }));
 
 vi.mock('../workspace-detection', () => ({
