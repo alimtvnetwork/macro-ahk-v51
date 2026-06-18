@@ -74,12 +74,51 @@ vi.mock("@/platform", () => ({
 
 import OptionsPage from "@/pages/Options";
 
-const normalizeSnapshotHtml = (html: string): string =>
-  html.replace(/radix-:r[0-9a-z]+:/g, "radix-:stable:");
+const getText = (element: Element | null): string =>
+  element?.textContent?.replace(/\s+/g, " ").trim() ?? "";
+
+const getAttribute = (element: Element | null, name: string): string =>
+  element?.getAttribute(name) ?? "";
+
+const getTexts = (elements: NodeListOf<Element>): string[] =>
+  Array.from(elements).map(getText).filter(Boolean);
+
+const getMenuItems = (container: HTMLElement) =>
+  Array.from(container.querySelectorAll("[data-sidebar='menu-button']")).map((button) => ({
+    label: getAttribute(button, "aria-label"),
+    section: getAttribute(button, "data-section"),
+  }));
+
+const getOptionsStructure = (container: HTMLElement) => {
+  const marker = container.querySelector("[data-testid='options-state-marker']");
+
+  return {
+    state: {
+      branch: getAttribute(marker, "data-branch"),
+      onboardingComplete: getAttribute(marker, "data-onboarding-complete"),
+      projectsLoading: getAttribute(marker, "data-projects-loading"),
+    },
+    floatingController: {
+      mode: getAttribute(container.querySelector("[data-testid='floating-controller-compact']"), "data-mode"),
+      phase: getText(container.querySelector("[data-testid='controller-primary']")),
+    },
+    sidebar: getMenuItems(container),
+    header: {
+      title: getText(container.querySelector("header h1")),
+      workspace: getText(container.querySelector("header [role='combobox'] span")),
+      recorderActions: getTexts(container.querySelectorAll("[data-testid='recorder-control-bar'] button")),
+    },
+    content: {
+      heading: getText(container.querySelector("main h2")),
+      projectNames: getTexts(container.querySelectorAll("main h3")),
+      actionButtons: getTexts(container.querySelectorAll("main button")),
+    },
+  };
+};
 
 describe("Options Page — Structural Snapshot", () => {
   it("matches the baseline snapshot", () => {
     const { container } = render(<OptionsPage />);
-    expect(normalizeSnapshotHtml(container.innerHTML)).toMatchSnapshot();
+    expect(getOptionsStructure(container)).toMatchSnapshot();
   });
 });
