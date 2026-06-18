@@ -323,6 +323,16 @@ async function executeMove(
   try {
     const resp = await window.marco!.api!.workspace.move(projectId, targetWorkspaceId, { baseUrl: CREDIT_API_BASE });
 
+    if (isCastleDenied(resp.status, resp.data)) {
+      const castleMsg = extractCastleMessage(resp.data);
+      logError('Move blocked', 'Castle 403 castle_denied — ' + castleMsg);
+      updateLoopMoveStatus('error', 'Blocked by Lovable security (castle_denied)');
+      showToast('Move blocked by Lovable security: ' + castleMsg + ' Verify your account on lovable.dev, then retry.', 'error', { noStop: true });
+      clearDelegationState();
+
+      return;
+    }
+
     if (isAuthFailure(resp.status) && !isRetry) {
       await handleMoveAuthFailure(projectId, targetWorkspaceId, targetWorkspaceName, token, resp.status);
 
