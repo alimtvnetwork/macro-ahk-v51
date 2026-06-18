@@ -421,25 +421,34 @@ export async function moveToWorkspace(targetWorkspaceId: string, targetWorkspace
     return;
   }
 
-  let token = resolveToken();
+  // Unified auth contract: getBearerToken() handles TTL freshness,
+  // localStorage fast-path, AND full waterfall recovery (extension bridge,
+  // cookie fallback). Replaces the older resolveToken+recoverAuthOnce dance
+  // which silently failed when the bridge was the only source of a valid
+  // token. See mem://auth/unified-auth-contract.
+  let token = '';
+
+  try {
+    token = await getBearerToken();
+  } catch (caught: unknown) {
+    logError('moveToWorkspace.getBearerToken', 'token fetch threw', caught);
+    token = '';
+  }
 
   if (!token) {
-    log('No bearer token — recovering before move request', 'warn');
-
+    // Last-ditch: force a fresh refresh (skip TTL cache) before giving up.
     try {
-      const recoveredToken = await recoverAuthOnce();
-      token = recoveredToken || resolveToken();
-    } catch {
-      handleMoveNoToken();
-
-      return;
+      token = await getBearerToken({ force: true });
+    } catch (caught: unknown) {
+      logError('moveToWorkspace.getBearerToken.force', 'forced refresh threw', caught);
+      token = '';
     }
+  }
 
-    if (!token) {
-      handleMoveNoToken();
+  if (!token) {
+    handleMoveNoToken();
 
-      return;
-    }
+    return;
   }
 
   const projectId = extractProjectIdFromUrl();
