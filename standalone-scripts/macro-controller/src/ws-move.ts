@@ -340,7 +340,13 @@ async function executeSwitchContext(
   targetWorkspaceName: string,
   isRetry: boolean,
 ): Promise<void> {
-  const token = resolveToken();
+  let token = '';
+  try {
+    token = await getBearerToken(isRetry ? { force: true } : undefined);
+  } catch (caught: unknown) {
+    logError('executeSwitchContext.getBearerToken', 'token fetch threw', caught);
+    token = resolveToken();
+  }
 
   if (!token) {
     handleMoveNoToken();
