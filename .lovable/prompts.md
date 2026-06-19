@@ -30,7 +30,7 @@ re-deriving it from chat history.
 | 10 | [10-lowercase-readme-and-sequence.md](./prompts/10-lowercase-readme-and-sequence.md) | Lowercase Readme + `NN-kebab.md` Convention | `lowercase readme`, `sequence slugs`, `file naming convention` | active |
 | 11 | [11-explain-like-layman.md](./prompts/11-explain-like-layman.md) | Explain Like I'm a Layman (v1) | `explain like layman`, `explain like i'm five`, `eli5`, `eli-layman` | active |
 | 12 | [12-next-steps-v7.md](./prompts/12-next-steps-v7.md) | Next ${N} Steps (v7) — single-task append (Issue 126) | `next 1`, `next 2`, `next 3`, `next 4`, `next 5`, `next 8`, `next n steps`, `next n tasks` | active |
-| 13 | [13-plan-steps-v7.md](./prompts/13-plan-steps-v7.md) | Plan ${N} (v7) — Evidence Enforcement, single-task append (Issue 126) | `plan 5`, `plan 8`, `plan 10`, `plan 12`, `plan 15`, `plan 20`, `plan 25`, `plan 30`, `plan 35`, `plan 40`, `plan 45`, `plan 50`, `plan 100` | active |
+| 13 | [13-plan-steps-v7.md](./prompts/13-plan-steps-v7.md) | Plan ${N} (v7) — Evidence Enforcement, single-task append (Issue 126) | `plan 2`, `plan 3`, `plan 5`, `plan 8`, `plan 10`, `plan 12`, `plan 14`, `plan 15`, `plan 18`, `plan 20`, `plan 22`, `plan 25`, `plan 28`, `plan 30`, `plan 32`, `plan 35`, `plan 38`, `plan 40`, `plan 42`, `plan 45`, `plan 48`, `plan 50`, `plan 52`, `plan 55`, `plan 58`, `plan 60`, `plan 70`, `plan 80`, `plan 100`, `plan 150`, `plan 200` | active |
 ## Dropdown-shipped subset (canonical, v3.59.x)
 
 These 8 prompts are exposed in the macro-controller chat-box dropdown
@@ -40,4 +40,4 @@ registry and sync workflow:
 
 - 03 Write Memory · 05 Read Memory · 07 Proofread · 09 Coding Guidelines
 - 10 Lowercase Readme + Sequence · 11 Explain Like Layman
-- 12 Next ${N} (dynamic: 1/2/3/4/5/8) · 13 Plan ${N} (dynamic: 5..100)
+- 12 Next ${N} (dynamic: 1/2/3/4/5/8) · 13 Plan ${N} (dynamic: 2/3/5/8/10/12/14/15/18/20/22/25/28/30/32/35/38/40/42/45/48/50/52/55/58/60/70/80/100/150/200)
