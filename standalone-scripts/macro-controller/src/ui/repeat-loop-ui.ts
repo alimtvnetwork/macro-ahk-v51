@@ -469,6 +469,12 @@ function buildControl(opts: { compact: boolean }): HTMLElement {
   const render = (): void => { renderControl(refs); };
   render();
   repeatLoopState.subscribers.add(render);
+  // Live ticker: phase boundaries call notify(), but the elapsed/countdown
+  // seconds need to advance every tick while running.
+  const tickId = setInterval(function () {
+    if (!document.body.contains(root)) { clearInterval(tickId); return; }
+    if (repeatLoopState.running) render();
+  }, 1000);
   return root;
 }
 
