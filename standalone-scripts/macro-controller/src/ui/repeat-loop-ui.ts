@@ -337,6 +337,11 @@ function buildControl(opts: { compact: boolean }): HTMLElement {
   function render(): void {
     input.value = String(repeatLoopState.count);
     input.disabled = repeatLoopState.running;
+    modeSel.value = repeatLoopState.waitMode;
+    modeSel.disabled = repeatLoopState.running;
+    delayInput.value = String(repeatLoopState.delaySec);
+    delayInput.disabled = repeatLoopState.running || repeatLoopState.waitMode !== 'fixed-delay';
+    delayInput.style.opacity = repeatLoopState.waitMode === 'fixed-delay' ? '1' : '0.45';
     if (repeatLoopState.running) {
       action.textContent = '⏹ Stop';
       action.style.background = '#dc2626';
