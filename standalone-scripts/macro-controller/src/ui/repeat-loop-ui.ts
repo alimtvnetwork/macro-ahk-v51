@@ -398,6 +398,21 @@ interface ControlRefs {
   progress: HTMLElement;
 }
 
+function formatPhaseTimer(): string {
+  const now = Date.now();
+  const phase = repeatLoopState.phase;
+  if (phase === 'idle') return '';
+  if (phase === 'submitting') return '⏳ submitting…';
+  if (phase === 'waiting-completion') {
+    const elapsed = Math.max(0, Math.floor((now - repeatLoopState.phaseStartedAt) / 1000));
+    return '⏱ waiting reply ' + elapsed + 's';
+  }
+  // waiting-delay (fixed delay): show countdown
+  const remainMs = Math.max(0, repeatLoopState.phaseDeadlineAt - now);
+  const remainSec = Math.ceil(remainMs / 1000);
+  return '⏱ next in ' + remainSec + 's';
+}
+
 function renderControl(refs: ControlRefs): void {
   refs.input.value = String(repeatLoopState.count);
   refs.input.disabled = repeatLoopState.running;
@@ -409,7 +424,8 @@ function renderControl(refs: ControlRefs): void {
   if (repeatLoopState.running) {
     refs.action.textContent = '⏹ Stop';
     refs.action.style.background = '#dc2626';
-    refs.progress.textContent = repeatLoopState.completed + '/' + repeatLoopState.count;
+    const timer = formatPhaseTimer();
+    refs.progress.textContent = repeatLoopState.completed + '/' + repeatLoopState.count + (timer ? ' • ' + timer : '');
   } else {
     refs.action.textContent = '▶ Start';
     refs.action.style.background = cPrimary;
