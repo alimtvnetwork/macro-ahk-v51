@@ -33,4 +33,12 @@ describe('default prompt content', () => {
     expect(prompt).toContain('Do one logical task at a time');
     expect(prompt).toContain('repeated submissions require the dedicated Repeat `▶ Start` control');
   });
+
+  it('bundles the numbered Plan prompt source', () => {
+    const prompt = readPrompt('standalone-scripts/prompts/14-plan-steps/prompt.md');
+
+    expect(prompt).toContain('Plan in ${N}-Steps Plan');
+    expect(prompt).toContain('Single-task append rule');
+    expect(prompt).toContain('DO NOT execute anything this turn');
+  });
 });
