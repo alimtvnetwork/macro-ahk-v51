@@ -85,8 +85,8 @@ function hydrate(): void {
 hydrate();
 
 function notify(): void {
-  for (const fn of repeatLoopState.subscribers) {
-    try { fn(); } catch (e) { log('Repeat: subscriber failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+  for (const subscriber of repeatLoopState.subscribers) {
+    try { subscriber(); } catch (e) { log('Repeat: subscriber failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
   }
 }
 
