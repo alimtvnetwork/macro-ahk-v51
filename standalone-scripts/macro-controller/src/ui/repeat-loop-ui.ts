@@ -258,6 +258,9 @@ async function runRepeatLoopAsync(): Promise<void> {
   const total = repeatLoopState.count;
   repeatLoopState.running = false;
   repeatLoopState.cancelled = false;
+  repeatLoopState.phase = 'idle';
+  repeatLoopState.phaseStartedAt = 0;
+  repeatLoopState.phaseDeadlineAt = 0;
   notify();
 
   if (wasCancelled) {
