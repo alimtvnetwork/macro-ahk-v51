@@ -113,16 +113,16 @@ export class PaymentBannerHider implements PaymentBannerHiderApi {
      * not leave a visible slot once the banner collapses. Stops at `main`,
      * `body`, or any ancestor with more than one element child.
      */
-    private collectCollapseTargets(el: HTMLElement): HTMLElement[] {
-        const out: HTMLElement[] = [el];
-        let cur: HTMLElement | null = el;
+    private collectCollapseTargets(element: HTMLElement): HTMLElement[] {
+        const out: HTMLElement[] = [element];
+        let cur: HTMLElement = element;
         for (let i = 0; i < 3; i++) {
-            const parent = cur.parentElement;
-            if (parent === null) break;
-            if (parent.tagName === "MAIN" || parent.tagName === "BODY") break;
-            if (parent.childElementCount !== 1) break;
-            out.push(parent);
-            cur = parent;
+            const parentEl: HTMLElement | null = cur.parentElement;
+            if (parentEl === null) break;
+            if (parentEl.tagName === "MAIN" || parentEl.tagName === "BODY") break;
+            if (parentEl.childElementCount !== 1) break;
+            out.push(parentEl);
+            cur = parentEl;
         }
         return out;
     }
