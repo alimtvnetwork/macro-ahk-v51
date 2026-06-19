@@ -217,6 +217,9 @@ export function createUI(deps: PanelBuilderDeps): void {
   // Record indicator (fixed position)
   document.body.appendChild(createRecordIndicator());
 
+  // Inline Repeat strip above Lovable's chat textarea (Ambiguity 126)
+  mountRepeatInlineStrip();
+
   // Keyboard handlers (with Task Next deps for Ctrl+Shift+1..9 shortcuts)
   const kbTaskNextDeps = deps.taskNextDeps;
   registerKeyboardHandlers({
