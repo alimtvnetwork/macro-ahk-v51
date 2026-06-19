@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /**
  * Regression test — banner height collapse for both parent and inner
  * wrapper layouts, plus text-fallback when XPath misses.

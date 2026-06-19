@@ -183,6 +183,7 @@ export function setLoopInterval(newIntervalMs: number): boolean {
  * See: .lovable/memory/features/macro-controller/close-then-reinject.md and
  * spec/22-app-issues/12-controller-reinject-after-close.md
  */
+// eslint-disable-next-line sonarjs/cognitive-complexity -- multi-step teardown with isolated try/catch per side-effect (v3.60.0 close→reinject fix)
 export function destroyPanel(): void {
   log('MacroLoop panel DESTROYED by user — remove marker + globals for clean re-inject', 'warn');
   nsWrite('_internal.destroyed', true);
