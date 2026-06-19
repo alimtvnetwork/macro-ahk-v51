@@ -9,8 +9,6 @@
 import { log, logSub } from '../logging';
 import type { ResolvedPromptsConfig } from '../types';
 import { showPasteToast, pasteIntoEditor } from './prompt-utils';
-import { getSettingsOverrides } from '../settings-store';
-import { isReturnButtonVisible } from '../xpath-utils';
 
 import { cPanelBg, cPanelFg, cPrimary, cPrimaryLight } from '../shared-state';
 import { logError } from '../error-utils';
@@ -185,131 +183,7 @@ export function findAddToTasksButton(): HTMLElement | null {
 }
 
 
-// ============================================
-// tryClickAndAdvance — extracted from nested closure (CQ16)
-// Attempts to click the "Add To Tasks" button with retries.
-// ============================================
 
-interface ClickContext {
-  readonly index: number;
-  readonly count: number;
-  readonly doNextTask: (idx: number) => void;
-  completed: number;
-  retries: number;
-}
-
-function tryClickAndAdvance(ctx: ClickContext): void {
-  const btn = findAddToTasksButton();
-
-  if (!btn) {
-    logError('Task Next', '"Add To Tasks" button not found — aborting');
-    showPasteToast('❌ Task Next: Button not found — stopped at ' + ctx.completed + '/' + ctx.count, true);
-    taskNextState.running = false;
-
-    return;
-  }
-
-  if ((btn as HTMLButtonElement).disabled) {
-    ctx.retries++;
-
-    if (ctx.retries <= taskNextState.settings.retryCount) {
-      log('Task Next: Button disabled, retry ' + ctx.retries + '/' + taskNextState.settings.retryCount, 'warn');
-      setTimeout(function () { tryClickAndAdvance(ctx); }, taskNextState.settings.retryDelayMs);
-
-      return;
-    }
-
-    log('Task Next: Button stayed disabled after ' + taskNextState.settings.retryCount + ' retries, skipping task ' + (ctx.index + 1), 'warn');
-    ctx.completed++;
-    showPasteToast('⏭ Task Next: ' + ctx.completed + '/' + ctx.count + ' (skipped disabled)', false);
-    setTimeout(function () { ctx.doNextTask(ctx.index + 1); }, taskNextState.settings.postClickDelayMs);
-
-    return;
-  }
-
-  btn.click();
-  ctx.completed++;
-  log('Task Next: Task ' + ctx.completed + '/' + ctx.count + ' queued', 'info');
-  showPasteToast('⏭ Task Next: ' + ctx.completed + '/' + ctx.count + ' completed', false);
-
-  setTimeout(function () { ctx.doNextTask(ctx.index + 1); }, taskNextState.settings.postClickDelayMs);
-}
-
-function resolveRequestedTaskCount(count: number): number {
-  const requested = Math.max(1, Math.floor(count) || 1);
-  taskNextState.settings.requireStartForMultiRun = true;
-  if (requested > 1) {
-    log('Task Next: multi-run blocked; queuing one task only. Use Repeat Start for repeated submissions.', 'warn');
-    showPasteToast('⏭ Task Next: queued 1 only — use Repeat Start for repeats', false);
-    return 1;
-  }
-  return requested;
-}
-
-// CQ16: Extracted context for task next loop
-interface TaskNextLoopCtx {
-  count: number;
-  completed: number;
-  prompt: { text: string; name?: string };
-  promptsCfg: ResolvedPromptsConfig;
-  deps: TaskNextDeps;
-}
-
-// CQ16: Extracted from runTaskNextLoop closure → module scope
-function doNextTask(ctx: TaskNextLoopCtx, index: number): void {
-  if (taskNextState.cancelled || index >= ctx.count) {
-    taskNextState.running = false;
-
-    if (taskNextState.cancelled) {
-      showPasteToast('⚠️ Task Next: Stopped at ' + ctx.completed + '/' + ctx.count, true);
-      log('Task Next: Cancelled at ' + ctx.completed + '/' + ctx.count, 'warn');
-    } else {
-      showPasteToast('✅ Task Next: All ' + ctx.count + ' tasks queued', false);
-      log('Task Next: Completed all ' + ctx.count + ' tasks', 'success');
-    }
-
-    return;
-  }
-
-  const outcome = pasteIntoEditor(ctx.prompt.text, ctx.promptsCfg, ctx.deps.getByXPath);
-
-  // Conditional delay check
-  const overrides = getSettingsOverrides();
-  let delay = taskNextState.settings.preClickDelayMs;
-  
-  if (overrides.autoDetectDelay !== false && isReturnButtonVisible()) {
-    const delaySec = overrides.nextSubmissionDelaySeconds ?? 22;
-    log('Task Next: Return button detected, applying ' + delaySec + 's delay...', 'info');
-    delay += delaySec * 1000;
-  }
-
-  if (String(outcome) === 'failed') {
-    logError('Task Next', 'Failed to inject prompt at task ' + (index + 1));
-    showPasteToast('❌ Task Next: Injection failed at ' + (index + 1) + '/' + ctx.count, true);
-    taskNextState.running = false;
-
-    return;
-  }
-
-  setTimeout(function () {
-    if (taskNextState.cancelled) {
-      taskNextState.running = false;
-
-      return;
-    }
-
-    const clickCtx: ClickContext = {
-      index,
-      count: ctx.count,
-      doNextTask: (idx: number) => doNextTask(ctx, idx),
-      completed: ctx.completed,
-      retries: 0,
-    };
-
-    tryClickAndAdvance(clickCtx);
-    ctx.completed = clickCtx.completed;
-  }, delay);
-}
 
 export function runTaskNextLoop(deps: TaskNextDeps, count: number) {
   if (taskNextState.running) {
