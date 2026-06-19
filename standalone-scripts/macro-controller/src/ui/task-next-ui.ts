@@ -24,6 +24,7 @@ export interface TaskNextSettings {
   retryDelayMs: number;
   buttonXPath: string;
   promptSlug: string;
+  requireStartForMultiRun: boolean;
 }
 
 /** Concrete union of all setting value types — derived from TaskNextSettings */
@@ -41,7 +42,8 @@ export const taskNextState: {
     retryCount: 3,
     retryDelayMs: 1000,
     buttonXPath: '/html/body/div[3]/div/div[2]/main/div/div/div[1]/div/div[2]/div/form/div[2]/div/button[2]',
-    promptSlug: Label.NextTasks
+    promptSlug: Label.NextTasks,
+    requireStartForMultiRun: true,
   },
   running: false,
   cancelled: false,
