@@ -1,0 +1,14 @@
+{
+  "Id": "default-plan-steps",
+  "Title": "Plan Steps",
+  "Slug": "plan-steps",
+  "Version": "1.0.0",
+  "Author": "marco",
+  "Categories": [
+    "Plan"
+  ],
+  "IsDefault": true,
+  "Order": 14,
+  "CreatedAt": "2026-06-19T00:00:00Z",
+  "UpdatedAt": "2026-06-19T00:00:00Z"
+}

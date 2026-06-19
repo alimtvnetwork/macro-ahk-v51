@@ -4,9 +4,11 @@
   "Slug": "conversation-log",
   "Version": "1.0.0",
   "Author": "marco",
-  "Categories": ["memory"],
+  "Categories": [
+    "memory"
+  ],
   "IsDefault": false,
-  "Order": 20,
+  "Order": 21,
   "CreatedAt": "2026-05-26T00:00:00Z",
   "UpdatedAt": "2026-05-26T00:00:00Z"
 }

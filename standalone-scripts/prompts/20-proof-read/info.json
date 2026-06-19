@@ -1,12 +1,14 @@
 {
-  "Id": "default-logo-create",
-  "Title": "Logo Create",
-  "Slug": "logo-create",
+  "Id": "default-proof-read",
+  "Title": "Proofread / Rewrite",
+  "Slug": "proof-read",
   "Version": "1.0.0",
   "Author": "marco",
-  "Categories": ["assets"],
+  "Categories": [
+    "writing"
+  ],
   "IsDefault": true,
-  "Order": 18,
+  "Order": 20,
   "CreatedAt": "2026-05-22T00:00:00Z",
   "UpdatedAt": "2026-05-22T00:00:00Z"
 }
