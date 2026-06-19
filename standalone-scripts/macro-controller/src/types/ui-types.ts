@@ -61,6 +61,10 @@ export interface PromptEntry {
   replaceKey?: string;
   replaceValues?: string[];
   slugTemplate?: string;
+  // Bridge fields set on expanded variant entries (spec 30-next-button-reference).
+  parentTitle?: string;
+  parentSlug?: string;
+  variantValue?: string;
 }
 
 export interface PromptsCfg {
