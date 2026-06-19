@@ -28,7 +28,7 @@
   Pass `latest` to force the API fallback even when a URL pin is present.
 
 .PARAMETER InstallDir
-  Target directory. Default: $HOME\marco-extension
+  Target directory. Default: <cwd>\marco-extension
 
 .PARAMETER Repo
   GitHub owner/repo. Default: alimtvnetwork/macro-ahk-v50
@@ -403,7 +403,7 @@ Conforms to spec/14-update/01-generic-installer-behavior.md.
 
 Options:
   -Version <ver>             Force vX.Y.Z[-pre] or 'latest'.
-  -InstallDir <path>         Target directory (default: \$HOME\marco-extension).
+  -InstallDir <path>         Target directory (default: <cwd>\marco-extension).
   -Repo <o/r>                GitHub owner/repo override.
   -DryRun                    Resolve plan, print, exit 0 without installing.
   -NoSiblingDiscovery        Disable §4 sibling-repo probing (overrides config).
@@ -420,7 +420,10 @@ override env vars. Strict mode always wins.
 
 function Resolve-InstallDir([string]$dir) {
     if ($dir -ne "") { return $dir }
-    return Join-Path $HOME "marco-extension"
+    # Default to current working directory (where the user invoked the script),
+    # not $HOME. PWD reflects the caller's cwd even when piped via irm | iex.
+    $cwd = (Get-Location).Path
+    return Join-Path $cwd "marco-extension"
 }
 
 # --- Updater run identity (scopes every artifact this run creates) ---
