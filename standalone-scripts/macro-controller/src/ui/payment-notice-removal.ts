@@ -43,20 +43,20 @@ function isHTMLElement(node: Node | null): node is HTMLElement {
   return typeof HTMLElement !== 'undefined' && node instanceof HTMLElement;
 }
 
-function isMacroElement(el: HTMLElement): boolean {
-  if (el.id === MACRO_PANEL_ID) {
+function isMacroElement(element: HTMLElement): boolean {
+  if (element.id === MACRO_PANEL_ID) {
     return true;
   }
 
-  return el.closest('#' + MACRO_PANEL_ID) !== null;
+  return element.closest('#' + MACRO_PANEL_ID) !== null;
 }
 
-function isCompactPaymentNotice(el: HTMLElement): boolean {
-  if (isMacroElement(el)) {
+function isCompactPaymentNotice(element: HTMLElement): boolean {
+  if (isMacroElement(element)) {
     return false;
   }
 
-  const text = el.textContent ?? '';
+  const text = element.textContent ?? '';
   if (text.length > MAX_NOTICE_TEXT_LENGTH) {
     return false;
   }
@@ -64,9 +64,9 @@ function isCompactPaymentNotice(el: HTMLElement): boolean {
   return matchesPaymentNoticeText(text);
 }
 
-function resolveNoticeRoot(el: HTMLElement): HTMLElement {
-  let root = el;
-  let parent = el.parentElement;
+function resolveNoticeRoot(element: HTMLElement): HTMLElement {
+  let root = element;
+  let parent = element.parentElement;
 
   while (parent !== null && parent !== document.body && parent !== document.documentElement) {
     if (!isCompactPaymentNotice(parent)) {
@@ -114,15 +114,15 @@ function locatePaymentNotices(): HTMLElement[] {
   return Array.from(matches);
 }
 
-function hidePaymentNotice(el: HTMLElement): boolean {
-  if (el.getAttribute(REMOVED_ATTR) === 'true') {
+function hidePaymentNotice(element: HTMLElement): boolean {
+  if (element.getAttribute(REMOVED_ATTR) === 'true') {
     return false;
   }
 
-  el.setAttribute(REMOVED_ATTR, 'true');
-  el.setAttribute('aria-hidden', 'true');
-  el.hidden = true;
-  el.style.setProperty('display', 'none', 'important');
+  element.setAttribute(REMOVED_ATTR, 'true');
+  element.setAttribute('aria-hidden', 'true');
+  element.hidden = true;
+  element.style.setProperty('display', 'none', 'important');
 
   return true;
 }

@@ -368,23 +368,52 @@ async function executeMove(
 // executeSwitchContext — fallback GET request when no project ID
 // ============================================
 
- 
+async function resolveSwitchToken(isRetry: boolean): Promise<string> {
+  try {
+    return await getBearerToken(isRetry ? { force: true } : undefined);
+  } catch (caught: unknown) {
+    logError('executeSwitchContext.getBearerToken', 'token fetch threw', caught);
+    return resolveToken();
+  }
+}
+
+/** Returns true if the caller should return (auth flow handled the retry). */
+async function handleSwitchAuthFailure(
+  status: number,
+  token: string,
+  targetWorkspaceId: string,
+  targetWorkspaceName: string,
+): Promise<void> {
+  const invalidatedKey = invalidateSessionBridgeKey(token);
+  log('Switch got ' + status + ' — invalidated "' + invalidatedKey + '", retrying with fallback', 'warn');
+  showToast('Switch auth ' + status + ' — token "' + invalidatedKey + '" expired, retrying...', 'warn', { noStop: true });
+
+  const fallbackToken = resolveToken();
+  if (fallbackToken) {
+    await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, true);
+    return;
+  }
+
+  try {
+    const recoveredToken = await recoverAuthOnce();
+    if (recoveredToken || resolveToken()) {
+      await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, true);
+      return;
+    }
+  } catch { // allow-swallow: Auth recovery failure is intentionally handled by the no-token fallback path below.
+    // fall through to handleMoveNoToken
+  }
+  handleMoveNoToken();
+}
+
 async function executeSwitchContext(
   targetWorkspaceId: string,
   targetWorkspaceName: string,
   isRetry: boolean,
 ): Promise<void> {
-  let token = '';
-  try {
-    token = await getBearerToken(isRetry ? { force: true } : undefined);
-  } catch (caught: unknown) {
-    logError('executeSwitchContext.getBearerToken', 'token fetch threw', caught);
-    token = resolveToken();
-  }
-
+  const token = await resolveSwitchToken(isRetry);
   if (!token) {
     handleMoveNoToken();
-
     return;
   }
 
@@ -408,52 +437,20 @@ async function executeSwitchContext(
       updateLoopMoveStatus('error', 'Blocked by Lovable security (castle_denied)');
       showToast('Switch blocked by Lovable security: ' + castleMsg + ' Verify your account on lovable.dev, then retry.', 'error', { noStop: true });
       clearDelegationState();
-
       return;
     }
 
     if (isAuthFailure(resp.status) && !isRetry) {
-      const invalidatedKey = invalidateSessionBridgeKey(token);
-      log('Switch got ' + resp.status + ' — invalidated "' + invalidatedKey + '", retrying with fallback', 'warn');
-      showToast('Switch auth ' + resp.status + ' — token "' + invalidatedKey + '" expired, retrying...', 'warn', { noStop: true });
-
-      const fallbackToken = resolveToken();
-
-      if (fallbackToken) {
-        await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, true);
-
-        return;
-      }
-
-      try {
-        const recoveredToken = await recoverAuthOnce();
-        const refreshedToken = recoveredToken || resolveToken();
-
-        if (refreshedToken) {
-          await executeSwitchContext(targetWorkspaceId, targetWorkspaceName, true);
-
-          return;
-        }
-      } catch { // allow-swallow: Auth recovery failure is intentionally handled by the no-token fallback path below.
-        // fall through to handleMoveNoToken
-      }
-
-      handleMoveNoToken();
-
+      await handleSwitchAuthFailure(resp.status, token, targetWorkspaceId, targetWorkspaceName);
       return;
     }
 
     if (resp.ok) {
       log('Switch context response: ' + resp.status + label, 'success');
     } else {
-      logError('ws-move', 'Switch context response: ' + resp.status + label);
-    }
-
-    if (!resp.ok) {
       const bodyPreview = JSON.stringify(resp.data).substring(0, 500);
       logError('Switch context failed', 'HTTP ' + resp.status + ' | body: ' + bodyPreview);
       updateLoopMoveStatus('error', 'HTTP ' + resp.status + ': ' + bodyPreview.substring(0, 80));
-
       return;
     }
 
