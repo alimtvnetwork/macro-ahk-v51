@@ -326,6 +326,16 @@ export function setRepeatDelaySec(sec: number): void {
   persist();
 }
 
+export function setRepeatCollapsed(v: boolean): void {
+  repeatLoopState.collapsed = v;
+  notify();
+  persist();
+}
+
+export function toggleRepeatCollapsed(): void {
+  setRepeatCollapsed(!repeatLoopState.collapsed);
+}
+
 // ─────────────────────────────────────────────
 // UI building blocks
 // ─────────────────────────────────────────────
