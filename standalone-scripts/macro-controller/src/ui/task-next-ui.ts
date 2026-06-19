@@ -327,13 +327,14 @@ export function runTaskNextLoop(deps: TaskNextDeps, count: number) {
 
   taskNextState.running = true;
   taskNextState.cancelled = false;
+  const taskCount = resolveRequestedTaskCount(count);
   const promptsCfg = deps.getPromptsConfig();
 
-  log('Task Next: Starting ' + count + ' tasks', 'info');
-  showPasteToast('⏭ Task Next: Starting ' + count + ' tasks…', false);
+  log('Task Next: Starting ' + taskCount + ' task(s)', 'info');
+  showPasteToast('⏭ Task Next: Starting ' + taskCount + ' task(s)…', false);
 
   const ctx: TaskNextLoopCtx = {
-    count,
+    count: taskCount,
     completed: 0,
     prompt,
     promptsCfg,
