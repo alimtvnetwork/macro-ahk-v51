@@ -62,7 +62,11 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-Set-StrictMode -Version Latest
+# NOTE: Do NOT enable `Set-StrictMode -Version Latest` here. When this script
+# is run via `irm ... | iex`, strict mode is inherited by the caller session
+# and turns every later missing-property access in the user's shell into a
+# hard error. It also broke our own `$rsp.tag_name` access when the GitHub
+# API response shape varies slightly (e.g. rate-limited HTML response).
 
 function Write-Step([string]$msg) { Write-Host "  [..] $msg" -ForegroundColor Cyan }
 function Write-Ok  ([string]$msg) { Write-Host "  [OK] $msg" -ForegroundColor Green }
@@ -89,11 +93,15 @@ function Resolve-Version([string]$raw, [string]$repo) {
             Write-Err "Failed to query $api : $($_.Exception.Message)"
             exit 2
         }
-        if (-not $rsp.tag_name) {
+        $tagName = $null
+        if ($rsp -and ($rsp.PSObject.Properties.Name -contains 'tag_name')) {
+            $tagName = [string]$rsp.tag_name
+        }
+        if ([string]::IsNullOrWhiteSpace($tagName)) {
             Write-Err "Latest release response missing tag_name (Reason=ApiShapeUnexpected; ReasonDetail=$api)"
             exit 2
         }
-        return [string]$rsp.tag_name
+        return $tagName
     }
 
     $candidate = $raw.Trim()
@@ -113,7 +121,7 @@ Write-Ok "Resolved version: $tag"
 # ----------------------------------------------------------------------
 $assetName  = "marco-extension-$tag.zip"
 $downloadUrl = "https://github.com/$Repo/releases/download/$tag/$assetName"
-$cwd        = (Get-Location).Path
+$cwd        = if ($PWD.ProviderPath) { $PWD.ProviderPath } else { (Get-Location).Path }
 $zipPath    = Join-Path $cwd $assetName
 $targetDir  = Join-Path $cwd $FolderName
 
