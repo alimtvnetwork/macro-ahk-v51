@@ -7,14 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
-## [v3.57.0] — 2026-06-19
+## [v3.57.0] — 2026-06-19 Repeat Loop + Payment Notice Removal + Lint Cleanup
 
 ### Added
+- **Chat-box Repeat selector** (`standalone-scripts/macro-controller/src/ui/repeat-loop-ui.ts`): paste → submit → wait → repeat N times on whatever text is in the Lovable chat box. Two synchronized mount points (compact section inside the floating macro panel + inline strip auto-mounted above Lovable's chat textarea, with a `MutationObserver` for SPA re-renders) share one state. Count input (1–1000) with presets 1/5/10/25/50/100; wait-mode dropdown: `auto (submit-ready)` (default) or `fixed delay` with input (1–3600s) + presets 5/8/12/15/20/30/60s. Manual Stop only. Persists `count`, `waitMode`, `delaySec` synchronously via `localStorage` under `marco-repeat-loop-prefs` (never persists running state — no auto-resume after reload).
+- **Automatic payment notice removal** (`standalone-scripts/macro-controller/src/ui/payment-notice-removal.ts`): once MacroController is injected, a one-shot pass + `MutationObserver` hide Lovable "Payment issue detected" / "Payment notice" banners. 320-char text-length guard prevents accidental removal of main page content; macro panel itself is exempted. Delegates to any pre-existing `window.PaymentBannerHider.check()` first. 4/4 regression tests passing.
+- Prompt files 09–13 under `.lovable/prompts/` (coding guidelines, lowercase-readme-and-sequence, explain-like-layman, next-steps-v7, plan-steps-v7) and pasted-prompts archive under `.lovable/pasted-prompts/`.
 
 ### Fixed
+- **CI lint errors (id-denylist)**: renamed restricted identifiers `el` → `element` / `editor` and `fn` → `subscriber` in `standalone-scripts/macro-controller/src/ui/payment-notice-removal.ts`, `standalone-scripts/macro-controller/src/ui/repeat-loop-ui.ts`, and `src/background/recorder/live-dom-replay.ts`.
+- **Cognitive complexity / max-lines warnings**: split `runRepeatLoopAsync` into `submitOneIteration` + `waitBetweenIterations`; split `buildControl` into `buildCountInput` / `buildCountPresets` / `buildWaitControls` / `renderControl`; split `executeSwitchContext` (`standalone-scripts/macro-controller/src/ws-move.ts`) into `resolveSwitchToken` + `handleSwitchAuthFailure`.
+- Extracted `WAIT_MODE_SUBMIT_READY` / `WAIT_MODE_FIXED_DELAY` constants to eliminate the `sonarjs/no-duplicate-string` warning.
 
 ### Changed
-- Version bump: 3.56.0 → 3.57.0 (all version files synced)
+- Version bump: 3.56.0 → 3.57.0 (all version files synced).
 
 ---
 
