@@ -164,10 +164,23 @@ export function setLoopInterval(newIntervalMs: number): boolean {
 /**
  * Fully destroy the controller panel and clean up globals for re-injection.
  *
- * v3.18.0 fix: also tear down the MacroController singleton so that re-running
- * the script in the same page (without a full refresh) builds a fresh instance
- * instead of reusing the stale one with `_initialized=true` and dead manager
- * references pointing at a removed DOM container.
+ * v3.18.0 fix: also tear down the MacroController singleton so re-running
+ * the script in the same page builds a fresh instance.
+ *
+ * v3.60.0 fix (close→reinject bug): teardown was leaving stale satellite
+ * state behind, so re-injection showed only the toast and never rebuilt the
+ * panel. We now also:
+ *   - remove the record indicator + inline repeat strip (their idempotency
+ *     guards would otherwise skip rebuild on second injection),
+ *   - reset `window.__marcoRouteGuardInstalled` so `installSpaRouteGuard()`
+ *     actually re-installs on the next bootstrap,
+ *   - invalidate `domCache` so the new `createUI()` cannot reuse a detached
+ *     XPath result and append the panel into an orphaned node,
+ *   - drop the stale `_internal.createUIWrapper` / `_internal.createUIManager`
+ *     factories so a fresh IIFE always wires its own panel-builder deps.
+ *
+ * See: .lovable/memory/features/macro-controller/close-then-reinject.md and
+ * spec/22-app-issues/12-controller-reinject-after-close.md
  */
 export function destroyPanel(): void {
   log('MacroLoop panel DESTROYED by user — remove marker + globals for clean re-inject', 'warn');
@@ -180,8 +193,32 @@ export function destroyPanel(): void {
   const container = document.getElementById(IDS.CONTAINER);
   if (container) container.remove();
 
+  // v3.60.0: also remove satellite elements with their own idempotency guards
+  const recordIndicator = document.getElementById(IDS.RECORD_INDICATOR);
+  if (recordIndicator) recordIndicator.remove();
+  const inlineRepeat = document.getElementById('marco-repeat-inline');
+  if (inlineRepeat) inlineRepeat.remove();
+
+  // v3.60.0: clear SPA route-guard sentinel so the next bootstrap re-installs it
+  try {
+    (window as unknown as { __marcoRouteGuardInstalled?: boolean }).__marcoRouteGuardInstalled = false;
+  } catch (e) { log('destroyPanel: route-guard reset failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+
+  // v3.60.0: invalidate DOM cache — stale detached nodes must not be reused
+  try {
+    const { domCache } = require('../dom-cache') as { domCache: { invalidate?: () => void } };
+    if (typeof domCache.invalidate === 'function') domCache.invalidate();
+  } catch (_e) { /* dom-cache may be unavailable in tests — non-fatal */ }
+
+  // v3.60.0: drop stale UI factories so the next IIFE installs fresh closures
+  // (otherwise self-heal in startup.ts may revive the OLD createUIWrapper that
+  // captured dead managers).
+  try {
+    nsWrite('_internal.createUIWrapper', undefined as unknown as () => void);
+    nsWrite('_internal.createUIManager', undefined as unknown as () => unknown);
+  } catch (_e) { /* namespace may already be torn down — non-fatal */ }
+
   // Tear down the singleton so the next injection bootstraps a fresh one
-  // instead of reusing a stale `_initialized=true` instance with dead refs.
   try {
     const mc = MacroController.getInstance() as unknown as { destroy?: () => void };
     if (typeof mc.destroy === 'function') mc.destroy();
