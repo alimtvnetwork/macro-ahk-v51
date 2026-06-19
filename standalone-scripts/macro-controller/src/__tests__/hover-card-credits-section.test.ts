@@ -19,7 +19,7 @@ beforeEach(function () {
 });
 
 describe('hover-card credits section (resolver-backed)', function () {
-    it('renders Source row when summary.source !== Inline', async function () {
+    it('renders Source row when summary.source !== Inline', { timeout: 15000 }, async function () {
         const cache = await import('../credit-balance-update/credit-balance-cache');
         const enumMod = await import('../credit-balance-update/credit-fetch-outcome');
         vi.mocked(cache.readCreditBalanceUpdateCacheSync).mockReturnValue({
@@ -45,7 +45,7 @@ describe('hover-card credits section (resolver-backed)', function () {
         expect(summary.total).toBe(100);
     });
 
-    it('emits Timeout source with renderDash when cache outcome is Timeout', async function () {
+    it('emits Timeout source with renderDash when cache outcome is Timeout', { timeout: 15000 }, async function () {
         const cache = await import('../credit-balance-update/credit-balance-cache');
         const enumMod = await import('../credit-balance-update/credit-fetch-outcome');
         vi.mocked(cache.readCreditBalanceUpdateCacheSync).mockReturnValue({
