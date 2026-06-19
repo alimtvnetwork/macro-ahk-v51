@@ -183,7 +183,10 @@ export function createUI(deps: PanelBuilderDeps): void {
   // Track body elements for minimize/restore. Auth Diagnostics has moved
   // INSIDE Tools & Logs (Issue 125 §2.1) and is no longer a panel-root
   // child, so it is excluded from this list.
-  plCtx.bodyElements = [status, infoRow, summaryBar.root, btnRow, wsDropSection, taskQueueSection, toolsSection];
+  // Repeat-loop control — chat-box repeat selector (Ambiguity 126)
+  const repeatPanelSection = buildRepeatPanelSection();
+
+  plCtx.bodyElements = [status, infoRow, summaryBar.root, btnRow, wsDropSection, taskQueueSection, repeatPanelSection, toolsSection];
 
   // Assembly
   ui.appendChild(titleRow);
@@ -193,6 +196,7 @@ export function createUI(deps: PanelBuilderDeps): void {
   ui.appendChild(btnRow);
   ui.appendChild(wsDropSection);
   ui.appendChild(taskQueueSection);
+  ui.appendChild(repeatPanelSection);
   ui.appendChild(toolsSection);
 
 
