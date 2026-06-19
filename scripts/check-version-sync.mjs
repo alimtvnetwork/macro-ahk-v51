@@ -72,6 +72,22 @@ const files = [
       return m ? m[1] : null;
     },
   },
+  {
+    label: "instruction.ts (payment-banner-hider)",
+    path: "standalone-scripts/payment-banner-hider/src/instruction.ts",
+    extract: (txt) => {
+      const m = txt.match(/[Vv]ersion:\s*"(\d+\.\d+\.\d+)/);
+      return m ? m[1] : null;
+    },
+  },
+  {
+    label: "index.ts (payment-banner-hider)",
+    path: "standalone-scripts/payment-banner-hider/src/index.ts",
+    extract: (txt) => {
+      const m = txt.match(/VERSION\s*=\s*"(\d+\.\d+\.\d+)/);
+      return m ? m[1] : null;
+    },
+  },
 ];
 
 const results = files.map(({ label, path, extract, optional }) => {
