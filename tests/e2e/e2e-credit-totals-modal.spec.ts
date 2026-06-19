@@ -50,6 +50,16 @@ test.describe('Credit Totals modal — sort → drag → filter → CSV export r
             await page.getByText('💰 Credits').click();
             await expect.poll(() => creditStub.counts.userWorkspaces, { timeout: 20_000 }).toBeGreaterThan(0);
 
+            // Wait for per-workspace /credit-balance fetches to land before
+            // opening the modal — otherwise `available` is 0 for every row
+            // and the stable sort keeps original (Ktlo-first) order.
+            await expect
+                .poll(() => creditStub.creditBalanceCallsFor(CANCELLED_WORKSPACE.id), { timeout: 20_000 })
+                .toBeGreaterThan(0);
+            await expect
+                .poll(() => creditStub.creditBalanceCallsFor(KTLO_WORKSPACE.id), { timeout: 20_000 })
+                .toBeGreaterThan(0);
+
             await page.getByTitle('More actions').click();
             await page.getByText('Credit Totals').click();
             const modal = page.locator('#marco-credit-totals-modal');
