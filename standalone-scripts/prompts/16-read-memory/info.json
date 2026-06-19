@@ -1,10 +1,12 @@
 {
-  "Id": "default-write-memory",
-  "Title": "Write Memory",
-  "Slug": "write-memory",
+  "Id": "default-read-memory",
+  "Title": "Read Memory",
+  "Slug": "read-memory",
   "Version": "1.0.0",
   "Author": "marco",
-  "Categories": ["onboarding"],
+  "Categories": [
+    "onboarding"
+  ],
   "IsDefault": true,
   "Order": 16,
   "CreatedAt": "2026-05-14T00:00:00Z",
