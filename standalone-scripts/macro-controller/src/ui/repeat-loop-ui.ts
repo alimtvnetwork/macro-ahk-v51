@@ -270,6 +270,102 @@ export function setRepeatDelaySec(sec: number): void {
 // UI building blocks
 // ─────────────────────────────────────────────
 
+function buildCountInput(): HTMLInputElement {
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.min = '1';
+  input.max = '1000';
+  input.value = String(repeatLoopState.count);
+  input.style.cssText = 'width:60px;padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:11px;';
+  input.oninput = function () { setRepeatCount(parseInt(input.value, 10) || 1); };
+  return input;
+}
+
+function buildCountPresets(): DocumentFragment {
+  const frag = document.createDocumentFragment();
+  for (const n of PRESETS) {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = String(n);
+    b.title = 'Set repeat count to ' + n;
+    b.style.cssText = 'padding:2px 6px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:10px;';
+    b.onclick = function () { setRepeatCount(n); };
+    frag.appendChild(b);
+  }
+  return frag;
+}
+
+interface WaitControls {
+  wrap: HTMLElement;
+  modeSel: HTMLSelectElement;
+  delayInput: HTMLInputElement;
+}
+
+function buildWaitControls(): WaitControls {
+  const wrap = document.createElement('span');
+  wrap.style.cssText = 'display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding-left:6px;border-left:1px solid rgba(124,58,237,0.25);';
+  const waitLabel = document.createElement('span');
+  waitLabel.textContent = 'wait';
+  waitLabel.style.cssText = 'font-size:10px;opacity:0.8;';
+  wrap.appendChild(waitLabel);
+
+  const modeSel = document.createElement('select');
+  modeSel.style.cssText = 'padding:2px 4px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
+  const optA = document.createElement('option'); optA.value = WAIT_MODE_SUBMIT_READY; optA.textContent = 'auto (submit ready)'; modeSel.appendChild(optA);
+  const optB = document.createElement('option'); optB.value = WAIT_MODE_FIXED_DELAY; optB.textContent = 'fixed delay'; modeSel.appendChild(optB);
+  modeSel.value = repeatLoopState.waitMode;
+  modeSel.onchange = function () { setRepeatWaitMode(modeSel.value as RepeatWaitMode); };
+  wrap.appendChild(modeSel);
+
+  const delayInput = document.createElement('input');
+  delayInput.type = 'number'; delayInput.min = '1'; delayInput.max = '3600';
+  delayInput.value = String(repeatLoopState.delaySec);
+  delayInput.title = 'Fixed delay between iterations (seconds)';
+  delayInput.style.cssText = 'width:52px;padding:2px 4px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
+  delayInput.oninput = function () { setRepeatDelaySec(parseInt(delayInput.value, 10) || 1); };
+  wrap.appendChild(delayInput);
+  const sUnit = document.createElement('span'); sUnit.textContent = 's'; sUnit.style.cssText = 'font-size:10px;opacity:0.7;'; wrap.appendChild(sUnit);
+
+  for (const s of DELAY_PRESETS_SEC) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.textContent = s + 's'; b.title = 'Set fixed delay to ' + s + 's';
+    b.style.cssText = 'padding:1px 4px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);border-radius:3px;color:' + cPanelFg + ';cursor:pointer;font-size:9px;';
+    b.onclick = function () { setRepeatWaitMode(WAIT_MODE_FIXED_DELAY); setRepeatDelaySec(s); };
+    wrap.appendChild(b);
+  }
+
+  return { wrap, modeSel, delayInput };
+}
+
+interface ControlRefs {
+  input: HTMLInputElement;
+  modeSel: HTMLSelectElement;
+  delayInput: HTMLInputElement;
+  action: HTMLButtonElement;
+  progress: HTMLElement;
+}
+
+function renderControl(refs: ControlRefs): void {
+  refs.input.value = String(repeatLoopState.count);
+  refs.input.disabled = repeatLoopState.running;
+  refs.modeSel.value = repeatLoopState.waitMode;
+  refs.modeSel.disabled = repeatLoopState.running;
+  refs.delayInput.value = String(repeatLoopState.delaySec);
+  refs.delayInput.disabled = repeatLoopState.running || repeatLoopState.waitMode !== WAIT_MODE_FIXED_DELAY;
+  refs.delayInput.style.opacity = repeatLoopState.waitMode === WAIT_MODE_FIXED_DELAY ? '1' : '0.45';
+  if (repeatLoopState.running) {
+    refs.action.textContent = '⏹ Stop';
+    refs.action.style.background = '#dc2626';
+    refs.progress.textContent = repeatLoopState.completed + '/' + repeatLoopState.count;
+  } else {
+    refs.action.textContent = '▶ Start';
+    refs.action.style.background = cPrimary;
+    refs.progress.textContent = repeatLoopState.completed > 0
+      ? 'done ' + repeatLoopState.completed + '/' + repeatLoopState.count
+      : '';
+  }
+}
+
 function buildControl(opts: { compact: boolean }): HTMLElement {
   const root = document.createElement('div');
   const pad = opts.compact ? '4px 6px' : '6px 8px';
@@ -280,57 +376,12 @@ function buildControl(opts: { compact: boolean }): HTMLElement {
   label.style.cssText = 'font-weight:600;color:' + cPrimaryLight + ';';
   root.appendChild(label);
 
-  const input = document.createElement('input');
-  input.type = 'number';
-  input.min = '1';
-  input.max = '1000';
-  input.value = String(repeatLoopState.count);
-  input.style.cssText = 'width:60px;padding:3px 6px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:11px;';
-  input.oninput = function () { setRepeatCount(parseInt(input.value, 10) || 1); };
+  const input = buildCountInput();
   root.appendChild(input);
+  root.appendChild(buildCountPresets());
 
-  for (const n of PRESETS) {
-    const b = document.createElement('button');
-    b.type = 'button';
-    b.textContent = String(n);
-    b.title = 'Set repeat count to ' + n;
-    b.style.cssText = 'padding:2px 6px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:10px;';
-    b.onclick = function () { setRepeatCount(n); };
-    root.appendChild(b);
-  }
-
-  // ── wait-mode selector ──
-  const waitWrap = document.createElement('span');
-  waitWrap.style.cssText = 'display:inline-flex;align-items:center;gap:4px;margin-left:6px;padding-left:6px;border-left:1px solid rgba(124,58,237,0.25);';
-  const waitLabel = document.createElement('span');
-  waitLabel.textContent = 'wait';
-  waitLabel.style.cssText = 'font-size:10px;opacity:0.8;';
-  waitWrap.appendChild(waitLabel);
-  const modeSel = document.createElement('select');
-  modeSel.style.cssText = 'padding:2px 4px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
-  const optA = document.createElement('option'); optA.value = WAIT_MODE_SUBMIT_READY; optA.textContent = 'auto (submit ready)'; modeSel.appendChild(optA);
-  const optB = document.createElement('option'); optB.value = WAIT_MODE_FIXED_DELAY; optB.textContent = 'fixed delay'; modeSel.appendChild(optB);
-  modeSel.value = repeatLoopState.waitMode;
-  modeSel.onchange = function () { setRepeatWaitMode(modeSel.value as RepeatWaitMode); };
-  waitWrap.appendChild(modeSel);
-
-  const delayInput = document.createElement('input');
-  delayInput.type = 'number'; delayInput.min = '1'; delayInput.max = '3600';
-  delayInput.value = String(repeatLoopState.delaySec);
-  delayInput.title = 'Fixed delay between iterations (seconds)';
-  delayInput.style.cssText = 'width:52px;padding:2px 4px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:10px;';
-  delayInput.oninput = function () { setRepeatDelaySec(parseInt(delayInput.value, 10) || 1); };
-  waitWrap.appendChild(delayInput);
-  const sUnit = document.createElement('span'); sUnit.textContent = 's'; sUnit.style.cssText = 'font-size:10px;opacity:0.7;'; waitWrap.appendChild(sUnit);
-
-  for (const s of DELAY_PRESETS_SEC) {
-    const b = document.createElement('button');
-    b.type = 'button'; b.textContent = s + 's'; b.title = 'Set fixed delay to ' + s + 's';
-    b.style.cssText = 'padding:1px 4px;background:rgba(124,58,237,0.12);border:1px solid rgba(124,58,237,0.25);border-radius:3px;color:' + cPanelFg + ';cursor:pointer;font-size:9px;';
-    b.onclick = function () { setRepeatWaitMode(WAIT_MODE_FIXED_DELAY); setRepeatDelaySec(s); };
-    waitWrap.appendChild(b);
-  }
-  root.appendChild(waitWrap);
+  const wait = buildWaitControls();
+  root.appendChild(wait.wrap);
 
   const progress = document.createElement('span');
   progress.style.cssText = 'font-size:10px;color:' + cPrimaryLight + ';margin-left:4px;min-width:42px;';
@@ -345,26 +396,8 @@ function buildControl(opts: { compact: boolean }): HTMLElement {
   };
   root.appendChild(action);
 
-  function render(): void {
-    input.value = String(repeatLoopState.count);
-    input.disabled = repeatLoopState.running;
-    modeSel.value = repeatLoopState.waitMode;
-    modeSel.disabled = repeatLoopState.running;
-    delayInput.value = String(repeatLoopState.delaySec);
-    delayInput.disabled = repeatLoopState.running || repeatLoopState.waitMode !== WAIT_MODE_FIXED_DELAY;
-    delayInput.style.opacity = repeatLoopState.waitMode === WAIT_MODE_FIXED_DELAY ? '1' : '0.45';
-    if (repeatLoopState.running) {
-      action.textContent = '⏹ Stop';
-      action.style.background = '#dc2626';
-      progress.textContent = repeatLoopState.completed + '/' + repeatLoopState.count;
-    } else {
-      action.textContent = '▶ Start';
-      action.style.background = cPrimary;
-      progress.textContent = repeatLoopState.completed > 0
-        ? 'done ' + repeatLoopState.completed + '/' + repeatLoopState.count
-        : '';
-    }
-  }
+  const refs: ControlRefs = { input, modeSel: wait.modeSel, delayInput: wait.delayInput, action, progress };
+  const render = (): void => { renderControl(refs); };
   render();
   repeatLoopState.subscribers.add(render);
   return root;
