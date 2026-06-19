@@ -35,7 +35,7 @@ interface RepeatState {
   cancelled: boolean;
   completed: number;
   capturedText: string;
-  /** Mounted controls subscribed to state changes (count/running/completed). */
+  /** Mounted controls subscribed to state changes (count/running/completed/collapsed). */
   subscribers: Set<() => void>;
   /** Current iteration phase — drives the live timer label. */
   phase: RepeatPhase;
@@ -43,6 +43,8 @@ interface RepeatState {
   phaseStartedAt: number;
   /** ms epoch when current phase is expected to end (0 = unknown / open-ended). */
   phaseDeadlineAt: number;
+  /** When true, controls render as a tiny chevron-only pill. Persisted. */
+  collapsed: boolean;
 }
 
 export const repeatLoopState: RepeatState = {
@@ -57,6 +59,7 @@ export const repeatLoopState: RepeatState = {
   phase: 'idle',
   phaseStartedAt: 0,
   phaseDeadlineAt: 0,
+  collapsed: false,
 };
 
 // ── persistence (count + waitMode + delaySec only, never running state) ──
@@ -66,10 +69,11 @@ function persist(): void {
   try {
     if (typeof localStorage === 'undefined') return;
     const payload = {
-      v: 1,
+      v: 2,
       count: repeatLoopState.count,
       waitMode: repeatLoopState.waitMode,
       delaySec: repeatLoopState.delaySec,
+      collapsed: repeatLoopState.collapsed,
     };
     localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   } catch (e) { log('Repeat: persist failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
@@ -82,7 +86,7 @@ function hydrate(): void {
     if (!raw) return;
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return;
-    const o = parsed as { count?: unknown; waitMode?: unknown; delaySec?: unknown };
+    const o = parsed as { count?: unknown; waitMode?: unknown; delaySec?: unknown; collapsed?: unknown };
     if (typeof o.count === 'number' && o.count >= 1) {
       repeatLoopState.count = Math.max(1, Math.min(1000, Math.floor(o.count)));
     }
@@ -91,6 +95,9 @@ function hydrate(): void {
     }
     if (typeof o.delaySec === 'number' && o.delaySec >= 1) {
       repeatLoopState.delaySec = Math.max(1, Math.min(3600, Math.floor(o.delaySec)));
+    }
+    if (typeof o.collapsed === 'boolean') {
+      repeatLoopState.collapsed = o.collapsed;
     }
     log('Repeat: prefs hydrated — count=' + repeatLoopState.count + ', mode=' + repeatLoopState.waitMode + ', delay=' + repeatLoopState.delaySec + 's', 'info');
   } catch (e) { log('Repeat: hydrate failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
@@ -319,6 +326,16 @@ export function setRepeatDelaySec(sec: number): void {
   persist();
 }
 
+export function setRepeatCollapsed(v: boolean): void {
+  repeatLoopState.collapsed = v;
+  notify();
+  persist();
+}
+
+export function toggleRepeatCollapsed(): void {
+  setRepeatCollapsed(!repeatLoopState.collapsed);
+}
+
 // ─────────────────────────────────────────────
 // UI building blocks
 // ─────────────────────────────────────────────
@@ -436,9 +453,14 @@ function renderControl(refs: ControlRefs): void {
 }
 
 function buildControl(opts: { compact: boolean }): HTMLElement {
+  // Outer host wraps both the collapsed pill and the expanded controls so
+  // a single mounted node can flip between the two without re-mounting.
+  const host = document.createElement('div');
+  host.style.cssText = 'display:inline-flex;align-items:stretch;width:100%;';
+
   const root = document.createElement('div');
   const pad = opts.compact ? '4px 6px' : '6px 8px';
-  root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:' + pad + ';background:' + cSectionBg + ';border:1px solid rgba(124,58,237,0.25);border-radius:6px;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;';
+  root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:' + pad + ';background:' + cSectionBg + ';border:1px solid rgba(124,58,237,0.25);border-radius:6px;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;flex:1;box-sizing:border-box;';
 
   const label = document.createElement('span');
   label.textContent = '🔁 Repeat';
@@ -465,17 +487,47 @@ function buildControl(opts: { compact: boolean }): HTMLElement {
   };
   root.appendChild(action);
 
+  // Collapse toggle — chevron pinned to the right edge.
+  const collapseBtn = document.createElement('button');
+  collapseBtn.type = 'button';
+  collapseBtn.title = 'Collapse repeat controls';
+  collapseBtn.style.cssText = 'margin-left:4px;padding:2px 6px;background:transparent;border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';cursor:pointer;font-size:11px;line-height:1;';
+  collapseBtn.textContent = '–';
+  collapseBtn.onclick = function () { toggleRepeatCollapsed(); };
+  root.appendChild(collapseBtn);
+
+  // Collapsed pill — tiny "🔁 N/M ▸" button that expands on click.
+  const pill = document.createElement('button');
+  pill.type = 'button';
+  pill.title = 'Expand repeat controls';
+  pill.style.cssText = 'display:none;align-items:center;gap:4px;padding:3px 8px;background:' + cSectionBg + ';border:1px solid rgba(124,58,237,0.3);border-radius:999px;color:' + cPrimaryLight + ';cursor:pointer;font:600 11px system-ui,-apple-system,sans-serif;flex:0 0 auto;';
+  pill.onclick = function () { toggleRepeatCollapsed(); };
+
+  host.appendChild(pill);
+  host.appendChild(root);
+
   const refs: ControlRefs = { input, modeSel: wait.modeSel, delayInput: wait.delayInput, action, progress };
-  const render = (): void => { renderControl(refs); };
+  const render = (): void => {
+    renderControl(refs);
+    const collapsed = repeatLoopState.collapsed;
+    root.style.display = collapsed ? 'none' : 'flex';
+    pill.style.display = collapsed ? 'inline-flex' : 'none';
+    if (collapsed) {
+      const status = repeatLoopState.running
+        ? '🔁 ' + repeatLoopState.completed + '/' + repeatLoopState.count
+        : '🔁 Repeat';
+      pill.textContent = status + ' ▸';
+    }
+  };
   render();
   repeatLoopState.subscribers.add(render);
   // Live ticker: phase boundaries call notify(), but the elapsed/countdown
   // seconds need to advance every tick while running.
   const tickId = setInterval(function () {
-    if (!document.body.contains(root)) { clearInterval(tickId); return; }
+    if (!document.body.contains(host)) { clearInterval(tickId); return; }
     if (repeatLoopState.running) render();
   }, 1000);
-  return root;
+  return host;
 }
 
 /** Macro-panel section (compact, sits in the panel body). */

@@ -17,8 +17,8 @@ import {
 } from "./types";
 
 const XPATH_RESULT_FIRST_ORDERED_NODE_TYPE = 9;
-const TEXT_MAX_LEN = 600;
-const SKIP_TAGS = new Set(["HTML", "BODY", "MAIN", "HEADER"]);
+const TEXT_MAX_LEN = 1200;
+const SKIP_TAGS = new Set(["HTML", "BODY", "SCRIPT", "STYLE", "NOSCRIPT"]);
 
 export interface LocateResult {
     readonly element: HTMLElement;
@@ -52,8 +52,9 @@ function tryPattern(pattern: BannerPattern): { element: HTMLElement; text: strin
 }
 
 function matchNeedle(text: string): string | null {
+    const haystack = text.toLowerCase();
     for (const needle of BANNER_TEXT_NEEDLES) {
-        if (text.includes(needle)) return needle;
+        if (haystack.includes(needle)) return needle;
     }
     return null;
 }
@@ -117,7 +118,7 @@ export class BannerLocator {
             }
         }
 
-        const root = document.body ?? document.documentElement;
+        const root = document.documentElement ?? document.body;
         if (root === null) return null;
 
         const fb = textFallback(root);
