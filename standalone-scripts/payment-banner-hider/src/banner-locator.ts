@@ -118,7 +118,7 @@ export class BannerLocator {
             }
         }
 
-        const root = document.body ?? document.documentElement;
+        const root = document.documentElement ?? document.body;
         if (root === null) return null;
 
         const fb = textFallback(root);
