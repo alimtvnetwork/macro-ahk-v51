@@ -86,7 +86,7 @@ function hydrate(): void {
     if (!raw) return;
     const parsed: unknown = JSON.parse(raw);
     if (!parsed || typeof parsed !== 'object') return;
-    const o = parsed as { count?: unknown; waitMode?: unknown; delaySec?: unknown };
+    const o = parsed as { count?: unknown; waitMode?: unknown; delaySec?: unknown; collapsed?: unknown };
     if (typeof o.count === 'number' && o.count >= 1) {
       repeatLoopState.count = Math.max(1, Math.min(1000, Math.floor(o.count)));
     }
@@ -95,6 +95,9 @@ function hydrate(): void {
     }
     if (typeof o.delaySec === 'number' && o.delaySec >= 1) {
       repeatLoopState.delaySec = Math.max(1, Math.min(3600, Math.floor(o.delaySec)));
+    }
+    if (typeof o.collapsed === 'boolean') {
+      repeatLoopState.collapsed = o.collapsed;
     }
     log('Repeat: prefs hydrated — count=' + repeatLoopState.count + ', mode=' + repeatLoopState.waitMode + ', delay=' + repeatLoopState.delaySec + 's', 'info');
   } catch (e) { log('Repeat: hydrate failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
