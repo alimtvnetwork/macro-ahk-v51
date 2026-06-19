@@ -62,7 +62,11 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
-Set-StrictMode -Version Latest
+# NOTE: Do NOT enable `Set-StrictMode -Version Latest` here. When this script
+# is run via `irm ... | iex`, strict mode is inherited by the caller session
+# and turns every later missing-property access in the user's shell into a
+# hard error. It also broke our own `$rsp.tag_name` access when the GitHub
+# API response shape varies slightly (e.g. rate-limited HTML response).
 
 function Write-Step([string]$msg) { Write-Host "  [..] $msg" -ForegroundColor Cyan }
 function Write-Ok  ([string]$msg) { Write-Host "  [OK] $msg" -ForegroundColor Green }
