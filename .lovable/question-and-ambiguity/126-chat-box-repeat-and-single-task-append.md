@@ -206,3 +206,24 @@ precedence over a direct question per the memory rule.
 The recommended interpretation above is the one this AI will
 implement on the next user turn that says `next`, unless the user
 contradicts it explicitly.
+
+---
+
+## RESOLVED 2026-06-19 — User answers
+
+User explicitly opened a one-shot question turn and chose:
+
+- **Q1 Repeat semantics:** Paste → submit → wait → repeat N times.
+  Loop drives one "current chat box text" through N submit cycles,
+  waiting for Lovable to finish between each.
+- **Q2 Which prompt repeats:** Whatever text is currently in the
+  chat box at the moment Start is clicked. No pinning, no "last
+  picked" tracking.
+- **Q3 Where Repeat lives:** BOTH — floating macro panel
+  (number input + presets 1/5/10/25/50/100 + Start/Stop) AND an
+  inline strip injected directly above Lovable's chat textarea.
+  Both controls share the same state.
+- **Q4 Stop conditions:** Manual Stop button ONLY. No auto-stop on
+  errors, no credit threshold. User wants full manual control.
+
+**Status:** RESOLVED — ready to implement. No further questions.
