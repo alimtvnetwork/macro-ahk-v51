@@ -20,6 +20,7 @@ import { IDS, TIMING, state, loopCreditState } from '../shared-state';
 import { log } from '../logging';
 import { runCycle } from '../loop-engine';
 import { trackedSetInterval, trackedClearInterval } from '../interval-registry';
+import { domCache } from '../dom-cache';
 
 // Re-export status renderer symbols
 export { updateStatus, updateRecordIndicator, statusRenderStats, updateQueueBadge } from './ui-status-renderer';
