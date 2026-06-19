@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { removePaymentNoticeOnce } from '../../../standalone-scripts/macro-controller/src/ui/payment-notice-removal';
+import { removePaymentNoticeOnce } from '../ui/payment-notice-removal';
 
 interface TestPaymentBannerHiderWindow extends Window {
   PaymentBannerHider?: { check: () => void };
