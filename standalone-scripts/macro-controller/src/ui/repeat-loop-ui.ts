@@ -15,11 +15,18 @@ import { findAddToTasksButton } from './task-next-ui';
 import { cPanelFg, cPrimary, cPrimaryLight, cSectionBg } from '../shared-state';
 
 const PRESETS = [1, 5, 10, 25, 50, 100] as const;
+const DELAY_PRESETS_SEC = [5, 8, 12, 15, 20, 30, 60] as const;
 const POLL_MS = 500;
 const MAX_WAIT_MS = 10 * 60 * 1000; // 10 min per submit
+const STORAGE_KEY = 'marco-repeat-loop-prefs';
+
+export type RepeatWaitMode = 'submit-ready' | 'fixed-delay';
 
 interface RepeatState {
   count: number;
+  waitMode: RepeatWaitMode;
+  /** Fixed delay between iterations, seconds (used when waitMode = 'fixed-delay'). */
+  delaySec: number;
   running: boolean;
   cancelled: boolean;
   completed: number;
@@ -30,12 +37,48 @@ interface RepeatState {
 
 export const repeatLoopState: RepeatState = {
   count: 10,
+  waitMode: 'submit-ready',
+  delaySec: 15,
   running: false,
   cancelled: false,
   completed: 0,
   capturedText: '',
   subscribers: new Set(),
 };
+
+// ── persistence (count + waitMode + delaySec only, never running state) ──
+function persist(): void {
+  try {
+    const payload = { count: repeatLoopState.count, waitMode: repeatLoopState.waitMode, delaySec: repeatLoopState.delaySec };
+    const cs = (globalThis as { chrome?: { storage?: { local?: { set?: (i: Record<string, unknown>) => void } } } }).chrome;
+    if (cs?.storage?.local?.set) {
+      cs.storage.local.set({ [STORAGE_KEY]: payload });
+    } else if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    }
+  } catch (e) { log('Repeat: persist failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+}
+
+function hydrate(): void {
+  try {
+    const apply = (raw: unknown): void => {
+      if (!raw || typeof raw !== 'object') return;
+      const o = raw as { count?: unknown; waitMode?: unknown; delaySec?: unknown };
+      if (typeof o.count === 'number' && o.count >= 1) repeatLoopState.count = Math.min(1000, Math.floor(o.count));
+      if (o.waitMode === 'submit-ready' || o.waitMode === 'fixed-delay') repeatLoopState.waitMode = o.waitMode;
+      if (typeof o.delaySec === 'number' && o.delaySec >= 1) repeatLoopState.delaySec = Math.min(3600, Math.floor(o.delaySec));
+      notify();
+    };
+    const cs = (globalThis as { chrome?: { storage?: { local?: { get?: (k: string, cb: (r: Record<string, unknown>) => void) => void } } } }).chrome;
+    if (cs?.storage?.local?.get) {
+      cs.storage.local.get(STORAGE_KEY, function (result) { apply(result?.[STORAGE_KEY]); });
+    } else if (typeof localStorage !== 'undefined') {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) apply(JSON.parse(raw));
+    }
+  } catch (e) { log('Repeat: hydrate failed — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+}
+hydrate();
 
 function notify(): void {
   for (const fn of repeatLoopState.subscribers) {
