@@ -176,12 +176,21 @@ async function waitBetweenIterations(): Promise<void> {
   if (repeatLoopState.waitMode === WAIT_MODE_FIXED_DELAY) {
     const ms = Math.max(1, repeatLoopState.delaySec) * 1000;
     const until = Date.now() + ms;
+    setPhase('waiting-delay', ms);
     while (Date.now() < until && !repeatLoopState.cancelled) {
       await sleep(Math.min(POLL_MS, until - Date.now()));
     }
     return;
   }
+  setPhase('waiting-completion', 0);
   await waitForCompletion(MAX_WAIT_MS);
+}
+
+function setPhase(phase: RepeatPhase, durationMs: number): void {
+  repeatLoopState.phase = phase;
+  repeatLoopState.phaseStartedAt = Date.now();
+  repeatLoopState.phaseDeadlineAt = durationMs > 0 ? Date.now() + durationMs : 0;
+  notify();
 }
 
 /**
