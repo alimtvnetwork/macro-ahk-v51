@@ -61,10 +61,11 @@ export function loadTaskNextSettings(deps: TaskNextDeps, cb?: () => void) {
       try {
         const saved = JSON.parse(resp.value as string);
         for (const k of Object.keys(saved)) {
-          if (Object.prototype.hasOwnProperty.call(taskNextState.settings, k)) {
+          if (k !== 'requireStartForMultiRun' && Object.prototype.hasOwnProperty.call(taskNextState.settings, k)) {
             taskNextState.settings[k] = saved[k];
           }
         }
+        taskNextState.settings.requireStartForMultiRun = true;
       } catch (e) { log('Task Next: failed to parse saved settings — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
     }
     if (cb) {
@@ -236,7 +237,8 @@ function tryClickAndAdvance(ctx: ClickContext): void {
 
 function resolveRequestedTaskCount(count: number): number {
   const requested = Math.max(1, Math.floor(count) || 1);
-  if (taskNextState.settings.requireStartForMultiRun && requested > 1) {
+  taskNextState.settings.requireStartForMultiRun = true;
+  if (requested > 1) {
     log('Task Next: multi-run blocked; queuing one task only. Use Repeat Start for repeated submissions.', 'warn');
     showPasteToast('⏭ Task Next: queued 1 only — use Repeat Start for repeats', false);
     return 1;
@@ -380,7 +382,6 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
     { key: 'retryDelayMs', label: 'Retry delay (ms)', type: 'number' },
     { key: 'buttonXPath', label: 'Button XPath', type: 'text' },
     { key: 'promptSlug', label: 'Prompt slug', type: 'text' },
-    { key: 'requireStartForMultiRun', label: 'Next button runs once only', type: 'checkbox' },
   ];
 
   const inputs: Record<string, HTMLInputElement> = {};
@@ -423,7 +424,7 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
     taskNextState.settings.retryDelayMs = parseInt(inputs.retryDelayMs.value) || 1000;
     taskNextState.settings.buttonXPath = inputs.buttonXPath.value || taskNextState.settings.buttonXPath;
     taskNextState.settings.promptSlug = inputs.promptSlug.value || Label.NextTasks;
-    taskNextState.settings.requireStartForMultiRun = inputs.requireStartForMultiRun.checked;
+    taskNextState.settings.requireStartForMultiRun = true;
     saveTaskNextSettings(deps);
     overlay.remove();
     showPasteToast('✅ Task Next settings saved', false);
