@@ -39,6 +39,7 @@ import { nsWrite, getNamespace } from './api-namespace';
 import { updateWsSelectionUI, triggerLoopMoveFromSelection, setLoopWsNavIndex, populateLoopWorkspaceDropdown, renderBulkRenameDialog, getLoopWsCompactMode, setLoopWsCompactMode, getLoopWsFreeOnly, setLoopWsFreeOnly, getLoopWsExpiredWithCredits, setLoopWsExpiredWithCredits, getLoopWsExpiring, setLoopWsExpiring, getLoopWsRefillSoon, setLoopWsRefillSoon, getLoopWsRefillPriority, setLoopWsRefillPriority, getLoopWsNavIndex } from './ws-selection-ui';
 import { shouldInject } from './startup-domain-guard';
 import { runIdempotentCheck } from './startup-idempotent-check';
+import { installPaymentNoticeRemoval } from './ui/payment-notice-removal';
 
 import { Label } from './types';
 
@@ -86,6 +87,9 @@ import { Label } from './types';
 
   // ── XPath init ──
   initXPathUtils();
+
+  // ── Payment notice cleanup ──
+  installPaymentNoticeRemoval();
 
   // ── Loop control globals ──
   nsWrite('api.workspace.forceSwitch', forceSwitch);
