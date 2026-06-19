@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.73.0] — 2026-06-19
+
+### Added
+
+### Fixed
+
+### Changed
+- Version bump: 3.72.0 → 3.73.0 (all version files synced)
+
+---
+
 ## [v3.72.0] — 2026-06-19 Prompt cache invalidation + Next runs once by default
 
 ### Fixed
