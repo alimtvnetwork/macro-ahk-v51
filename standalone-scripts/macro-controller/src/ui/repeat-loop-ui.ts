@@ -221,6 +221,7 @@ function dispatchChatSubmit(): boolean {
 
 /** Returns true if iteration submitted successfully; false if loop should break. */
 async function submitOneIteration(): Promise<boolean> {
+  setPhase('submitting', 0);
   if (!setEditorText(repeatLoopState.capturedText)) {
     showPasteToast('❌ Repeat: editor not found — stopped at ' + repeatLoopState.completed + '/' + repeatLoopState.count, true);
     return false;
