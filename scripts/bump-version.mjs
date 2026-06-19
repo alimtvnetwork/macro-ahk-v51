@@ -154,6 +154,20 @@ function getTargets(ver) {
         { pattern: /(\b[Vv]ersion:\s*")[\d.]+(")/,             replacement: `$1${ver}$2` },
       ],
     },
+    {
+      // payment-banner-hider — Version in seed manifest (drives re-seed on bump)
+      path: "standalone-scripts/payment-banner-hider/src/instruction.ts",
+      replacements: [
+        { pattern: /(\b[Vv]ersion:\s*")[\d.]+(")/,             replacement: `$1${ver}$2` },
+      ],
+    },
+    {
+      // payment-banner-hider — VERSION constant exposed on window.PaymentBannerHider
+      path: "standalone-scripts/payment-banner-hider/src/index.ts",
+      replacements: [
+        { pattern: /(VERSION\s*=\s*")[\d.]+(")/,               replacement: `$1${ver}$2` },
+      ],
+    },
   ];
 }
 
