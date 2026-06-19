@@ -31,6 +31,6 @@ describe('default prompt content', () => {
     const prompt = readPrompt('standalone-scripts/prompts/13-next-tasks/prompt.md');
 
     expect(prompt).toContain('Do one logical task at a time');
-    expect(prompt).toContain('release bundle');
+    expect(prompt).toContain('repeated submissions require the dedicated Repeat `▶ Start` control');
   });
 });
