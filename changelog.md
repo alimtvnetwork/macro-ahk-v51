@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.60.0] — 2026-06-19 Compact Prompts List + Task Next Visibility
+
+### Changed
+- **Prompts dropdown — compact rows** (`standalone-scripts/macro-controller/src/ui/prompt-dropdown.ts` `renderPromptItem`): row padding `6px 8px` → `3px 6px`, badge `16×16` → `14×14`, name+tags now live on a single horizontal flex line (`flex-direction:row`, `gap:6px`) instead of stacking (tags no longer wrap onto a second row), tag padding/gap tightened, faint divider opacity reduced (`0.15` → `0.12`). Roughly halves vertical space per prompt so the dropdown shows ~2× more items without scroll.
+- **Task Next row — visibility** (`_buildTaskNextMenuShell`): label is now an explicit `<span>` (was a raw text node that collided with the right-anchored arrow under `space-between`), color bumped from `cPrimaryLight` to `#e9d5ff`, font-weight `600` → `700`, and a subtle purple tint (`rgba(124,58,237,0.18)`) is now always-on so the row reads as a header instead of blending into the prompt list. Arrow inherits the brighter color.
+
+### Version
+- Bumped 3.59.0 → 3.60.0 across `manifest.json`, `src/shared/constants.ts`, `standalone-scripts/macro-controller/src/shared-state.ts`, every `standalone-scripts/*/src/instruction.ts`, and `standalone-scripts/payment-banner-hider/src/index.ts`. Verified by `node scripts/check-version-sync.mjs` → `✅ All versions in sync: 3.60.0`.
+
+---
+
 ## [v3.59.0] — 2026-06-19 Payment Banner Patterns + Form-Submit for Repeat Loop
 
 ### Added
