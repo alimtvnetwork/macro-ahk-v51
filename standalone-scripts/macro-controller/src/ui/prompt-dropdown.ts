@@ -886,11 +886,13 @@ function _buildTaskNextMenuShell(promptsDropdown: HTMLElement): { taskNextItem: 
   const taskNextItem = document.createElement('div');
   taskNextItem.style.cssText = 'border-bottom:1px solid rgba(124,58,237,0.3);';
   const taskNextRow = document.createElement('div');
-  taskNextRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 8px;cursor:pointer;font-size:11px;color:' + cPrimaryLight + ';font-weight:600;';
-  taskNextRow.textContent = '⏭ Task Next';
+  taskNextRow.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:5px 8px;cursor:pointer;font-size:11px;color:#e9d5ff;font-weight:700;background:rgba(124,58,237,0.18);';
+  const taskNextLabel = document.createElement('span');
+  taskNextLabel.textContent = '⏭ Task Next';
+  taskNextRow.appendChild(taskNextLabel);
   const taskNextArrow = document.createElement('span');
   taskNextArrow.textContent = '▸';
-  taskNextArrow.style.cssText = 'font-size:10px;margin-left:4px;';
+  taskNextArrow.style.cssText = 'font-size:11px;margin-left:4px;color:#e9d5ff;';
   taskNextRow.appendChild(taskNextArrow);
 
   const taskNextSub = document.createElement('div');
@@ -1029,31 +1031,31 @@ function renderPromptItem(
   const item = document.createElement('div');
   item.setAttribute('data-prompt-idx', String(idx));
   const hasText = Boolean(p.text);
-  item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:6px 8px;cursor:pointer;font-size:10px;color:' + (hasText ? '#c9a8ef' : '#6b5a8a') + ';border-bottom:1px solid rgba(124,58,237,0.15);' + (hasText ? '' : 'opacity:0.6;');
+  item.style.cssText = 'display:flex;align-items:center;justify-content:space-between;padding:3px 6px;cursor:pointer;font-size:10px;color:' + (hasText ? '#c9a8ef' : '#6b5a8a') + ';border-bottom:1px solid rgba(124,58,237,0.12);' + (hasText ? '' : 'opacity:0.6;');
   item.onmouseover = function() { (this as HTMLElement).style.background = cBtnMenuHover; };
   item.onmouseout = function() { (this as HTMLElement).style.background = 'transparent'; };
 
   const badge = document.createElement('span');
   badge.textContent = String(idx + 1);
-  badge.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:3px;background:' + (hasText ? cPrimary : 'rgba(124,58,237,0.3)') + ';color:' + cPanelFg + ';font-size:8px;font-weight:700;margin-right:6px;flex-shrink:0;';
+  badge.style.cssText = 'display:inline-flex;align-items:center;justify-content:center;width:14px;height:14px;border-radius:3px;background:' + (hasText ? cPrimary : 'rgba(124,58,237,0.3)') + ';color:' + cPanelFg + ';font-size:8px;font-weight:700;margin-right:5px;flex-shrink:0;';
   item.appendChild(badge);
 
   const nameSpan = document.createElement('span');
   nameSpan.textContent = p.name + (hasText ? '' : ' (text not loaded)');
-  nameSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;';
+  nameSpan.style.cssText = 'flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;line-height:1.25;';
   nameSpan.title = p.text || 'Prompt text not available — click Load to refresh';
-  
+
   const contentWrap = document.createElement('div');
-  contentWrap.style.cssText = 'flex:1;display:flex;flex-direction:column;overflow:hidden;';
+  contentWrap.style.cssText = 'flex:1;display:flex;flex-direction:row;align-items:center;gap:6px;overflow:hidden;min-width:0;';
   contentWrap.appendChild(nameSpan);
 
   if (p.tags && p.tags.length > 0) {
     const tagsWrap = document.createElement('div');
-    tagsWrap.style.cssText = 'display:flex;gap:4px;flex-wrap:wrap;margin-top:2px;';
+    tagsWrap.style.cssText = 'display:flex;gap:3px;flex-wrap:nowrap;overflow:hidden;flex-shrink:0;';
     p.tags.forEach(tag => {
       const tagEl = document.createElement('span');
       tagEl.textContent = tag;
-      tagEl.style.cssText = 'font-size:8px;background:rgba(124,58,237,0.2);color:' + cPrimaryLight + ';padding:0px 4px;border-radius:2px;border:1px solid rgba(124,58,237,0.2);';
+      tagEl.style.cssText = 'font-size:8px;line-height:1.2;background:rgba(124,58,237,0.18);color:' + cPrimaryLight + ';padding:0 4px;border-radius:2px;border:1px solid rgba(124,58,237,0.2);';
       tagsWrap.appendChild(tagEl);
     });
     contentWrap.appendChild(tagsWrap);
