@@ -420,7 +420,10 @@ override env vars. Strict mode always wins.
 
 function Resolve-InstallDir([string]$dir) {
     if ($dir -ne "") { return $dir }
-    return Join-Path $HOME "marco-extension"
+    # Default to current working directory (where the user invoked the script),
+    # not $HOME. PWD reflects the caller's cwd even when piped via irm | iex.
+    $cwd = (Get-Location).Path
+    return Join-Path $cwd "marco-extension"
 }
 
 # --- Updater run identity (scopes every artifact this run creates) ---
