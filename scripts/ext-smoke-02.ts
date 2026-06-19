@@ -30,7 +30,7 @@ let failed = false;
 for (const rel of REQUIRED_ENTRIES) {
     const abs = resolve(ROOT, rel);
     if (!existsSync(abs)) {
-        console.error(`smoke: missing required entry ${rel}`);
+        process.stderr.write(`smoke: missing required entry ${rel}\n`);
         failed = true;
         break; // fail-fast per no-retry policy
     }
