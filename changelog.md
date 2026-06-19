@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.71.0] — 2026-06-19 Default prompts updated for release and next-task behavior
+
+### Changed
+- **Default prompts** — updated Minor/Major/Patch Bump prompt sources to explicitly treat “bump version + add changelog + pin that version to root readme” (and typo variants like “abump version ...”) as a release action. The prompts now require unified version files, root `version.json`, root `readme.md` pins, `changelog.md`, and changed prompt sources/fallback copies to move together.
+- **Next Tasks prompt** — now tells the assistant to execute the next pending task in the same turn, avoid plan-approval stalls, and end with a flat numbered remaining-task list.
+
+### Fixed
+- **Prompt propagation gap** — updated the prompt source markdown, prompt metadata versions, macro-controller hardcoded fallback prompts, background fallback prompts, and preview defaults so users do not keep seeing stale prompt text when bundled prompt JSON is missing or cached.
+
+
 ## [v3.70.0] — 2026-06-19 Banner hider matches "Final notice" + Repeat box collapses
 
 ### Fixed
