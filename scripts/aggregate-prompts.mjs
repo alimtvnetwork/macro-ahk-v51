@@ -95,6 +95,18 @@ async function main() {
             entry.category = Categories;
         }
 
+        // Dynamic prompt expansion metadata (e.g. Next ${N} steps, Plan ${N}).
+        // The dropdown UI uses this to render one entry per replace-value with
+        // ${ReplaceKey} substituted into the title, slug, and body.
+        const IsDynamic = pick("IsDynamic", "isDynamic");
+        const ReplaceKey = pick("ReplaceKey", "replaceKey");
+        const ReplaceValues = pick("ReplaceValues", "replaceValues");
+        const SlugTemplate = pick("SlugTemplate", "slugTemplate");
+        if (IsDynamic) entry.isDynamic = true;
+        if (ReplaceKey) entry.replaceKey = ReplaceKey;
+        if (Array.isArray(ReplaceValues)) entry.replaceValues = ReplaceValues.map(String);
+        if (SlugTemplate) entry.slugTemplate = SlugTemplate;
+
         prompts.push(entry);
     }
 
