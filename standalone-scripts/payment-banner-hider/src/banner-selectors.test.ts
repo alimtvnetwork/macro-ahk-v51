@@ -1,3 +1,4 @@
+/* eslint-disable max-lines-per-function */
 /**
  * Regression tests — ID/attribute-based selector verification.
  *
