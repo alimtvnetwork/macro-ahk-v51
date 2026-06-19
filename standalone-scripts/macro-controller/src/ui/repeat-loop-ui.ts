@@ -210,11 +210,10 @@ export function startRepeatLoop(): void {
     log('Repeat: already running', 'warn');
     return;
   }
-  // Per Ambiguity 126 follow-up (2026-06-19): empty chat box is allowed
-  // — user explicitly chose "start anyway". No guard.
-  const text = readEditorText();
-  if (!text.trim()) {
-    log('Repeat: starting with empty chat box (user-allowed)', 'warn');
+  const text = readEditorText().trim();
+  if (!text) {
+    showPasteToast('❌ Repeat: chat box is empty — type or paste something first', true);
+    return;
   }
   const n = Math.max(1, Math.min(1000, Math.floor(repeatLoopState.count) || 1));
   repeatLoopState.count = n;
