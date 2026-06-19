@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.66.0] — 2026-06-19
+
+### Fixed
+- `scripts/download-extension.ps1` no longer crashes when run via `irm … | iex`: removed `Set-StrictMode -Version Latest` (was leaking into the caller's session), defensive `tag_name` lookup against non-JSON GitHub responses, and CWD now uses `$PWD.ProviderPath` so `Invoke-WebRequest -OutFile` works on non-FileSystem providers.
+
 ## [v3.65.0] — 2026-06-19
 
 ### Changed
