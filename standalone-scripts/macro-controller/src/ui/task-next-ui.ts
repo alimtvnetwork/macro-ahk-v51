@@ -393,7 +393,11 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
     row.appendChild(lbl);
     const inp = document.createElement('input');
     inp.type = field.type;
-    inp.value = String(taskNextState.settings[field.key]);
+    if (field.type === 'checkbox') {
+      inp.checked = taskNextState.settings[field.key] === true;
+    } else {
+      inp.value = String(taskNextState.settings[field.key]);
+    }
     inp.style.cssText = 'width:100%;padding:6px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:6px;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;';
     row.appendChild(inp);
     modal.appendChild(row);
@@ -419,6 +423,7 @@ export function openTaskNextSettingsModal(deps: TaskNextDeps) {
     taskNextState.settings.retryDelayMs = parseInt(inputs.retryDelayMs.value) || 1000;
     taskNextState.settings.buttonXPath = inputs.buttonXPath.value || taskNextState.settings.buttonXPath;
     taskNextState.settings.promptSlug = inputs.promptSlug.value || Label.NextTasks;
+    taskNextState.settings.requireStartForMultiRun = inputs.requireStartForMultiRun.checked;
     saveTaskNextSettings(deps);
     overlay.remove();
     showPasteToast('✅ Task Next settings saved', false);
