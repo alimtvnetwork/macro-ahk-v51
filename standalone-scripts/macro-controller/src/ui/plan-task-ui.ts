@@ -84,7 +84,7 @@ function buildShell(ctx: PromptContext): { item: HTMLElement; sub: HTMLElement }
 
   const sub = document.createElement('div');
   sub.setAttribute('data-plan-task-sub', '1');
-  sub.style.cssText = 'display:none;position:static;margin:0 6px 6px 6px;background:rgba(0,0,0,0.18);border:1px solid ' + cPrimary + ';border-radius:' + lDropdownRadius + ';';
+  sub.style.cssText = 'display:none;position:static;margin:0 6px 6px 6px;max-height:240px;overflow-y:auto;background:rgba(0,0,0,0.18);border:1px solid ' + cPrimary + ';border-radius:' + lDropdownRadius + ';';
   item.appendChild(row);
   item.appendChild(sub);
   wireShellToggle(row, arrow, sub, ctx.promptsDropdown);
