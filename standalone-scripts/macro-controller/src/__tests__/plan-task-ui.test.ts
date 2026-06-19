@@ -57,16 +57,16 @@ describe('buildPlanTaskPrompt', () => {
   it('contains the N value in heading + body for n=5/10/15/99', () => {
     for (const n of [5, 10, 15, 99]) {
       const out = buildPlanTaskPrompt(n);
-      expect(out).toContain('## **' + n + '** steps Plan');
-      expect(out).toContain('plan this task for **' + n + '** steps');
-      expect(out).toContain('Write the ' + n + ' steps into `.lovable/plan.md`');
+      expect(out).toContain('# Plan in ' + n + '-Steps Plan');
+      expect(out).toContain('**Steps:** ' + n);
+      expect(out).toContain('Wrote EXACTLY ' + n + ' steps');
     }
   });
 
   it('includes guideline check block', () => {
     const out = buildPlanTaskPrompt(7);
     expect(out).toContain('.lovable/coding-guidelines.md');
-    expect(out).toContain('.lovable/seo-guidelines.md');
+    expect(out).toContain('spec/coding-guidelines/');
   });
 });
 
@@ -81,7 +81,7 @@ describe('renderPlanTaskSubmenu — toast surface', () => {
     const header = container.querySelector('div') as HTMLElement;
     header.click(); // open sub
     const presets = container.querySelectorAll('[data-plan-task-sub] > div');
-    (presets[0] as HTMLElement).click(); // "Plan in 5 steps"
+    (presets[0] as HTMLElement).click(); // "Plan 2"
 
     expect(showPasteToastSpy).not.toHaveBeenCalled();
   });
