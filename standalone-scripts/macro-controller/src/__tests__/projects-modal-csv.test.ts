@@ -138,6 +138,9 @@ describe('Projects modal CSV last communication cleanup', () => {
   });
 
   it('confirms the cleanup log path fires when rows were normalized', () => {
-    expect(logCsvLastCommunicationNormalization(1)).toBe(true);
+    const messages: string[] = [];
+
+    expect(logCsvLastCommunicationNormalization(1, function (message) { messages.push(message); })).toBe(true);
+    expect(messages).toEqual(['Projects: CSV lastCommunication normalized for 1 row(s)']);
   });
 });
