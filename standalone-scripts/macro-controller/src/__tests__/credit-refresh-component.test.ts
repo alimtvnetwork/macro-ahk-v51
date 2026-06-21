@@ -7,6 +7,7 @@
  * semantic progress bar instead of the Pending skeleton.
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import 'fake-indexeddb/auto';
 import type { WorkspaceCredit } from '../types';
 import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
 import { buildButtonRow } from '../ui/panel-controls';
@@ -22,6 +23,8 @@ vi.mock('../auth', () => ({
     getBearerToken: hoisted.getBearerTokenSpy,
     updateAuthBadge: vi.fn(),
 }));
+
+vi.mock('../api-namespace', () => ({ nsWrite: vi.fn() }));
 
 vi.mock('../async-utils', () => ({
     pollUntil: vi.fn((condition: () => true | null) => {
