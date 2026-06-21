@@ -918,7 +918,20 @@ function _buildTaskNextMenuShell(promptsDropdown: HTMLElement): { taskNextItem: 
     taskNextSub.style.display = 'none';
   };
   taskNextRow.onmouseover = showSub;
-  taskNextRow.onclick = function(e: Event) {
+  // Split-button pattern: clicking the label area pastes the Next Tasks prompt
+  // once (count=1) and closes the dropdown — matches user expectation that
+  // clicking "Task Next" immediately pastes the next prompt. Clicking the ▸/▾
+  // arrow toggles the submenu for choosing a custom count.
+  taskNextLabel.style.cursor = 'pointer';
+  taskNextLabel.title = 'Click to paste the Next Tasks prompt (use ▸ for count options)';
+  taskNextLabel.onclick = function(e: Event) {
+    e.stopPropagation();
+    promptsDropdown.style.display = 'none';
+    hideSub();
+    runTaskNextLoop(taskNextDeps, 1);
+  };
+  taskNextArrow.style.cursor = 'pointer';
+  taskNextArrow.onclick = function(e: Event) {
     e.stopPropagation();
     if (taskNextSub.style.display === 'none') showSub(); else hideSub();
   };
