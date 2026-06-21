@@ -206,7 +206,7 @@ I understand:
 - Naming conventions: [brief summary]
 - Error handling approach: [one sentence]
 - Active plan: [current milestone or focus]
-- mailto:[email protected]: [top 3–5 forbidden patterns]
+- Strict avoidances: [top 3–5 forbidden patterns]
 
 Ready for tasks.
 ```
