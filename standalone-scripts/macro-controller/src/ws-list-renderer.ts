@@ -665,6 +665,22 @@ function buildWsRowInnerHtml(
   return html;
 }
 
+/**
+ * Plan 01 Step 6/8b: build the placeholder bar that occupies the credit-bar
+ * slot while the resolver hasn't returned a real number. Pending → animated
+ * `.marco-skeleton` shimmer (160×8px). Timeout/Missing → thin red 2px bar so
+ * the failure is discoverable without collapsing row height. Both keep the
+ * same 160px min-width as `renderCreditBar()` so the table doesn't reflow
+ * when the resolver completes. Exported so it can be unit-tested without
+ * spinning up the full ws-row DOM.
+ */
+export function buildCreditPlaceholderBarHtml(isPending: boolean, dashTooltip: string): string {
+  if (isPending) {
+    return '<span class="marco-skeleton" title="' + dashTooltip + '" style="display:inline-block;min-width:160px;height:8px;vertical-align:middle;"></span>';
+  }
+  return '<span title="' + dashTooltip + '" style="display:inline-block;min-width:160px;height:2px;background:' + cWarning + ';vertical-align:middle;border-radius:2px;opacity:0.85;"></span>';
+}
+
 /** Build a single workspace row DOM element. */
 function buildWsRow(
   ws: WorkspaceCredit, wsIndex: number, isCurrent: boolean,
