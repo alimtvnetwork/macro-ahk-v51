@@ -320,8 +320,20 @@ async function executeMove(
 
   updateLoopMoveStatus('loading', 'Moving to ' + targetWorkspaceName + '...');
 
+  // Resolve a fresh Castle request token — Lovable's risk engine rejects
+  // PUT /move-to-workspace without `x-castle-request-token` (403
+  // castle_denied). Tokens are single-use, so we mint one per call.
+  const castleToken = await getCastleRequestToken();
+  const moveHeaders: Record<string, string> = {};
+  if (castleToken) moveHeaders['x-castle-request-token'] = castleToken;
+  logSub('Castle token: ' + (castleToken ? 'present (len=' + castleToken.length + ')' : 'MISSING — request may be blocked'), 1);
+
   try {
-    const resp = await window.marco!.api!.workspace.move(projectId, targetWorkspaceId, { baseUrl: CREDIT_API_BASE });
+    const resp = await window.marco!.api!.workspace.move(projectId, targetWorkspaceId, {
+      baseUrl: CREDIT_API_BASE,
+      headers: moveHeaders,
+    });
+
 
     if (isCastleDenied(resp.status, resp.data)) {
       const castleMsg = extractCastleMessage(resp.data);
