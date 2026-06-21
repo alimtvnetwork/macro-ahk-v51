@@ -1,10 +1,14 @@
-# Marco Chrome Extension v3.83.0
+# Marco Chrome Extension v3.84.0
+
+## Added
+
+- `onCreditResolved(listener)` pub-sub on the credit-fetch controller — emitted once per `/credit-balance` completion (success or failure) after cache + in-flight cleanup.
 
 ## Fixed
 
-- Workspace credit bar no longer collapses to an invisible em-dash while the resolver is fetching. A 160×8px shimmer skeleton bar now paints in the same row slot, and a thin red 2px bar is shown on timeout. Tooltips guide users to click 💰 Credits to refresh / retry. (Plan 01 / Step 6)
+- Workspace credit bars now repaint automatically when `/credit-balance` returns. `ws-list-renderer.ts` subscribes to `onCreditResolved`, debounces (120ms) parallel fan-out resolves into one render, invalidates the dropdown hash, and re-populates. (Plan 01 / Step 7, RCA #4)
 
 ## Verification
 
-- `bunx vitest run` — existing credit-resolver suites continue to pass.
-- `node scripts/check-version-sync.mjs` — all version files in sync at 3.83.0.
+- `bunx vitest run` on credit-fetch-controller / credit-button-fanout / credit-summary-resolver-pending → **3 files, 23 tests passed**.
+- `node scripts/check-version-sync.mjs` → `✅ All versions in sync: 3.84.0`.
