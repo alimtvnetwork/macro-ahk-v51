@@ -1,19 +1,22 @@
 # Marco Chrome Extension v3.102.0
 
-## Fixed
+## Added
 
-- Projects Modal Task 13: CSV exports now write `—` for missing
-  `lastCommunication` values instead of leaking blank values or Lovable's
-  upstream `(no data returned by API)` placeholder.
-- Added export observability: when cleanup happens, the activity log records
-  `Projects: CSV lastCommunication normalized for N row(s)`.
+- Projects Modal Task 14: end-to-end SQLite cache verification. The Projects
+  dialog now short-circuits per-workspace `projects.list` network fetches when
+  the SQLite-backed projects-cache row is fresh (within TTL). The Refresh
+  button still bypasses the cache.
+- Cache observability: each workspace logs `Projects: cache hit ws=… —
+  skipping projects.list fetch` or `Projects: cache miss ws=… — fetching
+  projects.list`, and load completion logs
+  `Projects: load complete — cacheHits=X cacheMisses=Y bypass=Z` so the cache
+  effect is visible without DevTools.
 
 ## Changed
 
-- Advanced `.lovable/plans/projects-modal-15-step-improvement.md` to Task 14 —
-  end-to-end SQLite cache verification.
+- Advanced `.lovable/plans/projects-modal-15-step-improvement.md` to Task 15 —
+  final changelog/version sweep.
 
 ## Verification
 
-- `bunx vitest run standalone-scripts/macro-controller/src/__tests__/projects-modal-csv.test.ts` → 1 file, 16 tests passed.
 - `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.102.0.
