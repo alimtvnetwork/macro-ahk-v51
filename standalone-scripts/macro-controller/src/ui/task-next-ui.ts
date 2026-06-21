@@ -253,84 +253,87 @@ function dispatchTaskNextSubmit(): boolean {
  * N === 1 delegates to the legacy paste-once `runTaskNextLoop` so the
  * split-button label keeps its v3.79.x behaviour (paste, do NOT submit).
  */
+const TASK_NEXT_QUEUE_LABEL = 'Task Next queue';
+
+type CycleStatus = 'ok' | 'paste-failed' | 'submit-failed' | 'idle-cancelled' | 'idle-timeout' | 'cancelled';
+
+async function runTaskNextCycle(
+  deps: TaskNextDeps,
+  promptText: string,
+  k: number,
+  n: number,
+  waitForLovableIdle: typeof import('./lovable-idle').waitForLovableIdle,
+): Promise<CycleStatus> {
+  if (taskNextState.cancelled) return 'cancelled';
+  const cycleStart = Date.now();
+  const promptsCfg = deps.getPromptsConfig();
+  const outcome = pasteIntoEditor(promptText, promptsCfg, deps.getByXPath);
+  if (String(outcome) === 'failed') return 'paste-failed';
+  if (!dispatchTaskNextSubmit()) return 'submit-failed';
+  const idleResult = await waitForLovableIdle({
+    isCancelled: function() { return taskNextState.cancelled; },
+  });
+  if (idleResult === 'cancelled') return 'idle-cancelled';
+  if (idleResult === 'timeout') return 'idle-timeout';
+  taskNextState.queue.completed = k + 1;
+  log('[TaskNextQueue] cycle ' + (k + 1) + '/' + n + ' done in ' + (Date.now() - cycleStart) + 'ms', 'info');
+  showPasteToast('🔁 Task Next queue: ' + (k + 1) + '/' + n, false);
+  return 'ok';
+}
+
+function reportCycleStatus(status: CycleStatus, k: number, n: number): void {
+  const at = (k + 1) + '/' + n;
+  if (status === 'cancelled') {
+    showPasteToast('🛑 Task Next queue cancelled at ' + k + '/' + n, false);
+    log('[TaskNextQueue] cancelled at cycle ' + k + '/' + n, 'warn');
+  } else if (status === 'paste-failed') {
+    logError(TASK_NEXT_QUEUE_LABEL, 'cycle ' + at + ' — paste failed; aborting queue');
+    showPasteToast('❌ Task Next queue: paste failed at ' + at, true);
+  } else if (status === 'submit-failed') {
+    logError(TASK_NEXT_QUEUE_LABEL, 'cycle ' + at + ' — no form#chat-input and no submit button; aborting queue');
+    showPasteToast('❌ Task Next queue: submit failed at ' + at, true);
+  } else if (status === 'idle-cancelled') {
+    showPasteToast('🛑 Task Next queue cancelled at ' + at, false);
+    log('[TaskNextQueue] cancelled mid-idle at cycle ' + at, 'warn');
+  } else if (status === 'idle-timeout') {
+    logError(TASK_NEXT_QUEUE_LABEL, 'cycle ' + at + ' — idle gate timed out after 10 min; aborting queue');
+    showPasteToast('❌ Task Next queue: timed out waiting at ' + at, true);
+  }
+}
+
 export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promise<void> {
   const n = Math.max(1, Math.floor(count) || 1);
-
-  if (n === 1) {
-    runTaskNextLoop(deps, 1);
-    return;
-  }
-
+  if (n === 1) { runTaskNextLoop(deps, 1); return; }
   if (taskNextState.running) {
     log('Task Next queue: already running — ignoring re-entry', 'warn');
     return;
   }
-
   const prompt = findNextTasksPrompt(deps);
   if (!prompt || !prompt.text) {
-    logError('Task Next queue', '"Next Tasks" prompt not found — aborting queue of ' + n);
+    logError(TASK_NEXT_QUEUE_LABEL, '"Next Tasks" prompt not found — aborting queue of ' + n);
     showPasteToast('❌ "Next Tasks" prompt not found', true);
     return;
   }
-
   // Lazy import to dodge a circular dep (lovable-idle.ts → task-next-ui.ts for findAddToTasksButton).
   const { waitForLovableIdle } = await import('./lovable-idle');
 
   taskNextState.running = true;
   taskNextState.cancelled = false;
   taskNextState.queue = { total: n, completed: 0, running: true, startedAt: Date.now() };
-
   log('[TaskNextQueue] starting queue of ' + n + ' — Escape to cancel', 'info');
   showPasteToast('🔁 Task Next queue: 0/' + n + ' — Escape to cancel', false);
 
   try {
     for (let k = 0; k < n; k++) {
-      if (taskNextState.cancelled) {
-        showPasteToast('🛑 Task Next queue cancelled at ' + k + '/' + n, false);
-        log('[TaskNextQueue] cancelled at cycle ' + k + '/' + n, 'warn');
-        break;
-      }
-
-      const cycleStart = Date.now();
-      const promptsCfg = deps.getPromptsConfig();
-      const outcome = pasteIntoEditor(prompt.text, promptsCfg, deps.getByXPath);
-      if (String(outcome) === 'failed') {
-        logError('Task Next queue', 'cycle ' + (k + 1) + '/' + n + ' — paste failed; aborting queue');
-        showPasteToast('❌ Task Next queue: paste failed at ' + (k + 1) + '/' + n, true);
-        break;
-      }
-
-      if (!dispatchTaskNextSubmit()) {
-        logError('Task Next queue', 'cycle ' + (k + 1) + '/' + n + ' — no form#chat-input and no submit button; aborting queue');
-        showPasteToast('❌ Task Next queue: submit failed at ' + (k + 1) + '/' + n, true);
-        break;
-      }
-
-      const idleResult = await waitForLovableIdle({
-        isCancelled: function() { return taskNextState.cancelled; },
-      });
-      if (idleResult === 'cancelled') {
-        showPasteToast('🛑 Task Next queue cancelled at ' + (k + 1) + '/' + n, false);
-        log('[TaskNextQueue] cancelled mid-idle at cycle ' + (k + 1) + '/' + n, 'warn');
-        break;
-      }
-      if (idleResult === 'timeout') {
-        logError('Task Next queue', 'cycle ' + (k + 1) + '/' + n + ' — idle gate timed out after 10 min; aborting queue');
-        showPasteToast('❌ Task Next queue: timed out waiting at ' + (k + 1) + '/' + n, true);
-        break;
-      }
-
-      taskNextState.queue.completed = k + 1;
-      log('[TaskNextQueue] cycle ' + (k + 1) + '/' + n + ' done in ' + (Date.now() - cycleStart) + 'ms', 'info');
-      showPasteToast('🔁 Task Next queue: ' + (k + 1) + '/' + n, false);
+      const status = await runTaskNextCycle(deps, prompt.text, k, n, waitForLovableIdle);
+      if (status !== 'ok') { reportCycleStatus(status, k, n); break; }
     }
-
     if (!taskNextState.cancelled && taskNextState.queue.completed >= n) {
       showPasteToast('✅ Task Next queue finished ' + n + '/' + n, false);
       log('[TaskNextQueue] completed ' + n + '/' + n + ' in ' + (Date.now() - taskNextState.queue.startedAt) + 'ms', 'info');
     }
   } catch (err) {
-    logError('Task Next queue', 'unexpected failure at cycle ' + (taskNextState.queue.completed + 1) + '/' + n, err);
+    logError(TASK_NEXT_QUEUE_LABEL, 'unexpected failure at cycle ' + (taskNextState.queue.completed + 1) + '/' + n, err);
     showPasteToast('❌ Task Next queue: unexpected error at ' + (taskNextState.queue.completed + 1) + '/' + n, true);
   } finally {
     taskNextState.queue.running = false;
@@ -338,6 +341,7 @@ export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promi
     taskNextState.cancelled = false;
   }
 }
+
 
 // Escape key cancel handler — call once at init
 export function setupTaskNextCancelHandler() {
