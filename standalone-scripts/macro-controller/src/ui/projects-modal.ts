@@ -880,6 +880,8 @@ interface ExportRow {
     exportedAt: string;
 }
 
+type CsvInfoLogger = (message: string, type: string) => void;
+
 const CSV_MISSING_LAST_COMMUNICATION_LABEL = '—';
 const CSV_UPSTREAM_EMPTY_PLACEHOLDER = '(no data returned by api)';
 
@@ -1017,7 +1019,7 @@ export function getCsvLastCommunicationNormalizedLogMessage(normalizedCount: num
     return 'Projects: CSV lastCommunication normalized for ' + normalizedCount + ' row(s)';
 }
 
-export function logCsvLastCommunicationNormalization(normalizedCount: number): boolean {
+export function logCsvLastCommunicationNormalization(normalizedCount: number, logger: CsvInfoLogger = log): boolean {
     const normalizedLogMessage = getCsvLastCommunicationNormalizedLogMessage(normalizedCount);
     if (normalizedLogMessage === null) {
         return false;
