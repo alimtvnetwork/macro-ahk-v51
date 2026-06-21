@@ -56,6 +56,7 @@ import { classifyFromStatus, type WorkspaceDisplayStatus } from './workspace-dis
 
 import { resolveBadgeStyle, diluteBadgeBg } from './workspace-badge-styles';
 import { resolveCreditSummary } from './credit-balance-update/credit-summary-resolver';
+import { onCreditResolved } from './credit-balance-update/credit-fetch-controller';
 
 
 const CSS_BG = ';background:';
@@ -1088,3 +1089,48 @@ export function populateLoopWorkspaceDropdown(): void {
 export function invalidateWsDropdownHash(): void {
   dropdownState().invalidate();
 }
+
+// ============================================
+// Plan 01 / Step 7 — Resolver completion subscription
+// ============================================
+// When `/credit-balance` completes for any workspace, the cache holds the
+// fresh value but the dropdown's hash short-circuit would otherwise skip the
+// repaint until the next user interaction (RCA #4). We invalidate the hash
+// and re-populate, debounced so a fan-out of N parallel resolves coalesces
+// into a single render pass.
+
+class CreditResolvedRepaintScheduler {
+  private static instance: CreditResolvedRepaintScheduler | null = null;
+  private timer: ReturnType<typeof setTimeout> | null = null;
+  private readonly debounceMs = 120;
+
+  static get(): CreditResolvedRepaintScheduler {
+    if (!CreditResolvedRepaintScheduler.instance) {
+      CreditResolvedRepaintScheduler.instance = new CreditResolvedRepaintScheduler();
+    }
+    return CreditResolvedRepaintScheduler.instance;
+  }
+
+  schedule(): void {
+    if (this.timer !== null) {
+      return;
+    }
+    this.timer = setTimeout(() => {
+      this.timer = null;
+      try {
+        invalidateWsDropdownHash();
+        populateLoopWorkspaceDropdown();
+      } catch (caught: CaughtError) {
+        logError(
+          'CreditBalanceUpdate.repaint',
+          'Path: standalone-scripts/macro-controller/src/ws-list-renderer.ts. Missing item: workspace dropdown repaint after CreditResolved. Reason: populateLoopWorkspaceDropdown threw during debounced re-render.',
+          caught,
+        );
+      }
+    }, this.debounceMs);
+  }
+}
+
+onCreditResolved(function (_workspaceId: string): void {
+  CreditResolvedRepaintScheduler.get().schedule();
+});

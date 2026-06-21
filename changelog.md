@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.84.0] — 2026-06-21
+
+### Added
+
+- **Resolver-completion event (`onCreditResolved`) in `credit-fetch-controller`.** Emitted after the cache write + `inFlight` cleanup so subscribers always read the fresh value. Errors inside one listener are logged via `CreditBalanceUpdate.controller` without breaking the rest of the fan-out.
+
+### Fixed
+
+- **Plan 01 / Step 7: workspace credit bars now repaint automatically when `/credit-balance` returns.** `ws-list-renderer.ts` subscribes to `onCreditResolved`, debounces (120ms) the per-row resolves of a 💰 fan-out into a single render pass, invalidates the dropdown hash, and calls `populateLoopWorkspaceDropdown()`. Removes the RCA #4 race where the value sat in cache until the next manual interaction.
+
+### Changed
+- Version bump: 3.83.0 → 3.84.0 (all version files synced)
+
+---
+
 ## [v3.83.0] — 2026-06-21
 
 ### Fixed
