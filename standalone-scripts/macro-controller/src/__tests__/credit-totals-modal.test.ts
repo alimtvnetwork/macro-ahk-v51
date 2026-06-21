@@ -134,10 +134,10 @@ describe('buildBreakdownTable', () => {
     expect(body.children).toHaveLength(2);
     const text = body.textContent || '';
     expect(text).toContain('A0001 D3v001');
-    expect(text).toContain('pro_3');
+    expect(text).toContain('Pro 3');
     expect(text).toContain('320');
     expect(text).toContain('A0002 D3v002');
-    expect(text).toContain('pro_0');
+    expect(text).toContain('Pro 0');
   });
 
   it('renders resolver-backed cache values instead of raw 0/0 cells', () => {

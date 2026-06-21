@@ -18,6 +18,7 @@ import { aggregateCreditTotals, type CreditTotals } from '../credit-totals';
 import { logError } from '../error-utils';
 import type { WorkspaceCredit } from '../types';
 import { resolveCreditSummary } from '../credit-balance-update/credit-summary-resolver';
+import { formatPlanDisplayLabel } from '../credit-balance-update/plan-mapper';
 import { makeDraggable } from './drag-window';
 
 const DIALOG_ID = 'marco-credit-totals-modal';
@@ -47,7 +48,7 @@ export function generateCsv(workspaces: ReadonlyArray<WorkspaceCredit>): string 
   for (const ws of workspaces) {
     const summary = resolveCreditSummary(ws);
     const name = (ws.fullName || ws.name || ws.id).replace(/"/g, '""');
-    const plan = (ws.plan || '').replace(/"/g, '""');
+    const plan = formatPlanDisplayLabel(ws.plan).replace(/"/g, '""');
     const projects = String(Number(ws.numProjects) || 0);
     const used = String(summary.totalUsed);
     const rem = String(summary.available);
@@ -492,7 +493,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
 
   const plan = document.createElement('span');
   plan.style.cssText = 'color:#67e8f9;font-weight:600;font-size:10px;';
-  plan.textContent = ws.plan || '—';
+  plan.textContent = formatPlanDisplayLabel(ws.plan) || '—';
 
   const projectsN = Number(ws.numProjects) || 0;
   const projects = document.createElement('span');
