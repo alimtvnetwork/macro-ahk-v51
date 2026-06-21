@@ -35,14 +35,16 @@ function clampTimeoutMs(value: number): number {
 }
 
 function readRawGrantTypeBalances(ws: WorkspaceCredit): ReadonlyArray<object> | null {
-    const fromRawApi = ws.rawApi.grant_type_balances;
+    const fromRawApi = ws.rawApi?.grant_type_balances;
     if (Array.isArray(fromRawApi)) {
         return fromRawApi as ReadonlyArray<object>;
     }
-    const fromRaw = ws.raw.grant_type_balances;
+
+    const fromRaw = ws.raw?.grant_type_balances;
     if (Array.isArray(fromRaw)) {
         return fromRaw as ReadonlyArray<object>;
     }
+
     return null;
 }
 
