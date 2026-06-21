@@ -9,12 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ## [v3.79.1] — 2026-06-21
 
-### Added
-
 ### Fixed
 
-### Changed
-- Version bump: 3.79.0 → 3.79.1 (all version files synced)
+- **Task Next pasting stale text**: The two fallback prompt registries (`standalone-scripts/macro-controller/src/ui/prompt-loader.ts` `DEFAULT_PROMPTS` and `src/background/handlers/prompt-handler.ts` `getFallbackDefaultPrompts`) still held the old short "Next, List out the remaining tasks..." / single-line "Plan Steps" placeholders. They now embed the full v5 "Next ${N} steps" and v6 "Plan ${N}" canonical prompt bodies (from `standalone-scripts/prompts/13-next-tasks/prompt.md` and `14-plan-steps/prompt.md`), with names and slugs aligned to canonical (`next-steps`, `plan-steps`). Task Next button now pastes the updated prompt; Plan Steps appears with its full v6 body.
+- **default-prompt-content tests**: Updated to assert against the new v5/v6 content (`NEXT N STEPS`, `Definition of done`, `Banned actions`) instead of the deleted v3/v4 phrases.
+
 
 ---
 
