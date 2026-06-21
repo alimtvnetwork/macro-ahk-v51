@@ -9,7 +9,7 @@ vi.mock('../error-utils', () => ({
     logError: logErrorSpy,
 }));
 
-import { mapPlanFromWire, shouldFetchCreditBalanceForPlan } from '../credit-balance-update/plan-mapper';
+import { mapPlanFromWire, shouldFetchCreditBalanceForPlan, formatPlanDisplayLabel } from '../credit-balance-update/plan-mapper';
 
 beforeEach(() => {
     logErrorSpy.mockClear();
