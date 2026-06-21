@@ -21,7 +21,7 @@ import { applyFilters, type FilterState } from '../ui/credit-totals-modal';
 import type { WorkspaceCredit } from '../types/credit-types';
 import type { WorkspaceDisplayKind } from '../workspace-display-status';
 import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
-import { clearCreditBalanceUpdateMemoryCache, writeCreditBalanceUpdateCache } from '../credit-balance-update/credit-balance-cache';
+import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
 
 function ws(over: Partial<WorkspaceCredit>): WorkspaceCredit {
     return {
@@ -40,8 +40,8 @@ beforeEach(() => {
     clearCreditBalanceUpdateMemoryCache();
 });
 
-async function seedSummaryCache(workspaceId: string, remaining: number, total: number): Promise<void> {
-    await writeCreditBalanceUpdateCache(workspaceId, {
+function seedSummaryCache(workspaceId: string, remaining: number, total: number): void {
+    __writeCreditBalanceUpdateMemoryCacheForTests(workspaceId, {
         outcome: CreditFetchOutcome.ApiHit,
         fetchedAt: Date.now(),
         sourceUrl: 'test',
@@ -82,8 +82,8 @@ describe('computeSummaryDetails', () => {
         expect(d.grand.availableSpendable).toBe(185);
     });
 
-    it('uses resolver-backed credit totals for pro summary values', async () => {
-        await seedSummaryCache('cached-pro', 88, 120);
+    it('uses resolver-backed credit totals for pro summary values', () => {
+        seedSummaryCache('cached-pro', 88, 120);
         const rows = [
             ws({ id: 'cached-pro', plan: 'pro_0', available: 0, totalCredits: 0 }),
         ];
