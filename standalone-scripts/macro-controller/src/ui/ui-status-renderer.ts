@@ -9,8 +9,9 @@
 
 import { clearSkeletons } from './skeleton';
 import { IDS, TIMING, state, loopCreditState, cWarning, tFontTiny, cPrimaryLight, cLogSuccess } from '../shared-state';
-import { calcTotalCredits, calcAvailableCredits, renderCreditBar } from '../credit-api';
+import { renderCreditBar } from '../credit-api';
 import { TaskQueueManager } from '../task-manager';
+import { resolveCreditSummary } from '../credit-balance-update/credit-summary-resolver';
 
 // ============================================
 // StatusRenderState — encapsulated render state (CQ11, CQ17)
@@ -189,19 +190,20 @@ function buildCreditBarsHtml(): string {
 
   const df = Math.round(cws.dailyFree || 0);
   const ro = Math.round(cws.rollover || 0);
-  const ba = Math.round(cws.billingAvailable || 0);
+  const summary = resolveCreditSummary(cws);
+  const ba = summary.billingAvailable;
   const fr = Math.round(cws.freeRemaining || 0);
-  const _totalCapacity = Math.round(cws.totalCredits ?? calcTotalCredits(cws.freeGranted, cws.dailyLimit, cws.limit, cws.topupLimit, cws.rolloverLimit, cws.plan));
-  const _availTotal = Math.round(cws.available ?? calcAvailableCredits(_totalCapacity, cws.rolloverUsed, cws.dailyUsed, cws.used, (cws.freeGranted || 0) - (cws.freeRemaining || 0), cws.plan));
+  const _totalCapacity = summary.total;
+  const _availTotal = summary.available;
   const _perWs = loopCreditState.perWorkspace || [];
   let _maxTc = 0;
   for (const _ws of _perWs) {
-    const _mtc = Math.round(_ws.totalCredits ?? calcTotalCredits(_ws.freeGranted, _ws.dailyLimit, _ws.limit, _ws.topupLimit, _ws.rolloverLimit, _ws.plan));
+    const _mtc = Math.round(resolveCreditSummary(_ws).total);
     if (_mtc > _maxTc) _maxTc = _mtc;
   }
 
   const html = renderCreditBar({
-    totalCredits: _totalCapacity, available: _availTotal, totalUsed: cws.totalCreditsUsed || 0,
+    totalCredits: _totalCapacity, available: _availTotal, totalUsed: summary.totalUsed,
     freeRemaining: fr, billingAvail: ba, rollover: ro, dailyFree: df,
     compact: false, marginTop: '4px', maxTotalCredits: _maxTc
   });
