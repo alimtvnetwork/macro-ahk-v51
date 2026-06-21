@@ -601,7 +601,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
 
     // Row 2: filter chips.
     const row2 = document.createElement('div');
-    row2.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;';
+    row2.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;flex-wrap:wrap;';
 
     function makeChip(label: string, title: string, getActive: () => boolean, toggle: () => void): HTMLButtonElement {
         const btn = document.createElement('button');
@@ -661,6 +661,44 @@ function createSearchBar(onChange: () => void): HTMLElement {
     return wrap;
 }
 
+function renderWorkspaceFilterChips(container: HTMLElement, status: HTMLElement, onChange: () => void): void {
+    container.innerHTML = '';
+    for (const block of state.blocks) {
+        container.appendChild(createWorkspaceFilterChip(block.ws, onChange));
+    }
+    const visibleCount = state.blocks.length - state.hiddenWorkspaces.size;
+    status.textContent = state.blocks.length > 0 ? visibleCount + '/' + state.blocks.length + ' workspaces' : '';
+}
+
+function createWorkspaceFilterChip(ws: WorkspaceCredit, onChange: () => void): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.title = 'Show or hide workspace: ' + (ws.fullName || ws.name || ws.id);
+    button.onclick = function (): void {
+        toggleWorkspaceFilter(ws.id);
+        onChange();
+    };
+    paintWorkspaceFilterChip(button, ws);
+
+    return button;
+}
+
+function toggleWorkspaceFilter(workspaceId: string): void {
+    if (state.hiddenWorkspaces.has(workspaceId)) {
+        state.hiddenWorkspaces.delete(workspaceId);
+        return;
+    }
+    state.hiddenWorkspaces.add(workspaceId);
+}
+
+function paintWorkspaceFilterChip(button: HTMLButtonElement, ws: WorkspaceCredit): void {
+    const isVisible = isWorkspaceFilterVisible(ws.id, state.hiddenWorkspaces);
+    button.textContent = (isVisible ? '● ' : '○ ') + (ws.fullName || ws.name || ws.id);
+    button.style.cssText = 'border-radius:10px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:inherit;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+        + (isVisible
+            ? 'background:rgba(16,185,129,0.14);color:#86efac;border:1px solid rgba(16,185,129,0.45);'
+            : 'background:rgba(15,23,42,0.45);color:#64748b;border:1px solid rgba(100,116,139,0.35);');
+}
 
 function createFooter(
     onRefresh: () => void,
