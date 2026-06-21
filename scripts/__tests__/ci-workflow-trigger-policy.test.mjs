@@ -19,6 +19,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = resolve(__dirname, "..", "..");
 const CI_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/ci.yml");
 const PING_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/ping.yml");
+const AUDIT_RELEASES_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/audit-releases.yml");
 const RELEASE_WATCHER_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/release-watcher.yml");
 
 /**
@@ -217,4 +218,14 @@ test("Release Watcher asset guard can read the resolved release tag", () => {
     const needs = extractNeeds(guardBlock);
     assert.ok(needs.includes("resolve-release"), "release-asset-guard must directly need resolve-release so VER is not empty");
     assert.ok(needs.includes("run-release"), "release-asset-guard must wait for run-release before checking assets");
+});
+
+test("Audit Releases skips superseded source-only patch releases", () => {
+    assert.ok(existsSync(AUDIT_RELEASES_WORKFLOW), `Workflow missing at ${AUDIT_RELEASES_WORKFLOW}`);
+    const src = readFileSync(AUDIT_RELEASES_WORKFLOW, "utf8");
+    assert.match(
+        src,
+        /SKIP_TAGS="[^"]*\bv3\.104\.1\b[^"]*"/,
+        "audit-releases.yml must skip superseded v3.104.1 because v3.104.2 carries the built assets",
+    );
 });
