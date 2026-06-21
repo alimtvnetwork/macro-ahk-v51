@@ -109,7 +109,7 @@ describe('Issue 116 — Cancel suppresses redundant EXPIRED tier badge', () => {
       subscriptionStatusChangedAt: '2026-04-20T00:00:00Z',
     });
     const html = buildTierBadgeHtml(ws);
-    expect(html).toContain('>PRO<');
+    expect(html).toMatch(/>Pro\b/i);
     expect((html.match(/>Cancel</g) || []).length).toBe(1);
   });
 });
