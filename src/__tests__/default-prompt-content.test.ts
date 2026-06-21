@@ -19,26 +19,27 @@ describe('default prompt content', () => {
     expect(releasePrompts).toContain('root readme');
   });
 
-  it('next prompt requires same-turn execution and remaining task numbering', () => {
+  it('next prompt (v5) requires N steps with reasoning and remaining items', () => {
     const prompt = readPrompt('standalone-scripts/prompts/13-next-tasks/prompt.md');
 
-    expect(prompt).toContain('Execute the next pending task now');
-    expect(prompt).toContain('same turn');
-    expect(prompt).toContain('flat numbered remaining-tasks list');
+    expect(prompt).toContain('NEXT N STEPS');
+    expect(prompt).toContain('Reasoning');
+    expect(prompt).toContain('every remaining item');
   });
 
-  it('repeat prompt clarifies that repeated submissions require Start', () => {
+  it('next prompt (v5) enforces root-cause-before-fix discipline', () => {
     const prompt = readPrompt('standalone-scripts/prompts/13-next-tasks/prompt.md');
 
-    expect(prompt).toContain('Do one logical task at a time');
-    expect(prompt).toContain('repeated submissions require the dedicated Repeat `▶ Start` control');
+    expect(prompt).toContain('STOP and read first');
+    expect(prompt).toContain('Root cause before fix');
+    expect(prompt).toContain('Definition of done');
   });
 
-  it('bundles the numbered Plan prompt source', () => {
+  it('bundles the numbered Plan prompt source (v6)', () => {
     const prompt = readPrompt('standalone-scripts/prompts/14-plan-steps/prompt.md');
 
-    expect(prompt).toContain('Plan in ${N}-Steps Plan');
-    expect(prompt).toContain('Single-task append rule');
+    expect(prompt).toContain('steps Plan, Maximal Enforcement');
     expect(prompt).toContain('DO NOT execute anything this turn');
+    expect(prompt).toContain('Banned actions');
   });
 });
