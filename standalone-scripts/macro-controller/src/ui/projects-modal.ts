@@ -691,10 +691,58 @@ function createSearchBar(onChange: () => void): HTMLElement {
     row2.appendChild(workspaceChips);
     row2.appendChild(workspaceStatus);
 
+    const row3 = createCreditsRangeRow(onChange);
+
     wrap.appendChild(row1);
     wrap.appendChild(row2);
+    wrap.appendChild(row3);
     paintWorkspaceFilters();
     return wrap;
+}
+
+function createCreditsRangeRow(onChange: () => void): HTMLElement {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;flex-wrap:wrap;color:#64748b;';
+
+    const label = document.createElement('span');
+    label.textContent = 'Credits used:';
+
+    function makeInput(attr: string, placeholder: string, getValue: () => number | null, setValue: (n: number | null) => void): HTMLInputElement {
+        const input = document.createElement('input');
+        input.setAttribute(attr, '1');
+        input.type = 'number';
+        input.min = '0';
+        input.placeholder = placeholder;
+        const initial = getValue();
+        input.value = initial === null ? '' : String(initial);
+        input.style.cssText = 'width:70px;background:rgba(0,0,0,0.35);color:#f1f5f9;border:1px solid rgba(124,58,237,0.30);'
+            + 'border-radius:4px;padding:2px 6px;font-size:10px;font-family:inherit;outline:none;';
+        input.addEventListener('input', function () {
+            const raw = input.value.trim();
+            if (raw === '') { setValue(null); onChange(); return; }
+            const n = Number(raw);
+            if (Number.isFinite(n) && n >= 0) { setValue(n); onChange(); return; }
+            setValue(null);
+            onChange();
+        });
+        input.addEventListener('keydown', function (e) { e.stopPropagation(); });
+        return input;
+    }
+
+    const minInput = makeInput('data-credits-min', 'min',
+        function () { return state.creditsUsedMin; },
+        function (n) { state.creditsUsedMin = n; });
+    const dash = document.createElement('span');
+    dash.textContent = '–';
+    const maxInput = makeInput('data-credits-max', 'max',
+        function () { return state.creditsUsedMax; },
+        function (n) { state.creditsUsedMax = n; });
+
+    row.appendChild(label);
+    row.appendChild(minInput);
+    row.appendChild(dash);
+    row.appendChild(maxInput);
+    return row;
 }
 
 function renderWorkspaceFilterChips(container: HTMLElement, status: HTMLElement, onChange: () => void): void {
