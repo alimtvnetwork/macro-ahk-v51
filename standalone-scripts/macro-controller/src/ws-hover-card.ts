@@ -395,7 +395,9 @@ function dateColor(daysUntilEvent: number, expired = false): string {
 }
 
 function planChipHtml(ws: WorkspaceCredit): string {
-  const plan = String(ws.tier || 'FREE').toUpperCase();
+  // Prefer the canonical plan label (`Light 2`, `Pro 3`, …) and fall back to
+  // the tier bucket only when no wire plan is present.
+  const plan = formatPlanDisplayLabel(ws.plan) || String(ws.tier || 'FREE');
   return '<span style="font-size:9px;color:' + C_ACCENT
     + ';background:rgba(103,232,249,0.12);border:1px solid rgba(103,232,249,0.35)'
     + ';padding:1px 5px;border-radius:3px;font-weight:700;letter-spacing:0.3px;'
