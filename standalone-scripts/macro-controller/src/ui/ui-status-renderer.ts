@@ -180,17 +180,24 @@ export function updateQueueBadge(): void {
 function buildCreditBarsHtml(): string {
   if (!loopCreditState.lastCheckedAt) return '';
 
-  const cacheKey = (loopCreditState.lastCheckedAt || 0) + '|' + (loopCreditState.currentWs ? loopCreditState.currentWs.name : '');
-  if (window._creditBarCache && window._creditBarCache.key === cacheKey) {
-    return window._creditBarCache.html;
-  }
-
   const cws = loopCreditState.currentWs;
   if (!cws) return '';
 
+  const summary = resolveCreditSummary(cws);
+  const cacheKey = (loopCreditState.lastCheckedAt || 0) + '|'
+    + (cws.name || '') + '|' + summary.source + '|' + summary.available + '|' + summary.total;
+  if (window._creditBarCache && window._creditBarCache.key === cacheKey) {
+    return window._creditBarCache.html;
+  }
+  if (summary.renderDash) {
+    const dashText = summary.source === 'Pending' ? '— fetching…' : '— unavailable';
+    const dashHtml = '<span title="Credit-balance ' + summary.source + '" style="font-size:11px;color:' + cWarning + ';min-width:160px;display:inline-block;margin-top:4px;">' + dashText + '</span>';
+    window._creditBarCache = { key: cacheKey, html: dashHtml };
+    return dashHtml;
+  }
+
   const df = Math.round(cws.dailyFree || 0);
   const ro = Math.round(cws.rollover || 0);
-  const summary = resolveCreditSummary(cws);
   const ba = summary.billingAvailable;
   const fr = Math.round(cws.freeRemaining || 0);
   const _totalCapacity = summary.total;
