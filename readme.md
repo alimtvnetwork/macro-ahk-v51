@@ -32,16 +32,16 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v50/main/scripts/d
 **Windows · PowerShell — pin a version + custom folder name (env-var form, works with `irm | iex`):**
 
 ```powershell
-$env:MARCO_DL_VERSION='v3.100.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v50/main/scripts/download-extension.ps1 | iex
+$env:MARCO_DL_VERSION='v3.101.0'; $env:MARCO_DL_FOLDER='marco'; irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v50/main/scripts/download-extension.ps1 | iex
 ```
 
 **Windows · PowerShell — run a local clone with explicit flags:**
 
 ```powershell
-.\scripts\download-extension.ps1 -Version v3.100.0 -FolderName marco-extension
+.\scripts\download-extension.ps1 -Version v3.101.0 -FolderName marco-extension
 ```
 
-After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v3.100.0.zip` backup sits next to it.
+After it finishes, load the resulting folder via `chrome://extensions → Load unpacked`. The `marco-extension-v3.101.0.zip` backup sits next to it.
 
 ### 🪟 Windows · PowerShell installer (latest)
 
@@ -55,23 +55,23 @@ irm https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v50/main/scripts/i
 curl -fsSL https://raw.githubusercontent.com/alimtvnetwork/macro-ahk-v50/main/scripts/install.sh | bash
 ```
 
-### 📌 Pinned version (`v3.100.0`)
+### 📌 Pinned version (`v3.101.0`)
 
 ```powershell
 # Windows · PowerShell
-irm https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.100.0/install.ps1 | iex
+irm https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.101.0/install.ps1 | iex
 
 
 ```
 
 ```bash
 # macOS · Linux · Bash
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.100.0/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.101.0/install.sh | bash
 
 
 ```
 
-**Pinned version:** `v3.100.0` &nbsp;•&nbsp; **Macro Controller:** `v3.100.0`
+**Pinned version:** `v3.101.0` &nbsp;•&nbsp; **Macro Controller:** `v3.101.0`
 
 > **v2.243.0 release-asset fix (historical):** the previous release pipeline pointed at a legacy `chrome-extension/dist/` subfolder that no longer exists (the unpacked extension is built into `chrome-extension/` itself — see `vite.config.extension.ts` and `powershell.json → distDir`). That mismatch caused `marco-extension-{VER}.zip` to be silently absent from the GitHub Releases page. The workflow now zips `chrome-extension/` directly and fails fast if the extension zip is missing or `< 10 KiB`. RCA: [`mem://constraints/chrome-extension-dist-path`](.lovable/memory/constraints/chrome-extension-dist-path.md).
 
@@ -96,12 +96,12 @@ Pick your platform — each section is a self-contained install path with the re
 **Recommended path.** Open **PowerShell** (Win + X → "Windows PowerShell" or "Terminal") and run:
 
 ```powershell
-irm https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.100.0/install.ps1 | iex
+irm https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.101.0/install.ps1 | iex
 
 
 ```
 
-- 🔒 Pinned to `v3.100.0` — see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
+- 🔒 Pinned to `v3.101.0` — see [Pinned to a specific release](#-pinned-to-a-specific-release) to change versions
 - 🌊 Want auto-update? Use the [latest channel](#-latest-channel-auto-update) one-liner
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
@@ -111,12 +111,12 @@ irm https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.100.0/in
 Open your terminal and run:
 
 ```bash
-curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.100.0/install.sh | bash
+curl -fsSL https://github.com/alimtvnetwork/macro-ahk-v50/releases/download/v3.101.0/install.sh | bash
 
 
 ```
 
-- 🔒 Pinned to `v3.100.0` — see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
+- 🔒 Pinned to `v3.101.0` — see [Pinned to a specific release](#-pinned-to-a-specific-release) for other tags
 - 🌊 Auto-update channel → [latest channel](#-latest-channel-auto-update)
 - 📁 Custom install folder? See [Custom Directory Install](#custom-directory-install)
 - 🚩 Full flag list, exit codes, checksum behavior → [Installer Options](#installer-options)
