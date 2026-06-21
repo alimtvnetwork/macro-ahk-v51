@@ -33,6 +33,12 @@ export const taskNextState: {
   settings: TaskNextSettings;
   running: boolean;
   cancelled: boolean;
+  queue: {
+    total: number;
+    completed: number;
+    running: boolean;
+    startedAt: number;
+  };
 } = {
   settings: {
     preClickDelayMs: 500,
@@ -45,6 +51,7 @@ export const taskNextState: {
   },
   running: false,
   cancelled: false,
+  queue: { total: 0, completed: 0, running: false, startedAt: 0 },
 };
 
 export interface TaskNextDeps {
