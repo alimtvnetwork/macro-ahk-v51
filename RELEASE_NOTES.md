@@ -1,19 +1,22 @@
-# Marco Chrome Extension v3.98.0
+# Marco Chrome Extension v3.99.0
+
+## Added
+
+- Projects Modal Task 11: workspace multi-select chips now hide/show whole
+  workspace blocks from the Projects dialog filter row.
+- The Projects dialog summary now reports visible/total workspace count, and
+  Clear all filters resets workspace visibility along with search/open/repo
+  filters.
 
 ## Changed
 
-- Synced `.lovable/plans/projects-modal-15-step-improvement.md` with reality:
-  Tasks 4–10 (SQLite cache schema, write/read paths, TTL setting, fetch delay
-  setting, search bar, filter chips, workspace + credits header) are already
-  shipped in code. Cursor advanced to **Task 11 — workspace multi-select
-  dropdown**.
-
-No runtime behavior change in this release — version bumped purely so plan
-state, changelog, and `version.json` stay in sync.
+- Advanced `.lovable/plans/projects-modal-15-step-improvement.md` to Task 12 —
+  credits-used filter.
 
 ## Verification
 
-- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.98.0.
+- `bunx vitest run standalone-scripts/macro-controller/src/__tests__/projects-modal-csv.test.ts` → 1 file, 5 tests passed.
+- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.99.0.
 
 ---
 

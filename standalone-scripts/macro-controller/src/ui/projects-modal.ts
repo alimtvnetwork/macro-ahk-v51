@@ -78,11 +78,16 @@ interface ModalState {
     filterOpenOnly: boolean;
     /** Show only projects that have a GitHub repo configured. */
     filterHasRepo: boolean;
+    /** Workspace IDs hidden by the workspace multi-select filter. */
+    hiddenWorkspaces: Set<string>;
+    /** Repaints the workspace filter dropdown after async workspace loads. */
+    refreshWorkspaceFilter: (() => void) | null;
 }
 const state: ModalState = {
     blocks: [], tabIndex: null, exporting: false,
     searchQuery: '', collapsed: new Set<string>(),
     filterOpenOnly: false, filterHasRepo: false,
+    hiddenWorkspaces: new Set<string>(), refreshWorkspaceFilter: null,
 };
 
 const COLLAPSED_STORAGE_KEY = 'marco_projects_modal_collapsed_v1';
@@ -115,6 +120,7 @@ export function showProjectsModal(): void {
     state.tabIndex = null;
     state.exporting = false;
     state.searchQuery = '';
+    state.hiddenWorkspaces = new Set<string>();
 
     const panel = createPanel();
     const titleBar = createTitleBar(panel);
@@ -141,6 +147,7 @@ export function showProjectsModal(): void {
 /** Render the current blocks + filter into the body element. */
 function renderBody(body: HTMLElement): void {
     const tabIndex = state.tabIndex ?? { byProjectId: new Map(), byUrlProjectId: new Map() };
+    state.refreshWorkspaceFilter?.();
     body.innerHTML = renderAll(state.blocks, tabIndex, null, state.searchQuery);
     attachRowClicks(body);
 }
@@ -149,6 +156,7 @@ export function removeProjectsModal(): void {
     const existing = document.getElementById(DIALOG_ID) as DraggableElement | null;
     if (!existing) return;
     if (existing.__cleanupDrag) existing.__cleanupDrag();
+    state.refreshWorkspaceFilter = null;
     existing.remove();
 }
 
@@ -298,6 +306,8 @@ function attachRowClicks(body: HTMLElement): void {
                 const c = panel?.querySelector('[data-chip="repo"]') as HTMLButtonElement | null;
                 c?.click();
             }
+            state.hiddenWorkspaces.clear();
+            state.refreshWorkspaceFilter?.();
             renderBody(body);
             return;
         }
@@ -334,10 +344,12 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
     const q = (query || '').trim().toLowerCase();
     const onlyOpen = state.filterOpenOnly;
     const onlyRepo = state.filterHasRepo;
-    const filterActive = q !== '' || onlyOpen || onlyRepo;
+    const hasWorkspaceFilter = state.hiddenWorkspaces.size > 0;
+    const filterActive = q !== '' || onlyOpen || onlyRepo || hasWorkspaceFilter;
+    const workspaceBlocks = filterWorkspaceBlocksByVisibility(blocks, state.hiddenWorkspaces);
 
     const filtered: WorkspaceBlock[] = filterActive
-        ? blocks.map(function (b) {
+        ? workspaceBlocks.map(function (b) {
             if (!b.projects) return b;
             const projects = b.projects.filter(function (p) {
                 if (q && !(
@@ -352,14 +364,14 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
             });
             return { ws: b.ws, projects, error: b.error, loading: b.loading };
         })
-        : blocks.slice();
+        : workspaceBlocks.slice();
 
     const totalOpen = tabIndex.byProjectId.size + tabIndex.byUrlProjectId.size;
     const matchCount = filterActive
         ? filtered.reduce(function (acc, b) { return acc + (b.projects?.length ?? 0); }, 0)
         : 0;
     let html = '<div style="font-size:10px;color:#94a3b8;padding:0 0 6px 0;">'
-        + blocks.length + ' workspace' + (blocks.length === 1 ? '' : 's')
+        + workspaceBlocks.length + '/' + blocks.length + ' workspace' + (blocks.length === 1 ? '' : 's')
         + ' · ' + totalOpen + ' open project tab' + (totalOpen === 1 ? '' : 's')
         + (filterActive ? ' · <span style="color:#fbbf24;">' + matchCount + ' match' + (matchCount === 1 ? '' : 'es') + '</span>' : '')
         + (capturedAt ? ' · ' + escapeHtml(capturedAt) : '')
@@ -376,6 +388,7 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
         if (q) activeChips.push('search "' + escapeHtml(q) + '"');
         if (onlyOpen) activeChips.push('open-in-tab');
         if (onlyRepo) activeChips.push('has-repo');
+        if (hasWorkspaceFilter) activeChips.push('workspace filter');
         html += '<div style="text-align:center;padding:24px 12px;color:' + cPanelFgDim + ';font-size:11px;'
             + 'border:1px dashed rgba(124,58,237,0.35);border-radius:6px;margin-top:4px;">'
             + '<div style="font-size:22px;margin-bottom:6px;opacity:0.6;">🔍</div>'
@@ -388,6 +401,18 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
             + '</div>';
     }
     return html;
+}
+
+interface WorkspaceVisibilityBlock {
+    readonly ws: Pick<WorkspaceCredit, 'id'>;
+}
+
+export function isWorkspaceFilterVisible(workspaceId: string, hiddenWorkspaceIds: ReadonlySet<string>): boolean {
+    return hiddenWorkspaceIds.has(workspaceId) === false;
+}
+
+export function filterWorkspaceBlocksByVisibility<T extends WorkspaceVisibilityBlock>(blocks: ReadonlyArray<T>, hiddenWorkspaceIds: ReadonlySet<string>): T[] {
+    return blocks.filter(function (block) { return isWorkspaceFilterVisible(block.ws.id, hiddenWorkspaceIds); });
 }
 
 // eslint-disable-next-line sonarjs/cognitive-complexity
@@ -577,7 +602,7 @@ function createSearchBar(onChange: () => void): HTMLElement {
 
     // Row 2: filter chips.
     const row2 = document.createElement('div');
-    row2.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;';
+    row2.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:10px;flex-wrap:wrap;';
 
     function makeChip(label: string, title: string, getActive: () => boolean, toggle: () => void): HTMLButtonElement {
         const btn = document.createElement('button');
@@ -610,6 +635,17 @@ function createSearchBar(onChange: () => void): HTMLElement {
     );
     chipRepo.setAttribute('data-chip', 'repo');
 
+    const workspaceChips = document.createElement('span');
+    workspaceChips.style.cssText = 'display:flex;align-items:center;gap:4px;flex-wrap:wrap;min-width:0;';
+
+    const workspaceStatus = document.createElement('span');
+    workspaceStatus.style.cssText = 'color:#64748b;margin-left:auto;white-space:nowrap;';
+
+    const paintWorkspaceFilters = function (): void {
+        renderWorkspaceFilterChips(workspaceChips, workspaceStatus, onChange);
+    };
+    state.refreshWorkspaceFilter = paintWorkspaceFilters;
+
     const chipsLabel = document.createElement('span');
     chipsLabel.textContent = 'Filter:';
     chipsLabel.style.cssText = 'color:#64748b;';
@@ -617,12 +653,55 @@ function createSearchBar(onChange: () => void): HTMLElement {
     row2.appendChild(chipsLabel);
     row2.appendChild(chipOpen);
     row2.appendChild(chipRepo);
+    row2.appendChild(workspaceChips);
+    row2.appendChild(workspaceStatus);
 
     wrap.appendChild(row1);
     wrap.appendChild(row2);
+    paintWorkspaceFilters();
     return wrap;
 }
 
+function renderWorkspaceFilterChips(container: HTMLElement, status: HTMLElement, onChange: () => void): void {
+    container.innerHTML = '';
+    for (const block of state.blocks) {
+        container.appendChild(createWorkspaceFilterChip(block.ws, onChange));
+    }
+    const visibleCount = filterWorkspaceBlocksByVisibility(state.blocks, state.hiddenWorkspaces).length;
+    status.textContent = state.blocks.length > 0 ? visibleCount + '/' + state.blocks.length + ' workspaces' : '';
+}
+
+function createWorkspaceFilterChip(ws: WorkspaceCredit, onChange: () => void): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.title = 'Show or hide workspace: ' + (ws.fullName || ws.name || ws.id);
+    button.onclick = function (): void {
+        toggleWorkspaceFilter(ws.id);
+        onChange();
+    };
+    paintWorkspaceFilterChip(button, ws);
+
+    return button;
+}
+
+function toggleWorkspaceFilter(workspaceId: string): void {
+    if (state.hiddenWorkspaces.has(workspaceId)) {
+        state.hiddenWorkspaces.delete(workspaceId);
+        log('Projects: workspace filter changed (hidden=' + state.hiddenWorkspaces.size + ')', 'info');
+        return;
+    }
+    state.hiddenWorkspaces.add(workspaceId);
+    log('Projects: workspace filter changed (hidden=' + state.hiddenWorkspaces.size + ')', 'info');
+}
+
+function paintWorkspaceFilterChip(button: HTMLButtonElement, ws: WorkspaceCredit): void {
+    const isVisible = isWorkspaceFilterVisible(ws.id, state.hiddenWorkspaces);
+    button.textContent = (isVisible ? '● ' : '○ ') + (ws.fullName || ws.name || ws.id);
+    button.style.cssText = 'border-radius:10px;padding:2px 8px;font-size:10px;cursor:pointer;font-family:inherit;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'
+        + (isVisible
+            ? 'background:rgba(16,185,129,0.14);color:#86efac;border:1px solid rgba(16,185,129,0.45);'
+            : 'background:rgba(15,23,42,0.45);color:#64748b;border:1px solid rgba(100,116,139,0.35);');
+}
 
 function createFooter(
     onRefresh: () => void,
