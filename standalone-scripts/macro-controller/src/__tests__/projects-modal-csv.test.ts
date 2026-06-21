@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  filterWorkspaceBlocksByVisibility,
+  isWorkspaceFilterVisible,
   isCsvProjectNameFallback,
   resolveCsvProjectName,
   type OpenTabIndex,
@@ -17,6 +19,10 @@ function project(partial: Partial<ProjectEntry>): ProjectEntry {
     lastMessageAt: '',
     ...partial,
   };
+}
+
+function workspaceBlock(id: string): { readonly ws: { readonly id: string }; readonly label: string } {
+  return { ws: { id }, label: id };
 }
 
 function openTab(partial: Partial<OpenTabRow>): OpenTabRow {
@@ -63,5 +69,17 @@ describe('Projects modal CSV project-name fallback', () => {
 
     expect(resolveCsvProjectName(entry, tabIndex(tab))).toBe('project-1');
     expect(isCsvProjectNameFallback(entry, tabIndex(tab))).toBe(false);
+  });
+});
+
+describe('Projects modal workspace filter', () => {
+  it('keeps workspaces visible when they are not hidden', () => {
+    expect(isWorkspaceFilterVisible('workspace-1', new Set(['workspace-2']))).toBe(true);
+  });
+
+  it('hides workspaces selected in the hidden workspace set', () => {
+    const blocks = [workspaceBlock('workspace-1'), workspaceBlock('workspace-2')];
+
+    expect(filterWorkspaceBlocksByVisibility(blocks, new Set(['workspace-2']))).toEqual([workspaceBlock('workspace-1')]);
   });
 });
