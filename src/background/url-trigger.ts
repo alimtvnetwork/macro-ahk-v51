@@ -241,8 +241,22 @@ async function injectSentinel(
     } catch (err) {
         // The upfront `isRestrictedUrl()` guard in `runGate` filters the
         // predictable chrome://, Web Store, and other-extension cases.
-        // Anything that reaches this catch is unexpected — log it fully
-        // (no swallowing, per project policy).
+        // A second class of URLs (NTP remote content, prerendered tabs,
+        // PDFs, discarded tabs, in-flight navigations) is only knowable
+        // post-hoc via Chrome's "Cannot access contents of the page"
+        // error — treat those as restricted: clear the stale decision
+        // and stay silent rather than flooding the error log.
+        const message = err instanceof Error ? err.message : String(err);
+        const isHostPermissionRefusal =
+            message.includes("Cannot access contents of the page") ||
+            message.includes("Cannot access a chrome") ||
+            message.includes("The extensions gallery cannot be scripted") ||
+            message.includes("No tab with id") ||
+            message.includes("The tab was closed");
+        if (isHostPermissionRefusal) {
+            clearTabDecision(tabId);
+            return;
+        }
         logCaughtError(
             BgLogTag.MARCO,
             `[url-trigger] sentinel inject failed (tab=${tabId})`,
