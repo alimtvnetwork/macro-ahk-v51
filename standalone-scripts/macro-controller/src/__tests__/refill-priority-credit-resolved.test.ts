@@ -16,7 +16,7 @@ import type { CreditFetchResult } from '../credit-balance-update/credit-balance-
 import { sortByRefillPriority } from '../workspace-refill-priority';
 import type { WorkspaceCredit } from '../types';
 
-const NOW = Date.parse('2026-06-21T00:00:00Z');
+const NOW = Date.now();
 const TOMORROW = new Date(NOW + 1 * 86_400_000).toISOString();
 
 function makeWs(id: string, available: number): WorkspaceCredit {
