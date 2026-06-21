@@ -82,12 +82,17 @@ interface ModalState {
     hiddenWorkspaces: Set<string>;
     /** Repaints the workspace filter dropdown after async workspace loads. */
     refreshWorkspaceFilter: (() => void) | null;
+    /** Minimum workspace credits-used (inclusive); null = no lower bound. */
+    creditsUsedMin: number | null;
+    /** Maximum workspace credits-used (inclusive); null = no upper bound. */
+    creditsUsedMax: number | null;
 }
 const state: ModalState = {
     blocks: [], tabIndex: null, exporting: false,
     searchQuery: '', collapsed: new Set<string>(),
     filterOpenOnly: false, filterHasRepo: false,
     hiddenWorkspaces: new Set<string>(), refreshWorkspaceFilter: null,
+    creditsUsedMin: null, creditsUsedMax: null,
 };
 
 const COLLAPSED_STORAGE_KEY = 'marco_projects_modal_collapsed_v1';
