@@ -18,6 +18,34 @@ let timeoutMs = DEFAULT_TIMEOUT_MS;
 const inFlight = new Map<string, Promise<CreditFetchResult>>();
 let settingsUnsubscribe: (() => void) | null = null;
 
+// Plan 01 / Step 7: tiny pub-sub so UI layers can re-paint the affected
+// workspace row after the resolver completes (success OR failure). Avoids the
+// "value is in cache but never pushed to DOM until next manual refresh" race
+// from `.lovable/plan.md` RCA #4.
+export type CreditResolvedListener = (workspaceId: string, result: CreditFetchResult) => void;
+const creditResolvedListeners = new Set<CreditResolvedListener>();
+
+export function onCreditResolved(listener: CreditResolvedListener): () => void {
+    creditResolvedListeners.add(listener);
+    return function unsubscribe(): void {
+        creditResolvedListeners.delete(listener);
+    };
+}
+
+function emitCreditResolved(workspaceId: string, result: CreditFetchResult): void {
+    for (const listener of creditResolvedListeners) {
+        try {
+            listener(workspaceId, result);
+        } catch (caught: CaughtError) {
+            logError(
+                'CreditBalanceUpdate.controller',
+                'Path: standalone-scripts/macro-controller/src/credit-balance-update/credit-fetch-controller.ts. Missing item: CreditResolved listener for workspace ' + workspaceId + '. Reason: listener threw during emit — continuing other listeners.',
+                caught,
+            );
+        }
+    }
+}
+
 interface CreditFetchSettingsShape {
     readonly creditFetchDelayMs?: number;
 }
