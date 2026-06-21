@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.95.0] — 2026-06-21
+
+### Changed
+
+- **Plan labels unified across badge, Credit Totals modal, and CSV export.** Promoted the inline `resolveTierBadgeLabel()` from `ws-list-renderer.ts` into a shared `formatPlanDisplayLabel(plan)` helper in `credit-balance-update/plan-mapper.ts`. Three surfaces now agree on the rendered label: workspace dropdown badge, Credit Totals modal Plan cell (`ui/credit-totals-modal.ts:496`), and CSV export Plan column (`ui/credit-totals-modal.ts:51`). Examples: `ktlo_2 → Light 2`, `ktlo → Lite`, `pro_3 → Pro 3`, `pro_0 → Pro 0`. Unknown tokens are surfaced verbatim so support can spot new tiers.
+
+### Tests
+
+- Added 18 `formatPlanDisplayLabel` parameterised cases + 3 new `ktlo_2`/`ktlo_3`/`KTLO_2` cases to `__tests__/plan-mapper.test.ts` (now 41 tests, all pass).
+- Updated `credit-totals-csv.test.ts` and `credit-totals-modal.test.ts` to assert the human-readable labels (`"Pro 3"`, `"Pro 0"`) instead of the wire tokens.
+- Verified: `bunx vitest run plan-mapper credit-totals-csv credit-totals-modal` → 3 files, 64 tests passed; `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.95.0.
+
+---
+
 ## [v3.94.0] — 2026-06-21
 
 ### Fixed
