@@ -50,3 +50,5 @@ No open `## Pending` / `## TODO` sections found in `.lovable/plan.md`, `.lovable
 - `.lovable/coding-guidelines.md` — present, will follow during execution.
 - `spec/coding-guidelines/` — not present, skipped silently.
 - Memory: `mem://features/macro-controller/credit-balance-update`, `mem://features/macro-controller/credit-refresh-behavior`, `mem://constraints/no-retry-policy` (no exponential backoff in step 4 fan-out — single-flight + single auth retry only).
+
+- **v3.85.0 — 2026-06-21 (Step 8a/8d):** Added `credit-new-free-network-count.test.ts` — locks the two highest-value invariants from Plan 01: (a) new-free workspace with zero `limit` + all-zero `grant_type_balances` row issues exactly ONE `/credit-balance` call (RCA #1/#3 lock), (b) Pro_1 with inline `limit>0` issues ZERO `/credit-balance` calls (Skipped outcome via `shouldFetchCreditBalanceForPlan`). Verification: `bunx vitest run credit-new-free-network-count.test.ts` → 2/2 pass. Versions synced at 3.85.0.
