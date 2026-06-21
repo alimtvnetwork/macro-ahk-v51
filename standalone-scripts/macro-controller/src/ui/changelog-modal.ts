@@ -18,6 +18,12 @@ export interface ChangelogEntry {
 }
 
 export const CHANGELOG_ENTRIES: ChangelogEntry[] = [
+  { ver: 'v3.104.0', date: '2026-06-21', changes: [
+    'Move-to-Workspace now sends x-castle-request-token header (Castle.io risk engine)',
+    'Castle token minted per request via window._castle(createRequestToken); fallback logs MISSING and the server returns 403 castle_denied',
+    'New spec: spec/workspace-move/00-api-contract.md'
+  ]},
+
   { ver: 'v3.102.0', date: '2026-06-21', changes: [
     'Projects modal: SQLite cache short-circuits projects.list fetches when fresh (within TTL)',
     'Projects modal: per-workspace cache hit/miss logs + load-complete summary (cacheHits/cacheMisses/bypass)',
