@@ -1014,7 +1014,8 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
     if (!n || n < 1 || n > 999) { showPasteToast('⚠️ Enter 1–999', true); return; }
     promptsDropdown.style.display = 'none';
     taskNextSub.style.display = 'none';
-    runTaskNextLoop(taskNextDeps, n);
+    if (n <= 1) runTaskNextLoop(taskNextDeps, n);
+    else void runTaskNextQueue(taskNextDeps, n);
   };
   customInput.onkeydown = function(e: KeyboardEvent) { if (e.key === 'Enter') { e.stopPropagation(); goBtn.click(); } };
   customRow.appendChild(goBtn);
