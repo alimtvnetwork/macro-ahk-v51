@@ -139,6 +139,18 @@ describe('buildBreakdownTable', () => {
     expect(text).toContain('A0002 D3v002');
     expect(text).toContain('pro_0');
   });
+
+  it('renders resolver-backed cache values instead of raw 0/0 cells', async () => {
+    await seedCachedBalance('cached', 77, 100);
+    const table = buildBreakdownTable([
+      ws({ id: 'cached', fullName: 'Cached Ktlo', plan: 'ktlo', available: 0, totalCredits: 0 }),
+    ]);
+    const body = table.querySelector('[data-credit-totals-rows]') as HTMLElement;
+    const text = body.textContent || '';
+    expect(text).toContain('Cached Ktlo');
+    expect(text).toContain('77');
+    expect(text).toContain('100');
+  });
 });
 
 describe('buildBody', () => {
