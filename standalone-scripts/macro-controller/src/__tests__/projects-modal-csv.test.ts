@@ -2,9 +2,11 @@ import { describe, expect, it } from 'vitest';
 
 import {
   filterWorkspaceBlocksByVisibility,
+  hasMissingCsvLastCommunication,
   isWorkspaceFilterVisible,
   isWorkspaceWithinCreditsRange,
   isCsvProjectNameFallback,
+  normalizeCsvLastCommunication,
   resolveCsvProjectName,
   type OpenTabIndex,
   type OpenTabRow,
@@ -104,5 +106,24 @@ describe('Projects modal credits-used range filter (Task 12)', () => {
 
   it('inclusive boundaries are honoured', () => {
     expect(isWorkspaceWithinCreditsRange(50, 50, 50)).toBe(true);
+  });
+});
+
+describe('Projects modal CSV last communication cleanup', () => {
+  it('replaces blank lastCommunication values with an em dash', () => {
+    expect(normalizeCsvLastCommunication('')).toBe('—');
+    expect(normalizeCsvLastCommunication('   ')).toBe('—');
+  });
+
+  it('replaces upstream placeholder lastCommunication values with an em dash', () => {
+    expect(hasMissingCsvLastCommunication('(no data returned by API)')).toBe(true);
+    expect(normalizeCsvLastCommunication('(no data returned by API)')).toBe('—');
+  });
+
+  it('keeps real lastCommunication values untouched', () => {
+    const value = '2026-06-21T08:30:00.000Z';
+
+    expect(hasMissingCsvLastCommunication(value)).toBe(false);
+    expect(normalizeCsvLastCommunication(value)).toBe(value);
   });
 });
