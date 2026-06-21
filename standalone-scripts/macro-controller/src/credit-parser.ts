@@ -52,8 +52,8 @@ export function resolveWsTier(plan: string, subStatus: string, billingLimit: num
   const p = (plan || '').toLowerCase().trim();
   const s = normalizeSubscriptionStatus(subStatus);
 
-  // Lite / ktlo plan
-  if (p === PlanName.KTLO || p === PlanName.LITE) return WsTierValue.LITE;
+  // Lite / ktlo plan (incl. tiered variants like `ktlo_2`, `ktlo_3`)
+  if (p === PlanName.KTLO || p === PlanName.LITE || p.startsWith('ktlo_')) return WsTierValue.LITE;
 
   // Has billing = was/is pro
   if (billingLimit > 0 || (p && p !== PlanName.FREE)) {

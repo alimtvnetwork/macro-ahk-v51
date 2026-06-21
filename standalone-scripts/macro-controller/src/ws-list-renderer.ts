@@ -623,16 +623,31 @@ function buildLegacyExpiredBadge(ws: WorkspaceCredit): string {
   return '<span style="font-size:10px;color:#fca5a5;background:rgba(127,29,29,0.55);padding:2px 5px;border-radius:3px;font-weight:600;margin-left:3px;vertical-align:middle;" data-marco-tip="' + tip + '">·' + days + 'd</span>';
 }
 
+/**
+ * Resolve the tier-badge text. Lovable ships Lite tiers on the wire as
+ * `ktlo_<N>` (e.g. `ktlo_2`). Render those as "Light N" so the badge
+ * reflects the actual tier instead of the bucket label "LITE" or the
+ * fallback "PRO".
+ */
+function resolveTierBadgeLabel(ws: WorkspaceCredit, fallback: string): string {
+  const plan = (ws.plan || '').toLowerCase().trim();
+  const ktloTier = /^ktlo_(\d+)$/.exec(plan);
+  if (ktloTier) return 'Light ' + ktloTier[1];
+  if (plan === 'ktlo' || plan === 'lite') return 'LITE';
+  return fallback;
+}
+
 /** Build the inner HTML for a workspace row. Exported for tests. */
 export function buildTierBadgeHtml(ws: WorkspaceCredit): string {
   const wsTier = ws.tier || WsTierValue.FREE;
   const tierMeta = WS_TIER_LABELS[wsTier] || WS_TIER_LABELS[WsTierValue.FREE];
   const config = getWorkspaceLifecycleConfig();
   const { pillHtml: statusPillHtml, suppressTier: suppressTierBadge } = resolveStatusPill(ws, config);
+  const tierLabel = resolveTierBadgeLabel(ws, tierMeta.label);
 
   let tierBadge = suppressTierBadge
     ? ''
-    : '<span style="font-size:10px;color:' + tierMeta.fg + CSS_BG + tierMeta.bg + ';padding:2px 5px;border-radius:3px;font-weight:700;margin-left:6px;vertical-align:middle;letter-spacing:0.3px;">' + tierMeta.label + '</span>';
+    : '<span style="font-size:10px;color:' + tierMeta.fg + CSS_BG + tierMeta.bg + ';padding:2px 5px;border-radius:3px;font-weight:700;margin-left:6px;vertical-align:middle;letter-spacing:0.3px;">' + tierLabel + '</span>';
 
   if (config.enableWorkspaceStatusLabels) {
     tierBadge += statusPillHtml;
