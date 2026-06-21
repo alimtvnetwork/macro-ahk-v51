@@ -1,4 +1,4 @@
-# Marco Chrome Extension v3.102.0
+# Marco Chrome Extension v3.103.0
 
 ## Added
 
@@ -19,4 +19,4 @@
 
 ## Verification
 
-- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.102.0.
+- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.103.0.

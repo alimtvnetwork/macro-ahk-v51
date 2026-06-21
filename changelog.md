@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
-## [v3.102.0] — 2026-06-21
+## [v3.103.0] — 2026-06-21
 
 ### Added
 
@@ -16,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ### Tests
 
-- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.102.0.
+- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.103.0.
 
 ---
 
