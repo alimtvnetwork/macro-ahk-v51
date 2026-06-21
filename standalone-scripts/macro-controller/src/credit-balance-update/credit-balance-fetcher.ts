@@ -42,7 +42,7 @@ function buildFailurePayload(
     reason: string,
     detail: string,
     options: FetchCreditBalanceOptions,
-    path: string,
+    sourceUrl: string,
     token: string | null,
     status: number | null,
     bodyPreview: string | null,
@@ -51,7 +51,7 @@ function buildFailurePayload(
     return {
         Reason: reason,
         ReasonDetail: detail,
-        Path: path,
+        SourceUrl: sourceUrl,
         WorkspaceId: options.workspaceId,
         Plan: options.plan,
         BearerPrefix: sanitizeBearerPrefix(token),
