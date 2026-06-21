@@ -499,12 +499,13 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
   projects.style.cssText = 'text-align:right;color:#94a3b8;font-weight:600;font-size:10px;';
   projects.textContent = projectsN > 0 ? String(projectsN) : '—';
 
-  const usedN = Number(ws.totalCreditsUsed);
+  const summary = resolveCreditSummary(ws);
+  const usedN = summary.totalUsed;
   const used = document.createElement('span');
   used.style.cssText = 'text-align:right;color:#fb923c;font-weight:700;font-size:11px;';
   used.textContent = formatCount(usedN);
 
-  const remN = Number(ws.available);
+  const remN = summary.available;
   const rem = document.createElement('span');
   const remColor = remN <= 0 ? cPanelFgDim : remN < 100 ? '#fbbf24' : '#86efac';
   rem.style.cssText = 'text-align:right;color:' + remColor + ';font-weight:700;font-size:11px;';
@@ -512,7 +513,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
 
   const total = document.createElement('span');
   total.style.cssText = 'text-align:right;color:#a78bfa;font-weight:700;font-size:11px;';
-  total.textContent = formatCount(Number(ws.totalCredits));
+  total.textContent = formatCount(summary.total);
 
   row.appendChild(name);
   row.appendChild(plan);
