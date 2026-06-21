@@ -1,27 +1,19 @@
-# Marco Chrome Extension v3.97.0
+# Marco Chrome Extension v3.98.0
 
-## Fixed
+## Changed
 
-- **Projects Modal CSV project names now fall back to the open Lovable tab name**
-  when `projects.list` returns a blank/id-only name. The CSV keeps the API name
-  when present, uses the open-tab project name when available, and only emits the
-  project id when no human-readable name exists.
-- Added an info log: `Projects: CSV project-name fallback used for N row(s)`.
+- Synced `.lovable/plans/projects-modal-15-step-improvement.md` with reality:
+  Tasks 4–10 (SQLite cache schema, write/read paths, TTL setting, fetch delay
+  setting, search bar, filter chips, workspace + credits header) are already
+  shipped in code. Cursor advanced to **Task 11 — workspace multi-select
+  dropdown**.
 
-## Files changed
-
-- `standalone-scripts/macro-controller/src/ui/projects-modal.ts`
-- `standalone-scripts/macro-controller/src/__tests__/projects-modal-csv.test.ts` (new)
+No runtime behavior change in this release — version bumped purely so plan
+state, changelog, and `version.json` stay in sync.
 
 ## Verification
 
-- Before: missing project names were collapsed to project ids in `fetchProjects()`
-  and CSV exported that id.
-- After: `projects-modal-csv.test.ts` proves list names win, id-only names use
-  open-tab fallback, and id remains only when no real name exists.
-- `bunx vitest run standalone-scripts/macro-controller/src/__tests__/projects-modal-csv.test.ts`
-  → **1 file, 3 tests passed**.
-- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.97.0.
+- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.98.0.
 
 ---
 
