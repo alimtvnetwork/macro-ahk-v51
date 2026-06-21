@@ -342,10 +342,12 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
     const q = (query || '').trim().toLowerCase();
     const onlyOpen = state.filterOpenOnly;
     const onlyRepo = state.filterHasRepo;
-    const filterActive = q !== '' || onlyOpen || onlyRepo;
+    const hasWorkspaceFilter = state.hiddenWorkspaces.size > 0;
+    const filterActive = q !== '' || onlyOpen || onlyRepo || hasWorkspaceFilter;
+    const workspaceBlocks = blocks.filter(function (b) { return !state.hiddenWorkspaces.has(b.ws.id); });
 
     const filtered: WorkspaceBlock[] = filterActive
-        ? blocks.map(function (b) {
+        ? workspaceBlocks.map(function (b) {
             if (!b.projects) return b;
             const projects = b.projects.filter(function (p) {
                 if (q && !(
@@ -360,14 +362,14 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
             });
             return { ws: b.ws, projects, error: b.error, loading: b.loading };
         })
-        : blocks.slice();
+        : workspaceBlocks.slice();
 
     const totalOpen = tabIndex.byProjectId.size + tabIndex.byUrlProjectId.size;
     const matchCount = filterActive
         ? filtered.reduce(function (acc, b) { return acc + (b.projects?.length ?? 0); }, 0)
         : 0;
     let html = '<div style="font-size:10px;color:#94a3b8;padding:0 0 6px 0;">'
-        + blocks.length + ' workspace' + (blocks.length === 1 ? '' : 's')
+        + workspaceBlocks.length + '/' + blocks.length + ' workspace' + (blocks.length === 1 ? '' : 's')
         + ' · ' + totalOpen + ' open project tab' + (totalOpen === 1 ? '' : 's')
         + (filterActive ? ' · <span style="color:#fbbf24;">' + matchCount + ' match' + (matchCount === 1 ? '' : 'es') + '</span>' : '')
         + (capturedAt ? ' · ' + escapeHtml(capturedAt) : '')
@@ -384,6 +386,7 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
         if (q) activeChips.push('search "' + escapeHtml(q) + '"');
         if (onlyOpen) activeChips.push('open-in-tab');
         if (onlyRepo) activeChips.push('has-repo');
+        if (hasWorkspaceFilter) activeChips.push('workspace filter');
         html += '<div style="text-align:center;padding:24px 12px;color:' + cPanelFgDim + ';font-size:11px;'
             + 'border:1px dashed rgba(124,58,237,0.35);border-radius:6px;margin-top:4px;">'
             + '<div style="font-size:22px;margin-bottom:6px;opacity:0.6;">🔍</div>'
