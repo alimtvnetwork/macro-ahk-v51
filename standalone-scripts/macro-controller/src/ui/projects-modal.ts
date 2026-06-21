@@ -358,8 +358,14 @@ function renderAll(blocks: ReadonlyArray<WorkspaceBlock>, tabIndex: OpenTabIndex
     const onlyOpen = state.filterOpenOnly;
     const onlyRepo = state.filterHasRepo;
     const hasWorkspaceFilter = state.hiddenWorkspaces.size > 0;
-    const filterActive = q !== '' || onlyOpen || onlyRepo || hasWorkspaceFilter;
-    const workspaceBlocks = filterWorkspaceBlocksByVisibility(blocks, state.hiddenWorkspaces);
+    const creditsMin = state.creditsUsedMin;
+    const creditsMax = state.creditsUsedMax;
+    const hasCreditsFilter = creditsMin !== null || creditsMax !== null;
+    const filterActive = q !== '' || onlyOpen || onlyRepo || hasWorkspaceFilter || hasCreditsFilter;
+    const visibleByWorkspace = filterWorkspaceBlocksByVisibility(blocks, state.hiddenWorkspaces);
+    const workspaceBlocks = visibleByWorkspace.filter(function (b) {
+        return isWorkspaceWithinCreditsRange(b.ws.used ?? 0, creditsMin, creditsMax);
+    });
 
     const filtered: WorkspaceBlock[] = filterActive
         ? workspaceBlocks.map(function (b) {
