@@ -40,7 +40,7 @@ function mkWs(id: string, available: number, daysToRefill: number): WorkspaceCre
   return {
     id,
     name: id,
-    plan: 'pro',
+    plan: 'pro_1',
     available,
     used: 0,
     total: 205,
