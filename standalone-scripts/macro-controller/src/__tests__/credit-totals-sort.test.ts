@@ -11,7 +11,7 @@ import {
 } from '../ui/credit-totals-modal';
 import type { WorkspaceCredit } from '../types';
 import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
-import { clearCreditBalanceUpdateMemoryCache, writeCreditBalanceUpdateCache } from '../credit-balance-update/credit-balance-cache';
+import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
 
 function ws(partial: Partial<WorkspaceCredit>): WorkspaceCredit {
   return {
@@ -75,9 +75,9 @@ describe('sortWorkspaces', () => {
     expect(input.map((w) => w.id)).toEqual(['a', 'b', 'c']);
   });
 
-  it('sorts by resolver-backed totals when raw workspace totals are 0/0', async () => {
+  it('sorts by resolver-backed totals when raw workspace totals are 0/0', () => {
     clearCreditBalanceUpdateMemoryCache();
-    await writeCreditBalanceUpdateCache('cached-high', {
+    __writeCreditBalanceUpdateMemoryCacheForTests('cached-high', {
       outcome: CreditFetchOutcome.ApiHit,
       fetchedAt: Date.now(),
       sourceUrl: 'test',
