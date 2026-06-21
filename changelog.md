@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.88.0] — 2026-06-21
+
+### Changed
+
+- **Plan 01 Step 9 — credit-fetch failure-log schema lock.** Renamed the `CreditFailureLogPayload.Path` field to `SourceUrl` so every `/credit-balance` failure logged via `Logger.error('CreditBalanceUpdate.fetch', …)` matches the mandated schema: `Reason`, `ReasonDetail`, `WorkspaceId`, `BearerPrefix`, `ElapsedMs`, `SourceUrl` (plus `Plan`, `Status`, `BodyPreview`, `TimeoutMs`). Added `credit-fetch-failure-schema.test.ts` (5 tests) covering MissingToken / AuthError-401 / Http5xx / NetworkError paths and asserting the legacy `Path` key is gone. Closes the last "no swallowed catches" requirement from Plan 01.
+
+---
+
 ## [v3.87.0] — 2026-06-21
 
 ### Added
