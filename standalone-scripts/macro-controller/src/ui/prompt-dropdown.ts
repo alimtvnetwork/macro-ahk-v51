@@ -12,7 +12,7 @@ import type { PromptEntry as LoaderPromptEntry, ResolvedPromptsConfig } from '..
 import { cPanelFg, cPanelFgDim, cPrimary, cPrimaryLight, cBtnMenuHover, lDropdownRadius } from '../shared-state';
 import { getByXPath } from '../xpath-utils';
 import { pasteIntoEditor, showPasteToast } from './prompt-utils';
-import { runTaskNextLoop, openTaskNextSettingsModal, type TaskNextDeps, findNextTasksPrompt } from './task-next-ui';
+import { runTaskNextLoop, runTaskNextQueue, openTaskNextSettingsModal, type TaskNextDeps, findNextTasksPrompt } from './task-next-ui';
 import { addTaskToQueue } from '../task-queue';
 import { getDisplayProjectName } from '../logging';
 
@@ -985,7 +985,8 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
       e.stopPropagation();
       promptsDropdown.style.display = 'none';
       taskNextSub.style.display = 'none';
-      runTaskNextLoop(taskNextDeps, count);
+      if (count <= 1) runTaskNextLoop(taskNextDeps, count);
+      else void runTaskNextQueue(taskNextDeps, count);
     };
     taskNextSub.appendChild(subItem);
   }
@@ -1013,7 +1014,8 @@ function _appendCustomCountRow(taskNextSub: HTMLElement, promptsDropdown: HTMLEl
     if (!n || n < 1 || n > 999) { showPasteToast('⚠️ Enter 1–999', true); return; }
     promptsDropdown.style.display = 'none';
     taskNextSub.style.display = 'none';
-    runTaskNextLoop(taskNextDeps, n);
+    if (n <= 1) runTaskNextLoop(taskNextDeps, n);
+    else void runTaskNextQueue(taskNextDeps, n);
   };
   customInput.onkeydown = function(e: KeyboardEvent) { if (e.key === 'Enter') { e.stopPropagation(); goBtn.click(); } };
   customRow.appendChild(goBtn);
