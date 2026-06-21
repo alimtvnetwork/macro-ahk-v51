@@ -7,6 +7,7 @@ import {
   isWorkspaceFilterVisible,
   isWorkspaceWithinCreditsRange,
   isCsvProjectNameFallback,
+  logCsvLastCommunicationNormalization,
   normalizeCsvLastCommunication,
   resolveCsvProjectName,
   type OpenTabIndex,
@@ -134,5 +135,9 @@ describe('Projects modal CSV last communication cleanup', () => {
 
   it('skips the cleanup log when no rows were normalized', () => {
     expect(getCsvLastCommunicationNormalizedLogMessage(0)).toBeNull();
+  });
+
+  it('confirms the cleanup log path fires when rows were normalized', () => {
+    expect(logCsvLastCommunicationNormalization(1)).toBe(true);
   });
 });
