@@ -2,6 +2,8 @@
 
 > Single summary of every CI/CD failure (build, lint, typecheck, test runner, GitHub Actions, release pipeline). Per-issue files live in `.lovable/cicd-issues/XX-name.md`.
 >
+> **⚡ Fast triage:** read [`cicd-profile.md`](./cicd-profile.md) FIRST — 30-second decision tree for "CI not running" / "build broken" / "release didn't fire". Avoids scope-creep edits on repo-side problems.
+>
 > **Rule:** check this index before opening a new file — do not duplicate.
 > **Lifecycle:** CI/CD issues stay in this folder even after resolution (they recur). Status flips to `✅ Resolved`. Do **not** move to `.lovable/solved-issues/`.
 
