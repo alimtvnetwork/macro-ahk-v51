@@ -1025,7 +1025,7 @@ export function logCsvLastCommunicationNormalization(normalizedCount: number, lo
         return false;
     }
 
-    log(normalizedLogMessage, 'info');
+    logger(normalizedLogMessage, 'info');
 
     return true;
 }
