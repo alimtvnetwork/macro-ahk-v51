@@ -985,7 +985,8 @@ function _appendPresetCounts(taskNextSub: HTMLElement, promptsDropdown: HTMLElem
       e.stopPropagation();
       promptsDropdown.style.display = 'none';
       taskNextSub.style.display = 'none';
-      runTaskNextLoop(taskNextDeps, count);
+      if (count <= 1) runTaskNextLoop(taskNextDeps, count);
+      else void runTaskNextQueue(taskNextDeps, count);
     };
     taskNextSub.appendChild(subItem);
   }
