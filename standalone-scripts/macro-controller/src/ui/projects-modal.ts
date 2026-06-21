@@ -314,6 +314,12 @@ function attachRowClicks(body: HTMLElement): void {
                 c?.click();
             }
             state.hiddenWorkspaces.clear();
+            state.creditsUsedMin = null;
+            state.creditsUsedMax = null;
+            const minInput = panel?.querySelector('[data-credits-min]') as HTMLInputElement | null;
+            const maxInput = panel?.querySelector('[data-credits-max]') as HTMLInputElement | null;
+            if (minInput) minInput.value = '';
+            if (maxInput) maxInput.value = '';
             state.refreshWorkspaceFilter?.();
             renderBody(body);
             return;
