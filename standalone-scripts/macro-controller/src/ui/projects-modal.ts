@@ -881,7 +881,7 @@ interface ExportRow {
 }
 
 const CSV_MISSING_LAST_COMMUNICATION_LABEL = '—';
-const CSV_UPSTREAM_EMPTY_PLACEHOLDER = '(no data returned by API)';
+const CSV_UPSTREAM_EMPTY_PLACEHOLDER = '(no data returned by api)';
 
 const EXPORT_HEADERS: ReadonlyArray<keyof ExportRow> = [
     'workspaceId', 'workspaceName', 'creditsUsed', 'creditsTotal',
