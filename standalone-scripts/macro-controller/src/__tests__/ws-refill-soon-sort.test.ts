@@ -21,7 +21,7 @@ import { sortByRefillPriority } from '../workspace-refill-priority';
 import { filterAndSortWorkspaces, setLoopWsCreditSortMode } from '../ws-list-renderer';
 import type { WorkspaceCredit } from '../types';
 import { CreditFetchOutcome } from '../credit-balance-update/credit-fetch-outcome';
-import { clearCreditBalanceUpdateMemoryCache, writeCreditBalanceUpdateCache } from '../credit-balance-update/credit-balance-cache';
+import { __writeCreditBalanceUpdateMemoryCacheForTests, clearCreditBalanceUpdateMemoryCache } from '../credit-balance-update/credit-balance-cache';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const SRC = join(HERE, '..', 'ws-list-renderer.ts');
@@ -70,10 +70,10 @@ describe('sortByRefillPriority — screenshot scenario (all 1d, mixed credits)',
     expect(ids).toEqual(['A0087', 'A0084', 'A0088', 'A0086', 'A0081', 'A0082', 'A0083']);
   });
 
-  it('filterAndSortWorkspaces credit sort uses resolver-backed available credits', async () => {
+  it('filterAndSortWorkspaces credit sort uses resolver-backed available credits', () => {
     clearCreditBalanceUpdateMemoryCache();
     setLoopWsCreditSortMode('high');
-    await writeCreditBalanceUpdateCache('cached', {
+    __writeCreditBalanceUpdateMemoryCacheForTests('cached', {
       outcome: CreditFetchOutcome.ApiHit,
       fetchedAt: Date.now(),
       sourceUrl: 'test',
