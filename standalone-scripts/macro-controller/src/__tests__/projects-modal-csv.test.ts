@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import {
   filterWorkspaceBlocksByVisibility,
   isWorkspaceFilterVisible,
+  isWorkspaceWithinCreditsRange,
   isCsvProjectNameFallback,
   resolveCsvProjectName,
   type OpenTabIndex,
