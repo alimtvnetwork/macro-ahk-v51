@@ -880,6 +880,9 @@ interface ExportRow {
     exportedAt: string;
 }
 
+const CSV_MISSING_LAST_COMMUNICATION_LABEL = '—';
+const CSV_UPSTREAM_EMPTY_PLACEHOLDER = '(no data returned by API)';
+
 const EXPORT_HEADERS: ReadonlyArray<keyof ExportRow> = [
     'workspaceId', 'workspaceName', 'creditsUsed', 'creditsTotal',
     'projectId', 'projectName', 'isOpenInChrome',
@@ -928,6 +931,9 @@ function exportCsv(statusEl: HTMLElement): void {
     const fallbackCount = tasks.filter(function (task) {
         return isCsvProjectNameFallback(task.project, tabIndex);
     }).length;
+    const normalizedLastCommunicationCount = tasks.filter(function (task) {
+        return hasMissingCsvLastCommunication(task.project.lastMessageAt);
+    }).length;
     const rows: ExportRow[] = tasks.map(function (task) {
         return {
             workspaceId: task.ws.id,
@@ -939,7 +945,7 @@ function exportCsv(statusEl: HTMLElement): void {
             isOpenInChrome: isOpen(task.project.id, tabIndex) ? 'yes' : 'no',
             gitRepo: task.project.githubRepo,
             gitBranch: task.project.githubBranch,
-            lastCommunication: task.project.lastMessageAt,
+            lastCommunication: normalizeCsvLastCommunication(task.project.lastMessageAt),
             extensionVersion: VERSION,
             exportedAt,
         };
@@ -956,6 +962,9 @@ function exportCsv(statusEl: HTMLElement): void {
         + (rows.length === 1 ? '' : 's') + ' → ' + filename;
     if (fallbackCount > 0) {
         log('Projects: CSV project-name fallback used for ' + fallbackCount + ' row(s)', 'info');
+    }
+    if (normalizedLastCommunicationCount > 0) {
+        log('Projects: CSV lastCommunication normalized for ' + normalizedLastCommunicationCount + ' row(s)', 'info');
     }
     log('Projects: CSV export complete (' + rows.length + ' rows)', 'info');
 }
