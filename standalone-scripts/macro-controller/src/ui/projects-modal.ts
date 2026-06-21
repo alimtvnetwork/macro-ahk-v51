@@ -368,7 +368,6 @@ function renderEmpty(text: string): string {
     return '<div style="color:' + cPanelFgDim + ';font-size:11px;padding:6px;">' + escapeHtml(text) + '</div>';
 }
 
-// eslint-disable-next-line sonarjs/cognitive-complexity
 function buildZeroResultsPanel(
     q: string,
     onlyOpen: boolean,
