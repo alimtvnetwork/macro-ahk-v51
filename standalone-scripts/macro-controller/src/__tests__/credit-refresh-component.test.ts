@@ -154,7 +154,7 @@ describe('💰 Credits button — new-free row render after fan-out (plan 01 ste
 
         creditBtn?.click();
         await flushMicrotasks();
-        await vi.advanceTimersByTimeAsync(130);
+        await vi.advanceTimersByTimeAsync(260);
         await flushMicrotasks();
 
         const progress = document.querySelector('#loop-ws-list [role="progressbar"]') as HTMLElement | null;
