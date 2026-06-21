@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.99.0] — 2026-06-21
+
+### Added
+
+- **Projects Modal Task 11 — workspace multi-select filter.** Added workspace chips to the Projects dialog filter row so each workspace block can be hidden/shown without affecting search, open-tab, or repo filters. `renderAll()` now applies `state.hiddenWorkspaces` before row-level filtering and the zero-results panel names the workspace filter when active.
+- **Workspace filter observability.** The dialog summary now reports visible/total workspace count, and Clear all filters resets workspace visibility along with search/open/repo filters.
+
+### Tests
+
+- Added Projects Modal workspace-filter unit coverage in `standalone-scripts/macro-controller/src/__tests__/projects-modal-csv.test.ts`.
+- `bunx vitest run standalone-scripts/macro-controller/src/__tests__/projects-modal-csv.test.ts` → **1 file, 5 tests passed**.
+- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.99.0.
+
+---
+
 ## [v3.98.0] — 2026-06-21
 
 ### Changed
