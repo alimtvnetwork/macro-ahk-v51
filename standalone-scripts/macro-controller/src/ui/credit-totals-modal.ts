@@ -493,7 +493,7 @@ function buildRow(ws: WorkspaceCredit, index: number = 0): HTMLElement {
 
   const plan = document.createElement('span');
   plan.style.cssText = 'color:#67e8f9;font-weight:600;font-size:10px;';
-  plan.textContent = ws.plan || '—';
+  plan.textContent = formatPlanDisplayLabel(ws.plan) || '—';
 
   const projectsN = Number(ws.numProjects) || 0;
   const projects = document.createElement('span');
