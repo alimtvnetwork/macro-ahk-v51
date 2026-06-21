@@ -11,14 +11,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ### Added
 
+- **Projects Modal Task 15 — final changelog sweep.** Added in-app `changelog-modal.ts` entries for v3.97.0 (CSV name fallback), v3.99.0 (workspace multi-select filter), v3.100.0 (credits-used range filter), v3.101.0 (CSV `lastCommunication` cleanup) and v3.102.0 (SQLite cache short-circuit + hit/miss logging), so the in-extension changelog now reflects every Projects Modal change from the 15-step plan.
+- **Plan closure.** `.lovable/plans/projects-modal-15-step-improvement.md` cursor advanced to "closed" — all 15 tasks shipped.
+
+### Tests
+
+- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.103.0.
+- `bunx vitest run standalone-scripts/macro-controller/src/__tests__/projects-modal-csv.test.ts` → 1 file, 16 tests passed.
+
+---
+
+## [v3.102.0] — 2026-06-21
+
+### Added
+
 - **Projects Modal Task 14 — SQLite cache end-to-end verification.** `loadAndRender()` now short-circuits the per-workspace `projects.list` network fetch when the SQLite-backed projects-cache row is fresh (within TTL). Refresh button still bypasses the cache via `bypassCache=true`. Reopening the modal within the TTL window now performs zero `projects.list` calls.
 - **Cache observability.** Each workspace logs `Projects: cache hit ws=… — skipping projects.list fetch` or `Projects: cache miss ws=… — fetching projects.list`, and load completion logs a summary `Projects: load complete — cacheHits=X cacheMisses=Y bypass=Z` so the cache effect is visible in the activity log without DevTools.
 
 ### Tests
 
-- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.103.0.
+- `node scripts/check-version-sync.mjs` → ✅ All versions in sync: 3.102.0.
 
 ---
+
 
 ## [v3.101.0] — 2026-06-21
 
