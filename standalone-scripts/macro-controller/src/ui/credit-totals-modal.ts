@@ -48,7 +48,7 @@ export function generateCsv(workspaces: ReadonlyArray<WorkspaceCredit>): string 
   for (const ws of workspaces) {
     const summary = resolveCreditSummary(ws);
     const name = (ws.fullName || ws.name || ws.id).replace(/"/g, '""');
-    const plan = (ws.plan || '').replace(/"/g, '""');
+    const plan = formatPlanDisplayLabel(ws.plan).replace(/"/g, '""');
     const projects = String(Number(ws.numProjects) || 0);
     const used = String(summary.totalUsed);
     const rem = String(summary.available);
