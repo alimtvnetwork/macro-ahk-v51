@@ -56,4 +56,25 @@ describe('credit-balance-update plan mapper', () => {
     ])('shouldFetchCreditBalanceForPlan(%s) returns %s', (plan, expected) => {
         expect(shouldFetchCreditBalanceForPlan(plan)).toBe(expected);
     });
+
+    it.each([
+        ['ktlo_2', 'Light 2'],
+        ['ktlo_3', 'Light 3'],
+        ['KTLO_5', 'Light 5'],
+        ['ktlo', 'Lite'],
+        ['lite', 'Lite'],
+        ['pro_0', 'Pro 0'],
+        ['pro_1', 'Pro 1'],
+        ['pro_3', 'Pro 3'],
+        ['free', 'Free'],
+        ['cancelled', 'Cancelled'],
+        ['canceled', 'Cancelled'],
+        ['business', 'Business'],
+        ['enterprise', 'Enterprise'],
+        ['', ''],
+        [null, ''],
+        ['future_plan', 'future_plan'],
+    ])('formatPlanDisplayLabel(%s) returns %s', (wire, expected) => {
+        expect(formatPlanDisplayLabel(wire)).toBe(expected);
+    });
 });
