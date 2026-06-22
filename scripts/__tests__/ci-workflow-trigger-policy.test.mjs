@@ -24,6 +24,8 @@ const RELEASE_WATCHER_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/release-w
 const RELEASE_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/release.yml");
 const PACKAGE_JSON = resolve(REPO_ROOT, "package.json");
 const CLONE_AHK_SCRIPT = resolve(REPO_ROOT, "scripts/clone-ahk.mjs");
+const CLONE_REPO_PS1 = resolve(REPO_ROOT, "scripts/clone-repo.ps1");
+const CONTRIBUTING_MD = resolve(REPO_ROOT, "contributing.md");
 
 /**
  * Naïve YAML top-level key extractor.  Only needs to recognise:
@@ -289,3 +291,22 @@ test("AHK sidecar clone is shallow and canonical-owner guarded", () => {
     assert.match(script, /"--filter=blob:none"/, "clone helper must use partial clone filtering to reduce GitHub transfer size");
     assert.match(script, /"--no-tags"/, "clone helper must avoid fetching tags for the sidecar clone");
 });
+
+test("Repository checkout docs avoid full-history clones and expose fallback helper", () => {
+    assert.ok(existsSync(CLONE_REPO_PS1), `File missing at ${CLONE_REPO_PS1}`);
+    assert.ok(existsSync(CONTRIBUTING_MD), `File missing at ${CONTRIBUTING_MD}`);
+
+    const helper = readFileSync(CLONE_REPO_PS1, "utf8");
+    const contributing = readFileSync(CONTRIBUTING_MD, "utf8");
+
+    assert.doesNotMatch(
+        contributing,
+        /git clone https:\/\/github\.com\/aukgit\/macro-ahk-v51\.git/,
+        "contributing.md must not recommend a full-history repository clone",
+    );
+    assert.match(contributing, /--depth=1 --single-branch --filter=blob:none --no-tags/, "repository setup docs must use a shallow filtered clone");
+    assert.match(helper, /alimtvnetwork\/macro-ahk-v51/, "clone-repo.ps1 must rewrite the stale repository owner");
+    assert.match(helper, /--depth=1 --single-branch --filter=blob:none --no-tags/, "clone-repo.ps1 must avoid full-history git transfers");
+    assert.match(helper, /archive\/refs\/heads\/\$BranchValue\.zip/, "clone-repo.ps1 must fall back to GitHub source ZIP downloads");
+}
+);
