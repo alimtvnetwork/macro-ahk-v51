@@ -20,6 +20,7 @@ required built assets to the GitHub Release page:
 - `lovable-owner-switch-{VER}.zip`
 - `lovable-user-add-{VER}.zip`
 - `prompts-{VER}.zip` when prompts exist
+- `download-extension.ps1`
 - `install.ps1`
 - `install.sh`
 - `VERSION.txt`
@@ -69,6 +70,9 @@ completion. Known causes:
 - The release body must include one-line install commands for Windows
   PowerShell and Linux/macOS Bash, plus direct download/install guidance for
   the Chrome-extension ZIP.
+- Download-only PowerShell snippets must fetch `download-extension.ps1` from
+  GitHub Release assets (`/releases/latest/download/` or `/releases/download/{VER}/`),
+  not raw `main`, so users do not depend on source cloning or branch raw-file availability.
 - A separate release-audit job should detect any existing `v*` GitHub Release
   that has only source archives or is missing required built assets.
 - Descriptor-based recovery should call the canonical release workflow via
