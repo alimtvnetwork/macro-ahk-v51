@@ -21,6 +21,7 @@ const CI_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/ci.yml");
 const PING_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/ping.yml");
 const AUDIT_RELEASES_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/audit-releases.yml");
 const RELEASE_WATCHER_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/release-watcher.yml");
+const RELEASE_WORKFLOW = resolve(REPO_ROOT, ".github/workflows/release.yml");
 
 /**
  * Naïve YAML top-level key extractor.  Only needs to recognise:
@@ -228,4 +229,46 @@ test("Audit Releases skips superseded source-only patch releases", () => {
         /SKIP_TAGS="[^"]*\bv3\.104\.1\b[^"]*"/,
         "audit-releases.yml must skip superseded v3.104.1 because v3.104.2 carries the built assets",
     );
+});
+
+test("Release pipeline publishes download-extension.ps1 as a first-class asset", () => {
+    assert.ok(existsSync(RELEASE_WORKFLOW), `Workflow missing at ${RELEASE_WORKFLOW}`);
+    const src = readFileSync(RELEASE_WORKFLOW, "utf8");
+
+    assert.match(
+        src,
+        /cp scripts\/download-extension\.ps1 release-assets\/download-extension\.ps1/,
+        "release.yml must upload download-extension.ps1 so releases/latest/download/download-extension.ps1 does not 404",
+    );
+    assert.match(
+        src,
+        /release-assets\/download-extension\.ps1:512/,
+        "release.yml required-asset gate must include download-extension.ps1",
+    );
+    assert.match(
+        src,
+        /"download-extension\.ps1"/,
+        "release.yml upload verification must require download-extension.ps1 on the GitHub Release page",
+    );
+    assert.match(
+        src,
+        /releases\/latest\/download\/download-extension\.ps1/,
+        "release notes must use the latest release asset URL for the download-only helper, not raw main",
+    );
+    assert.match(
+        src,
+        /releases\/download\/\$\{VER\}\/download-extension\.ps1/,
+        "release notes must use the pinned release asset URL for download-extension.ps1",
+    );
+});
+
+test("Release auditors require download-extension.ps1", () => {
+    assert.ok(existsSync(AUDIT_RELEASES_WORKFLOW), `Workflow missing at ${AUDIT_RELEASES_WORKFLOW}`);
+    assert.ok(existsSync(RELEASE_WATCHER_WORKFLOW), `Workflow missing at ${RELEASE_WATCHER_WORKFLOW}`);
+
+    const auditSrc = readFileSync(AUDIT_RELEASES_WORKFLOW, "utf8");
+    const watcherSrc = readFileSync(RELEASE_WATCHER_WORKFLOW, "utf8");
+
+    assert.match(auditSrc, /"download-extension\.ps1"/, "audit-releases.yml must require download-extension.ps1");
+    assert.match(watcherSrc, /"download-extension\.ps1"/, "release-watcher.yml guard must require download-extension.ps1");
 });
