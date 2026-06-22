@@ -320,5 +320,4 @@ test("Repository checkout docs avoid full-history clones and expose fallback hel
     assert.match(helper, /alimtvnetwork\/macro-ahk-v51/, "clone-repo.ps1 must rewrite the stale repository owner");
     assert.match(helper, /--depth=1 --single-branch --filter=blob:none --no-tags/, "clone-repo.ps1 must avoid full-history git transfers");
     assert.match(helper, /archive\/refs\/heads\/\$BranchValue\.zip/, "clone-repo.ps1 must fall back to GitHub source ZIP downloads");
-}
-);
+});
