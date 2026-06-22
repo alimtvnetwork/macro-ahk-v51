@@ -62,7 +62,6 @@ jobs:
             "lovable-common-__VER__.zip"
             "lovable-owner-switch-__VER__.zip"
             "lovable-user-add-__VER__.zip"
-            "download-extension.ps1"
             "install.ps1"
             "install.sh"
             "VERSION.txt"
@@ -124,6 +123,10 @@ jobs:
             DASHBOARD_KEY="$(version_key "v3.21.0")"
             if [[ "${TAG_KEY}" > "${DASHBOARD_KEY}" || "${TAG_KEY}" == "${DASHBOARD_KEY}" ]]; then
               REQUIRED_FOR_TAG+=("lovable-dashboard-__VER__.zip")
+            fi
+            DOWNLOAD_HELPER_KEY="$(version_key "v3.104.4")"
+            if [[ "${TAG_KEY}" > "${DOWNLOAD_HELPER_KEY}" || "${TAG_KEY}" == "${DOWNLOAD_HELPER_KEY}" ]]; then
+              REQUIRED_FOR_TAG+=("download-extension.ps1")
             fi
             for PAT in "${REQUIRED_FOR_TAG[@]}"; do
               EXPECTED="${PAT//__VER__/$VER}"
