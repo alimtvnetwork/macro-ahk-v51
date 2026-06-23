@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 
 ---
 
+## [v3.104.4] — 2026-06-23
+
+### Changed
+- Version bump: 3.104.3 → 3.104.4 (all version files synced to match `.gitmap/release/v3.104.4.json`).
+
+### Notes
+- UI-bleed ambiguity logged in `.lovable/question-and-ambiguity/09-macro-controller-panel-bg-transparency.md` — pending user disambiguation before applying a panel-background opacity fix.
+
+---
+
 ## [v3.104.3] — 2026-06-21
 
 ### Added
