@@ -1,5 +1,17 @@
 # Changelog
 
+## [v4.2.0] — 2026-06-24 Inline strip reorder (Plan → Next → Repeat)
+
+### Changed
+- **Inline chat strips reordered** to Plan (top) → Next (middle) → Repeat (bottom, closest to chat box). The previous Next-on-top / Plan-below layout was confusing — the new order matches the natural workflow: plan first, queue next steps, then repeat-loop.
+- `mountNextInlineStrip` now inserts the `📋 Plan` strip before `▶ Next` so both action buttons stay right-aligned in a consistent vertical stack with the `🔁 Repeat` strip below.
+- Root `readme.md` install snippets and pinned-version badges bumped from `v4.0.0` to `v4.2.0`.
+
+### Internal
+- Version pins moved from 4.1.0 → 4.2.0 across `version.json`, `manifest.json`, `src/shared/constants.ts`, all `standalone-scripts/**/instruction.ts`, `shared-state.ts`, `payment-banner-hider/src/index.ts`, and the prompts bundle metadata.
+
+---
+
 ## [v4.0.0] — 2026-06-24
 
 ### Changed
