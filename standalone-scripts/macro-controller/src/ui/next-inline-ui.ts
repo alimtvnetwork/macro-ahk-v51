@@ -21,6 +21,7 @@ import {
   findNextTasksPrompt,
   type TaskNextDeps,
 } from './task-next-ui';
+import { triggerSplitFromInline, isSplitterRunning } from './task-splitter-ui';
 import { cPanelFg, cPrimaryLight, cSectionBg } from '../shared-state';
 
 const STEP_PRESETS = [2, 5, 10, 20] as const;
