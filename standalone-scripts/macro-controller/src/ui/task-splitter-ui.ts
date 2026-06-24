@@ -31,7 +31,7 @@ const DELAY_DEFAULT = 15;
 const STORAGE_KEY = 'marco-task-splitter-prefs';
 const POLL_MS = 500;
 const MAX_WAIT_MS = 10 * 60 * 1000;
-const ROW_STYLE = ROW_STYLE;
+const ROW_STYLE = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
 
 interface SplitterState {
   bigText: string;
