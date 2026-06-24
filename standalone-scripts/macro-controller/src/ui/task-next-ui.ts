@@ -361,17 +361,26 @@ const TASK_NEXT_QUEUE_LABEL = 'Task Next queue';
 
 type CycleStatus = 'ok' | 'paste-failed' | 'submit-failed' | 'idle-cancelled' | 'idle-timeout' | 'cancelled';
 
+async function resolveCyclePrompt(deps: TaskNextDeps, legacyText: string): Promise<{ text: string; source: TaskNextPromptSource; remaining: number }> {
+  const dequeued = await dequeueTaskNextPrompt();
+  if (dequeued.failed) return { text: '', source: 'queue', remaining: -1 };
+  if (dequeued.selection) return { text: dequeued.selection.text, source: 'queue', remaining: dequeued.selection.remaining };
+  return { text: legacyText, source: 'legacy', remaining: 0 };
+}
+
 async function runTaskNextCycle(
   deps: TaskNextDeps,
-  promptText: string,
+  legacyPromptText: string,
   k: number,
   n: number,
   waitForLovableIdle: typeof import('./lovable-idle').waitForLovableIdle,
 ): Promise<CycleStatus> {
   if (taskNextState.cancelled) return 'cancelled';
   const cycleStart = Date.now();
+  const chosen = await resolveCyclePrompt(deps, legacyPromptText);
+  if (chosen.remaining === -1) return 'paste-failed';
   const promptsCfg = deps.getPromptsConfig();
-  const outcome = pasteIntoEditor(promptText, promptsCfg, deps.getByXPath);
+  const outcome = pasteIntoEditor(chosen.text, promptsCfg, deps.getByXPath);
   if (String(outcome) === 'failed') return 'paste-failed';
   if (!dispatchTaskNextSubmit()) return 'submit-failed';
   const idleResult = await waitForLovableIdle({
@@ -380,8 +389,8 @@ async function runTaskNextCycle(
   if (idleResult === 'cancelled') return 'idle-cancelled';
   if (idleResult === 'timeout') return 'idle-timeout';
   taskNextState.queue.completed = k + 1;
-  log('[TaskNextQueue] cycle ' + (k + 1) + '/' + n + ' done in ' + (Date.now() - cycleStart) + 'ms', 'info');
-  showPasteToast('🔁 Task Next queue: ' + (k + 1) + '/' + n, false);
+  log('[TaskNextQueue] cycle ' + (k + 1) + '/' + n + ' done in ' + (Date.now() - cycleStart) + 'ms (source=' + chosen.source + ')', 'info');
+  showPasteToast('🔁 Task Next queue: ' + (k + 1) + '/' + n + ' (' + chosen.source + ')', false);
   return 'ok';
 }
 
