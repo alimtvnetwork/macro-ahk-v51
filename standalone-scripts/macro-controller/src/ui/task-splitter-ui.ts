@@ -31,7 +31,7 @@ const DELAY_DEFAULT = 15;
 const STORAGE_KEY = 'marco-task-splitter-prefs';
 const POLL_MS = 500;
 const MAX_WAIT_MS = 10 * 60 * 1000;
-const ROW_STYLE = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+const ROW_STYLE = ROW_STYLE;
 
 interface SplitterState {
   bigText: string;
@@ -402,7 +402,7 @@ function buildControl(): HTMLElement {
 
   // Row 1: N + Delay
   const row1 = document.createElement('div');
-  row1.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+  row1.style.cssText = ROW_STYLE;
   const nLbl = document.createElement('span'); nLbl.textContent = 'Steps'; nLbl.style.opacity = '0.8';
   const nInput = makeInput(String(state.stepCount), '50px');
   nInput.type = 'number'; nInput.min = String(STEP_MIN); nInput.max = String(STEP_MAX);
@@ -423,7 +423,7 @@ function buildControl(): HTMLElement {
 
   // Row 2: Split prompt
   const row2 = document.createElement('div');
-  row2.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+  row2.style.cssText = ROW_STYLE;
   const sLbl = document.createElement('span'); sLbl.textContent = 'Split'; sLbl.style.opacity = '0.8';
   const sSel = makeSelect();
   sSel.style.flex = '1';
@@ -434,7 +434,7 @@ function buildControl(): HTMLElement {
 
   // Row 3: Per-step prompt
   const row3 = document.createElement('div');
-  row3.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+  row3.style.cssText = ROW_STYLE;
   const pLbl = document.createElement('span'); pLbl.textContent = 'Step'; pLbl.style.opacity = '0.8';
   const pSel = makeSelect();
   pSel.style.flex = '1';
@@ -445,7 +445,7 @@ function buildControl(): HTMLElement {
 
   // Row 4: action buttons
   const row4 = document.createElement('div');
-  row4.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;';
+  row4.style.cssText = ROW_STYLE;
   const breakBtn = makeBtn('✂ Break into steps', true);
   breakBtn.onclick = function () { void breakIntoSteps(); };
   const nextBtn = makeBtn('▶ Next', false);
