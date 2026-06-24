@@ -27,6 +27,8 @@ import { parseSplitterSubtasks, SplitterParseError } from './task-splitter-parse
 import { readLatestSplitterReply } from './task-splitter-dom';
 import { waitForLovableIdle } from './lovable-idle';
 import { getPersistentTaskQueue, resolveTaskQueueProjectId } from '../queue-control/task-queue-project-store';
+import { getSettingsOverrides } from '../settings-store';
+
 
 const DELAY_PRESETS_SEC = [2, 5, 10, 15, 30, 60] as const;
 const STEP_MIN = 2;
