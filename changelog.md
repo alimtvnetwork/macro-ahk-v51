@@ -10,11 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.1
 ## [v3.105.0] — 2026-06-24
 
 ### Added
+- **Plan 08 — Task Splitter & Next Queue (close-out).**
+  - Splitter persists parsed subtasks into per-project `TaskQueue` with capacity enforcement.
+  - Multi-cycle `runTaskNextQueue` now dequeues from the splitter queue per cycle, falling back to the legacy prompt only when the queue is empty (`resolveCyclePrompt` in `src/ui/task-next-ui.ts`).
+  - Startup reinjection toast surfaces orphaned queued tasks after reload (`src/ui/task-queue-reinjection-toast.ts`) with Continue / Clear actions.
+  - Settings: new `splitterAutoEnqueue` toggle and `maxQueueSize` input in the Automation & Queue Timing panel, persisted via `saveSettingsOverrides`.
 
 ### Fixed
+- Restored `src/test/setup.ts` (and macro-controller mirror) so vitest suites can load `@testing-library/jest-dom` without crashing during transform.
 
 ### Changed
-- Version bump: 3.104.4 → 3.105.0 (all version files synced)
+- Version bump: 3.104.4 → 3.105.0 (all version files synced).
+
 
 ---
 
