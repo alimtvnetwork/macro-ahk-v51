@@ -136,7 +136,9 @@ function sanitize(raw: unknown): SettingsOverrides {
     'hoverCardHideGracePeriodMs',
     'nextSubmissionDelaySeconds',
     'creditPollIntervalSeconds',
-    'maxTaskRetries'
+    'maxTaskRetries',
+    'maxQueueSize'
+
   ];
 
   numericFields.forEach(f => {
