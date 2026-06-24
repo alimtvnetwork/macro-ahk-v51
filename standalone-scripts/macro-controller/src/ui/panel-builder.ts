@@ -198,17 +198,8 @@ export function createUI(deps: PanelBuilderDeps): void {
 
   plCtx.bodyElements = [status, infoRow, summaryBar.root, btnRow, wsDropSection, taskQueueSection, repeatPanelSection, taskSplitterSection, toolsSection];
 
-  // Assembly
-  ui.appendChild(titleRow);
-  ui.appendChild(summaryBar.root);
-  ui.appendChild(status);
-  ui.appendChild(infoRow);
-  ui.appendChild(btnRow);
-  ui.appendChild(wsDropSection);
-  ui.appendChild(taskQueueSection);
-  ui.appendChild(repeatPanelSection);
-  ui.appendChild(taskSplitterSection);
-  ui.appendChild(toolsSection);
+  assemblePanelChildren(ui, { titleRow, summaryBar, status, infoRow, btnRow, wsDropSection, taskQueueSection, repeatPanelSection, taskSplitterSection, toolsSection });
+
 
 
   mountUiContainer(container, ui);
