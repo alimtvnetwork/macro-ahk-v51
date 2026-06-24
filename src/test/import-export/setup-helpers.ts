@@ -110,8 +110,8 @@ function installWasmFetchShim(): void {
     path: string, ...rest: unknown[]
   ): void => {
     if (isSqlWasmPath(path)) {
-      const cb = rest[rest.length - 1] as ReadFileCb;
-      cb(null, wasmBytes);
+      const callback = rest[rest.length - 1] as ReadFileCb;
+      callback(null, wasmBytes);
       return;
     }
     (origReadFile as unknown as (...a: unknown[]) => void)(path, ...rest);
