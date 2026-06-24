@@ -291,8 +291,8 @@ function buildControl(deps: TaskNextDeps): HTMLElement {
   label.textContent = '▶ Next';
   label.style.cssText = 'font-weight:600;color:' + cPrimaryLight + ';';
   root.appendChild(label);
-  root.appendChild(buildSplitButton());
   buildStepsSection(root);
+
 
   const sep = document.createElement('span');
   sep.style.cssText = 'border-left:1px solid rgba(124,58,237,0.25);height:14px;margin:0 2px;';
