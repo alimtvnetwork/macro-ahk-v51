@@ -1,0 +1,12 @@
+{
+  "version": "3.105.1",
+  "branch": "release/v3.105.1",
+  "sourceBranch": "main",
+  "commit": "834eb2d93944c88c125fd931034abfe196525951",
+  "tag": "v3.105.1",
+  "assets": [],
+  "isDraft": false,
+  "isPreRelease": false,
+  "createdAt": "2026-06-24T14:40:00Z",
+  "isLatest": false
+}
