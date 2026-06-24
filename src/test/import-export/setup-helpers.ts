@@ -143,15 +143,19 @@ async function buildCachedBundle(): Promise<CachedBundle> {
 }
 
 /* ─── 5. Helper: open the cached DB read-only via sql.js. ─── */
+function wasmFilePath(): string {
+  return resolve(process.cwd(), "node_modules/sql.js/dist/sql-wasm.wasm");
+}
+
 export async function openCachedDb(): Promise<Database> {
   const { dbBytes } = await loadCachedBundle();
-  const SQL = await initSqlJs({ locateFile: () => "sql-wasm.wasm" });
+  const SQL = await initSqlJs({ locateFile: () => wasmFilePath() });
   return new SQL.Database(dbBytes);
 }
 
 /* ─── 6. Helper: clone the cached DB for mutation tests. ─── */
 export async function cloneCachedDbInMemory(): Promise<Database> {
   const { dbBytes } = await loadCachedBundle();
-  const SQL = await initSqlJs({ locateFile: () => "sql-wasm.wasm" });
+  const SQL = await initSqlJs({ locateFile: () => wasmFilePath() });
   return new SQL.Database(new Uint8Array(dbBytes));
 }
