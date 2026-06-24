@@ -31,12 +31,14 @@ vi.mock("sql.js", async () => {
   const { readFileSync: readLocalFileSync } = await import("node:fs");
   const { resolve: resolveLocalPath } = await import("node:path");
   const localWasmPath = resolveLocalPath(process.cwd(), SQL_WASM_PACKAGE_PATH);
-  const wasmBinary = readLocalFileSync(localWasmPath);
-  const initWithLocalWasm: typeof real.default = (config) => real.default({
+  const wasmBytes = readLocalFileSync(localWasmPath);
+  const wasmBinary = new ArrayBuffer(wasmBytes.byteLength);
+  new Uint8Array(wasmBinary).set(wasmBytes);
+  const initWithLocalWasm = ((config) => real.default({
     ...config,
     locateFile: () => localWasmPath,
     wasmBinary,
-  });
+  })) as typeof real.default;
 
   return {
     ...real,
