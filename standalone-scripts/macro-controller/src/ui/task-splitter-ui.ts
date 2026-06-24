@@ -542,7 +542,6 @@ function buildControl(): HTMLElement {
   const render = (): void => {
     body.style.display = state.collapsed ? 'none' : 'flex';
     chevron.textContent = state.collapsed ? '▸' : '▾';
-    ta.disabled = state.running;
     nInput.disabled = state.running;
     nInput.value = String(state.stepCount);
     dSel.disabled = state.running;
