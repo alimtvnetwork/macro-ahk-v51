@@ -124,16 +124,6 @@ function findPromptBySlug(slug: string): PromptEntry | null {
   return null;
 }
 
-function resolveSplitPrompt(): PromptEntry | null {
-  if (state.splitPromptSlug) {
-    const p = findPromptBySlug(state.splitPromptSlug);
-    if (p) return p;
-  }
-  // Auto: plan-${N}
-  return findPromptBySlug('plan-' + state.stepCount)
-      || findPromptBySlug('plan-steps');
-}
-
 function resolvePerStepPrompt(): PromptEntry | null {
   if (state.perStepPromptSlug) {
     const p = findPromptBySlug(state.perStepPromptSlug);
@@ -251,9 +241,15 @@ async function waitForCompletion(maxMs: number): Promise<void> {
 // ── actions ─────────────────────────────────────────────────────────
 
 async function breakIntoSteps(): Promise<void> {
-  if (state.running) { showPasteToast('⏸ Task Splitter is already running', true); return; }
+  if (state.running) {
+    showPasteToast('⏸ Task Splitter is already running', true);
+    return;
+  }
   const text = state.bigText.trim();
-  if (!text) { showPasteToast('❌ Task Splitter: paste an instruction first', true); return; }
+  if (!text) {
+    showPasteToast('❌ Task Splitter: paste an instruction first', true);
+    return;
+  }
   state.running = true;
   state.cancelled = false;
   notify();
