@@ -332,7 +332,7 @@ function tryTaskNextSubmitButton(TAG: string): boolean {
   }
 }
 
-function dispatchTaskNextSubmit(): boolean {
+export function dispatchTaskNextSubmit(): boolean {
   const TAG = 'Task Next';
   if (typeof document === 'undefined' || !document.body) {
     showPasteToast('❌ ' + TAG + ': submit aborted — document not ready', true);
