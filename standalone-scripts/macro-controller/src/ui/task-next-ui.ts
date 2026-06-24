@@ -227,16 +227,32 @@ export function runTaskNextLoop(deps: TaskNextDeps, count: number) {
  * Lovable's own form-level handler runs (avoids brittle XPath drift).
  */
 function dispatchTaskNextSubmit(): boolean {
-  const form = document.getElementById('chat-input');
-  if (form instanceof HTMLFormElement) {
-    if (typeof form.requestSubmit === 'function') form.requestSubmit();
-    else form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    return true;
+  if (typeof document === 'undefined' || !document.body) {
+    log('Task Next: submit aborted — document/body not available', 'warn');
+    return false;
   }
-  const btn = findAddToTasksButton();
+  let form: HTMLElement | null = null;
+  try { form = document.getElementById('chat-input'); }
+  catch (e) { log('Task Next: getElementById threw — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+
+  if (form instanceof HTMLFormElement) {
+    try {
+      if (typeof form.requestSubmit === 'function') form.requestSubmit();
+      else form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      return true;
+    } catch (e) {
+      logError('Task Next', 'form#chat-input.requestSubmit() threw — falling back to button click', e);
+    }
+  } else if (form) {
+    log('Task Next: #chat-input is not <form> (got ' + form.tagName + ') — falling back to button click', 'warn');
+  }
+
+  let btn: HTMLElement | null = null;
+  try { btn = findAddToTasksButton(); }
+  catch (e) { logError('Task Next', 'findAddToTasksButton threw', e); }
   if (btn && !(btn as HTMLButtonElement).disabled) {
-    btn.click();
-    return true;
+    try { btn.click(); return true; }
+    catch (e) { logError('Task Next', 'submit-button .click() threw', e); }
   }
   return false;
 }
