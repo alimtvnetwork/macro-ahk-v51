@@ -196,7 +196,7 @@ interface TaskNextPromptResult {
   readonly failed: boolean;
 }
 
-async function dequeueTaskNextPrompt(): Promise<TaskNextPromptResult> {
+export async function dequeueTaskNextPrompt(): Promise<TaskNextPromptResult> {
   try {
     const projectId = resolveTaskQueueProjectId();
     const queue = getPersistentTaskQueue();
