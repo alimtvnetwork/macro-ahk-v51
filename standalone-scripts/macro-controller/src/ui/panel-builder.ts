@@ -246,8 +246,6 @@ export function createUI(deps: PanelBuilderDeps): void {
   // Record indicator (fixed position)
   document.body.appendChild(createRecordIndicator());
 
-  // Inline Repeat strip above Lovable's chat textarea (Ambiguity 126)
-  mountRepeatInlineStrip();
   // Inline Next strip — Steps + Delay, drains splitter queue with fixed delay
   mountNextInlineStrip(taskNextDeps);
 
