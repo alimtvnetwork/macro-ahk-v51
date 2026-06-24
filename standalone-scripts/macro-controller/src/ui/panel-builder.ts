@@ -230,6 +230,8 @@ export function createUI(deps: PanelBuilderDeps): void {
 
   // Inline Repeat strip above Lovable's chat textarea (Ambiguity 126)
   mountRepeatInlineStrip();
+  // Inline Next strip — Steps + Delay, drains splitter queue with fixed delay
+  mountNextInlineStrip(deps.taskNextDeps);
 
   // Keyboard handlers (with Task Next deps for Ctrl+Shift+1..9 shortcuts)
   const kbTaskNextDeps = deps.taskNextDeps;
