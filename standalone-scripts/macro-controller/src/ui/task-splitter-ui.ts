@@ -466,14 +466,12 @@ function buildControl(): HTMLElement {
   const body = document.createElement('div');
   body.style.cssText = 'display:flex;flex-direction:column;gap:6px;';
 
-  // Textarea
-  const ta = document.createElement('textarea');
-  ta.placeholder = 'Paste one long instruction here…';
-  ta.rows = 3;
-  ta.value = state.bigText;
-  ta.style.cssText = 'width:100%;padding:6px 8px;background:rgba(0,0,0,0.3);border:1px solid rgba(124,58,237,0.3);border-radius:4px;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;resize:vertical;font-family:inherit;';
-  ta.oninput = function () { state.bigText = ta.value; persist(); };
-  body.appendChild(ta);
+  // Hint — text is read live from Lovable's own chat box (no second editor).
+  const hint = document.createElement('div');
+  hint.textContent = '↳ Reads the instruction directly from the Lovable chat box.';
+  hint.style.cssText = 'font-size:10px;opacity:0.7;font-style:italic;';
+  body.appendChild(hint);
+
 
   // Row 1: N + Delay
   const row1 = document.createElement('div');
