@@ -21,10 +21,18 @@ import {
   findNextTasksPrompt,
   type TaskNextDeps,
 } from './task-next-ui';
-import { triggerSplitFromInline, isSplitterRunning } from './task-splitter-ui';
+import { triggerPlanPasteFromInline, isSplitterRunning } from './task-splitter-ui';
 import { cPanelFg, cPrimaryLight, cSectionBg } from '../shared-state';
 
-const STEP_PRESETS = [2, 5, 10, 20] as const;
+const STEP_PRESETS = [1, 2, 3, 5, 8, 10, 15] as const;
+const STEP_PRESETS_HIGHLIGHT = new Set<number>([5, 10]);
+const PLAN_PRESETS = [
+  5, 10, 12, 15, 18, 20, 22, 25, 28, 30, 32, 35, 38, 40, 42, 45, 48, 50,
+  52, 55, 58, 60, 70, 80, 100, 125, 150, 200,
+] as const;
+const PLAN_PRESETS_HIGHLIGHT = new Set<number>([5, 10, 12, 15, 30]);
+const PLAN_MIN = 2;
+const PLAN_MAX = 200;
 const DELAY_PRESETS_SEC = [5, 10, 15, 30, 60] as const;
 const STORAGE_KEY = 'marco-next-inline-prefs';
 const CSS_HINT_LABEL = 'font-size:10px;opacity:0.8;';
