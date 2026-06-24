@@ -50,6 +50,7 @@ import {
 import { startRedockObserver } from './redock-observer';
 import { buildRepeatPanelSection, mountRepeatInlineStrip } from './repeat-loop-ui';
 import { buildTaskSplitterPanelSection } from './task-splitter-ui';
+import { mountTaskQueueReinjectionToast } from './task-queue-reinjection-toast';
 import { createSummaryBar, type SummaryBarHandle } from './summary-bar/component';
 import { computeDashboardSummary, computeSummaryDetails, type DisplayKindResolver } from './summary-bar';
 import { subscribeVisibleWorkspaces } from '../visible-workspaces-store';
@@ -135,6 +136,11 @@ function wireSummaryBarSubscription(summaryBar: SummaryBarHandle): void {
   });
 }
 
+function mountUiContainer(container: Element, ui: HTMLElement): void {
+  container.appendChild(ui);
+  void mountTaskQueueReinjectionToast();
+}
+
  
 export function createUI(deps: PanelBuilderDeps): void {
   let container = getByXPath(CONFIG.CONTROLS_XPATH);
@@ -204,7 +210,7 @@ export function createUI(deps: PanelBuilderDeps): void {
   ui.appendChild(toolsSection);
 
 
-  container.appendChild(ui);
+  mountUiContainer(container, ui);
 
   // Auto-float if body fallback, then start polling for the real XPath target
   if (container === document.body) {
