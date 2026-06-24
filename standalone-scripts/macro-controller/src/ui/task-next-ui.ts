@@ -426,9 +426,16 @@ export async function runTaskNextQueue(deps: TaskNextDeps, count: number): Promi
     return;
   }
   const prompt = findNextTasksPrompt(deps);
-  if (!prompt || !prompt.text) {
-    logError(TASK_NEXT_QUEUE_LABEL, '"Next Tasks" prompt not found — aborting queue of ' + n);
-    showPasteToast('❌ "Next Tasks" prompt not found', true);
+  const legacyText = prompt && prompt.text ? prompt.text : '';
+  let queuedCount = 0;
+  try {
+    queuedCount = await getPersistentTaskQueue().count(resolveTaskQueueProjectId());
+  } catch (caught: CaughtError) {
+    logError(TASK_NEXT_QUEUE_LABEL, 'queue count probe failed before drain', caught);
+  }
+  if (!legacyText && queuedCount === 0) {
+    logError(TASK_NEXT_QUEUE_LABEL, '"Next Tasks" prompt not found AND splitter queue empty — aborting queue of ' + n);
+    showPasteToast('❌ No queued tasks and no "Next Tasks" prompt', true);
     return;
   }
   // Lazy import to dodge a circular dep (lovable-idle.ts → task-next-ui.ts for findAddToTasksButton).
