@@ -16,7 +16,7 @@
 
 import { log } from '../logging';
 import { logError } from '../error-utils';
-import { showPasteToast, pasteIntoEditor } from './prompt-utils';
+import { showPasteToast, pasteIntoEditor, findPasteTarget } from './prompt-utils';
 import { getPromptsConfig } from './prompt-manager';
 import { getByXPath, isReturnButtonVisible } from '../xpath-utils';
 import { findAddToTasksButton } from './task-next-ui';
