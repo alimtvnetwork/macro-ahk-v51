@@ -637,7 +637,6 @@ export function isSplitterRunning(): boolean {
  * text is currently in the Lovable chat box. Does NOT submit. The user
  * reviews/edits, then presses Send themselves.
  */
-// eslint-disable-next-line max-lines-per-function
 export async function triggerPlanPasteFromInline(stepCount: number): Promise<void> {
   const n = clamp(stepCount, 2, 200);
   if (state.running) {
@@ -655,8 +654,8 @@ export async function triggerPlanPasteFromInline(stepCount: number): Promise<voi
     ? existing.replace(/\s+$/, '') + '\n\n' + planText
     : planText;
   try {
-    const cfg = getPromptsConfig();
-    const outcome = await pasteIntoEditor(combined, cfg, (xp) => getByXPath(xp) as Element | null);
+    const promptsCfg = getPromptsConfig();
+    const outcome = await pasteIntoEditor(combined, promptsCfg, (xp) => getByXPath(xp) as Element | null);
     if (String(outcome) === 'failed') {
       showPasteToast('❌ Plan: paste failed', true);
       return;

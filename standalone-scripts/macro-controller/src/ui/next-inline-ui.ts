@@ -153,7 +153,7 @@ function stopNextQueue(): void {
 
 // ── UI ──────────────────────────────────────────────────────────────
 
-// eslint-disable-next-line max-lines-per-function
+
 function buildSplitStrip(): HTMLElement {
   const root = document.createElement('div');
   root.style.cssText = 'display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:4px 6px;background:' + cSectionBg + ';border:1px solid rgba(245,158,11,0.35);border-radius:6px;font-family:system-ui,-apple-system,sans-serif;color:' + cPanelFg + ';font-size:11px;box-sizing:border-box;';
