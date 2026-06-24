@@ -209,19 +209,32 @@ function setPhase(phase: RepeatPhase, durationMs: number): void {
  * absent.
  */
 function dispatchChatSubmit(): boolean {
-  const form = document.getElementById('chat-input');
-  if (form instanceof HTMLFormElement) {
-    if (typeof form.requestSubmit === 'function') {
-      form.requestSubmit();
-    } else {
-      form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
-    }
-    return true;
+  if (typeof document === 'undefined' || !document.body) {
+    log('Repeat: submit aborted — document/body not available', 'warn');
+    return false;
   }
-  const btn = findAddToTasksButton();
+  let form: HTMLElement | null = null;
+  try { form = document.getElementById('chat-input'); }
+  catch (e) { log('Repeat: getElementById threw — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
+
+  if (form instanceof HTMLFormElement) {
+    try {
+      if (typeof form.requestSubmit === 'function') form.requestSubmit();
+      else form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+      return true;
+    } catch (e) {
+      log('Repeat: form#chat-input.requestSubmit() threw — falling back to button click: ' + (e instanceof Error ? e.message : String(e)), 'warn');
+    }
+  } else if (form) {
+    log('Repeat: #chat-input is not <form> (got ' + form.tagName + ') — falling back to button click', 'warn');
+  }
+
+  let btn: HTMLElement | null = null;
+  try { btn = findAddToTasksButton(); }
+  catch (e) { log('Repeat: findAddToTasksButton threw — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
   if (btn && !(btn as HTMLButtonElement).disabled) {
-    btn.click();
-    return true;
+    try { btn.click(); return true; }
+    catch (e) { log('Repeat: submit-button .click() threw — ' + (e instanceof Error ? e.message : String(e)), 'warn'); }
   }
   return false;
 }
