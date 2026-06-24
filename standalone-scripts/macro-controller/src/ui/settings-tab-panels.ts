@@ -193,6 +193,8 @@ function _buildAutomationToggles(panel: HTMLElement, overrides: SettingsOverride
     { key: 'enableNextSubmissionDelay', label: 'Enable Submission Delay', value: overrides.enableNextSubmissionDelay !== false, hint: 'Wait between prompts in the queue.' },
     { key: 'autoDetectDelay', label: 'Auto-detect delay', value: overrides.autoDetectDelay !== false, hint: 'Automatically wait if Return button is detected.' },
     { key: 'retryOnFailure', label: 'Retry on Failure', value: overrides.retryOnFailure !== false, hint: 'Hold and retry prompts if injection fails.' },
+    { key: 'splitterAutoEnqueue', label: 'Splitter Auto-Enqueue', value: overrides.splitterAutoEnqueue !== false, hint: 'Auto-add parsed subtasks to the persistent queue.' },
+
   ];
   const toggles: Record<string, HTMLInputElement> = {};
 
